@@ -8,8 +8,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     "",
     "/programs",
-    "/programs/aap-entry",
-    "/programs/aap-honors",
     "/tuition",
     "/inquire",
   ].map((p) => ({

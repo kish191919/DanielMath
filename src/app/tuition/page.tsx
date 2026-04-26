@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Check, CalendarDays, Clock, Users } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
 import { Button } from "@/components/ui/button";
@@ -6,29 +7,16 @@ import { Button } from "@/components/ui/button";
 export const metadata: Metadata = {
   title: "Tuition · 수업료",
   description:
-    "Daniel Math 공부방 수업료 안내. 학년·트랙별 세부 금액은 상담 시 안내드립니다.",
+    "Daniel Math 공부방 수업료 안내. 월 $50, 모든 학년 K-6 동일. 주 1회 60분.",
 };
 
-// PLACEHOLDER: 실제 운영 금액으로 교체하세요.
-const rows = [
-  {
-    track: "AAP Entry",
-    grade: "K – 2",
-    sessions: "주 2회 · 회당 90분",
-    monthly: "$XXX / 월",
-  },
-  {
-    track: "AAP Honors",
-    grade: "3 – 4",
-    sessions: "주 2회 · 회당 90분",
-    monthly: "$XXX / 월",
-  },
-  {
-    track: "AAP Honors",
-    grade: "5 – 6",
-    sessions: "주 2회 · 회당 120분",
-    monthly: "$XXX / 월",
-  },
+const includes = [
+  { en: "Personalized worksheets every session", ko: "학생별 맞춤 학습지 (매 수업)" },
+  { en: "Personalized homework", ko: "학생별 맞춤 숙제" },
+  { en: "AI-powered grading & error analysis", ko: "AI 자동 채점·오답 유형 분석" },
+  { en: "Daily report to parents (Korean)", ko: "매일 한국어 학부모 리포트" },
+  { en: "Monthly progress summary", ko: "월별 종합 학습 리포트" },
+  { en: "No enrollment fee, no textbook fee", ko: "등록비·교재비 별도 없음" },
 ];
 
 export default function TuitionPage() {
@@ -37,54 +25,80 @@ export default function TuitionPage() {
       <Container>
         <SectionHeader
           eyebrow="Tuition · 수업료"
-          title="Transparent pricing."
-          titleKo="투명한 수업료"
-          description="정확한 금액과 시간표는 자녀의 학년과 트랙에 따라 상담 시 안내드립니다."
+          title="One simple price. All K-6."
+          titleKo="모든 학년 동일한 단일 요금"
+          description="학년·실력에 따라 학습 내용은 학생마다 다르지만, 수업료는 모두 같습니다."
         />
 
-        <div className="mt-12 overflow-hidden rounded-2xl border border-navy-100 bg-white shadow-sm">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-navy-50 text-xs uppercase tracking-wider text-navy-700">
-              <tr>
-                <th className="px-5 py-4">Track / 트랙</th>
-                <th className="px-5 py-4">Grade / 학년</th>
-                <th className="px-5 py-4">Schedule / 시간</th>
-                <th className="px-5 py-4">Monthly / 월 수업료</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-navy-100">
-              {rows.map((r, i) => (
-                <tr key={i} className="text-navy-800">
-                  <td className="px-5 py-5 font-semibold text-navy-900">
-                    {r.track}
-                  </td>
-                  <td className="px-5 py-5">{r.grade}</td>
-                  <td className="px-5 py-5 font-ko" lang="ko">
-                    {r.sessions}
-                  </td>
-                  <td className="px-5 py-5 font-mono text-navy-900">
-                    {r.monthly}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {/* Single-tier pricing card */}
+        <div className="mx-auto mt-14 max-w-2xl">
+          <div className="rounded-3xl border border-navy-100 bg-white p-8 shadow-sm sm:p-10">
+            <div className="text-center">
+              <span className="inline-block rounded-full bg-navy-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-navy-700">
+                Grade K – 6 · All Levels
+              </span>
+              <div className="mt-6 flex items-baseline justify-center gap-2">
+                <span className="text-6xl font-bold tracking-tight text-navy-900">
+                  $50
+                </span>
+                <span className="text-lg font-medium text-navy-600">/ month</span>
+              </div>
+              <p className="mt-2 text-base font-semibold text-navy-700 font-ko" lang="ko">
+                월 50불 · 모든 학년 동일
+              </p>
+            </div>
 
-        <div className="mt-10 grid gap-6 sm:grid-cols-3">
-          <Card title="형제 할인" desc="둘째 자녀부터 월 수업료 할인 적용" />
-          <Card title="등록비 / 교재비" desc="교재·인쇄·리포트 발송료 포함 (별도 청구 없음)" />
-          <Card title="환불 정책" desc="첫 2주 내 100% 환불 보장 · 자세한 안내는 상담 시" />
-        </div>
+            <div className="my-8 grid gap-4 border-y border-navy-100 py-7 sm:grid-cols-3">
+              <Spec
+                icon={CalendarDays}
+                label="운영일"
+                value="월 · 화 · 목 · 금"
+                valueEn="Mon · Tue · Thu · Fri"
+              />
+              <Spec
+                icon={Clock}
+                label="시간"
+                value="주 1회 · 60분"
+                valueEn="1 × 60 min / week"
+              />
+              <Spec
+                icon={Users}
+                label="정원"
+                value="회당 최대 4명"
+                valueEn="Max 4 / session"
+              />
+            </div>
 
-        <div className="mt-12 rounded-xl border border-navy-100 bg-navy-50/60 p-6 text-center">
-          <p className="text-sm text-navy-700 font-ko" lang="ko">
-            정확한 수업료·시간표·등록 가능 여부는 상담 시 안내드립니다.
-          </p>
-          <div className="mt-4">
-            <Button href="/inquire" size="md">
-              상담 신청하기
-            </Button>
+            <div>
+              <h3 className="text-sm font-semibold uppercase tracking-wider text-navy-500">
+                Included / 포함 사항
+              </h3>
+              <ul className="mt-4 space-y-2.5">
+                {includes.map((it) => (
+                  <li key={it.en} className="flex gap-2.5 text-sm text-navy-800">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-navy-500" />
+                    <span>
+                      <span className="font-medium">{it.en}</span>
+                      <span className="ml-2 text-navy-600 font-ko" lang="ko">
+                        / {it.ko}
+                      </span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="mt-8 rounded-xl border border-navy-100 bg-navy-50/60 p-4 text-sm text-navy-700 font-ko" lang="ko">
+              <strong className="text-navy-900">시간 배정 안내:</strong>{" "}
+              매주 월·화·목·금 오후 5시 ~ 8시 사이에서 학생별로 60분 시간을
+              등록 시 배정해드립니다.
+            </div>
+
+            <div className="mt-8">
+              <Button href="/inquire" size="lg" className="w-full">
+                무료 상담 · 진단 신청
+              </Button>
+            </div>
           </div>
         </div>
       </Container>
@@ -92,15 +106,29 @@ export default function TuitionPage() {
   );
 }
 
-function Card({ title, desc }: { title: string; desc: string }) {
+function Spec({
+  icon: Icon,
+  label,
+  value,
+  valueEn,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+  valueEn: string;
+}) {
   return (
-    <div className="rounded-xl border border-navy-100 bg-white p-5 shadow-sm">
-      <h3 className="text-base font-bold text-navy-900 font-ko" lang="ko">
-        {title}
-      </h3>
-      <p className="mt-2 text-sm leading-6 text-navy-700 font-ko" lang="ko">
-        {desc}
+    <div className="text-center">
+      <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-navy-50 text-navy-700">
+        <Icon className="h-4.5 w-4.5" />
+      </span>
+      <p className="mt-2 text-[11px] font-semibold uppercase tracking-wider text-navy-500 font-ko" lang="ko">
+        {label}
       </p>
+      <p className="mt-1 text-sm font-semibold text-navy-900 font-ko" lang="ko">
+        {value}
+      </p>
+      <p className="text-xs text-navy-600">{valueEn}</p>
     </div>
   );
 }

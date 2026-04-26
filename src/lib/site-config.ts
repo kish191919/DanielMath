@@ -7,7 +7,7 @@ export const siteConfig = {
   descriptionEn:
     "A boutique math academy for K-6 gifted minds in Northern Virginia. AI-powered worksheets, daily reports, and a curriculum built for AAP, CogAT, and AMC 8.",
   region: "Northern Virginia",
-  contactEmail: "hello@danielmath.com",
+  contactEmail: "kish1919@gmail.com",
   ogImage: "/og.png",
   nav: [
     { href: "/programs", label: "Programs", labelKo: "프로그램" },

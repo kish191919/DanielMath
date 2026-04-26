@@ -24,22 +24,22 @@ export function SiteFooter() {
 
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider text-navy-900">
-              Programs
+              Quick Links
             </h3>
             <ul className="mt-4 space-y-2 text-sm">
               <li>
-                <Link href="/programs/aap-entry" className="text-navy-700 hover:text-navy-900">
-                  AAP Entry · K-2
-                </Link>
-              </li>
-              <li>
-                <Link href="/programs/aap-honors" className="text-navy-700 hover:text-navy-900">
-                  AAP Honors · 3-6
+                <Link href="/programs" className="text-navy-700 hover:text-navy-900">
+                  Program / 프로그램
                 </Link>
               </li>
               <li>
                 <Link href="/tuition" className="text-navy-700 hover:text-navy-900">
                   Tuition / 수업료
+                </Link>
+              </li>
+              <li>
+                <Link href="/inquire" className="text-navy-700 hover:text-navy-900">
+                  Inquire / 상담 신청
                 </Link>
               </li>
             </ul>

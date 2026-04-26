@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { ArrowRight, Brain, FileText, LineChart, Sparkles } from "lucide-react";
+import { ArrowRight, Brain, FileText, LineChart, Sparkles, Clock, Users, DollarSign } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
 import { Button } from "@/components/ui/button";
@@ -63,26 +62,24 @@ function HeroSection() {
 }
 
 function ProgramsPreview() {
-  const programs = [
+  const facts = [
     {
-      href: "/programs/aap-entry",
-      grade: "K – 2",
-      title: "AAP Entry Track",
-      titleKo: "AAP 진입 트랙",
-      desc: "CogAT/NNAT 추론 + Common Core 학년 진도 + 도형·패턴 사고력. 2학년 CogAT 응시까지의 정확한 로드맵.",
-      descEn:
-        "CogAT/NNAT reasoning, Common Core mastery, and pattern logic — a precise roadmap to the 2nd-grade CogAT.",
-      tags: ["CogAT", "NNAT", "Common Core", "Pattern Logic"],
+      icon: Users,
+      label: "정원 / Class Size",
+      value: "회당 최대 4명",
+      valueEn: "Up to 4 students",
     },
     {
-      href: "/programs/aap-honors",
-      grade: "3 – 6",
-      title: "AAP Honors Track",
-      titleKo: "AAP 유지·심화 트랙",
-      desc: "Common Core 심화 + 한 학년 위 콘텐츠 + AMC 8 입문. AAP 유지와 중학교 진학 대비.",
-      descEn:
-        "Above-grade Common Core, depth & complexity, and AMC 8 prep — sustained excellence into middle school.",
-      tags: ["Above-grade", "Word Problems", "AMC 8", "Singapore Math"],
+      icon: Clock,
+      label: "시간 / Time",
+      value: "주 1회 · 60분",
+      valueEn: "1 session/wk · 60 min",
+    },
+    {
+      icon: DollarSign,
+      label: "수업료 / Tuition",
+      value: "월 $50",
+      valueEn: "$50 / month",
     },
   ];
 
@@ -90,44 +87,63 @@ function ProgramsPreview() {
     <Section>
       <Container>
         <SectionHeader
-          eyebrow="Programs"
-          title="Two tracks. One goal."
-          titleKo="두 개의 트랙, 하나의 목표"
-          description="학년과 목표에 따라 가장 적합한 트랙을 선택할 수 있습니다."
+          eyebrow="Program"
+          title="One program. Every student personalized."
+          titleKo="하나의 프로그램, 모두 다른 학습지"
+          description="K-6 모든 학생이 같은 공간에서 모이지만, 학년과 실력에 맞춰 매 수업 새로운 학습지와 숙제가 제공됩니다."
         />
-        <div className="mt-12 grid gap-6 sm:grid-cols-2">
-          {programs.map((p) => (
-            <Link
-              key={p.href}
-              href={p.href}
-              className="group rounded-2xl border border-navy-100 bg-white p-7 shadow-sm transition-all hover:-translate-y-0.5 hover:border-navy-300 hover:shadow-md"
-            >
-              <div className="flex items-center justify-between">
-                <span className="rounded-full bg-navy-50 px-3 py-1 text-xs font-semibold text-navy-700">
-                  Grade {p.grade}
-                </span>
-                <ArrowRight className="h-5 w-5 text-navy-400 transition group-hover:translate-x-0.5 group-hover:text-navy-700" />
-              </div>
-              <h3 className="mt-5 text-2xl font-bold text-navy-900">{p.title}</h3>
+
+        <div className="mt-12 rounded-2xl border border-navy-100 bg-white p-8 shadow-sm sm:p-10">
+          <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:gap-12">
+            <div>
+              <h3 className="text-xl font-bold text-navy-900">
+                Same room, different paths.
+              </h3>
               <p className="mt-1 text-lg font-semibold text-navy-700 font-ko" lang="ko">
-                {p.titleKo}
+                같은 교실, 학생마다 다른 진도
               </p>
-              <p className="mt-4 text-sm leading-6 text-navy-700 font-ko" lang="ko">
-                {p.desc}
+              <p className="mt-4 text-sm leading-7 text-navy-700 font-ko" lang="ko">
+                학년 그룹으로 학생을 나누지 않습니다. K-6 모두 한 시간대에 모이되,
+                AI가 그 학생의 학년·실력·최근 오답 유형을 반영해 매 수업 새로운
+                학습지와 숙제를 만들어냅니다. 학교 진도(Common Core)부터
+                AAP·CogAT·AMC 8까지 학생별로 비율을 다르게 가져갑니다.
               </p>
-              <p className="mt-2 text-sm leading-6 text-navy-600">{p.descEn}</p>
-              <div className="mt-5 flex flex-wrap gap-1.5">
-                {p.tags.map((t) => (
-                  <span
-                    key={t}
-                    className="rounded-md bg-navy-50 px-2 py-1 text-xs font-medium text-navy-700"
+
+              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                {facts.map((f) => (
+                  <div
+                    key={f.label}
+                    className="rounded-xl border border-navy-100 bg-navy-50/60 p-4"
                   >
-                    {t}
-                  </span>
+                    <div className="flex items-center gap-2 text-navy-700">
+                      <f.icon className="h-4 w-4" />
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-navy-500">
+                        {f.label}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-base font-semibold text-navy-900 font-ko" lang="ko">
+                      {f.value}
+                    </p>
+                    <p className="text-xs text-navy-600">{f.valueEn}</p>
+                  </div>
                 ))}
               </div>
-            </Link>
-          ))}
+
+              <p className="mt-6 text-sm text-navy-700 font-ko" lang="ko">
+                <strong className="text-navy-900">운영일</strong> · 매주 월·화·목·금
+                오후 5시 ~ 8시 (학생별 시간은 등록 시 배정)
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3 lg:items-end lg:justify-end">
+              <Button href="/programs" variant="primary" size="lg">
+                프로그램 자세히 보기 <ArrowRight className="h-4 w-4" />
+              </Button>
+              <Button href="/inquire" variant="secondary" size="lg">
+                무료 상담 신청
+              </Button>
+            </div>
+          </div>
         </div>
       </Container>
     </Section>

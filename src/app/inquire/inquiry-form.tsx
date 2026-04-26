@@ -17,7 +17,6 @@ const schema = z.object({
   childName: z.string().min(1, "자녀 이름을 입력해주세요."),
   grade: z.string().min(1, "학년을 선택해주세요."),
   school: z.string().optional(),
-  program: z.enum(["aap-entry", "aap-honors", "not-sure"]),
   language: z.enum(["ko", "en"]),
   message: z.string().max(2000).optional(),
 });
@@ -44,7 +43,6 @@ export function InquiryForm() {
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      program: "not-sure",
       language: "ko",
     },
   });
@@ -126,14 +124,6 @@ export function InquiryForm() {
           autoComplete="organization"
           placeholder="e.g. Wakefield Forest ES"
         />
-      </Field>
-
-      <Field label="관심 트랙 / Program">
-        <div className="flex flex-col gap-2 sm:flex-row sm:gap-5">
-          <Radio {...register("program")} value="aap-entry" label="AAP Entry · K-2" />
-          <Radio {...register("program")} value="aap-honors" label="AAP Honors · 3-6" />
-          <Radio {...register("program")} value="not-sure" label="잘 모르겠음 / Not sure" />
-        </div>
       </Field>
 
       <Field label="응답 선호 언어 / Preferred Language">
