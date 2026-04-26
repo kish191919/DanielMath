@@ -46,9 +46,3 @@ body {
   word-break: keep-all;
 }
 
-/* Subtle gradient background utility */
-.bg-hero-grid {
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(43, 90, 140, 0.15), transparent),
-    linear-gradient(180deg, #ffffff 0%, #f3f6fb 100%);
-}

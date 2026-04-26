@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Brain, FileText, LineChart, Sparkles, Clock, Users, DollarSign, CalendarDays } from "lucide-react";
+import { Brain, FileText, LineChart, Sparkles, Clock, Users, CalendarDays } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
 import { Button } from "@/components/ui/button";
@@ -64,12 +64,6 @@ const ops = [
     label: "정원 / Class Size",
     value: "회당 최대 4명",
     valueEn: "Up to 4 students per session",
-  },
-  {
-    icon: DollarSign,
-    label: "수업료 / Tuition",
-    value: "월 $50 (전 학년 동일)",
-    valueEn: "$50/month (all K-6)",
   },
 ];
 
@@ -137,11 +131,11 @@ export default function ProgramsPage() {
       <Section>
         <Container>
           <SectionHeader
-            eyebrow="Schedule & Tuition"
-            title="Simple, transparent."
-            titleKo="간단하고 투명한 운영"
+            eyebrow="Schedule · 운영 안내"
+            title="Simple, focused."
+            titleKo="간결하고 집중된 운영"
           />
-          <div className="mt-12 grid gap-6 sm:grid-cols-2">
+          <div className="mt-12 grid gap-6 sm:grid-cols-3">
             {ops.map((o) => (
               <div
                 key={o.label}

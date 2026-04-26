@@ -1,16 +1,20 @@
-import { ArrowRight, Brain, FileText, LineChart, Sparkles, Clock, Users, DollarSign } from "lucide-react";
+import { ArrowRight, Brain, FileText, LineChart, Sparkles, Clock, Users, ClipboardCheck, FileSpreadsheet, ScanSearch, Send, ChevronRight } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
+import { HeroBackground } from "@/components/site/hero-background";
+import { WarmthSection } from "@/components/site/warmth-section";
 import { Button } from "@/components/ui/button";
 
 export default function HomePage() {
   return (
     <>
       <HeroSection />
+      <Stats />
       <ProgramsPreview />
       <WhyUs />
+      <WarmthSection />
+      <HowItWorks />
       <CurriculumChips />
-      <Testimonials />
       <FinalCTA />
     </>
   );
@@ -18,46 +22,86 @@ export default function HomePage() {
 
 function HeroSection() {
   return (
-    <section className="bg-hero-grid">
-      <Container className="py-20 sm:py-28 lg:py-32">
+    <HeroBackground>
+      <Container className="relative py-24 sm:py-32 lg:py-40">
         <div className="mx-auto max-w-3xl text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-navy-200 bg-white/60 px-3 py-1 text-xs font-medium text-navy-700 backdrop-blur">
-            <Sparkles className="h-3.5 w-3.5 text-gold-500" />
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3.5 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-white backdrop-blur">
+            <Sparkles className="h-3.5 w-3.5 text-gold-300" />
             AI-powered math studio · K–6
           </span>
-          <h1 className="mt-6 text-4xl font-bold tracking-tight text-navy-900 sm:text-5xl lg:text-6xl">
-            Personalized Math for{" "}
-            <span className="text-navy-700">Gifted Minds</span>, K–6
+          <h1
+            className="mt-7 text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl font-ko"
+            lang="ko"
+          >
+            아이마다 다른,
+            <br />
+            <span className="text-gold-300">맞춤</span> 수학 공부방.
           </h1>
           <p
-            className="mt-4 text-2xl font-semibold tracking-tight text-navy-700 sm:text-3xl font-ko"
+            className="mx-auto mt-5 max-w-xl text-lg font-medium text-navy-100 sm:text-xl font-ko"
             lang="ko"
           >
-            AAP를 향한 가장 확실한 길
+            한 사람씩 꾸준히, K–6 영재 수학.
           </p>
-          <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-navy-700 sm:text-lg">
+          <p className="mx-auto mt-6 max-w-xl text-sm tracking-wide text-navy-200/80 sm:text-base">
+            Personalized Math for Gifted Minds · K–6
+          </p>
+          <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-navy-200/70">
             AI-generated worksheets, daily progress reports, and a curriculum
-            built around AAP, CogAT/NNAT, and AMC 8 — designed for every
-            student&apos;s strengths and gaps.
-          </p>
-          <p
-            className="mx-auto mt-3 max-w-2xl text-base leading-7 text-navy-700 sm:text-lg font-ko"
-            lang="ko"
-          >
-            AI가 만드는 맞춤형 학습지와 매일 자동 리포트, AAP·CogAT·AMC 8를
-            아우르는 커리큘럼으로 영재 수학의 길을 엽니다.
+            built around AAP, CogAT/NNAT, and AMC 8.
           </p>
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button href="/inquire" size="lg">
-              상담 신청 / Inquire <ArrowRight className="h-4 w-4" />
+            <Button href="/inquire" size="lg" variant="secondary">
+              상담 신청 <ArrowRight className="h-4 w-4" />
             </Button>
-            <Button href="/programs" size="lg" variant="secondary">
-              View Programs / 프로그램 보기
+            <Button
+              href="/programs"
+              size="lg"
+              variant="ghost"
+              className="border border-white/40 text-white hover:bg-white/10"
+            >
+              프로그램 보기
             </Button>
           </div>
         </div>
       </Container>
-    </section>
+    </HeroBackground>
+  );
+}
+
+function Stats() {
+  const stats = [
+    { value: "K–6", labelKo: "모든 학년 통합", labelEn: "All grades", accent: false },
+    { value: "4명", labelKo: "회당 정원", labelEn: "Per session", accent: false },
+    { value: "AAP", labelKo: "전용 커리큘럼", labelEn: "Native curriculum", accent: true },
+    { value: "매일", labelKo: "자동 리포트", labelEn: "Daily report", accent: false },
+  ];
+
+  return (
+    <Section className="border-y border-navy-100">
+      <Container>
+        <dl className="grid grid-cols-2 gap-y-10 sm:grid-cols-4 sm:gap-y-0 sm:divide-x sm:divide-navy-100">
+          {stats.map((s) => (
+            <div key={s.labelEn} className="flex flex-col items-center px-4 text-center">
+              <dt className="sr-only">{s.labelEn}</dt>
+              <dd
+                className={
+                  s.accent
+                    ? "text-4xl font-bold tracking-tight text-gold-500 sm:text-5xl"
+                    : "text-4xl font-bold tracking-tight text-navy-900 sm:text-5xl"
+                }
+              >
+                {s.value}
+              </dd>
+              <p className="mt-3 text-sm font-semibold text-navy-900 font-ko" lang="ko">
+                {s.labelKo}
+              </p>
+              <p className="text-xs text-navy-500">{s.labelEn}</p>
+            </div>
+          ))}
+        </dl>
+      </Container>
+    </Section>
   );
 }
 
@@ -75,16 +119,10 @@ function ProgramsPreview() {
       value: "주 1회 · 60분",
       valueEn: "1 session/wk · 60 min",
     },
-    {
-      icon: DollarSign,
-      label: "수업료 / Tuition",
-      value: "월 $50",
-      valueEn: "$50 / month",
-    },
   ];
 
   return (
-    <Section>
+    <Section className="bg-navy-50/60">
       <Container>
         <SectionHeader
           eyebrow="Program"
@@ -109,7 +147,7 @@ function ProgramsPreview() {
                 AAP·CogAT·AMC 8까지 학생별로 비율을 다르게 가져갑니다.
               </p>
 
-              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 {facts.map((f) => (
                   <div
                     key={f.label}
@@ -179,7 +217,7 @@ function WhyUs() {
   ];
 
   return (
-    <Section className="bg-navy-50/60">
+    <Section>
       <Container>
         <SectionHeader
           eyebrow="Why Daniel Math"
@@ -204,6 +242,77 @@ function WhyUs() {
               <p className="mt-3 text-sm leading-6 text-navy-700 font-ko" lang="ko">
                 {f.desc}
               </p>
+            </div>
+          ))}
+        </div>
+      </Container>
+    </Section>
+  );
+}
+
+function HowItWorks() {
+  const steps = [
+    {
+      icon: ClipboardCheck,
+      title: "Diagnose",
+      titleKo: "진단",
+      desc: "학년·실력·약점 영역을 진단해 학생만의 출발점을 잡습니다.",
+    },
+    {
+      icon: FileSpreadsheet,
+      title: "Personalized Worksheet",
+      titleKo: "맞춤 학습지",
+      desc: "AI가 그 학생을 위한 학습지를 매 수업 새로 만들어냅니다.",
+    },
+    {
+      icon: ScanSearch,
+      title: "AI Grading",
+      titleKo: "AI 채점",
+      desc: "오답을 계산실수·개념·해석 등 유형별로 자동 분류합니다.",
+    },
+    {
+      icon: Send,
+      title: "Daily Report",
+      titleKo: "학부모 리포트",
+      desc: "매일 저녁 한국어 리포트가 학부모에게 자동 발송됩니다.",
+    },
+  ];
+
+  return (
+    <Section className="bg-navy-50/60">
+      <Container>
+        <SectionHeader
+          eyebrow="How It Works"
+          title="Four steps, every single session."
+          titleKo="매 수업, 네 단계로 돌아갑니다"
+          description="추상적인 'AI'가 아니라, 학생 한 명에게 매주 적용되는 구체적 흐름입니다."
+        />
+
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] lg:items-stretch lg:gap-3">
+          {steps.map((s, i) => (
+            <div key={s.title} className="contents">
+              <div className="flex h-full flex-col rounded-2xl border border-navy-100 bg-white p-6 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-navy-900 text-sm font-bold text-white">
+                    {i + 1}
+                  </span>
+                  <s.icon className="h-5 w-5 text-navy-500" />
+                </div>
+                <h3 className="mt-4 text-base font-bold text-navy-900">
+                  {s.title}
+                </h3>
+                <p className="mt-0.5 text-sm font-semibold text-navy-700 font-ko" lang="ko">
+                  {s.titleKo}
+                </p>
+                <p className="mt-3 text-sm leading-6 text-navy-700 font-ko" lang="ko">
+                  {s.desc}
+                </p>
+              </div>
+              {i < steps.length - 1 && (
+                <div className="hidden items-center justify-center text-navy-300 lg:flex">
+                  <ChevronRight className="h-6 w-6" aria-hidden />
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -249,54 +358,6 @@ function CurriculumChips() {
   );
 }
 
-function Testimonials() {
-  // PLACEHOLDER: 실제 학부모 후기로 교체하세요.
-  const reviews = [
-    {
-      quote:
-        "매일 저녁 받는 리포트가 정말 큰 차이를 만듭니다. 아이가 어떤 부분이 부족한지 명확히 알 수 있어요.",
-      author: "K-2 학부모, Annandale",
-    },
-    {
-      quote:
-        "다른 학원과 다르게 아이별로 다른 학습지가 나옵니다. AAP 합격은 물론 자신감도 같이 자랐어요.",
-      author: "3-6 학부모, Vienna",
-    },
-    {
-      quote:
-        "선생님이 AAP 시스템을 정확히 이해하고 계셔서 무엇을 언제 준비해야 할지 명확합니다.",
-      author: "2학년 학부모, McLean",
-    },
-  ];
-
-  return (
-    <Section className="bg-navy-50/60">
-      <Container>
-        <SectionHeader
-          eyebrow="From Parents"
-          title="Words from our families"
-          titleKo="학부모님들의 이야기"
-        />
-        <div className="mt-12 grid gap-5 md:grid-cols-3">
-          {reviews.map((r, i) => (
-            <figure
-              key={i}
-              className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm"
-            >
-              <blockquote className="text-base leading-7 text-navy-800 font-ko" lang="ko">
-                “{r.quote}”
-              </blockquote>
-              <figcaption className="mt-5 text-sm font-medium text-navy-600 font-ko" lang="ko">
-                — {r.author}
-              </figcaption>
-            </figure>
-          ))}
-        </div>
-      </Container>
-    </Section>
-  );
-}
-
 function FinalCTA() {
   return (
     <Section>
@@ -305,7 +366,9 @@ function FinalCTA() {
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
             Ready to start? <br className="hidden sm:inline" />
             <span className="font-ko" lang="ko">
-              지금 바로 상담 신청하세요.
+              지금 바로{" "}
+              <span className="border-b-2 border-gold-500 pb-0.5">상담 신청</span>
+              하세요.
             </span>
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-base text-navy-100 sm:text-lg font-ko" lang="ko">
@@ -316,8 +379,8 @@ function FinalCTA() {
             <Button href="/inquire" size="lg" variant="secondary">
               상담 신청 / Inquire <ArrowRight className="h-4 w-4" />
             </Button>
-            <Button href="/tuition" size="lg" variant="ghost" className="text-white hover:bg-white/10">
-              수업료 보기 / View Tuition
+            <Button href="/programs" size="lg" variant="ghost" className="text-white hover:bg-white/10">
+              프로그램 보기 / View Programs
             </Button>
           </div>
         </div>

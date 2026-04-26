@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Inter, Noto_Sans_KR } from "next/font/google";
-import { SiteHeader } from "@/components/site/header";
-import { SiteFooter } from "@/components/site/footer";
 import { siteConfig } from "@/lib/site-config";
 import "./globals.css";
 
@@ -68,9 +66,7 @@ export default function RootLayout({
       className={`${inter.variable} ${notoKR.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-white text-navy-900">
-        <SiteHeader />
-        <main className="flex-1">{children}</main>
-        <SiteFooter />
+        {children}
       </body>
     </html>
   );

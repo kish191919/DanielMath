@@ -33,11 +33,6 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="/tuition" className="text-navy-700 hover:text-navy-900">
-                  Tuition / 수업료
-                </Link>
-              </li>
-              <li>
                 <Link href="/inquire" className="text-navy-700 hover:text-navy-900">
                   Inquire / 상담 신청
                 </Link>

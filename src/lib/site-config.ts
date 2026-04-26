@@ -8,11 +8,11 @@ export const siteConfig = {
     "A boutique math academy for K-6 gifted minds in Northern Virginia. AI-powered worksheets, daily reports, and a curriculum built for AAP, CogAT, and AMC 8.",
   region: "Northern Virginia",
   contactEmail: "kish1919@gmail.com",
+  hours: "M · T · Th · F · 5–8 PM",
+  hoursKo: "월·화·목·금 오후 5–8시",
   ogImage: "/og.png",
   nav: [
     { href: "/programs", label: "Programs", labelKo: "프로그램" },
-    { href: "/tuition", label: "Tuition", labelKo: "수업료" },
-    { href: "/inquire", label: "Inquire", labelKo: "상담 신청" },
   ],
 } as const;
 

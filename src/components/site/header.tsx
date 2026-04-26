@@ -38,8 +38,8 @@ export function SiteHeader() {
               </Link>
             ))}
             <div className="ml-3">
-              <Button href="/inquire" size="md">
-                상담 신청
+              <Button href="/login" size="md">
+                로그인 / Login
               </Button>
             </div>
           </nav>
@@ -78,8 +78,8 @@ export function SiteHeader() {
               </Link>
             ))}
             <div className="mt-2">
-              <Button href="/inquire" size="lg" className="w-full">
-                상담 신청 / Inquire
+              <Button href="/login" size="lg" className="w-full">
+                로그인 / Login
               </Button>
             </div>
           </nav>

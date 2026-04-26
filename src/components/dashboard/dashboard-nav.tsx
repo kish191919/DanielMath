@@ -1,0 +1,39 @@
+import Link from "next/link";
+import { Container } from "@/components/site/container";
+import type { Role } from "@/lib/supabase/types";
+
+const principalLinks = [
+  { href: "/dashboard/principal/students", label: "학생", labelEn: "Students" },
+  { href: "/dashboard/principal/worksheets", label: "학습지", labelEn: "Worksheets" },
+  { href: "/dashboard/principal/progress", label: "진행 상황", labelEn: "Progress" },
+];
+
+const parentLinks = [
+  { href: "/dashboard/parent/children", label: "자녀", labelEn: "Children" },
+  { href: "/dashboard/parent/progress", label: "진행 상황", labelEn: "Progress" },
+];
+
+export function DashboardNav({ role }: { role: Role }) {
+  const links = role === "principal" ? principalLinks : parentLinks;
+  return (
+    <nav className="border-b border-navy-100 bg-navy-50/50">
+      <Container>
+        <ul className="flex gap-1 overflow-x-auto py-2">
+          {links.map((link) => (
+            <li key={link.href}>
+              <Link
+                href={link.href}
+                className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-navy-700 hover:bg-white hover:text-navy-900"
+              >
+                <span className="font-ko" lang="ko">
+                  {link.label}
+                </span>
+                <span className="text-xs text-navy-500">{link.labelEn}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </Container>
+    </nav>
+  );
+}
