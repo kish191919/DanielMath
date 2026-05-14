@@ -1,6 +1,6 @@
 export type Role = "principal" | "parent";
 
-export type Grade = "K" | "1" | "2" | "3" | "4" | "5" | "6";
+export type Grade = "3" | "4" | "5" | "6";
 
 export interface Profile {
   id: string;

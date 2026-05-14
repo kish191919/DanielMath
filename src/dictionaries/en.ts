@@ -1,0 +1,293 @@
+import type { Dictionary } from './ko'
+
+const en: Dictionary = {
+  meta: {
+    description:
+      "A boutique math academy for 3rd–6th grade gifted minds in Northern Virginia. AI-powered worksheets, daily reports, and a curriculum built for AAP, CogAT, and AMC 8.",
+  },
+  nav: {
+    programs: "Programs",
+    resources: "Resources",
+    login: "Login",
+  },
+  utilityBar: {
+    welcome: "Free consultation welcome",
+  },
+  home: {
+    hero: {
+      badge: "AI-powered math studio · Grades 3–6",
+      h1line1: "Personalized math,",
+      h1highlight: "one student",
+      h1line2: "at a time.",
+      subtitle: "Individual Math for Gifted Minds · Grades 3–6",
+      desc: "AI-generated worksheets, daily progress reports, and a curriculum built around AAP, CogAT/NNAT, and AMC 8.",
+      ctaInquire: "Schedule a Consult",
+      ctaPrograms: "View Program",
+    },
+    stats: [
+      { value: "3–6", label: "Grades served", sublabel: "Grades 3–6" },
+      { value: "4", label: "Per session", sublabel: "Students per session" },
+      { value: "AAP", label: "Native curriculum", sublabel: "AAP-aligned" },
+      { value: "Daily", label: "Auto report", sublabel: "Parent reports" },
+    ],
+    programs: {
+      eyebrow: "Program",
+      title: "One program. Every student personalized.",
+      titleKo: "",
+      desc: "Students from grades 3–6 share the same classroom, but each receives their own personalized worksheets and homework tailored to their grade and ability.",
+      h3en: "Same room, different paths.",
+      h3ko: "",
+      body: "We don't split students by grade group. Students from 3rd to 6th grade come together in one session, and AI generates a fresh set of worksheets and homework for each student — reflecting their grade, ability, and recent error patterns. The blend of Common Core, AAP, CogAT, and AMC 8 content is tailored to every student.",
+      classSize: { label: "Class Size", value: "Up to 4 students", sublabel: "" },
+      time: { label: "Time", value: "1 session/wk · 60 min", sublabel: "" },
+      schedule: "Schedule — Mon/Tue/Thu/Fri, 5:00–8:00 PM (time slot assigned at enrollment)",
+      ctaDetails: "Program Details",
+      ctaInquire: "Free Consultation",
+    },
+    why: {
+      eyebrow: "Why Daniel Math",
+      title: "A studio built for one job: getting your child ahead.",
+      titleKo: "",
+      features: [
+        {
+          title: "AI-Generated Worksheets",
+          titleKo: "",
+          desc: "Specify grade, type, difficulty, and quantity — a worksheet unique to that student is instantly generated. Recent error patterns are automatically weighted.",
+        },
+        {
+          title: "Daily Auto Reports",
+          titleKo: "",
+          desc: "Every evening, parents receive a report summarizing the day's problems, accuracy rate, strengths, and areas to improve.",
+        },
+        {
+          title: "AAP-Native Curriculum",
+          titleKo: "",
+          desc: "CogAT/NNAT, Common Core, above-grade, and AMC 8 are integrated across four tracks.",
+        },
+        {
+          title: "1:1 Weakness Analysis",
+          titleKo: "",
+          desc: "Wrong answers aren't just marked — they're categorized (computational, conceptual, or reading) and automatically fed into the next worksheet.",
+        },
+      ],
+    },
+    warmth: {
+      eyebrow: "Why families stay",
+      titleEn: "Numbers move when trust does.",
+      titleKo: "",
+      bodyKo: "",
+      bodyEn: "Every worksheet, every report, every conversation — built to honor the trust a parent places in us.",
+    },
+    how: {
+      eyebrow: "How It Works",
+      title: "Four steps, every single session.",
+      titleKo: "",
+      desc: "Not abstract 'AI' — a concrete process applied to each student, every week.",
+      steps: [
+        { title: "Diagnose", titleKo: "", desc: "Grade, ability, and weak areas are assessed to set each student's unique starting point." },
+        { title: "Personalized Worksheet", titleKo: "", desc: "AI generates a brand-new worksheet for that student every session." },
+        { title: "AI Grading", titleKo: "", desc: "Wrong answers are automatically categorized as computational, conceptual, or reading errors." },
+        { title: "Daily Report", titleKo: "", desc: "Parents receive an automated daily progress report each evening." },
+      ],
+    },
+    curriculum: {
+      eyebrow: "Curriculum",
+      title: "Four pillars, one progression.",
+      titleKo: "",
+      desc: "Not just school math — an integrated curriculum designed for AAP placement and retention.",
+      chips: [
+        { label: "Common Core", sublabel: "" },
+        { label: "CogAT / NNAT", sublabel: "" },
+        { label: "Above-grade", sublabel: "" },
+        { label: "AMC 8 Prep", sublabel: "" },
+        { label: "Word Problems", sublabel: "" },
+        { label: "Pattern Logic", sublabel: "" },
+      ],
+    },
+    cta: {
+      titleEn: "Ready to start?",
+      titleKo: "Let us guide your child forward.",
+      highlightKo: "",
+      desc: "Enrollment is limited. Share your child's grade and current level, and we'll recommend the right track.",
+      ctaInquire: "Schedule a Consult",
+      ctaPrograms: "View Program",
+    },
+  },
+  programs: {
+    meta: {
+      title: "Program",
+      description: "Students from grades 3–6 share the same classroom, but each receives their own personalized worksheets and assignments every session, tailored to their grade and ability.",
+    },
+    header: {
+      eyebrow: "Program",
+      title: "One program. Every student personalized.",
+      titleKo: "",
+      desc: "Students from grades 3–6 share the same space, but each receives their own personalized worksheets and homework tailored to their grade and ability — no grade-based grouping, just each student's own path.",
+    },
+    pillars: [
+      {
+        title: "Personalized Worksheets",
+        titleKo: "",
+        desc: "Grade, ability, and recent error patterns are all factored in — every student gets a fresh, unique worksheet each session. Same room, different paths.",
+      },
+      {
+        title: "AAP-Aligned Curriculum",
+        titleKo: "",
+        desc: "Common Core, CogAT/NNAT, above-grade, and AMC 8 are blended to match each student's level and goals — school progress through gifted-track and competitions in one flow.",
+      },
+      {
+        title: "1:1 Weakness Analysis",
+        titleKo: "",
+        desc: "Wrong answers aren't just marked — they're categorized (computational, conceptual, or reading) and automatically carried into the next worksheet.",
+      },
+      {
+        title: "Daily Parent Report",
+        titleKo: "",
+        desc: "Content covered, accuracy rate, strengths, and weak areas are automatically sent to parents each evening.",
+      },
+    ],
+    coverage: {
+      eyebrow: "Curriculum",
+      title: "What we cover, blended per student.",
+      titleKo: "",
+      desc: "These areas are blended at different ratios each week, based on each student's grade and goals.",
+      chips: [
+        { label: "Common Core", sublabel: "" },
+        { label: "CogAT / NNAT", sublabel: "" },
+        { label: "Above-grade", sublabel: "" },
+        { label: "AMC 8 / Olympiad", sublabel: "" },
+        { label: "Word Problems", sublabel: "" },
+        { label: "Pattern Logic", sublabel: "" },
+      ],
+    },
+    ops: {
+      eyebrow: "Schedule",
+      title: "Simple, focused.",
+      titleKo: "",
+      items: [
+        { label: "Days", value: "Mon · Tue · Thu · Fri", sublabel: "" },
+        { label: "Hours", value: "5:00 PM – 8:00 PM", sublabel: "" },
+        { label: "Class Size", value: "Up to 4 students per session", sublabel: "" },
+      ],
+      note: "1 session/week · 60 min per student. A time slot between 5–8 PM on M/T/Th/F is assigned at enrollment.",
+      cta: "Free Consult & Assessment",
+    },
+  },
+  inquire: {
+    meta: {
+      title: "Inquire",
+      description: "Schedule a free consultation with Daniel Math. Share your child's grade and current level and we'll respond within 24 hours.",
+    },
+    eyebrow: "Inquire",
+    title: "Tell us about your child.",
+    titleKo: "",
+    desc: "Fill out the form below and we'll respond within 24 hours. We'll also help schedule a free assessment.",
+    form: {
+      parentName: { label: "Parent Name", placeholder: "Jane Smith" },
+      email: { label: "Email" },
+      phone: { label: "Phone" },
+      childName: { label: "Child Name", placeholder: "Child's name" },
+      grade: { label: "Grade", placeholder: "Select grade" },
+      school: { label: "Current School (optional)" },
+      language: { label: "Preferred Response Language" },
+      message: { label: "Message (optional)", placeholder: "Tell us about your child's current math level, goals, or any questions." },
+      submit: "Submit",
+      submitting: "Sending...",
+      privacy: "This form collects parent information only. Student data is handled separately with consent after enrollment (COPPA compliant).",
+    },
+    errors: {
+      parentName: "Please enter your name.",
+      email: "Please enter a valid email.",
+      phone: "Please enter a phone number.",
+      childName: "Please enter your child's name.",
+      grade: "Please select a grade.",
+    },
+  },
+  thanks: {
+    meta: {
+      title: "Thank you",
+      description: "Your inquiry has been received.",
+    },
+    title: "Thank you!",
+    subtitle: "Your inquiry has been received.",
+    body: "We appreciate you reaching out. We'll reply to your email or phone within 24 hours with the track that best fits your child's grade and goals.",
+    cta1: "Back to Home",
+    cta2: "View Program →",
+  },
+  resources: {
+    hub: {
+      meta: {
+        title: "FCPS Math Resource Center",
+        description: "Grade-by-grade curriculum comparisons, Virginia SOL standards, and test & competition calendars for Fairfax County (FCPS) elementary math.",
+      },
+      badge: "Fairfax County · FCPS",
+      title: "Math Resource Center",
+      subtitle: "FCPS Elementary Math Guide",
+      desc: "Everything you need to know about elementary math in Fairfax County, in one place. Grade-by-grade curriculum comparisons, Virginia SOL standards, and test & competition calendars.",
+      sections: [
+        {
+          badge: "K–6",
+          title: "Grade-by-Grade Curriculum",
+          titleEn: "Grade-by-Grade Curriculum",
+          desc: "From kindergarten through 6th grade, see what Standard and Advanced (AAP) math cover each quarter.",
+          cta: "View Curriculum",
+        },
+        {
+          badge: "Virginia",
+          title: "Virginia Standards of Learning",
+          titleEn: "Virginia Standards of Learning",
+          desc: "The statewide math achievement standards all Virginia public schools follow — explained grade by grade.",
+          cta: "View SOL Standards",
+        },
+        {
+          badge: "Calendar",
+          title: "Test & Competition Calendar",
+          titleEn: "Test & Competition Calendar",
+          desc: "AAP screening (CogAT/NNAT), SOL tests, AMC 8, MOEMS, and more — all in one calendar.",
+          cta: "View Calendar",
+        },
+      ],
+      why: {
+        eyebrow: "Why This Matters",
+        title: "Why the FCPS Math Structure Matters",
+        titleKo: "Key facts about elementary math in Northern Virginia",
+        points: [
+          { title: "Two tracks at every grade", body: "FCPS runs two math tracks at every elementary grade: Standard and Advanced (AAP). Advanced covers content one grade level above the Virginia SOL standard." },
+          { title: "Major impact on middle school", body: "Completing the advanced (AAP) track through 6th grade opens the path to Algebra I before 8th grade — which leads to AP Calculus AB/BC in high school." },
+          { title: "AAP placement is renewed annually", body: "Getting into AAP isn't permanent — it's re-evaluated every year. Daniel Math supports both initial placement and ongoing retention." },
+        ],
+        note: "Curriculum information on this site is based on the FCPS Year at a Glance and Virginia Mathematics SOL. For the most current information, please visit the",
+        noteLink: "FCPS official website",
+      },
+      faq: {
+        eyebrow: "FAQ",
+        title: "Frequently Asked Questions",
+        titleKo: "",
+        items: [
+          { q: "What is the difference between Standard and Advanced (AAP) math?", a: "FCPS operates two math tracks at every grade. Standard math follows the grade-level Virginia SOL. Advanced/AAP math covers content one grade above — a 3rd grader in the advanced track studies 4th grade SOL content." },
+          { q: "What is AAP? Is it like a gifted program?", a: "AAP (Advanced Academic Programs) is FCPS's enrichment program — similar in concept to a gifted education center. Eligible students attend full-time at a designated AAP center school, or receive part-time (Level III) services at their home school." },
+          { q: "How do I know if my child is in Standard or Advanced math?", a: "Check the class schedule sent at the start of the school year, or look at your child's courses in ParentVUE. If the course name says 'Advanced Math' or lists a higher grade level (e.g., 'Math 4' for a 3rd grader), your child is in the advanced track." },
+          { q: "What is the SOL test?", a: "The Virginia SOL (Standards of Learning) test is a state-level standardized assessment. All students in grades 3–8 take the SOL test each spring. Results factor into school accountability and, in some cases, promotion decisions." },
+        ],
+      },
+    },
+  },
+  footer: {
+    quickLinks: "Quick Links",
+    mathResources: "Math Resources",
+    contact: "Contact",
+    coppa: "This site does not directly collect personal information from students under 13 (COPPA compliant).",
+    links: {
+      programs: "Program",
+      resources: "Resources",
+      inquire: "Inquire",
+      curriculum: "Grade Curriculum",
+      sol: "Virginia SOL Standards",
+      testing: "Test & Competition Calendar",
+      location: "area (exact address provided after consultation)",
+    },
+    inquireCta: "Schedule a Consult →",
+  },
+}
+
+export default en

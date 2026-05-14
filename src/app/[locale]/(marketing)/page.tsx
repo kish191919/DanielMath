@@ -1,0 +1,347 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { ArrowRight, Brain, FileText, LineChart, Sparkles, Clock, Users, ClipboardCheck, FileSpreadsheet, ScanSearch, Send, ChevronRight } from "lucide-react";
+import { Container } from "@/components/site/container";
+import { Section, SectionHeader } from "@/components/site/section";
+import { HeroBackground } from "@/components/site/hero-background";
+import { WarmthSection } from "@/components/site/warmth-section";
+import { Button } from "@/components/ui/button";
+import { getDictionary } from "@/dictionaries";
+import { hasLocale, localePath, type Locale } from "@/lib/i18n";
+import { siteConfig } from "@/lib/site-config";
+
+type Props = { params: Promise<{ locale: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  if (!hasLocale(locale)) return {};
+  const d = await getDictionary(locale as Locale);
+  const isKo = locale === "ko";
+  return {
+    description: d.meta.description,
+    alternates: {
+      canonical: siteConfig.url,
+      languages: { ko: siteConfig.url, en: `${siteConfig.url}/en` },
+    },
+    openGraph: {
+      locale: isKo ? "ko_KR" : "en_US",
+      alternateLocale: isKo ? "en_US" : "ko_KR",
+    },
+  };
+}
+
+export default async function HomePage({ params }: Props) {
+  const { locale } = await params;
+  if (!hasLocale(locale)) notFound();
+  const d = await getDictionary(locale as Locale);
+  const lp = (path: string) => localePath(locale as Locale, path);
+  const isKo = locale === "ko";
+
+  return (
+    <>
+      <HeroSection d={d.home} lp={lp} isKo={isKo} />
+      <Stats d={d.home} />
+      <ProgramsPreview d={d.home} lp={lp} isKo={isKo} />
+      <WhyUs d={d.home} />
+      <WarmthSection locale={locale as Locale} d={d.home.warmth} />
+      <HowItWorks d={d.home} isKo={isKo} />
+      <CurriculumChips d={d.home} isKo={isKo} />
+      <FinalCTA d={d.home} lp={lp} isKo={isKo} />
+    </>
+  );
+}
+
+function HeroSection({ d, lp, isKo }: { d: Awaited<ReturnType<typeof getDictionary>>["home"]; lp: (p: string) => string; isKo: boolean }) {
+  const h = d.hero;
+  return (
+    <HeroBackground>
+      <Container className="relative py-24 sm:py-32 lg:py-40">
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3.5 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-white backdrop-blur">
+            <Sparkles className="h-3.5 w-3.5 text-gold-300" />
+            {h.badge}
+          </span>
+          {isKo ? (
+            <h1
+              className="mt-7 text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl font-ko"
+              lang="ko"
+            >
+              {h.h1line1}
+              <br />
+              <span className="text-gold-300">{h.h1highlight}</span> {h.h1line2}
+            </h1>
+          ) : (
+            <h1 className="mt-7 text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
+              {h.h1line1}
+              <br />
+              <span className="text-gold-300">{h.h1highlight}</span> {h.h1line2}
+            </h1>
+          )}
+          <p className="mx-auto mt-5 max-w-xl text-lg font-medium text-navy-100 sm:text-xl">
+            {h.subtitle}
+          </p>
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-navy-200/70 sm:text-base">
+            {h.desc}
+          </p>
+          <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Button href={lp("/inquire")} size="lg" variant="secondary">
+              {h.ctaInquire} <ArrowRight className="h-4 w-4" />
+            </Button>
+            <Button
+              href={lp("/programs")}
+              size="lg"
+              variant="ghost"
+              className="border border-white/40 text-white hover:bg-white/10"
+            >
+              {h.ctaPrograms}
+            </Button>
+          </div>
+        </div>
+      </Container>
+    </HeroBackground>
+  );
+}
+
+function Stats({ d }: { d: Awaited<ReturnType<typeof getDictionary>>["home"] }) {
+  return (
+    <Section className="border-y border-navy-100">
+      <Container>
+        <dl className="grid grid-cols-2 gap-y-10 sm:grid-cols-4 sm:gap-y-0 sm:divide-x sm:divide-navy-100">
+          {d.stats.map((s, i) => (
+            <div key={i} className="flex flex-col items-center px-4 text-center">
+              <dt className="sr-only">{s.sublabel}</dt>
+              <dd
+                className={
+                  s.value === "AAP"
+                    ? "text-4xl font-bold tracking-tight text-gold-500 sm:text-5xl"
+                    : "text-4xl font-bold tracking-tight text-navy-900 sm:text-5xl"
+                }
+              >
+                {s.value}
+              </dd>
+              <p className="mt-3 text-sm font-semibold text-navy-900">{s.label}</p>
+              {s.sublabel && <p className="text-xs text-navy-500">{s.sublabel}</p>}
+            </div>
+          ))}
+        </dl>
+      </Container>
+    </Section>
+  );
+}
+
+function ProgramsPreview({ d, lp, isKo }: { d: Awaited<ReturnType<typeof getDictionary>>["home"]; lp: (p: string) => string; isKo: boolean }) {
+  const p = d.programs;
+  return (
+    <Section className="bg-navy-50/60">
+      <Container>
+        <SectionHeader
+          eyebrow={p.eyebrow}
+          title={p.title}
+          titleKo={p.titleKo || undefined}
+          description={p.desc}
+        />
+
+        <div className="mt-12 rounded-2xl border border-navy-100 bg-white p-8 shadow-sm sm:p-10">
+          <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:gap-12">
+            <div>
+              <h3 className="text-xl font-bold text-navy-900">{p.h3en}</h3>
+              {p.h3ko && (
+                <p className="mt-1 text-lg font-semibold text-navy-700 font-ko" lang="ko">
+                  {p.h3ko}
+                </p>
+              )}
+              <p className={`mt-4 text-sm leading-7 text-navy-700${isKo ? " font-ko" : ""}`}>
+                {p.body}
+              </p>
+
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                {[p.classSize, p.time].map((f) => (
+                  <div
+                    key={f.label}
+                    className="rounded-xl border border-navy-100 bg-navy-50/60 p-4"
+                  >
+                    <div className="flex items-center gap-2 text-navy-700">
+                      {f.label === p.classSize.label ? (
+                        <Users className="h-4 w-4" />
+                      ) : (
+                        <Clock className="h-4 w-4" />
+                      )}
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-navy-500">
+                        {f.label}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-base font-semibold text-navy-900">{f.value}</p>
+                    {f.sublabel && <p className="text-xs text-navy-600">{f.sublabel}</p>}
+                  </div>
+                ))}
+              </div>
+
+              <p className={`mt-6 text-sm text-navy-700${isKo ? " font-ko" : ""}`}>
+                <strong className="text-navy-900">{p.schedule}</strong>
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3 lg:items-end lg:justify-end">
+              <Button href={lp("/programs")} variant="primary" size="lg">
+                {p.ctaDetails} <ArrowRight className="h-4 w-4" />
+              </Button>
+              <Button href={lp("/inquire")} variant="secondary" size="lg">
+                {p.ctaInquire}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Container>
+    </Section>
+  );
+}
+
+function WhyUs({ d }: { d: Awaited<ReturnType<typeof getDictionary>>["home"] }) {
+  const icons = [FileText, LineChart, Brain, Sparkles];
+  return (
+    <Section>
+      <Container>
+        <SectionHeader
+          eyebrow={d.why.eyebrow}
+          title={d.why.title}
+          titleKo={d.why.titleKo || undefined}
+        />
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {d.why.features.map((f, i) => {
+            const Icon = icons[i];
+            return (
+              <div
+                key={f.title}
+                className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm"
+              >
+                <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-navy-900 text-white">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <h3 className="mt-4 text-base font-bold text-navy-900">{f.title}</h3>
+                {f.titleKo && (
+                  <p className="mt-0.5 text-sm font-semibold text-navy-700 font-ko" lang="ko">
+                    {f.titleKo}
+                  </p>
+                )}
+                <p className="mt-3 text-sm leading-6 text-navy-700">{f.desc}</p>
+              </div>
+            );
+          })}
+        </div>
+      </Container>
+    </Section>
+  );
+}
+
+function HowItWorks({ d, isKo }: { d: Awaited<ReturnType<typeof getDictionary>>["home"]; isKo: boolean }) {
+  const icons = [ClipboardCheck, FileSpreadsheet, ScanSearch, Send];
+  return (
+    <Section className="bg-navy-50/60">
+      <Container>
+        <SectionHeader
+          eyebrow={d.how.eyebrow}
+          title={d.how.title}
+          titleKo={d.how.titleKo || undefined}
+          description={d.how.desc}
+        />
+
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] lg:items-stretch lg:gap-3">
+          {d.how.steps.map((s, i) => {
+            const Icon = icons[i];
+            return (
+              <div key={s.title} className="contents">
+                <div className="flex h-full flex-col rounded-2xl border border-navy-100 bg-white p-6 shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-navy-900 text-sm font-bold text-white">
+                      {i + 1}
+                    </span>
+                    <Icon className="h-5 w-5 text-navy-500" />
+                  </div>
+                  <h3 className="mt-4 text-base font-bold text-navy-900">{s.title}</h3>
+                  {s.titleKo && (
+                    <p className="mt-0.5 text-sm font-semibold text-navy-700 font-ko" lang="ko">
+                      {s.titleKo}
+                    </p>
+                  )}
+                  <p className={`mt-3 text-sm leading-6 text-navy-700${isKo ? " font-ko" : ""}`}>
+                    {s.desc}
+                  </p>
+                </div>
+                {i < d.how.steps.length - 1 && (
+                  <div className="hidden items-center justify-center text-navy-300 lg:flex">
+                    <ChevronRight className="h-6 w-6" aria-hidden />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </Container>
+    </Section>
+  );
+}
+
+function CurriculumChips({ d, isKo }: { d: Awaited<ReturnType<typeof getDictionary>>["home"]; isKo: boolean }) {
+  return (
+    <Section>
+      <Container>
+        <SectionHeader
+          eyebrow={d.curriculum.eyebrow}
+          title={d.curriculum.title}
+          titleKo={d.curriculum.titleKo || undefined}
+          description={d.curriculum.desc}
+        />
+        <div className="mt-10 flex flex-wrap justify-center gap-2.5">
+          {d.curriculum.chips.map((c) => (
+            <div
+              key={c.label}
+              className="flex items-baseline gap-2 rounded-full border border-navy-200 bg-white px-4 py-2 text-sm shadow-sm"
+            >
+              <span className="font-semibold text-navy-900">{c.label}</span>
+              {c.sublabel && (
+                <span className={`text-xs text-navy-600${isKo ? " font-ko" : ""}`}>
+                  {c.sublabel}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      </Container>
+    </Section>
+  );
+}
+
+function FinalCTA({ d, lp, isKo }: { d: Awaited<ReturnType<typeof getDictionary>>["home"]; lp: (p: string) => string; isKo: boolean }) {
+  const c = d.cta;
+  return (
+    <Section>
+      <Container>
+        <div className="rounded-3xl bg-navy-900 px-8 py-14 text-center text-white sm:px-12 sm:py-20">
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            {c.titleEn} <br className="hidden sm:inline" />
+            {isKo ? (
+              <span className="font-ko" lang="ko">
+                지금 바로{" "}
+                <span className="border-b-2 border-gold-500 pb-0.5">{c.highlightKo}</span>
+                하세요.
+              </span>
+            ) : (
+              <span>{c.titleKo}</span>
+            )}
+          </h2>
+          <p className={`mx-auto mt-4 max-w-2xl text-base text-navy-100 sm:text-lg${isKo ? " font-ko" : ""}`}>
+            {c.desc}
+          </p>
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Button href={lp("/inquire")} size="lg" variant="secondary">
+              {c.ctaInquire} <ArrowRight className="h-4 w-4" />
+            </Button>
+            <Button href={lp("/programs")} size="lg" variant="ghost" className="text-white hover:bg-white/10">
+              {c.ctaPrograms}
+            </Button>
+          </div>
+        </div>
+      </Container>
+    </Section>
+  );
+}

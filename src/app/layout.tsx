@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Noto_Sans_KR } from "next/font/google";
+import { headers } from "next/headers";
 import { siteConfig } from "@/lib/site-config";
 import "./globals.css";
 
@@ -34,7 +35,7 @@ export const metadata: Metadata = {
     "Common Core math",
     "Korean math academy",
     "Northern Virginia",
-    "K-6 math tutor",
+    "3rd-6th grade math tutor",
     "영재 수학",
     "한인 수학공부방",
   ],
@@ -55,14 +56,17 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const heads = await headers();
+  const locale = heads.get("x-locale") ?? "ko";
+
   return (
     <html
-      lang="ko"
+      lang={locale}
       className={`${inter.variable} ${notoKR.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-white text-navy-900">

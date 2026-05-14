@@ -1,18 +1,44 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/site-config";
 
+const marketingPaths = [
+  "",
+  "/programs",
+  "/inquire",
+  "/resources",
+  "/resources/curriculum",
+  "/resources/sol",
+  "/resources/testing",
+  "/resources/curriculum/kindergarten",
+  "/resources/curriculum/grade-1",
+  "/resources/curriculum/grade-2",
+  "/resources/curriculum/grade-3",
+  "/resources/curriculum/grade-4",
+  "/resources/curriculum/grade-5",
+  "/resources/curriculum/grade-6",
+];
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = siteConfig.url;
   const now = new Date();
 
-  return [
-    "",
-    "/programs",
-    "/inquire",
-  ].map((p) => ({
+  const priority = (p: string) => (p === "" ? 1 : p.split("/").length <= 2 ? 0.8 : 0.6);
+
+  const koEntries = marketingPaths.map((p) => ({
     url: `${base}${p}`,
     lastModified: now,
     changeFrequency: "monthly" as const,
-    priority: p === "" ? 1 : 0.8,
+    priority: priority(p),
+    alternates: { languages: { ko: `${base}${p}`, en: `${base}/en${p}` } },
   }));
+
+  const enEntries = marketingPaths.map((p) => ({
+    url: `${base}/en${p}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: priority(p) * 0.9,
+    alternates: { languages: { ko: `${base}${p}`, en: `${base}/en${p}` } },
+  }));
+
+  return [...koEntries, ...enEntries];
 }
