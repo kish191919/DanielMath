@@ -24,6 +24,7 @@ export default async function InquirePage({ params }: Props) {
   const d = await getDictionary(locale as Locale);
   const q = d.inquire;
   const lp = (path: string) => localePath(locale as Locale, path);
+  const isKo = locale === "ko";
 
   return (
     <Section>
@@ -33,6 +34,7 @@ export default async function InquirePage({ params }: Props) {
           title={q.title}
           titleKo={q.titleKo || undefined}
           description={q.desc}
+          isKo={isKo}
         />
         <div className="mx-auto mt-12 max-w-2xl">
           <InquiryForm

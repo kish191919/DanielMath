@@ -28,9 +28,11 @@ export function SiteHeader({ locale }: { locale: Locale }) {
             <span className="text-lg font-bold tracking-tight text-navy-900">
               {siteConfig.name}
             </span>
-            <span className="hidden text-sm text-navy-600 sm:inline font-ko" lang="ko">
-              {siteConfig.nameKo}
-            </span>
+            {isKo && (
+              <span className="hidden text-sm text-navy-600 sm:inline font-ko" lang="ko">
+                {siteConfig.nameKo}
+              </span>
+            )}
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">

@@ -26,26 +26,23 @@ export function WarmthSection({ locale, d }: { locale: Locale; d: WarmthData }) 
             />
           </div>
           <div>
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-gold-600">
+            <span className={`text-xs font-semibold uppercase tracking-[0.2em] text-gold-600${isKo ? " font-ko" : ""}`}>
               {d.eyebrow}
             </span>
-            <h2 className="mt-4 text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl">
-              Numbers move{" "}
-              <span className="border-b-2 border-gold-400 pb-1">when trust does</span>.
-            </h2>
-            {isKo && (
-              <p className="mt-3 text-xl font-semibold text-navy-700 font-ko" lang="ko">
-                실력은 <span className="text-navy-900">신뢰</span>가 쌓일 때 움직입니다.
-              </p>
+            {isKo ? (
+              <h2 className="mt-4 text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl font-ko" lang="ko">
+                실력은 <span className="text-navy-900">신뢰</span>가 쌓일 때{" "}
+                <span className="border-b-2 border-gold-400 pb-1">움직입니다</span>.
+              </h2>
+            ) : (
+              <h2 className="mt-4 text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl">
+                Numbers move{" "}
+                <span className="border-b-2 border-gold-400 pb-1">when trust does</span>.
+              </h2>
             )}
             <p className={`mt-6 text-base leading-7 text-navy-700${isKo ? " font-ko" : ""}`}>
               {isKo ? d.bodyKo : d.bodyEn}
             </p>
-            {isKo && (
-              <p className="mt-3 text-sm leading-7 text-navy-600">
-                {d.bodyEn}
-              </p>
-            )}
           </div>
         </div>
       </Container>

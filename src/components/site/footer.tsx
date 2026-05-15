@@ -16,9 +16,11 @@ export function SiteFooter({ locale }: { locale: Locale }) {
               <span className="text-lg font-bold text-navy-900">
                 {siteConfig.name}
               </span>
-              <span className="text-sm text-navy-600 font-ko" lang="ko">
-                {siteConfig.nameKo}
-              </span>
+              {isKo && (
+                <span className="text-sm text-navy-600 font-ko" lang="ko">
+                  {siteConfig.nameKo}
+                </span>
+              )}
             </Link>
             <p
               className={`mt-3 max-w-sm text-sm leading-6 text-navy-700${isKo ? " font-ko" : ""}`}
@@ -31,23 +33,23 @@ export function SiteFooter({ locale }: { locale: Locale }) {
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-navy-900">
-              Quick Links
+            <h3 className={`text-sm font-semibold uppercase tracking-wider text-navy-900${isKo ? " font-ko" : ""}`}>
+              {isKo ? "바로가기" : "Quick Links"}
             </h3>
             <ul className="mt-4 space-y-2 text-sm">
               <li>
-                <Link href={lp("/programs")} className="text-navy-700 hover:text-navy-900">
-                  {isKo ? "Program / 프로그램" : "Programs"}
+                <Link href={lp("/programs")} className={`text-navy-700 hover:text-navy-900${isKo ? " font-ko" : ""}`}>
+                  {isKo ? "프로그램" : "Programs"}
                 </Link>
               </li>
               <li>
-                <Link href={lp("/resources")} className="text-navy-700 hover:text-navy-900">
-                  {isKo ? "Resources / 수학 자료" : "Resources"}
+                <Link href={lp("/resources")} className={`text-navy-700 hover:text-navy-900${isKo ? " font-ko" : ""}`}>
+                  {isKo ? "수학 자료" : "Resources"}
                 </Link>
               </li>
               <li>
-                <Link href={lp("/inquire")} className="text-navy-700 hover:text-navy-900">
-                  {isKo ? "Inquire / 상담 신청" : "Inquire"}
+                <Link href={lp("/inquire")} className={`text-navy-700 hover:text-navy-900${isKo ? " font-ko" : ""}`}>
+                  {isKo ? "상담 신청" : "Inquire"}
                 </Link>
               </li>
             </ul>
@@ -82,8 +84,8 @@ export function SiteFooter({ locale }: { locale: Locale }) {
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-navy-900">
-              Contact
+            <h3 className={`text-sm font-semibold uppercase tracking-wider text-navy-900${isKo ? " font-ko" : ""}`}>
+              {isKo ? "연락처" : "Contact"}
             </h3>
             <ul className="mt-4 space-y-2 text-sm text-navy-700">
               <li>
@@ -97,7 +99,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
                   : `${siteConfig.region} (exact location shared upon inquiry)`}
               </li>
               <li>
-                <Link href={lp("/inquire")} className="font-medium text-navy-900 hover:underline">
+                <Link href={lp("/inquire")} className={`font-medium text-navy-900 hover:underline${isKo ? " font-ko" : ""}`}>
                   {isKo ? "상담 신청 →" : "Get in touch →"}
                 </Link>
               </li>

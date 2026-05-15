@@ -40,9 +40,9 @@ export default async function HomePage({ params }: Props) {
   return (
     <>
       <HeroSection d={d.home} lp={lp} isKo={isKo} />
-      <Stats d={d.home} />
+      <Stats d={d.home} isKo={isKo} />
       <ProgramsPreview d={d.home} lp={lp} isKo={isKo} />
-      <WhyUs d={d.home} />
+      <WhyUs d={d.home} isKo={isKo} />
       <WarmthSection locale={locale as Locale} d={d.home.warmth} />
       <HowItWorks d={d.home} isKo={isKo} />
       <CurriculumChips d={d.home} isKo={isKo} />
@@ -77,10 +77,10 @@ function HeroSection({ d, lp, isKo }: { d: Awaited<ReturnType<typeof getDictiona
               <span className="text-gold-300">{h.h1highlight}</span> {h.h1line2}
             </h1>
           )}
-          <p className="mx-auto mt-5 max-w-xl text-lg font-medium text-navy-100 sm:text-xl">
+          <p className={`mx-auto mt-5 max-w-xl text-lg font-medium text-navy-100 sm:text-xl${isKo ? " font-ko" : ""}`}>
             {h.subtitle}
           </p>
-          <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-navy-200/70 sm:text-base">
+          <p className={`mx-auto mt-4 max-w-xl text-sm leading-6 text-navy-200/70 sm:text-base${isKo ? " font-ko" : ""}`}>
             {h.desc}
           </p>
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -102,24 +102,24 @@ function HeroSection({ d, lp, isKo }: { d: Awaited<ReturnType<typeof getDictiona
   );
 }
 
-function Stats({ d }: { d: Awaited<ReturnType<typeof getDictionary>>["home"] }) {
+function Stats({ d, isKo }: { d: Awaited<ReturnType<typeof getDictionary>>["home"]; isKo: boolean }) {
   return (
     <Section className="border-y border-navy-100">
       <Container>
         <dl className="grid grid-cols-2 gap-y-10 sm:grid-cols-4 sm:gap-y-0 sm:divide-x sm:divide-navy-100">
           {d.stats.map((s, i) => (
             <div key={i} className="flex flex-col items-center px-4 text-center">
-              <dt className="sr-only">{s.sublabel}</dt>
+              <dt className="sr-only">{s.label}</dt>
               <dd
                 className={
                   s.value === "AAP"
                     ? "text-4xl font-bold tracking-tight text-gold-500 sm:text-5xl"
-                    : "text-4xl font-bold tracking-tight text-navy-900 sm:text-5xl"
+                    : `text-4xl font-bold tracking-tight text-navy-900 sm:text-5xl${isKo ? " font-ko" : ""}`
                 }
               >
                 {s.value}
               </dd>
-              <p className="mt-3 text-sm font-semibold text-navy-900">{s.label}</p>
+              <p className={`mt-3 text-sm font-semibold text-navy-900${isKo ? " font-ko" : ""}`}>{s.label}</p>
               {s.sublabel && <p className="text-xs text-navy-500">{s.sublabel}</p>}
             </div>
           ))}
@@ -139,16 +139,16 @@ function ProgramsPreview({ d, lp, isKo }: { d: Awaited<ReturnType<typeof getDict
           title={p.title}
           titleKo={p.titleKo || undefined}
           description={p.desc}
+          isKo={isKo}
         />
 
         <div className="mt-12 rounded-2xl border border-navy-100 bg-white p-8 shadow-sm sm:p-10">
           <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:gap-12">
             <div>
-              <h3 className="text-xl font-bold text-navy-900">{p.h3en}</h3>
-              {p.h3ko && (
-                <p className="mt-1 text-lg font-semibold text-navy-700 font-ko" lang="ko">
-                  {p.h3ko}
-                </p>
+              {isKo ? (
+                <h3 className="text-xl font-bold text-navy-900 font-ko" lang="ko">{p.h3ko}</h3>
+              ) : (
+                <h3 className="text-xl font-bold text-navy-900">{p.h3en}</h3>
               )}
               <p className={`mt-4 text-sm leading-7 text-navy-700${isKo ? " font-ko" : ""}`}>
                 {p.body}
@@ -166,11 +166,11 @@ function ProgramsPreview({ d, lp, isKo }: { d: Awaited<ReturnType<typeof getDict
                       ) : (
                         <Clock className="h-4 w-4" />
                       )}
-                      <span className="text-[11px] font-semibold uppercase tracking-wider text-navy-500">
+                      <span className={`text-[11px] font-semibold uppercase tracking-wider text-navy-500${isKo ? " font-ko" : ""}`}>
                         {f.label}
                       </span>
                     </div>
-                    <p className="mt-2 text-base font-semibold text-navy-900">{f.value}</p>
+                    <p className={`mt-2 text-base font-semibold text-navy-900${isKo ? " font-ko" : ""}`}>{f.value}</p>
                     {f.sublabel && <p className="text-xs text-navy-600">{f.sublabel}</p>}
                   </div>
                 ))}
@@ -196,7 +196,7 @@ function ProgramsPreview({ d, lp, isKo }: { d: Awaited<ReturnType<typeof getDict
   );
 }
 
-function WhyUs({ d }: { d: Awaited<ReturnType<typeof getDictionary>>["home"] }) {
+function WhyUs({ d, isKo }: { d: Awaited<ReturnType<typeof getDictionary>>["home"]; isKo: boolean }) {
   const icons = [FileText, LineChart, Brain, Sparkles];
   return (
     <Section>
@@ -205,6 +205,7 @@ function WhyUs({ d }: { d: Awaited<ReturnType<typeof getDictionary>>["home"] }) 
           eyebrow={d.why.eyebrow}
           title={d.why.title}
           titleKo={d.why.titleKo || undefined}
+          isKo={isKo}
         />
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {d.why.features.map((f, i) => {
@@ -217,13 +218,12 @@ function WhyUs({ d }: { d: Awaited<ReturnType<typeof getDictionary>>["home"] }) 
                 <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-navy-900 text-white">
                   <Icon className="h-5 w-5" />
                 </div>
-                <h3 className="mt-4 text-base font-bold text-navy-900">{f.title}</h3>
-                {f.titleKo && (
-                  <p className="mt-0.5 text-sm font-semibold text-navy-700 font-ko" lang="ko">
-                    {f.titleKo}
-                  </p>
+                {isKo ? (
+                  <h3 className="mt-4 text-base font-bold text-navy-900 font-ko" lang="ko">{f.titleKo}</h3>
+                ) : (
+                  <h3 className="mt-4 text-base font-bold text-navy-900">{f.title}</h3>
                 )}
-                <p className="mt-3 text-sm leading-6 text-navy-700">{f.desc}</p>
+                <p className={`mt-3 text-sm leading-6 text-navy-700${isKo ? " font-ko" : ""}`}>{f.desc}</p>
               </div>
             );
           })}
@@ -243,6 +243,7 @@ function HowItWorks({ d, isKo }: { d: Awaited<ReturnType<typeof getDictionary>>[
           title={d.how.title}
           titleKo={d.how.titleKo || undefined}
           description={d.how.desc}
+          isKo={isKo}
         />
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] lg:items-stretch lg:gap-3">
@@ -257,11 +258,10 @@ function HowItWorks({ d, isKo }: { d: Awaited<ReturnType<typeof getDictionary>>[
                     </span>
                     <Icon className="h-5 w-5 text-navy-500" />
                   </div>
-                  <h3 className="mt-4 text-base font-bold text-navy-900">{s.title}</h3>
-                  {s.titleKo && (
-                    <p className="mt-0.5 text-sm font-semibold text-navy-700 font-ko" lang="ko">
-                      {s.titleKo}
-                    </p>
+                  {isKo ? (
+                    <h3 className="mt-4 text-base font-bold text-navy-900 font-ko" lang="ko">{s.titleKo}</h3>
+                  ) : (
+                    <h3 className="mt-4 text-base font-bold text-navy-900">{s.title}</h3>
                   )}
                   <p className={`mt-3 text-sm leading-6 text-navy-700${isKo ? " font-ko" : ""}`}>
                     {s.desc}
@@ -290,6 +290,7 @@ function CurriculumChips({ d, isKo }: { d: Awaited<ReturnType<typeof getDictiona
           title={d.curriculum.title}
           titleKo={d.curriculum.titleKo || undefined}
           description={d.curriculum.desc}
+          isKo={isKo}
         />
         <div className="mt-10 flex flex-wrap justify-center gap-2.5">
           {d.curriculum.chips.map((c) => (
@@ -317,18 +318,18 @@ function FinalCTA({ d, lp, isKo }: { d: Awaited<ReturnType<typeof getDictionary>
     <Section>
       <Container>
         <div className="rounded-3xl bg-navy-900 px-8 py-14 text-center text-white sm:px-12 sm:py-20">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            {c.titleEn} <br className="hidden sm:inline" />
-            {isKo ? (
-              <span className="font-ko" lang="ko">
-                지금 바로{" "}
-                <span className="border-b-2 border-gold-500 pb-0.5">{c.highlightKo}</span>
-                하세요.
-              </span>
-            ) : (
+          {isKo ? (
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-ko" lang="ko">
+              지금 바로{" "}
+              <span className="border-b-2 border-gold-500 pb-0.5">{c.highlightKo}</span>
+              하세요.
+            </h2>
+          ) : (
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              {c.titleEn} <br className="hidden sm:inline" />
               <span>{c.titleKo}</span>
-            )}
-          </h2>
+            </h2>
+          )}
           <p className={`mx-auto mt-4 max-w-2xl text-base text-navy-100 sm:text-lg${isKo ? " font-ko" : ""}`}>
             {c.desc}
           </p>

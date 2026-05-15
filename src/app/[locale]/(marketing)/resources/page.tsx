@@ -107,6 +107,7 @@ export default async function ResourcesHubPage({ params }: Props) {
             title={hub.why.title}
             titleKo={isKo ? hub.why.titleKo : undefined}
             align="left"
+            isKo={isKo}
           />
           <div className="mt-10 grid gap-5 sm:grid-cols-3">
             {hub.why.points.map((p, i) => (
@@ -148,6 +149,7 @@ export default async function ResourcesHubPage({ params }: Props) {
             eyebrow={hub.faq.eyebrow}
             title={hub.faq.title}
             titleKo={isKo ? hub.faq.titleKo : undefined}
+            isKo={isKo}
           />
           <div className="mx-auto mt-10 max-w-3xl divide-y divide-navy-100">
             {hub.faq.items.map((faq) => (

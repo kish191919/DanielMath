@@ -38,6 +38,7 @@ export default async function ProgramsPage({ params }: Props) {
             title={p.header.title}
             titleKo={p.header.titleKo || undefined}
             description={p.header.desc}
+            isKo={isKo}
           />
 
           <div className="mt-14 grid gap-6 sm:grid-cols-2">
@@ -51,11 +52,10 @@ export default async function ProgramsPage({ params }: Props) {
                   <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-navy-900 text-white">
                     <Icon className="h-5 w-5" />
                   </div>
-                  <h3 className="mt-5 text-xl font-bold text-navy-900">{pillar.title}</h3>
-                  {pillar.titleKo && (
-                    <p className="mt-1 text-base font-semibold text-navy-700 font-ko" lang="ko">
-                      {pillar.titleKo}
-                    </p>
+                  {isKo ? (
+                    <h3 className="mt-5 text-xl font-bold text-navy-900 font-ko" lang="ko">{pillar.titleKo}</h3>
+                  ) : (
+                    <h3 className="mt-5 text-xl font-bold text-navy-900">{pillar.title}</h3>
                   )}
                   <p className={`mt-3 text-sm leading-7 text-navy-700${isKo ? " font-ko" : ""}`}>
                     {pillar.desc}
@@ -74,6 +74,7 @@ export default async function ProgramsPage({ params }: Props) {
             title={p.coverage.title}
             titleKo={p.coverage.titleKo || undefined}
             description={p.coverage.desc}
+            isKo={isKo}
           />
           <div className="mt-10 flex flex-wrap justify-center gap-2.5">
             {p.coverage.chips.map((c) => (
@@ -99,6 +100,7 @@ export default async function ProgramsPage({ params }: Props) {
             eyebrow={p.ops.eyebrow}
             title={p.ops.title}
             titleKo={p.ops.titleKo || undefined}
+            isKo={isKo}
           />
           <div className="mt-12 grid gap-6 sm:grid-cols-3">
             {p.ops.items.map((o, i) => {
@@ -109,11 +111,11 @@ export default async function ProgramsPage({ params }: Props) {
                     <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-navy-50 text-navy-700">
                       <Icon className="h-5 w-5" />
                     </span>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-navy-500">
+                    <p className={`text-xs font-semibold uppercase tracking-wider text-navy-500${isKo ? " font-ko" : ""}`}>
                       {o.label}
                     </p>
                   </div>
-                  <p className="mt-4 text-lg font-semibold text-navy-900">{o.value}</p>
+                  <p className={`mt-4 text-lg font-semibold text-navy-900${isKo ? " font-ko" : ""}`}>{o.value}</p>
                   {o.sublabel && <p className="mt-0.5 text-sm text-navy-600">{o.sublabel}</p>}
                 </div>
               );
