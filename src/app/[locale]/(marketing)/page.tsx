@@ -57,10 +57,12 @@ function HeroSection({ d, lp, isKo }: { d: Awaited<ReturnType<typeof getDictiona
     <HeroBackground>
       <Container className="relative py-24 sm:py-32 lg:py-40">
         <div className="mx-auto max-w-3xl text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3.5 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-white backdrop-blur">
-            <Sparkles className="h-3.5 w-3.5 text-gold-300" />
-            {h.badge}
-          </span>
+          {h.badge && (
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3.5 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-white backdrop-blur">
+              <Sparkles className="h-3.5 w-3.5 text-gold-300" />
+              {h.badge}
+            </span>
+          )}
           {isKo ? (
             <h1
               className="mt-7 text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl font-ko"

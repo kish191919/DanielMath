@@ -38,10 +38,12 @@ export default async function ResourcesHubPage({ params }: Props) {
       <section className="bg-navy-900 py-20 sm:py-28">
         <Container>
           <div className="mx-auto max-w-3xl text-center">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-white/80">
-              <GraduationCap className="h-3.5 w-3.5" />
-              {hub.badge}
-            </span>
+            {hub.badge && (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-white/80">
+                <GraduationCap className="h-3.5 w-3.5" />
+                {hub.badge}
+              </span>
+            )}
             <h1 className={`mt-6 text-4xl font-bold tracking-tight text-white sm:text-5xl${isKo ? " font-ko" : ""}`}>
               {hub.title}
             </h1>
