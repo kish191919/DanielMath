@@ -46,24 +46,9 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
-  // ── Marketing: locale rewriting ──────────────────────────────────────────
+  // ── Marketing: set x-locale header (URL rewriting handled by next.config) ──
   if (isMarketingPath(pathname)) {
-    const locale = extractLocale(pathname);
-
-    if (!locale) {
-      // No locale prefix → rewrite to default (ko) and forward x-locale header
-      const url = request.nextUrl.clone();
-      url.pathname = `/${defaultLocale}${pathname === "/" ? "" : pathname}`;
-
-      const requestHeaders = new Headers(request.headers);
-      requestHeaders.set("x-locale", defaultLocale);
-
-      return NextResponse.rewrite(url, {
-        request: { headers: requestHeaders },
-      });
-    }
-
-    // Already has a locale prefix → just forward x-locale header
+    const locale = extractLocale(pathname) ?? defaultLocale;
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set("x-locale", locale);
     return NextResponse.next({ request: { headers: requestHeaders } });
