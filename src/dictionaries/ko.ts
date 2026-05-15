@@ -1,7 +1,7 @@
 const ko = {
   meta: {
     description:
-      "4명 소수 정예, AAP·CogAT/NNAT·AMC 8 통합 커리큘럼으로 3-6학년 영재 수학을 키우는 한인 수학공부방.",
+      "4명 소수 정예, AAP·CogAT/NNAT 통합 커리큘럼으로 3-6학년 영재 수학을 키우는 한인 수학 아카데미.",
   },
   nav: {
     programs: "프로그램",
@@ -16,35 +16,35 @@ const ko = {
       badge: "",
       h1line1: "소수 정예,",
       h1highlight: "영재",
-      h1line2: "수학 공부방.",
+      h1line2: "수학 아카데미.",
       subtitle: "4명 정원, 3–6학년 집중 수업.",
-      desc: "AAP·CogAT/NNAT·AMC 8 통합 커리큘럼 · 월·화·목·금 오후 5시~8시",
+      desc: "AAP·CogAT/NNAT 통합 커리큘럼 · 월·화·목·금 오후 5시~8시",
       ctaInquire: "상담 신청",
       ctaPrograms: "프로그램 보기",
     },
     stats: [
       { value: "3–6학년", label: "3-6학년 대상", sublabel: "" },
-      { value: "4명", label: "회당 정원", sublabel: "" },
-      { value: "주 4회", label: "월·화·목·금", sublabel: "" },
-      { value: "90분", label: "회당 수업 시간", sublabel: "" },
+      { value: "4명", label: "클래스당 정원", sublabel: "" },
+      { value: "주 1~2회", label: "월·목 / 화·금", sublabel: "" },
+      { value: "90분", label: "수업 시간", sublabel: "" },
     ],
     programs: {
       eyebrow: "프로그램",
       title: "4명 정원, 검증된 교재로 영재 수학",
-      titleKo: "Small group. Proven materials.",
-      desc: "Singapore Math·Beast Academy로 영재 수학과 토론 수업, IXL로 개념 완성, CogAT/NNAT 준비까지 — 4명 소수 정예 수업으로 체계적으로 운영됩니다.",
+      titleKo: "",
+      desc: "Singapore Math·Beast Academy로 영재 수학과 토론 수업, IXL Math로 개념 완성, CogAT/NNAT 준비까지 모두 4명 소수 정예 수업으로 체계적으로 운영됩니다.",
       h3en: "Same room. Proven curriculum.",
       h3ko: "검증된 교재, 함께 성장하는 수업",
-      body: "학년별 4명이 Singapore Math·Beast Academy로 영재 수학과 토론 중심 수업을 하고, IXL로 개념을 완성하며, CogAT/NNAT 준비까지 한 수업 안에서 이루어집니다.",
+      body: "학년별 4명이 Singapore Math·Beast Academy로 영재 수학과 토론 중심 수업을 하고, IXL Math로 개념을 완성하며, CogAT/NNAT 준비까지 한 수업 안에서 이루어집니다.",
       classSize: { label: "정원", value: "회당 최대 4명", sublabel: "" },
-      time: { label: "시간", value: "주 4회 · 90분", sublabel: "" },
+      time: { label: "시간", value: "주 1~2회 · 90분", sublabel: "" },
       schedule: "월·화·목·금 오후 5:00~6:30 / 6:30~8:00",
       ctaDetails: "프로그램 자세히 보기",
       ctaInquire: "무료 상담 신청",
     },
     why: {
-      eyebrow: "Why Daniel Math",
-      title: "소수 정예로 설계된 영재 수학 공부방",
+      eyebrow: "Why Daniel Math Academy",
+      title: "소수 정예로 설계된 영재 수학 아카데미",
       titleKo: "Small group. Expert curriculum. Real results.",
       features: [
         {
@@ -60,7 +60,7 @@ const ko = {
         {
           title: "Proven Textbooks",
           titleKo: "검증된 교재 사용",
-          desc: "Singapore Math·Beast Academy·IXL — 세계적으로 인정받는 교재로 개념 이해, 토론·사고력, 기본기 완성을 체계적으로 키웁니다.",
+          desc: "Singapore Math·Beast Academy·IXL Math — 세계적으로 인정받는 교재로 개념 이해, 토론·사고력, 기본기 완성을 체계적으로 키웁니다.",
         },
         {
           title: "Structured Progression",
@@ -78,44 +78,30 @@ const ko = {
     },
     how: {
       eyebrow: "수업 방식",
-      title: "매 수업, 네 단계로 돌아갑니다",
-      titleKo: "Four steps, every single session.",
+      title: "처음 등록부터 매 수업, 이렇게 이루어집니다",
+      titleKo: "",
       desc: "매 수업 실제로 이루어지는 구체적인 흐름입니다.",
       steps: [
-        { title: "Assessment", titleKo: "배치 진단", desc: "처음 등록 시 학생 수준을 파악해 적합한 시간대에 배정합니다." },
-        { title: "Class Session", titleKo: "수업 진행", desc: "같은 커리큘럼 학습지로 함께 배우고 문제를 풀며 개념을 익힙니다." },
-        { title: "Review", titleKo: "오답 정리", desc: "틀린 문제를 함께 검토하고 개념 이해를 확인합니다." },
-        { title: "Parent Update", titleKo: "학부모 소통", desc: "수업 내용과 진도를 학부모와 정기적으로 공유합니다." },
+        { title: "Placement", titleKo: "배치 진단", desc: "처음 등록 시 한 번만 진행합니다. 학생 수준을 파악해 적합한 클래스와 시간대에 배정합니다." },
+        { title: "IXL Diagnostic", titleKo: "IXL 진단", desc: "매 수업 시작, IXL Math 숙제를 검사·채점합니다. 정답률 데이터로 약점을 파악하고 그날 수업 방향을 설정합니다." },
+        { title: "Concept Learning", titleKo: "개념 학습", desc: "Singapore Math·Beast Academy 학습지로 수학 개념의 '왜(Why)'를 탐구합니다. 답이 아닌 사고 과정을 중심으로 배웁니다." },
+        { title: "Solution Discussion", titleKo: "풀이 토론", desc: "4명 각자가 풀이 방법을 말로 설명하고 서로 다른 접근법을 비교합니다. 소수 정예이기 때문에 가능한 깊은 수업입니다." },
+        { title: "Advanced Practice", titleKo: "심화 연습", desc: "개념이 잡힌 후 심화 문제로 확장합니다. CogAT·NNAT·AAP에서 요구하는 사고력 문제 유형까지 다룹니다." },
+        { title: "Parent Update", titleKo: "학부모 소통", desc: "매월 한 번, 수업 내용·진도·학업 진척도를 학부모와 정기적으로 공유합니다." },
       ],
     },
     curriculum: {
       eyebrow: "커리큘럼",
       title: "검증된 세 교재, 하나의 통합 커리큘럼",
       titleKo: "Three proven materials. One integrated path.",
-      desc: "Singapore Math로 개념을 깊이 잡고, Beast Academy(Art of Problem Solving 교재)로 토론·사고력을 키우며, IXL로 기본기를 완성합니다. 이 세 교재가 CogAT·NNAT·AMC 8 준비와 함께 하나의 커리큘럼으로 운영됩니다.",
+      desc: "Singapore Math로 개념을 깊이 잡고, Beast Academy(Art of Problem Solving 교재)로 토론·사고력을 키우며, IXL Math로 기본기를 완성합니다. 이 세 교재가 CogAT·NNAT 준비와 함께 하나의 커리큘럼으로 운영됩니다.",
       chips: [
         { label: "Singapore Math", sublabel: "영재 수학 교재" },
         { label: "Beast Academy", sublabel: "토론·사고력 수업" },
         { label: "IXL Math", sublabel: "개념 완성 훈련" },
         { label: "CogAT / NNAT", sublabel: "AAP 진입 시험" },
-        { label: "AMC 8 Prep", sublabel: "수학 경시" },
         { label: "Common Core", sublabel: "학년별 진도" },
       ],
-    },
-    schoolCalendar: {
-      eyebrow: "FCPS 학사 일정",
-      title: "학교 캘린더",
-      titleKo: "FCPS School Year Calendar",
-      desc: "Fairfax County 학교의 주요 날짜를 한눈에 확인하세요.",
-      source: "출처: FCPS 공식 학사 일정",
-      sourceLink: "fcps.edu/calendars",
-      types: {
-        important: "주요 날짜",
-        holiday: "공휴일",
-        break: "방학",
-        quarter: "분기 마감",
-        noSchool: "휴교",
-      },
     },
     cta: {
       titleEn: "Ready to start?",
@@ -124,6 +110,25 @@ const ko = {
       desc: "등록 가능 인원이 제한적입니다. 자녀의 학년과 현재 수준을 알려주시면 가장 적합한 트랙을 안내해드립니다.",
       ctaInquire: "상담 신청",
       ctaPrograms: "프로그램 보기",
+    },
+  },
+  schoolCalendar: {
+    meta: {
+      title: "학교 캘린더",
+      description: "Fairfax County 공립학교(FCPS) 학사 일정을 한국어로 확인하세요. 방학·공휴일·분기 마감일 등 주요 날짜를 한눈에 볼 수 있습니다.",
+    },
+    eyebrow: "FCPS 학사 일정",
+    title: "학교 캘린더",
+    titleKo: "FCPS School Year Calendar",
+    desc: "Fairfax County 학교의 주요 날짜를 한눈에 확인하세요.",
+    source: "출처: FCPS 공식 학사 일정",
+    sourceLink: "fcps.edu/calendars",
+    types: {
+      important: "주요 날짜",
+      holiday: "공휴일",
+      break: "방학",
+      quarter: "분기 마감",
+      noSchool: "휴교",
     },
   },
   programs: {
@@ -146,7 +151,7 @@ const ko = {
       {
         title: "Proven Textbooks, Integrated",
         titleKo: "검증된 교재 통합 커리큘럼",
-        desc: "Singapore Math로 개념을 깊이 이해하고, Beast Academy(Art of Problem Solving 교재)로 토론 중심 영재 수학을 배우며, IXL로 기본 개념을 익힙니다. CogAT/NNAT 준비까지 하나의 흐름으로 운영합니다.",
+        desc: "Singapore Math로 개념을 깊이 이해하고, Beast Academy(Art of Problem Solving 교재)로 토론 중심 영재 수학을 배우며, IXL Math로 기본 개념을 익힙니다. CogAT/NNAT 준비까지 하나의 흐름으로 운영합니다.",
       },
       {
         title: "Homework Every Session",
@@ -163,7 +168,7 @@ const ko = {
       eyebrow: "커리큘럼",
       title: "검증된 세 교재, 하나의 통합 커리큘럼",
       titleKo: "Three trusted textbooks. One integrated curriculum.",
-      desc: "Singapore Math, Beast Academy, IXL를 핵심으로, 학생의 학년과 목표에 맞춰 CogAT/NNAT 준비까지 비율을 조정해 학습지에 반영합니다.",
+      desc: "Singapore Math, Beast Academy, IXL Math를 핵심으로, 학생의 학년과 목표에 맞춰 CogAT/NNAT 준비까지 비율을 조정해 학습지에 반영합니다.",
       chips: [
         { label: "Singapore Math", sublabel: "영재 수학 교재" },
         { label: "Beast Academy", sublabel: "AoPS 사고력 토론" },
@@ -187,7 +192,7 @@ const ko = {
   inquire: {
     meta: {
       title: "상담 신청",
-      description: "Daniel Math 공부방 무료 상담 신청. 자녀의 학년과 현재 수준을 알려주시면 24시간 내 회신드립니다.",
+      description: "Daniel Math Academy 무료 상담 신청. 자녀의 학년과 현재 수준을 알려주시면 24시간 내 회신드립니다.",
     },
     eyebrow: "상담 신청",
     title: "자녀에 대해 알려주세요",
@@ -254,7 +259,7 @@ const ko = {
           badge: "일정",
           title: "시험 & 대회 일정",
           titleEn: "Test & Competition Calendar",
-          desc: "AAP 스크리닝(CogAT/NNAT), SOL 시험, AMC 8, MOEMS 등 주요 시험과 대회 일정을 확인하세요.",
+          desc: "AAP 스크리닝(CogAT/NNAT), SOL 시험, MOEMS 등 주요 시험과 대회 일정을 확인하세요.",
           cta: "일정 보기",
         },
       ],
@@ -265,7 +270,7 @@ const ko = {
         points: [
           { title: "트랙이 두 가지입니다", body: "FCPS는 모든 초등학년에 일반(Standard)과 심화(Advanced/AAP) 두 개의 수학 트랙을 운영합니다. 심화반은 한 학년 높은 Virginia SOL 내용을 가르칩니다." },
           { title: "중학교 수학에 큰 영향을 줍니다", body: "6학년에 심화반(7학년 수준)을 이수하면 중학교에서 Algebra I를 8학년이 아닌 더 일찍 시작할 수 있습니다. 이는 고등학교 AP Calculus 이수에까지 이어집니다." },
-          { title: "AAP 배치는 매년 갱신됩니다", body: "AAP는 한 번 들어가면 끝이 아닙니다. 매 학년 말에 재평가가 있으며, 학업 유지가 필요합니다. Daniel Math는 AAP 진입과 유지를 모두 지원합니다." },
+          { title: "AAP 배치는 매년 갱신됩니다", body: "AAP는 한 번 들어가면 끝이 아닙니다. 매 학년 말에 재평가가 있으며, 학업 유지가 필요합니다. Daniel Math Academy는 AAP 진입과 유지를 모두 지원합니다." },
         ],
         note: "이 페이지의 커리큘럼 내용은 FCPS Year at a Glance와 Virginia Mathematics SOL을 바탕으로 작성되었습니다. 가장 최신 정보는 FCPS 공식 웹사이트에서 확인하시기 바랍니다.",
         noteLink: "FCPS 공식 웹사이트",

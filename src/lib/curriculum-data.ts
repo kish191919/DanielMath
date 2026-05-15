@@ -1041,17 +1041,6 @@ export const testEvents: TestEvent[] = [
     color: "navy",
   },
   {
-    name: "AMC 8 (Math Competition)",
-    nameKo: "AMC 8 수학 경시대회",
-    when: "Mid-November (annually)",
-    whenKo: "매년 11월 중순",
-    grades: "Gr 6 and below (recommended for advanced 4–5)",
-    gradesKo: "6학년 이하 (4~5학년 심화반 권장)",
-    description:
-      "The AMC 8 (American Mathematics Competition) is a 25-question multiple-choice contest covering pre-algebra topics. It is a great first math competition experience and is open to students in Grade 8 or below. Many AAP students in Grades 4–6 participate.",
-    color: "purple",
-  },
-  {
     name: "FCPS Math Olympiad (MOEMS)",
     nameKo: "FCPS 수학 올림피아드 (MOEMS)",
     when: "Nov – Mar (5 monthly contests)",
@@ -1059,7 +1048,7 @@ export const testEvents: TestEvent[] = [
     grades: "Gr 4–6 (school-based teams)",
     gradesKo: "4~6학년 (학교 팀 기반)",
     description:
-      "Mathematical Olympiads for Elementary and Middle Schools (MOEMS) is held in monthly rounds. Schools form teams and students compete individually. Strong preparation for AMC 8 and future math competitions.",
+      "Mathematical Olympiads for Elementary and Middle Schools (MOEMS) is held in monthly rounds. Schools form teams and students compete individually. Strong preparation for future math competitions.",
     color: "purple",
   },
 ];

@@ -262,7 +262,7 @@ function HighlightSection({
                   <p>
                     <strong className="text-navy-900">중학교 진입 전략</strong> — 심화반 5~6학년을 마친 학생은 중학교에서
                     Algebra I를 조기 이수할 수 있어, 고등학교 AP Calculus AB/BC까지의 경로가 열립니다.
-                    Daniel Math는 이 진입 준비를 전문적으로 지원합니다.
+                    Daniel Math Academy는 이 진입 준비를 전문적으로 지원합니다.
                   </p>
                 )}
               </>
@@ -280,7 +280,7 @@ function HighlightSection({
                   <p>
                     <strong className="text-navy-900">Middle School Strategy</strong> — Students who finish Advanced 5th–6th grade can access Algebra I early in middle school,
                     opening the path to AP Calculus AB/BC in high school.
-                    Daniel Math specializes in preparing students for this transition.
+                    Daniel Math Academy specializes in preparing students for this transition.
                   </p>
                 )}
               </>

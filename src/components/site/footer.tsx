@@ -27,8 +27,8 @@ export function SiteFooter({ locale }: { locale: Locale }) {
               lang={isKo ? "ko" : undefined}
             >
               {isKo
-                ? "북버지니아 한인 3-6학년 학생을 위한 영재 수학 공부방. AAP·CogAT·AMC 8 통합 커리큘럼."
-                : "A boutique math studio for 3rd–6th grade students in Northern Virginia. AAP, CogAT, and AMC 8 curriculum."}
+                ? "북버지니아 한인 3-6학년 학생을 위한 영재 수학 아카데미. AAP·CogAT 통합 커리큘럼."
+                : "A boutique math studio for 3rd–6th grade students in Northern Virginia. AAP and CogAT curriculum."}
             </p>
           </div>
 
@@ -78,6 +78,11 @@ export function SiteFooter({ locale }: { locale: Locale }) {
               <li>
                 <Link href={lp("/resources/testing")} className="text-navy-700 hover:text-navy-900">
                   {isKo ? "시험 & 대회 일정" : "Test & Competition Calendar"}
+                </Link>
+              </li>
+              <li>
+                <Link href={lp("/school-calendar")} className="text-navy-700 hover:text-navy-900">
+                  {isKo ? "학교 캘린더" : "School Calendar"}
                 </Link>
               </li>
             </ul>

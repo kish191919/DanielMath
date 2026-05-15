@@ -8,6 +8,7 @@ const koRoutes = [
   "/resources/sol",
   "/resources/testing",
   "/thanks",
+  "/school-calendar",
 ];
 
 const nextConfig: NextConfig = {

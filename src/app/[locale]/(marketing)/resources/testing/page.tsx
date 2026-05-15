@@ -36,8 +36,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   if (!hasLocale(locale)) return {};
   return locale === "ko"
-    ? { title: "시험 & 대회 일정", description: "Fairfax County AAP 스크리닝 (CogAT/NNAT), Virginia SOL 시험, AMC 8, MOEMS 등 수학 관련 시험과 대회 일정을 한국어로 안내합니다." }
-    : { title: "Test & Competition Calendar", description: "AAP screening (CogAT/NNAT), Virginia SOL tests, AMC 8, MOEMS, and more — all test and competition calendars for Fairfax County students." };
+    ? { title: "시험 & 대회 일정", description: "Fairfax County AAP 스크리닝 (CogAT/NNAT), Virginia SOL 시험, MOEMS 등 수학 관련 시험과 대회 일정을 한국어로 안내합니다." }
+    : { title: "Test & Competition Calendar", description: "AAP screening (CogAT/NNAT), Virginia SOL tests, MOEMS, and more — all test and competition calendars for Fairfax County students." };
 }
 
 export default async function TestingPage({ params }: Props) {
@@ -60,8 +60,8 @@ export default async function TestingPage({ params }: Props) {
             </h1>
             <p className={`mx-auto mt-5 max-w-2xl text-sm leading-7 text-navy-700${isKo ? " font-ko" : ""}`}>
               {isKo
-                ? "Fairfax County 학생들이 알아야 할 주요 수학 관련 시험과 대회 일정을 정리했습니다. AAP 스크리닝부터 SOL 시험, AMC 8까지 한 곳에서 확인하세요."
-                : "Key math tests and competitions for Fairfax County students — from AAP screening to SOL tests and AMC 8, all in one place."}
+                ? "Fairfax County 학생들이 알아야 할 주요 수학 관련 시험과 대회 일정을 정리했습니다. AAP 스크리닝부터 SOL 시험까지 한 곳에서 확인하세요."
+                : "Key math tests and competitions for Fairfax County students — from AAP screening to SOL tests, all in one place."}
             </p>
           </div>
         </Container>
@@ -164,12 +164,12 @@ export default async function TestingPage({ params }: Props) {
         <Container>
           <div className="mx-auto max-w-2xl rounded-2xl border border-navy-100 bg-white p-8 text-center shadow-sm">
             <h2 className={`text-xl font-bold text-navy-900${isKo ? " font-ko" : ""}`}>
-              {isKo ? "시험 준비, Daniel Math와 함께하세요" : "Prepare for These Tests with Daniel Math"}
+              {isKo ? "시험 준비, Daniel Math Academy와 함께하세요" : "Prepare for These Tests with Daniel Math Academy"}
             </h2>
             <p className={`mx-auto mt-3 max-w-lg text-sm leading-7 text-navy-700${isKo ? " font-ko" : ""}`}>
               {isKo
-                ? "AAP 스크리닝(CogAT/NNAT), SOL 시험, AMC 8 — 모든 시험에 맞춘 커리큘럼을 개인별로 설계합니다."
-                : "AAP screening (CogAT/NNAT), SOL tests, AMC 8 — we build a curriculum tailored to each student's test goals."}
+                ? "AAP 스크리닝(CogAT/NNAT), SOL 시험 — 모든 시험에 맞춘 커리큘럼을 개인별로 설계합니다."
+                : "AAP screening (CogAT/NNAT), SOL tests — we build a curriculum tailored to each student's test goals."}
             </p>
             <Link
               href={lp("/inquire")}

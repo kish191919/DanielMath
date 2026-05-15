@@ -3,7 +3,7 @@ import type { Dictionary } from './ko'
 const en: Dictionary = {
   meta: {
     description:
-      "A small-group gifted math academy for grades 3–6 in Northern Virginia. AAP, CogAT/NNAT, and AMC 8 — 4 students per class, Mon/Tue/Thu/Fri.",
+      "A small-group gifted math academy for grades 3–6 in Northern Virginia. AAP, CogAT/NNAT — 4 students per class, Mon/Tue/Thu/Fri.",
   },
   nav: {
     programs: "Programs",
@@ -20,32 +20,32 @@ const en: Dictionary = {
       h1highlight: "Gifted",
       h1line2: "math academy.",
       subtitle: "4 students per class. Grades 3–6.",
-      desc: "AAP · CogAT/NNAT · AMC 8 — Mon, Tue, Thu, Fri · 5–8 PM",
+      desc: "AAP · CogAT/NNAT — Mon, Tue, Thu, Fri · 5–8 PM",
       ctaInquire: "Schedule a Consult",
       ctaPrograms: "View Program",
     },
     stats: [
       { value: "3–6", label: "Grades served", sublabel: "Grades 3–6" },
-      { value: "4", label: "Per session", sublabel: "Students per session" },
-      { value: "4×/wk", label: "M · T · Th · F", sublabel: "Days per week" },
-      { value: "90 min", label: "Per session", sublabel: "Session length" },
+      { value: "4", label: "Per class", sublabel: "Students per class" },
+      { value: "1–2×/wk", label: "Mon·Thu / Tue·Fri", sublabel: "Sessions per week" },
+      { value: "90 min", label: "Session length", sublabel: "Per session" },
     ],
     programs: {
       eyebrow: "Program",
       title: "Small group. Proven materials. Big results.",
       titleKo: "",
-      desc: "Students in grades 3–6 learn together in groups of four using Singapore Math, Beast Academy, and IXL — with structured CogAT/NNAT prep woven in throughout.",
+      desc: "Students in grades 3–6 learn together in groups of four using Singapore Math, Beast Academy, and IXL Math — with structured CogAT/NNAT prep woven in throughout.",
       h3en: "Same room. Proven curriculum.",
       h3ko: "",
-      body: "Four students per class, learning from Singapore Math and Beast Academy for gifted enrichment and discussion-based problem solving, IXL for concept mastery, and structured CogAT/NNAT prep — all in one focused session.",
+      body: "Four students per class, learning from Singapore Math and Beast Academy for gifted enrichment and discussion-based problem solving, IXL Math for concept mastery, and structured CogAT/NNAT prep — all in one focused session.",
       classSize: { label: "Class Size", value: "Up to 4 students", sublabel: "" },
-      time: { label: "Time", value: "4×/wk · 90 min", sublabel: "" },
+      time: { label: "Time", value: "1–2×/wk · 90 min", sublabel: "" },
       schedule: "Mon/Tue/Thu/Fri · 5:00–6:30 PM / 6:30–8:00 PM",
       ctaDetails: "Program Details",
       ctaInquire: "Free Consultation",
     },
     why: {
-      eyebrow: "Why Daniel Math",
+      eyebrow: "Why Daniel Math Academy",
       title: "A small group academy built for gifted math.",
       titleKo: "",
       features: [
@@ -62,7 +62,7 @@ const en: Dictionary = {
         {
           title: "Proven Textbooks",
           titleKo: "",
-          desc: "Singapore Math, Beast Academy, and IXL — internationally recognized materials used to build deep understanding, discussion skills, and concept mastery.",
+          desc: "Singapore Math, Beast Academy, and IXL Math — internationally recognized materials used to build deep understanding, discussion skills, and concept mastery.",
         },
         {
           title: "Structured Progression",
@@ -80,44 +80,30 @@ const en: Dictionary = {
     },
     how: {
       eyebrow: "How It Works",
-      title: "Four steps, every single session.",
+      title: "From day one through every session.",
       titleKo: "",
       desc: "A concrete process applied every session — not abstract promises.",
       steps: [
-        { title: "Assessment", titleKo: "", desc: "At enrollment, we assess your child's level and assign them to the right time slot." },
-        { title: "Class Session", titleKo: "", desc: "Students work through the same curriculum worksheets together, building understanding as a group." },
-        { title: "Review", titleKo: "", desc: "Incorrect answers are reviewed together so students understand exactly where they went wrong." },
-        { title: "Parent Update", titleKo: "", desc: "Parents receive a regular update on class content and their child's progress." },
+        { title: "Placement", titleKo: "", desc: "A one-time placement test at enrollment. We assess each student's level and assign them to the right class and time slot." },
+        { title: "IXL Diagnostic", titleKo: "", desc: "Every session starts with IXL Math homework review. We analyze accuracy data to identify weak areas and set the day's instructional focus." },
+        { title: "Concept Learning", titleKo: "", desc: "Students work through Singapore Math and Beast Academy worksheets focused on the 'why' behind each concept — building mathematical reasoning, not memorization." },
+        { title: "Solution Discussion", titleKo: "", desc: "Each student explains their solution approach aloud. Different methods are compared and discussed — a depth of engagement only possible in a small group." },
+        { title: "Advanced Practice", titleKo: "", desc: "After concepts are solidified, students tackle extension problems targeting the higher-order thinking required for CogAT, NNAT, and AAP." },
+        { title: "Parent Update", titleKo: "", desc: "Once a month, parents receive a structured update covering class content, curriculum progress, and their child's academic growth." },
       ],
     },
     curriculum: {
       eyebrow: "Curriculum",
       title: "Three proven materials. One integrated path.",
       titleKo: "",
-      desc: "Singapore Math builds deep conceptual understanding. Beast Academy (by Art of Problem Solving) develops creative problem-solving through discussion. IXL reinforces fundamentals. Together they form our integrated AAP, CogAT, and competition pathway.",
+      desc: "Singapore Math builds deep conceptual understanding. Beast Academy (by Art of Problem Solving) develops creative problem-solving through discussion. IXL Math reinforces fundamentals. Together they form our integrated AAP, CogAT, and competition pathway.",
       chips: [
         { label: "Singapore Math", sublabel: "Gifted textbook" },
         { label: "Beast Academy", sublabel: "Discussion & reasoning" },
         { label: "IXL Math", sublabel: "Concept mastery" },
         { label: "CogAT / NNAT", sublabel: "AAP placement prep" },
-        { label: "AMC 8 Prep", sublabel: "Competition math" },
         { label: "Common Core", sublabel: "Grade-level standards" },
       ],
-    },
-    schoolCalendar: {
-      eyebrow: "FCPS School Year",
-      title: "School Year Calendar",
-      titleKo: "",
-      desc: "Key dates for Fairfax County Public Schools — breaks, holidays, and quarter markers.",
-      source: "Source: FCPS Standard School Year Calendar",
-      sourceLink: "fcps.edu/calendars",
-      types: {
-        important: "Key Date",
-        holiday: "Holiday",
-        break: "Break",
-        quarter: "Quarter End",
-        noSchool: "No School",
-      },
     },
     cta: {
       titleEn: "Ready to start?",
@@ -126,6 +112,25 @@ const en: Dictionary = {
       desc: "Enrollment is limited. Share your child's grade and current level, and we'll recommend the right track.",
       ctaInquire: "Schedule a Consult",
       ctaPrograms: "View Program",
+    },
+  },
+  schoolCalendar: {
+    meta: {
+      title: "School Calendar",
+      description: "FCPS school year calendar — key dates for Fairfax County Public Schools including breaks, holidays, and quarter end dates.",
+    },
+    eyebrow: "FCPS School Year",
+    title: "School Year Calendar",
+    titleKo: "",
+    desc: "Key dates for Fairfax County Public Schools — breaks, holidays, and quarter markers.",
+    source: "Source: FCPS Standard School Year Calendar",
+    sourceLink: "fcps.edu/calendars",
+    types: {
+      important: "Key Date",
+      holiday: "Holiday",
+      break: "Break",
+      quarter: "Quarter End",
+      noSchool: "No School",
     },
   },
   programs: {
@@ -148,7 +153,7 @@ const en: Dictionary = {
       {
         title: "Proven Textbooks, Integrated",
         titleKo: "",
-        desc: "We use Singapore Math for deep conceptual understanding, Beast Academy (by Art of Problem Solving) for discussion-centered gifted enrichment, and IXL to build fundamental concept mastery — all blended with CogAT/NNAT prep in one structured sequence.",
+        desc: "We use Singapore Math for deep conceptual understanding, Beast Academy (by Art of Problem Solving) for discussion-centered gifted enrichment, and IXL Math to build fundamental concept mastery — all blended with CogAT/NNAT prep in one structured sequence.",
       },
       {
         title: "Homework Every Session",
@@ -165,7 +170,7 @@ const en: Dictionary = {
       eyebrow: "Curriculum",
       title: "Three trusted textbooks. One integrated curriculum.",
       titleKo: "",
-      desc: "Singapore Math, Beast Academy, and IXL form the core — blended with CogAT/NNAT prep at ratios matched to each student's grade and goals.",
+      desc: "Singapore Math, Beast Academy, and IXL Math form the core — blended with CogAT/NNAT prep at ratios matched to each student's grade and goals.",
       chips: [
         { label: "Singapore Math", sublabel: "Gifted textbook" },
         { label: "Beast Academy", sublabel: "AoPS discussion math" },
@@ -189,7 +194,7 @@ const en: Dictionary = {
   inquire: {
     meta: {
       title: "Inquire",
-      description: "Schedule a free consultation with Daniel Math. Share your child's grade and current level and we'll respond within 24 hours.",
+      description: "Schedule a free consultation with Daniel Math Academy. Share your child's grade and current level and we'll respond within 24 hours.",
     },
     eyebrow: "Inquire",
     title: "Tell us about your child.",
@@ -256,7 +261,7 @@ const en: Dictionary = {
           badge: "Calendar",
           title: "Test & Competition Calendar",
           titleEn: "Test & Competition Calendar",
-          desc: "AAP screening (CogAT/NNAT), SOL tests, AMC 8, MOEMS, and more — all in one calendar.",
+          desc: "AAP screening (CogAT/NNAT), SOL tests, MOEMS, and more — all in one calendar.",
           cta: "View Calendar",
         },
       ],
@@ -267,7 +272,7 @@ const en: Dictionary = {
         points: [
           { title: "Two tracks at every grade", body: "FCPS runs two math tracks at every elementary grade: Standard and Advanced (AAP). Advanced covers content one grade level above the Virginia SOL standard." },
           { title: "Major impact on middle school", body: "Completing the advanced (AAP) track through 6th grade opens the path to Algebra I before 8th grade — which leads to AP Calculus AB/BC in high school." },
-          { title: "AAP placement is renewed annually", body: "Getting into AAP isn't permanent — it's re-evaluated every year. Daniel Math supports both initial placement and ongoing retention." },
+          { title: "AAP placement is renewed annually", body: "Getting into AAP isn't permanent — it's re-evaluated every year. Daniel Math Academy supports both initial placement and ongoing retention." },
         ],
         note: "Curriculum information on this site is based on the FCPS Year at a Glance and Virginia Mathematics SOL. For the most current information, please visit the",
         noteLink: "FCPS official website",

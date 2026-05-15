@@ -1,6 +1,6 @@
-# Daniel Math · 다니엘 수학공부방
+# Daniel Math Academy · 다니엘 수학 아카데미
 
-북버지니아(NoVa) 한인 K-6 학생을 위한 영재 수학 공부방 웹사이트.
+북버지니아(NoVa) 한인 K-6 학생을 위한 영재 수학 아카데미 웹사이트.
 AAP(Fairfax County Advanced Academic Program) 진입·유지를 목표로 하는 학생 대상.
 
 운영 인프라: **Vercel + Supabase + Claude API**.
