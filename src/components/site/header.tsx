@@ -25,14 +25,9 @@ export function SiteHeader({ locale }: { locale: Locale }) {
       <Container>
         <div className="flex h-16 items-center justify-between">
           <Link href={lp("/")} className="flex items-baseline gap-2">
-            <span className="text-lg font-bold tracking-tight text-navy-900">
-              {siteConfig.name}
+            <span className="text-lg font-bold tracking-tight text-navy-900" lang={isKo ? "ko" : undefined}>
+              {isKo ? siteConfig.nameKo : siteConfig.name}
             </span>
-            {isKo && (
-              <span className="hidden text-sm text-navy-600 sm:inline font-ko" lang="ko">
-                {siteConfig.nameKo}
-              </span>
-            )}
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">
@@ -41,13 +36,9 @@ export function SiteHeader({ locale }: { locale: Locale }) {
                 key={item.href}
                 href={lp(item.href)}
                 className="rounded-md px-3 py-2 text-sm font-medium text-navy-700 hover:bg-navy-50 hover:text-navy-900"
+                lang={isKo ? "ko" : undefined}
               >
-                <span>{item.label}</span>
-                {isKo && (
-                  <span className="ml-1.5 text-navy-500" lang="ko">
-                    {item.labelKo}
-                  </span>
-                )}
+                {isKo ? item.labelKo : item.label}
               </Link>
             ))}
             <Link
@@ -89,13 +80,9 @@ export function SiteHeader({ locale }: { locale: Locale }) {
                 href={lp(item.href)}
                 onClick={() => setOpen(false)}
                 className="rounded-md px-3 py-2.5 text-base font-medium text-navy-800 hover:bg-navy-50"
+                lang={isKo ? "ko" : undefined}
               >
-                {item.label}
-                {isKo && (
-                  <span className="ml-2 text-navy-500" lang="ko">
-                    {item.labelKo}
-                  </span>
-                )}
+                {isKo ? item.labelKo : item.label}
               </Link>
             ))}
             <Link
