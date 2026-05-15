@@ -9,6 +9,7 @@ const koRoutes = [
   "/resources/testing",
   "/thanks",
   "/school-calendar",
+  "/blog",
 ];
 
 const nextConfig: NextConfig = {
@@ -22,6 +23,11 @@ const nextConfig: NextConfig = {
       {
         source: "/resources/curriculum/:grade",
         destination: "/ko/resources/curriculum/:grade",
+      },
+      // Dynamic blog post pages
+      {
+        source: "/blog/:slug",
+        destination: "/ko/blog/:slug",
       },
     ];
   },

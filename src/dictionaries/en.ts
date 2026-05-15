@@ -294,6 +294,19 @@ const en: Dictionary = {
       },
     },
   },
+  blog: {
+    meta: {
+      title: "Blog",
+      description: "Math education resources for parents in the Fairfax area — AAP, CogAT/NNAT, curriculum, competitions, and home learning strategies explained clearly.",
+    },
+    eyebrow: "Blog",
+    title: "Math Education Insights",
+    desc: "AAP, test prep, curriculum, competitions, and home practice — everything Fairfax parents need to know about elementary math, explained clearly.",
+    backToList: "Back to Blog",
+    readMore: "Read More →",
+    minRead: "min read",
+    publishedAt: "Published",
+  },
   footer: {
     quickLinks: "Quick Links",
     mathResources: "Math Resources",

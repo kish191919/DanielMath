@@ -292,6 +292,19 @@ const ko = {
       },
     },
   },
+  blog: {
+    meta: {
+      title: "블로그",
+      description: "Fairfax 지역 학부모를 위한 수학 교육 정보 블로그. AAP, CogAT/NNAT, 교재, 경시대회, 가정 학습 전략을 쉽게 풀어드립니다.",
+    },
+    eyebrow: "블로그",
+    title: "수학 교육 이야기",
+    desc: "AAP, 시험 준비, 교재, 경시대회까지 — Fairfax 학부모가 꼭 알아야 할 수학 교육 정보를 쉽게 풀어드립니다.",
+    backToList: "블로그 목록으로",
+    readMore: "자세히 읽기 →",
+    minRead: "분",
+    publishedAt: "작성일",
+  },
   footer: {
     quickLinks: "바로가기",
     mathResources: "수학 자료",
