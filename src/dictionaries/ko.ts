@@ -119,7 +119,7 @@ const ko = {
     },
     eyebrow: "FCPS 학사 일정",
     title: "학교 캘린더",
-    titleKo: "FCPS School Year Calendar",
+    titleKo: "",
     desc: "Fairfax County 학교의 주요 날짜를 한눈에 확인하세요.",
     source: "출처: FCPS 공식 학사 일정",
     sourceLink: "fcps.edu/calendars",
@@ -139,7 +139,7 @@ const ko = {
     header: {
       eyebrow: "프로그램",
       title: "학년별 소수 정예, 검증된 커리큘럼",
-      titleKo: "Grade-separated. Small groups. Proven materials.",
+      titleKo: "",
       desc: "학년별로 분리된 소수 정예 수업입니다. 각 학년이 같은 교재와 자료를 사용하되, 학년 수준에 맞춰 진행합니다.",
     },
     pillars: [
@@ -159,15 +159,15 @@ const ko = {
         desc: "수업에서 다룬 개념을 집에서도 이어서 연습할 수 있도록 매 수업 후 숙제가 제공됩니다. 다음 수업 전까지 복습을 유지합니다.",
       },
       {
-        title: "Bi-Weekly Parent Report",
-        titleKo: "격주 학부모 리포트",
-        desc: "2주에 한 번, 학습 진도·정답률·잘한 영역·보완이 필요한 영역을 학부모님께 한국어로 공유합니다.",
+        title: "Monthly Parent Report",
+        titleKo: "월간 학부모 리포트",
+        desc: "매월 한 번, 수업 내용·학습 진도·학업 진척도를 정리해 학부모님께 한국어로 공유합니다. 잘한 영역과 보완이 필요한 부분을 함께 안내해 가정에서도 지원이 이어질 수 있도록 합니다.",
       },
     ],
     coverage: {
       eyebrow: "커리큘럼",
       title: "검증된 세 교재, 하나의 통합 커리큘럼",
-      titleKo: "Three trusted textbooks. One integrated curriculum.",
+      titleKo: "",
       desc: "Singapore Math, Beast Academy, IXL Math를 핵심으로, 학생의 학년과 목표에 맞춰 CogAT/NNAT 준비까지 비율을 조정해 학습지에 반영합니다.",
       chips: [
         { label: "Singapore Math", sublabel: "영재 수학 교재" },
@@ -179,13 +179,17 @@ const ko = {
     ops: {
       eyebrow: "운영 안내",
       title: "간결하고 집중된 운영",
-      titleKo: "Simple, focused.",
+      titleKo: "",
       items: [
         { label: "운영일", value: "월 · 화 · 목 · 금", sublabel: "" },
         { label: "운영시간", value: "오후 5시 – 8시", sublabel: "" },
-        { label: "정원", value: "회당 최대 4명", sublabel: "" },
+        { label: "정원", value: "클래스당 최대 4명", sublabel: "" },
       ],
-      note: "학년당 주 2회 · 90분 수업. 월·목 3학년(5–6:30) / 5학년(6:30–8), 화·금 4학년(5–6:30) / 6학년(6:30–8).",
+      noteHeader: "학년당 주 2회 · 90분 수업",
+      scheduleRows: [
+        "월·목  ·  3학년 (5:00–6:30)  /  5학년 (6:30–8:00)",
+        "화·금  ·  4학년 (5:00–6:30)  /  6학년 (6:30–8:00)",
+      ],
       cta: "무료 상담 · 진단 신청",
     },
   },

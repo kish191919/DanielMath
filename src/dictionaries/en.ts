@@ -161,9 +161,9 @@ const en: Dictionary = {
         desc: "Students receive homework after every session to keep practicing the concepts covered in class — bridging the gap between weekly meetings.",
       },
       {
-        title: "Bi-Weekly Parent Report",
+        title: "Monthly Parent Report",
         titleKo: "",
-        desc: "Every two weeks, parents receive a written update covering progress, accuracy, areas of strength, and what to watch.",
+        desc: "Once a month, parents receive a written update covering lesson content, curriculum progress, and overall academic development — including strengths and areas to focus on.",
       },
     ],
     coverage: {
@@ -185,9 +185,13 @@ const en: Dictionary = {
       items: [
         { label: "Days", value: "Mon · Tue · Thu · Fri", sublabel: "" },
         { label: "Hours", value: "5:00 PM – 8:00 PM", sublabel: "" },
-        { label: "Class Size", value: "Up to 4 students per session", sublabel: "" },
+        { label: "Class Size", value: "Up to 4 students per class", sublabel: "" },
       ],
-      note: "2 sessions/week · 90 min per session. Mon/Thu: Grade 3 (5–6:30 PM) / Grade 5 (6:30–8 PM). Tue/Fri: Grade 4 (5–6:30 PM) / Grade 6 (6:30–8 PM).",
+      noteHeader: "2 sessions/week · 90 min each",
+      scheduleRows: [
+        "Mon/Thu  ·  Grade 3 (5:00–6:30 PM)  /  Grade 5 (6:30–8:00 PM)",
+        "Tue/Fri  ·  Grade 4 (5:00–6:30 PM)  /  Grade 6 (6:30–8:00 PM)",
+      ],
       cta: "Free Consult & Assessment",
     },
   },

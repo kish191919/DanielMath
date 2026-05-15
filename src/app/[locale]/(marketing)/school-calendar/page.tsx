@@ -28,7 +28,7 @@ export default async function SchoolCalendarPage({ params }: Props) {
 
   return (
     <>
-      <div className="border-b border-navy-100 bg-white py-6">
+      <div className="border-b border-navy-100 bg-white py-4">
         <Container>
           <Link
             href={lp("/")}
@@ -37,12 +37,6 @@ export default async function SchoolCalendarPage({ params }: Props) {
             <ArrowLeft className="h-4 w-4" />
             {isKo ? "홈으로" : "Home"}
           </Link>
-          <h1
-            className={`mt-3 text-2xl font-bold text-navy-900 sm:text-3xl${isKo ? " font-ko" : ""}`}
-            lang={isKo ? "ko" : undefined}
-          >
-            {isKo ? "학교 캘린더" : "School Calendar"}
-          </h1>
         </Container>
       </div>
       <SchoolCalendarSection d={d.schoolCalendar} isKo={isKo} />

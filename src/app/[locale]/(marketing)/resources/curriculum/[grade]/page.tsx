@@ -7,6 +7,7 @@ import { Section } from "@/components/site/section";
 import { grades, gradeBySlug, type GradeData, type TrackData } from "@/lib/curriculum-data";
 import { gradeEquivalentEn, highlightsEn } from "@/lib/curriculum-data-en";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
+import { QuarterTabs } from "@/components/site/curriculum-quarter-tabs";
 
 type Props = { params: Promise<{ locale: string; grade: string }> };
 
@@ -68,7 +69,7 @@ function GradeHeader({
             className={`flex items-center gap-1 text-sm text-navy-500 hover:text-navy-800${isKo ? " font-ko" : ""}`}
           >
             <ChevronLeft className="h-4 w-4" />
-            {isKo ? "커리큘럼 목록" : "Curriculum List"}
+            {isKo ? "자료 센터로 돌아가기" : "Back to Curriculum"}
           </Link>
           <div className="flex items-center gap-2">
             {prev && (
@@ -112,10 +113,6 @@ function ComparisonSection({
   enData: { standard: string; advanced: string } | undefined;
   enHighlights: { standard: string[]; advanced: string[] } | undefined;
 }) {
-  const qLabels = isKo
-    ? { Q1: "1분기 (9~11월)", Q2: "2분기 (12~2월)", Q3: "3분기 (2~4월)", Q4: "4분기 (4~6월)" }
-    : { Q1: "Q1 (Sep–Nov)", Q2: "Q2 (Dec–Feb)", Q3: "Q3 (Feb–Apr)", Q4: "Q4 (Apr–Jun)" };
-
   return (
     <Section>
       <Container>
@@ -145,49 +142,12 @@ function ComparisonSection({
           />
         </div>
 
-        <div className="mt-4 space-y-4">
-          {(["Q1", "Q2", "Q3", "Q4"] as const).map((q) => {
-            const sq = g.standard.quarters.find((x) => x.quarter === q);
-            const aq = g.advanced.quarters.find((x) => x.quarter === q);
-            return (
-              <div key={q} className="grid gap-4 lg:grid-cols-2">
-                <div className="rounded-2xl border border-navy-100 bg-white p-5 shadow-sm">
-                  <div className="mb-3 flex items-center gap-2">
-                    <span className="rounded-md bg-navy-900 px-2 py-0.5 text-xs font-bold text-white">{q}</span>
-                    <span className="text-xs text-navy-500">{qLabels[q]}</span>
-                    {sq?.focusKo && isKo && (
-                      <span className="ml-auto text-xs font-semibold text-navy-700 font-ko">{sq.focusKo}</span>
-                    )}
-                  </div>
-                  <ul className="space-y-1.5">
-                    {sq?.topics.map((t) => (
-                      <li key={t.en} className="flex items-start gap-2 text-sm text-navy-800">
-                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-navy-400" />
-                        <span className={isKo ? "font-ko" : ""}>{isKo ? t.ko : t.en}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="rounded-2xl border border-gold-300/60 bg-amber-50/60 p-5">
-                  <div className="mb-3 flex items-center gap-2">
-                    <span className="rounded-md bg-gold-500 px-2 py-0.5 text-xs font-bold text-white">{q}</span>
-                    <span className="text-xs text-navy-500">{qLabels[q]}</span>
-                    {aq?.focusKo && isKo && (
-                      <span className="ml-auto text-xs font-semibold text-navy-700 font-ko">{aq.focusKo}</span>
-                    )}
-                  </div>
-                  <ul className="space-y-1.5">
-                    {aq?.topics.map((t) => (
-                      <li key={t.en} className="flex items-start gap-2 text-sm text-navy-800">
-                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gold-500" />
-                        <span className={isKo ? "font-ko" : ""}>{isKo ? t.ko : t.en}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            );
-          })}
+        <div className="mt-4">
+          <QuarterTabs
+            standardQuarters={g.standard.quarters}
+            advancedQuarters={g.advanced.quarters}
+            isKo={isKo}
+          />
         </div>
       </Container>
     </Section>

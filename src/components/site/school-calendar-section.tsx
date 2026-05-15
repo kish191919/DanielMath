@@ -26,6 +26,15 @@ const BADGE_STYLES: Record<EventType, string> = {
   noSchool: "bg-gray-100 text-gray-600",
 };
 
+const FILTER_ACTIVE: Record<EventType | "all", string> = {
+  all: "bg-navy-900 text-white shadow-sm",
+  important: "bg-navy-800 text-white shadow-sm",
+  break: "bg-amber-100 text-amber-800 border border-amber-300",
+  holiday: "bg-blue-100 text-blue-700 border border-blue-300",
+  quarter: "bg-yellow-100 text-yellow-700 border border-yellow-300",
+  noSchool: "bg-gray-200 text-gray-700 border border-gray-300",
+};
+
 const MONTH_NAMES_EN = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December",
@@ -56,16 +65,32 @@ function formatRange(start: string, end: string | undefined, isKo: boolean): str
 
 export function SchoolCalendarSection({ d, isKo }: { d: DictSlice; isKo: boolean }) {
   const [activeYear, setActiveYear] = useState<SchoolYearCalendar["id"]>("2025-26");
+  const [activeFilter, setActiveFilter] = useState<EventType | "all">("all");
 
   const yearData = schoolCalendars.find((y) => y.id === activeYear)!;
 
-  const grouped = yearData.events.reduce<Record<string, typeof yearData.events>>((acc, event) => {
+  const filteredEvents =
+    activeFilter === "all"
+      ? yearData.events
+      : yearData.events.filter((e) => e.type === activeFilter);
+
+  const grouped = filteredEvents.reduce<Record<string, typeof yearData.events>>((acc, event) => {
     const key = event.dateStart.slice(0, 7);
     if (!acc[key]) acc[key] = [];
     acc[key].push(event);
     return acc;
   }, {});
   const sortedMonths = Object.keys(grouped).sort();
+
+  const filterOptions: (EventType | "all")[] = ["all", "important", "break", "holiday", "quarter", "noSchool"];
+  const filterLabel: Record<EventType | "all", string> = {
+    all: isKo ? "전체" : "All",
+    important: d.types.important,
+    break: d.types.break,
+    holiday: d.types.holiday,
+    quarter: d.types.quarter,
+    noSchool: d.types.noSchool,
+  };
 
   return (
     <Section className="bg-navy-50/60">
@@ -83,7 +108,7 @@ export function SchoolCalendarSection({ d, isKo }: { d: DictSlice; isKo: boolean
           {YEAR_IDS.map((year) => (
             <button
               key={year}
-              onClick={() => setActiveYear(year)}
+              onClick={() => { setActiveYear(year); setActiveFilter("all"); }}
               className={
                 activeYear === year
                   ? "rounded-full px-5 py-2 text-sm font-semibold bg-navy-900 text-white shadow-sm"
@@ -95,61 +120,86 @@ export function SchoolCalendarSection({ d, isKo }: { d: DictSlice; isKo: boolean
           ))}
         </div>
 
-        {/* Event List */}
-        <div className="mt-6 rounded-2xl border border-navy-100 bg-white shadow-sm overflow-hidden">
-          <div className="divide-y divide-navy-50">
+        {/* Type Filter Chips */}
+        <div className="mt-4 flex flex-wrap gap-2">
+          {filterOptions.map((type) => (
+            <button
+              key={type}
+              onClick={() => setActiveFilter(type)}
+              className={`rounded-full px-3 py-1 text-[11px] font-semibold transition-colors ${
+                activeFilter === type
+                  ? FILTER_ACTIVE[type]
+                  : "bg-white text-navy-500 border border-navy-200 hover:border-navy-400 hover:text-navy-700"
+              }`}
+            >
+              {filterLabel[type]}
+            </button>
+          ))}
+        </div>
+
+        {/* Month Card Grid */}
+        {sortedMonths.length === 0 ? (
+          <div className="mt-6 rounded-2xl border border-navy-100 bg-white shadow-sm px-6 py-10 text-center text-sm text-navy-400">
+            {isKo ? "해당 일정이 없습니다." : "No events found."}
+          </div>
+        ) : (
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {sortedMonths.map((monthKey) => {
               const [y, m] = monthKey.split("-");
               const monthIdx = parseInt(m, 10) - 1;
               const monthLabel = isKo
                 ? `${y}년 ${MONTH_NAMES_KO[monthIdx]}`
                 : `${MONTH_NAMES_EN[monthIdx]} ${y}`;
+              const events = grouped[monthKey];
 
               return (
-                <div key={monthKey}>
-                  <div className="px-5 py-2.5 bg-navy-50/70">
-                    <p className={`text-xs font-semibold uppercase tracking-widest text-navy-500${isKo ? " font-ko" : ""}`}>
+                <div key={monthKey} className="rounded-xl border border-navy-100 bg-white shadow-sm overflow-hidden">
+                  <div className="px-4 py-2.5 bg-navy-50/80 border-b border-navy-100 flex items-center justify-between">
+                    <p className={`text-xs font-semibold uppercase tracking-widest text-navy-600${isKo ? " font-ko" : ""}`}>
                       {monthLabel}
                     </p>
+                    <span className="text-[10px] font-medium text-navy-400">{events.length}건</span>
                   </div>
-                  {grouped[monthKey].map((event, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-4 px-5 py-3 hover:bg-navy-50/40 transition-colors"
-                    >
-                      <span className="w-28 shrink-0 text-xs font-mono text-navy-500">
-                        {formatRange(event.dateStart, event.dateEnd, isKo)}
-                      </span>
-                      <span
-                        className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${BADGE_STYLES[event.type]}`}
+                  <div className="divide-y divide-navy-50">
+                    {events.map((event, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-navy-50/40 transition-colors"
                       >
-                        {d.types[event.type]}
-                      </span>
-                      <span className={`text-sm text-navy-800${isKo ? " font-ko" : ""}`}>
-                        {isKo ? event.labelKo : event.labelEn}
-                      </span>
-                    </div>
-                  ))}
+                        <span className="w-24 shrink-0 text-[11px] font-mono text-navy-400">
+                          {formatRange(event.dateStart, event.dateEnd, isKo)}
+                        </span>
+                        <span
+                          className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${BADGE_STYLES[event.type]}`}
+                        >
+                          {d.types[event.type]}
+                        </span>
+                        <span className={`text-sm text-navy-800 leading-snug${isKo ? " font-ko" : ""}`}>
+                          {isKo ? event.labelKo : event.labelEn}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               );
             })}
           </div>
+        )}
 
-          {/* Source Footer */}
-          <div className="flex items-center gap-2 border-t border-navy-100 px-5 py-3 bg-navy-50/40">
-            <ExternalLink className="h-3.5 w-3.5 shrink-0 text-navy-400" />
-            <p className={`text-xs text-navy-500${isKo ? " font-ko" : ""}`}>
-              {d.source}{" "}
-              <a
-                href="https://www.fcps.edu/calendars"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-semibold underline underline-offset-2 hover:text-navy-700"
-              >
-                {d.sourceLink}
-              </a>
-            </p>
-          </div>
+        {/* Source Footer */}
+        <div className="mt-4 flex items-center gap-2 px-1">
+          <ExternalLink className="h-3.5 w-3.5 shrink-0 text-navy-400" />
+          <p className={`text-xs text-navy-500${isKo ? " font-ko" : ""}`}>
+            {d.source}{" "}
+            <a
+              href="https://www.fcps.edu/calendars"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold underline underline-offset-2 hover:text-navy-700"
+            >
+              {d.sourceLink}
+            </a>
+          </p>
         </div>
       </Container>
     </Section>

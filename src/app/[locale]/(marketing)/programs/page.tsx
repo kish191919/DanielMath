@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { Brain, FileText, LineChart, Sparkles, Clock, Users, CalendarDays } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
@@ -8,6 +9,13 @@ import { getDictionary } from "@/dictionaries";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
 
 type Props = { params: Promise<{ locale: string }> };
+
+const TEXTBOOK_IMAGES: Record<string, { src: string; unoptimized?: boolean }> = {
+  "Singapore Math": { src: "/textbooks/singapore-math.png" },
+  "Beast Academy": { src: "/textbooks/beast-academy.png" },
+  "IXL Math": { src: "/textbooks/ixl-math.png" },
+  "CogAT / NNAT": { src: "/textbooks/cogat-nnat.svg", unoptimized: true },
+};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
@@ -76,20 +84,34 @@ export default async function ProgramsPage({ params }: Props) {
             description={p.coverage.desc}
             isKo={isKo}
           />
-          <div className="mt-10 flex flex-wrap justify-center gap-2.5">
-            {p.coverage.chips.map((c) => (
-              <div
-                key={c.label}
-                className="flex items-baseline gap-2 rounded-full border border-navy-200 bg-white px-4 py-2 text-sm shadow-sm"
-              >
-                <span className="font-semibold text-navy-900">{c.label}</span>
-                {c.sublabel && (
-                  <span className={`text-xs text-navy-600${isKo ? " font-ko" : ""}`}>
-                    {c.sublabel}
-                  </span>
-                )}
-              </div>
-            ))}
+          <div className="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-4">
+            {p.coverage.chips.map((c) => {
+              const img = TEXTBOOK_IMAGES[c.label];
+              return (
+                <div key={c.label} className="flex flex-col items-center gap-3">
+                  <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl shadow-md bg-white">
+                    {img && (
+                      <Image
+                        src={img.src}
+                        alt={c.label}
+                        fill
+                        unoptimized={img.unoptimized}
+                        className="object-cover"
+                        sizes="(min-width: 640px) 25vw, 50vw"
+                      />
+                    )}
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm font-semibold text-navy-900">{c.label}</p>
+                    {c.sublabel && (
+                      <p className={`text-xs text-navy-600${isKo ? " font-ko" : ""}`}>
+                        {c.sublabel}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </Container>
       </Section>
@@ -122,9 +144,18 @@ export default async function ProgramsPage({ params }: Props) {
             })}
           </div>
 
-          <p className={`mx-auto mt-8 max-w-2xl text-center text-sm leading-7 text-navy-700${isKo ? " font-ko" : ""}`}>
-            {p.ops.note}
-          </p>
+          <div className="mx-auto mt-8 max-w-lg text-center space-y-2">
+            <p className={`text-sm font-semibold text-navy-700${isKo ? " font-ko" : ""}`}>
+              {p.ops.noteHeader}
+            </p>
+            <div className="space-y-1">
+              {p.ops.scheduleRows.map((row: string, i: number) => (
+                <p key={i} className={`text-sm text-navy-500${isKo ? " font-ko" : ""}`}>
+                  {row}
+                </p>
+              ))}
+            </div>
+          </div>
 
           <div className="mt-10 text-center">
             <Button href={lp("/inquire")} size="lg">

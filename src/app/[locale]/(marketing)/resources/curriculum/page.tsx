@@ -1,11 +1,24 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, CheckCircle, Info } from "lucide-react";
+import { CheckCircle, Info } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
 import { grades } from "@/lib/curriculum-data";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
+
+const gradeConfig: Record<number, {
+  accent: string; border: string; hoverBorder: string;
+  enSummary: string; koSummary: string;
+}> = {
+  0: { accent: "bg-violet-600", border: "border-violet-100", hoverBorder: "hover:border-violet-300", enSummary: "Counting, shapes & patterns", koSummary: "수 세기, 도형과 패턴" },
+  1: { accent: "bg-sky-600",    border: "border-sky-100",    hoverBorder: "hover:border-sky-300",    enSummary: "Place value & basic operations",  koSummary: "자릿값과 기본 연산" },
+  2: { accent: "bg-teal-600",   border: "border-teal-100",   hoverBorder: "hover:border-teal-300",   enSummary: "Two-digit math & measurement",    koSummary: "두 자리 연산과 측정" },
+  3: { accent: "bg-green-600",  border: "border-green-100",  hoverBorder: "hover:border-green-300",  enSummary: "Multiplication, fractions & geometry", koSummary: "곱셈, 분수와 도형" },
+  4: { accent: "bg-orange-500", border: "border-orange-100", hoverBorder: "hover:border-orange-300", enSummary: "Multi-digit ops & fractions",      koSummary: "다자리 연산과 분수" },
+  5: { accent: "bg-rose-600",   border: "border-rose-100",   hoverBorder: "hover:border-rose-300",   enSummary: "Fractions, decimals & algebra",   koSummary: "분수, 소수와 대수" },
+  6: { accent: "bg-navy-700",   border: "border-navy-200",   hoverBorder: "hover:border-navy-400",   enSummary: "Ratios, integers & pre-algebra",  koSummary: "비율, 정수와 예비대수" },
+};
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -30,8 +43,8 @@ export default async function CurriculumOverviewPage({ params }: Props) {
     desc: "FCPS(Fairfax County Public Schools)는 모든 초등학년에 두 가지 수학 트랙을 운영합니다. 아래에서 각 학년을 선택해 일반 수학과 심화 수학의 분기별 학습 내용을 비교해보세요.",
     tracks: {
       eyebrow: "두 가지 트랙",
-      title: "Standard Math vs. Advanced Math",
-      titleKo: "일반 수학 vs. 심화 수학",
+      title: "일반 수학 vs. 심화 수학",
+      titleKo: undefined,
       desc: "FCPS는 같은 학년이라도 두 가지 다른 수준의 수학 과정을 제공합니다.",
       items: [
         {
@@ -48,12 +61,12 @@ export default async function CurriculumOverviewPage({ params }: Props) {
     grades: {
       eyebrow: "학년 선택",
       title: "학년별 자세히 보기",
-      titleKo: "Click a grade to see the full curriculum",
+      titleKo: undefined,
     },
     progression: {
-      eyebrow: "Track Overview",
+      eyebrow: "수준 비교",
       title: "학년별 수준 한눈에 보기",
-      titleKo: "Standard vs. Advanced — Grade Equivalents",
+      titleKo: undefined,
       ths: ["학년", "일반 수학", "심화 수학 (AAP)"],
       rows: [
         { grade: "K", standard: "K 수준", advanced: "1학년 수준" },
@@ -115,11 +128,11 @@ export default async function CurriculumOverviewPage({ params }: Props) {
     <>
       <section className="border-b border-navy-100 bg-white py-14 sm:py-20">
         <Container>
+          <Link href={lp("/resources")} className={`flex w-fit items-center gap-1 text-sm text-navy-500 hover:text-navy-700${isKo ? " font-ko" : ""}`}>
+            {t.back}
+          </Link>
           <div className="mx-auto max-w-3xl text-center">
-            <Link href={lp("/resources")} className={`text-sm text-navy-500 hover:text-navy-700${isKo ? " font-ko" : ""}`}>
-              {t.back}
-            </Link>
-            <h1 className={`mt-4 text-4xl font-bold tracking-tight text-navy-900 sm:text-5xl${isKo ? " font-ko" : ""}`}>
+            <h1 className={`mt-6 text-4xl font-bold tracking-tight text-navy-900 sm:text-5xl${isKo ? " font-ko" : ""}`}>
               {t.title}
             </h1>
             <p className={`mt-2 text-xl font-semibold text-navy-700${isKo ? " font-ko" : ""}`}>
@@ -180,26 +193,29 @@ export default async function CurriculumOverviewPage({ params }: Props) {
             titleKo={t.grades.titleKo}
           />
           <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
-            {grades.map((g) => (
-              <Link
-                key={g.slug}
-                href={lp(`/resources/curriculum/${g.slug}`)}
-                className="group flex flex-col items-center rounded-2xl border border-navy-100 bg-white p-5 text-center shadow-sm transition hover:border-navy-400 hover:shadow-md"
-              >
-                <span className="text-3xl font-bold text-navy-900">
-                  {g.gradeNum === 0 ? "K" : g.gradeNum}
-                </span>
-                <span className="mt-1 text-xs font-semibold text-navy-500">
-                  {g.gradeNum === 0 ? "Kinder" : `Grade ${g.gradeNum}`}
-                </span>
-                {isKo && (
-                  <span className="mt-1 text-xs text-navy-400 font-ko">
-                    {g.gradeNum === 0 ? "유치원" : `${g.gradeNum}학년`}
+            {grades.map((g) => {
+              const cfg = gradeConfig[g.gradeNum];
+              return (
+                <Link
+                  key={g.slug}
+                  href={lp(`/resources/curriculum/${g.slug}`)}
+                  className={`group flex flex-col items-center rounded-2xl border ${cfg.border} ${cfg.hoverBorder} bg-white p-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md`}
+                >
+                  <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${cfg.accent} text-xl font-bold text-white`}>
+                    {g.gradeNum === 0 ? "K" : g.gradeNum}
+                  </div>
+                  <span className={`mt-2 text-xs font-semibold text-navy-900${isKo && g.gradeNum === 0 ? " font-ko" : ""}`}>
+                    {isKo
+                      ? (g.gradeNum === 0 ? "유치원" : `${g.gradeNum}학년`)
+                      : (g.gradeNum === 0 ? "Kinder" : `Grade ${g.gradeNum}`)
+                    }
                   </span>
-                )}
-                <ArrowRight className="mt-3 h-4 w-4 text-navy-300 transition group-hover:translate-x-0.5 group-hover:text-navy-600" />
-              </Link>
-            ))}
+                  <p className={`mt-2 text-xs leading-snug text-navy-500${isKo ? " font-ko" : ""}`}>
+                    {isKo ? cfg.koSummary : cfg.enSummary}
+                  </p>
+                </Link>
+              );
+            })}
           </div>
         </Container>
       </Section>
