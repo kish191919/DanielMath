@@ -5,6 +5,7 @@ import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
 import { HeroBackground } from "@/components/site/hero-background";
 import { WarmthSection } from "@/components/site/warmth-section";
+import { SchoolCalendarSection } from "@/components/site/school-calendar-section";
 import { Button } from "@/components/ui/button";
 import { getDictionary } from "@/dictionaries";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
@@ -46,6 +47,7 @@ export default async function HomePage({ params }: Props) {
       <WarmthSection locale={locale as Locale} d={d.home.warmth} />
       <HowItWorks d={d.home} isKo={isKo} />
       <CurriculumChips d={d.home} isKo={isKo} />
+      <SchoolCalendarSection d={d.home.schoolCalendar} isKo={isKo} />
       <FinalCTA d={d.home} lp={lp} isKo={isKo} />
     </>
   );

@@ -104,6 +104,21 @@ const en: Dictionary = {
         { label: "Common Core", sublabel: "Grade-level standards" },
       ],
     },
+    schoolCalendar: {
+      eyebrow: "FCPS School Year",
+      title: "School Year Calendar",
+      titleKo: "",
+      desc: "Key dates for Fairfax County Public Schools — breaks, holidays, and quarter markers.",
+      source: "Source: FCPS Standard School Year Calendar",
+      sourceLink: "fcps.edu/calendars",
+      types: {
+        important: "Key Date",
+        holiday: "Holiday",
+        break: "Break",
+        quarter: "Quarter End",
+        noSchool: "No School",
+      },
+    },
     cta: {
       titleEn: "Ready to start?",
       titleKo: "Let us guide your child forward.",
@@ -122,18 +137,18 @@ const en: Dictionary = {
       eyebrow: "Program",
       title: "Grade-separated. Small groups. Proven materials.",
       titleKo: "",
-      desc: "Each grade meets separately in small groups of up to 4. Mon/Thu: Grade 3 (5–6:30 PM) and Grade 5 (6:30–8 PM). Tue/Fri: Grade 4 (5–6:30 PM) and Grade 6 (6:30–8 PM). Same proven curriculum materials, at each grade's level.",
+      desc: "Each grade meets separately in small groups of up to 4, working through the same proven curriculum materials at their grade's level.",
     },
     pillars: [
       {
-        title: "Personalized Worksheets",
+        title: "Worksheets Every Session",
         titleKo: "",
-        desc: "Grade, ability, and recent error patterns are all factored in — every student gets a fresh, unique worksheet each session. Same room, different paths.",
+        desc: "Curriculum-aligned worksheets are provided every session so students can practice what they've just learned and reinforce key concepts.",
       },
       {
         title: "Proven Textbooks, Integrated",
         titleKo: "",
-        desc: "We use Singapore Math for deep conceptual understanding, Beast Academy (by Art of Problem Solving) for discussion-centered gifted enrichment, and IXL for targeted concept reinforcement — all blended with CogAT/NNAT prep and AMC 8 competition math in one structured sequence.",
+        desc: "We use Singapore Math for deep conceptual understanding, Beast Academy (by Art of Problem Solving) for discussion-centered gifted enrichment, and IXL to build fundamental concept mastery — all blended with CogAT/NNAT prep in one structured sequence.",
       },
       {
         title: "Homework Every Session",
@@ -148,16 +163,14 @@ const en: Dictionary = {
     ],
     coverage: {
       eyebrow: "Curriculum",
-      title: "Three trusted textbooks, blended per student.",
+      title: "Three trusted textbooks. One integrated curriculum.",
       titleKo: "",
-      desc: "Singapore Math, Beast Academy, and IXL form the core — blended with CogAT/NNAT prep and AMC 8 competition math at ratios matched to each student's grade and goals.",
+      desc: "Singapore Math, Beast Academy, and IXL form the core — blended with CogAT/NNAT prep at ratios matched to each student's grade and goals.",
       chips: [
         { label: "Singapore Math", sublabel: "Gifted textbook" },
         { label: "Beast Academy", sublabel: "AoPS discussion math" },
         { label: "IXL Math", sublabel: "Adaptive concept drill" },
         { label: "CogAT / NNAT", sublabel: "AAP placement prep" },
-        { label: "AMC 8 / Olympiad", sublabel: "Competition math" },
-        { label: "Common Core", sublabel: "Grade-level standards" },
       ],
     },
     ops: {

@@ -102,6 +102,21 @@ const ko = {
         { label: "Common Core", sublabel: "학년별 진도" },
       ],
     },
+    schoolCalendar: {
+      eyebrow: "FCPS 학사 일정",
+      title: "학교 캘린더",
+      titleKo: "FCPS School Year Calendar",
+      desc: "Fairfax County 학교의 주요 날짜를 한눈에 확인하세요.",
+      source: "출처: FCPS 공식 학사 일정",
+      sourceLink: "fcps.edu/calendars",
+      types: {
+        important: "주요 날짜",
+        holiday: "공휴일",
+        break: "방학",
+        quarter: "분기 마감",
+        noSchool: "휴교",
+      },
+    },
     cta: {
       titleEn: "Ready to start?",
       titleKo: "지금 바로 상담 신청하세요.",
@@ -120,18 +135,18 @@ const ko = {
       eyebrow: "프로그램",
       title: "학년별 소수 정예, 검증된 커리큘럼",
       titleKo: "Grade-separated. Small groups. Proven materials.",
-      desc: "학년별로 분리된 소수 정예 수업입니다. 월·목은 3학년(5–6:30)과 5학년(6:30–8), 화·금은 4학년(5–6:30)과 6학년(6:30–8)이 같은 교재와 자료로 각 학년 수준에 맞춰 학습합니다.",
+      desc: "학년별로 분리된 소수 정예 수업입니다. 각 학년이 같은 교재와 자료를 사용하되, 학년 수준에 맞춰 진행합니다.",
     },
     pillars: [
       {
-        title: "Personalized Worksheets",
-        titleKo: "학생별 맞춤 학습지",
-        desc: "학년·실력·최근 오답 유형을 반영해 학생마다 다른 학습지가 매 수업 새롭게 생성됩니다. 같은 교실, 다른 진도.",
+        title: "Worksheets Every Session",
+        titleKo: "매 수업 학습지 제공",
+        desc: "매 수업 커리큘럼에 맞는 학습지가 제공됩니다. 수업에서 배운 내용을 바로 연습하며 개념을 다집니다.",
       },
       {
         title: "Proven Textbooks, Integrated",
         titleKo: "검증된 교재 통합 커리큘럼",
-        desc: "Singapore Math로 개념을 깊이 이해하고, Beast Academy(Art of Problem Solving 교재)로 토론 중심 영재 수학을 배우며, IXL로 약점을 정밀하게 보완합니다. 여기에 CogAT/NNAT 준비와 AMC 8 경시까지 하나의 흐름으로 운영합니다.",
+        desc: "Singapore Math로 개념을 깊이 이해하고, Beast Academy(Art of Problem Solving 교재)로 토론 중심 영재 수학을 배우며, IXL로 기본 개념을 익힙니다. CogAT/NNAT 준비까지 하나의 흐름으로 운영합니다.",
       },
       {
         title: "Homework Every Session",
@@ -146,16 +161,14 @@ const ko = {
     ],
     coverage: {
       eyebrow: "커리큘럼",
-      title: "검증된 세 교재를 학생마다 다르게 조합합니다",
-      titleKo: "Three trusted textbooks, blended per student.",
-      desc: "Singapore Math, Beast Academy, IXL를 핵심으로, 학생의 학년과 목표에 맞춰 CogAT/NNAT 준비, AMC 8 경시까지 비율을 조정해 학습지에 반영합니다.",
+      title: "검증된 세 교재, 하나의 통합 커리큘럼",
+      titleKo: "Three trusted textbooks. One integrated curriculum.",
+      desc: "Singapore Math, Beast Academy, IXL를 핵심으로, 학생의 학년과 목표에 맞춰 CogAT/NNAT 준비까지 비율을 조정해 학습지에 반영합니다.",
       chips: [
         { label: "Singapore Math", sublabel: "영재 수학 교재" },
         { label: "Beast Academy", sublabel: "AoPS 사고력 토론" },
         { label: "IXL Math", sublabel: "적응형 개념 훈련" },
         { label: "CogAT / NNAT", sublabel: "AAP 진입 시험" },
-        { label: "AMC 8 / Olympiad", sublabel: "경시 입문" },
-        { label: "Common Core", sublabel: "학년별 진도" },
       ],
     },
     ops: {
