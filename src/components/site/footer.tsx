@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Mail, MapPin, Clock } from "lucide-react";
 import { Container } from "./container";
 import { siteConfig } from "@/lib/site-config";
 import { localePath, type Locale } from "@/lib/i18n";
@@ -7,15 +8,28 @@ export function SiteFooter({ locale }: { locale: Locale }) {
   const isKo = locale === "ko";
   const lp = (path: string) => localePath(locale, path);
 
+  const navLinks = [
+    { href: "/programs", label: "Programs", labelKo: "프로그램" },
+    { href: "/resources", label: "Math Curriculum", labelKo: "수학 교육과정" },
+    { href: "/school-calendar", label: "School Calendar", labelKo: "학교 캘린더" },
+    { href: "/blog", label: "Blog", labelKo: "블로그" },
+  ];
+
+  const resourceLinks = [
+    { href: "/resources/curriculum", label: "Curriculum by Grade", labelKo: "학년별 커리큘럼" },
+    { href: "/resources/sol", label: "Virginia SOL Standards", labelKo: "Virginia SOL 기준" },
+    { href: "/resources/testing", label: "Test & Competition Calendar", labelKo: "시험 & 대회 일정" },
+  ];
+
   return (
     <footer className="border-t border-navy-100 bg-navy-50">
       <Container className="py-12">
-        <div className="grid gap-10 md:grid-cols-3">
-          <div>
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1.2fr]">
+
+          {/* Brand */}
+          <div className="sm:col-span-2 lg:col-span-1">
             <Link href={lp("/")} className="flex items-baseline gap-2">
-              <span className="text-lg font-bold text-navy-900">
-                {siteConfig.name}
-              </span>
+              <span className="text-lg font-bold text-navy-900">{siteConfig.name}</span>
               {isKo && (
                 <span className="text-sm text-navy-600 font-ko" lang="ko">
                   {siteConfig.nameKo}
@@ -23,101 +37,97 @@ export function SiteFooter({ locale }: { locale: Locale }) {
               )}
             </Link>
             <p
-              className={`mt-3 max-w-sm text-sm leading-6 text-navy-700${isKo ? " font-ko" : ""}`}
+              className={`mt-3 max-w-xs text-sm leading-6 text-navy-600${isKo ? " font-ko" : ""}`}
               lang={isKo ? "ko" : undefined}
             >
               {isKo
-                ? "북버지니아 한인 3-6학년 학생을 위한 영재 수학 아카데미. AAP·CogAT 통합 커리큘럼."
-                : "A boutique math studio for 3rd–6th grade students in Northern Virginia. AAP and CogAT curriculum."}
+                ? "북버지니아 한인 3–6학년을 위한 영재 수학 아카데미. AAP·CogAT 통합 커리큘럼, 4명 소수 정예."
+                : "Small-group gifted math for grades 3–6 in Northern Virginia. AAP & CogAT curriculum, 4 students per class."}
+            </p>
+            <p className={`mt-3 flex items-center gap-1.5 text-xs text-navy-500${isKo ? " font-ko" : ""}`}>
+              <Clock className="h-3.5 w-3.5 shrink-0" />
+              {isKo ? siteConfig.hoursKo : siteConfig.hours}
             </p>
           </div>
 
+          {/* Site Navigation */}
           <div>
-            <h3 className={`text-sm font-semibold uppercase tracking-wider text-navy-900${isKo ? " font-ko" : ""}`}>
-              {isKo ? "바로가기" : "Quick Links"}
+            <h3 className={`text-xs font-semibold uppercase tracking-wider text-navy-900${isKo ? " font-ko" : ""}`}>
+              {isKo ? "메뉴" : "Site"}
             </h3>
-            <ul className="mt-4 space-y-2 text-sm">
-              <li>
-                <Link href={lp("/programs")} className={`text-navy-700 hover:text-navy-900${isKo ? " font-ko" : ""}`}>
-                  {isKo ? "프로그램" : "Programs"}
-                </Link>
-              </li>
-              <li>
-                <Link href={lp("/resources")} className={`text-navy-700 hover:text-navy-900${isKo ? " font-ko" : ""}`}>
-                  {isKo ? "수학 자료" : "Resources"}
-                </Link>
-              </li>
-              <li>
-                <Link href={lp("/inquire")} className={`text-navy-700 hover:text-navy-900${isKo ? " font-ko" : ""}`}>
-                  {isKo ? "상담 신청" : "Inquire"}
-                </Link>
-              </li>
+            <ul className="mt-4 space-y-2.5 text-sm">
+              {navLinks.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={lp(item.href)}
+                    className={`text-navy-600 hover:text-navy-900 transition-colors${isKo ? " font-ko" : ""}`}
+                    lang={isKo ? "ko" : undefined}
+                  >
+                    {isKo ? item.labelKo : item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
+          {/* Math Resources */}
           <div>
-            <h3
-              className={`text-sm font-semibold uppercase tracking-wider text-navy-900${isKo ? " font-ko" : ""}`}
-            >
-              {isKo ? "수학 자료" : "Math Resources"}
+            <h3 className={`text-xs font-semibold uppercase tracking-wider text-navy-900${isKo ? " font-ko" : ""}`}>
+              {isKo ? "수학 자료" : "Resources"}
             </h3>
-            <ul
-              className={`mt-4 space-y-2 text-sm${isKo ? " font-ko" : ""}`}
-              lang={isKo ? "ko" : undefined}
-            >
-              <li>
-                <Link href={lp("/resources/curriculum")} className="text-navy-700 hover:text-navy-900">
-                  {isKo ? "학년별 커리큘럼" : "Curriculum by Grade"}
-                </Link>
-              </li>
-              <li>
-                <Link href={lp("/resources/sol")} className="text-navy-700 hover:text-navy-900">
-                  {isKo ? "Virginia SOL 기준" : "Virginia SOL Standards"}
-                </Link>
-              </li>
-              <li>
-                <Link href={lp("/resources/testing")} className="text-navy-700 hover:text-navy-900">
-                  {isKo ? "시험 & 대회 일정" : "Test & Competition Calendar"}
-                </Link>
-              </li>
-              <li>
-                <Link href={lp("/school-calendar")} className="text-navy-700 hover:text-navy-900">
-                  {isKo ? "학교 캘린더" : "School Calendar"}
-                </Link>
-              </li>
+            <ul className="mt-4 space-y-2.5 text-sm" lang={isKo ? "ko" : undefined}>
+              {resourceLinks.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={lp(item.href)}
+                    className={`text-navy-600 hover:text-navy-900 transition-colors${isKo ? " font-ko" : ""}`}
+                  >
+                    {isKo ? item.labelKo : item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
+          {/* Contact */}
           <div>
-            <h3 className={`text-sm font-semibold uppercase tracking-wider text-navy-900${isKo ? " font-ko" : ""}`}>
+            <h3 className={`text-xs font-semibold uppercase tracking-wider text-navy-900${isKo ? " font-ko" : ""}`}>
               {isKo ? "연락처" : "Contact"}
             </h3>
-            <ul className="mt-4 space-y-2 text-sm text-navy-700">
+            <ul className="mt-4 space-y-2.5 text-sm text-navy-600">
               <li>
-                <a href={`mailto:${siteConfig.contactEmail}`} className="hover:text-navy-900">
+                <a
+                  href={`mailto:${siteConfig.contactEmail}`}
+                  className="flex items-center gap-1.5 hover:text-navy-900 transition-colors"
+                >
+                  <Mail className="h-3.5 w-3.5 shrink-0" />
                   {siteConfig.contactEmail}
                 </a>
               </li>
-              <li className={isKo ? "font-ko" : ""} lang={isKo ? "ko" : undefined}>
-                {isKo
-                  ? `${siteConfig.region} 일대 (정확한 주소는 상담 시 안내)`
-                  : `${siteConfig.region} (exact location shared upon inquiry)`}
-              </li>
-              <li>
-                <Link href={lp("/inquire")} className={`font-medium text-navy-900 hover:underline${isKo ? " font-ko" : ""}`}>
-                  {isKo ? "상담 신청" : "Get in touch"}
-                </Link>
+              <li className={`flex items-start gap-1.5${isKo ? " font-ko" : ""}`} lang={isKo ? "ko" : undefined}>
+                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                <span>
+                  {isKo
+                    ? `${siteConfig.region} 일대\n(정확한 주소는 상담 시 안내)`
+                    : `${siteConfig.region}\n(location shared upon inquiry)`}
+                </span>
               </li>
             </ul>
+            <Link
+              href={lp("/inquire")}
+              className={`mt-5 inline-flex items-center justify-center rounded-md bg-navy-900 px-4 py-2 text-sm font-medium text-white hover:bg-navy-700 transition-colors${isKo ? " font-ko" : ""}`}
+            >
+              {isKo ? "상담 신청" : "Inquire Now"}
+            </Link>
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-navy-200 pt-6 text-xs text-navy-600 sm:flex-row sm:items-center">
+        <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-navy-200 pt-6 text-xs text-navy-500 sm:flex-row sm:items-center">
           <p>© {new Date().getFullYear()} {siteConfig.name}. All rights reserved.</p>
           <p className={isKo ? "font-ko" : ""} lang={isKo ? "ko" : undefined}>
             {isKo
-              ? "본 사이트는 13세 미만 학생의 개인정보를 직접 수집하지 않습니다 (COPPA 준수)."
-              : "This site does not directly collect personal information from children under 13 (COPPA compliant)."}
+              ? "13세 미만 학생의 개인정보를 직접 수집하지 않습니다 (COPPA 준수)."
+              : "We do not directly collect personal data from children under 13 (COPPA compliant)."}
           </p>
         </div>
       </Container>

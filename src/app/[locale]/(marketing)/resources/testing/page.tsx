@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { CalendarDays, Info } from "lucide-react";
+import Image from "next/image";
+import { ArrowLeft, CalendarDays, Info } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
 import { testEvents } from "@/lib/curriculum-data";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import { pageAlternates } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -35,9 +37,10 @@ const aapTimeline = [
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   if (!hasLocale(locale)) return {};
+  const alt = pageAlternates(locale, "/resources/testing");
   return locale === "ko"
-    ? { title: "시험 & 대회 일정", description: "Fairfax County AAP 스크리닝 (CogAT/NNAT), Virginia SOL 시험, MOEMS 등 수학 관련 시험과 대회 일정을 한국어로 안내합니다." }
-    : { title: "Test & Competition Calendar", description: "AAP screening (CogAT/NNAT), Virginia SOL tests, MOEMS, and more — all test and competition calendars for Fairfax County students." };
+    ? { title: "시험 & 대회 일정", description: "Fairfax County AAP 스크리닝 (CogAT/NNAT), Virginia SOL 시험, MOEMS 등 수학 관련 시험과 대회 일정을 한국어로 안내합니다.", alternates: alt }
+    : { title: "Test & Competition Calendar", description: "AAP screening (CogAT/NNAT), Virginia SOL tests, MOEMS, and more — all test and competition calendars for Fairfax County students.", alternates: alt };
 }
 
 export default async function TestingPage({ params }: Props) {
@@ -49,16 +52,26 @@ export default async function TestingPage({ params }: Props) {
   return (
     <>
       {/* Hero */}
-      <section className="border-b border-navy-100 bg-white py-14 sm:py-20">
+      <section className="relative isolate overflow-hidden bg-navy-900 py-14 sm:py-20">
+        <Image
+          src="/warmth/parent-student.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="absolute inset-0 -z-20 object-cover object-center opacity-30"
+        />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-navy-950/60 via-navy-900/70 to-navy-950/80" />
         <Container>
+          <Link href={lp("/resources")} className={`inline-flex w-fit items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium text-white/80 shadow-sm transition hover:border-white/40 hover:text-white${isKo ? " font-ko" : ""}`}>
+            <ArrowLeft className="h-3.5 w-3.5 shrink-0" />
+            {isKo ? "자료 센터로 돌아가기" : "Back to Resources"}
+          </Link>
           <div className="mx-auto max-w-3xl text-center">
-            <Link href={lp("/resources")} className={`text-sm text-navy-500 hover:text-navy-700${isKo ? " font-ko" : ""}`}>
-              {isKo ? "자료 센터로 돌아가기" : "Back to Resources"}
-            </Link>
-            <h1 className={`mt-4 text-4xl font-bold tracking-tight text-navy-900 sm:text-5xl${isKo ? " font-ko" : ""}`}>
+            <h1 className={`mt-4 text-4xl font-bold tracking-tight text-white sm:text-5xl${isKo ? " font-ko" : ""}`}>
               {isKo ? "시험 & 대회 일정" : "Test & Competition Calendar"}
             </h1>
-            <p className={`mx-auto mt-5 max-w-2xl text-sm leading-7 text-navy-700${isKo ? " font-ko" : ""}`}>
+            <p className={`mx-auto mt-5 max-w-2xl text-sm leading-7 text-white/70${isKo ? " font-ko" : ""}`}>
               {isKo
                 ? "Fairfax County 학생들이 알아야 할 주요 수학 관련 시험과 대회 일정을 정리했습니다. AAP 스크리닝부터 SOL 시험까지 한 곳에서 확인하세요."
                 : "Key math tests and competitions for Fairfax County students — from AAP screening to SOL tests, all in one place."}
@@ -150,8 +163,8 @@ export default async function TestingPage({ params }: Props) {
                     {ev.nameKo}
                   </p>
                 )}
-                <p className="mt-2 text-sm leading-6 text-navy-700">
-                  {ev.description}
+                <p className={`mt-2 text-sm leading-6 text-navy-700${isKo ? " font-ko" : ""}`}>
+                  {isKo && ev.descriptionKo ? ev.descriptionKo : ev.description}
                 </p>
               </div>
             ))}
@@ -168,8 +181,8 @@ export default async function TestingPage({ params }: Props) {
             </h2>
             <p className={`mx-auto mt-3 max-w-lg text-sm leading-7 text-navy-700${isKo ? " font-ko" : ""}`}>
               {isKo
-                ? "AAP 스크리닝(CogAT/NNAT), SOL 시험 — 모든 시험에 맞춘 커리큘럼을 개인별로 설계합니다."
-                : "AAP screening (CogAT/NNAT), SOL tests — we build a curriculum tailored to each student's test goals."}
+                ? "AAP 스크리닝(CogAT/NNAT), SOL 시험, AMC 8 — 모든 시험 목표에 맞춰 커리큘럼을 개인별로 설계합니다."
+                : "AAP screening (CogAT/NNAT), SOL tests, AMC 8 — we build a curriculum tailored to each student's test goals."}
             </p>
             <Link
               href={lp("/inquire")}

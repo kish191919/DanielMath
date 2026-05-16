@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Clock } from "lucide-react";
+import { ArrowLeft, Clock } from "lucide-react";
 import { getDictionary } from "@/dictionaries";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
+import { pageAlternates } from "@/lib/seo";
 import { Container } from "@/components/site/container";
 import { getBlogPost, getAllSlugs } from "@/lib/blog-posts";
+import { BlogPostingJsonLd } from "@/components/seo/json-ld";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
@@ -24,6 +26,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: isKo ? post.titleKo : post.titleEn,
     description: isKo ? post.descKo : post.descEn,
+    alternates: pageAlternates(locale, `/blog/${slug}`),
+    openGraph: {
+      type: "article",
+      publishedTime: post.publishedAt,
+    },
   };
 }
 
@@ -49,6 +56,7 @@ export default async function BlogPostPage({ params }: Props) {
 
   return (
     <>
+      <BlogPostingJsonLd post={post} locale={locale} />
       <div className="border-b border-navy-100 bg-white py-4">
         <Container>
           <Link

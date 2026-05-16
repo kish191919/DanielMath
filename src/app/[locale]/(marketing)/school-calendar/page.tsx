@@ -6,6 +6,7 @@ import { SchoolCalendarSection } from "@/components/site/school-calendar-section
 import { Container } from "@/components/site/container";
 import { getDictionary } from "@/dictionaries";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
+import { pageAlternates } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -16,6 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: d.schoolCalendar.meta.title,
     description: d.schoolCalendar.meta.description,
+    alternates: pageAlternates(locale, "/school-calendar"),
   };
 }
 

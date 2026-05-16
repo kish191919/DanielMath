@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { getDictionary } from "@/dictionaries";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
+import { pageAlternates } from "@/lib/seo";
 import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
 import { BlogListItem } from "@/components/site/blog-card";
@@ -18,6 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: d.blog.meta.title,
     description: d.blog.meta.description,
+    alternates: pageAlternates(locale, "/blog"),
   };
 }
 

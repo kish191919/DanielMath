@@ -41,12 +41,44 @@ export function SiteHeader({ locale }: { locale: Locale }) {
                 {isKo ? item.labelKo : item.label}
               </Link>
             ))}
-            <Link
-              href={altHref}
-              className="rounded-md px-2.5 py-1.5 text-xs font-medium text-navy-500 hover:bg-navy-50 hover:text-navy-900"
-            >
-              {isKo ? "English" : "한국어"}
-            </Link>
+            <div className="flex items-center gap-0.5">
+              {isKo ? (
+                <span
+                  aria-current="true"
+                  title="한국어"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-navy-100 text-lg ring-1 ring-navy-300"
+                >
+                  🇰🇷
+                </span>
+              ) : (
+                <Link
+                  href={altHref}
+                  aria-label="한국어로 전환"
+                  title="한국어"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full text-lg opacity-40 transition hover:bg-navy-50 hover:opacity-100"
+                >
+                  🇰🇷
+                </Link>
+              )}
+              {!isKo ? (
+                <span
+                  aria-current="true"
+                  title="English"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-navy-100 text-lg ring-1 ring-navy-300"
+                >
+                  🇺🇸
+                </span>
+              ) : (
+                <Link
+                  href={altHref}
+                  aria-label="Switch to English"
+                  title="English"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full text-lg opacity-40 transition hover:bg-navy-50 hover:opacity-100"
+                >
+                  🇺🇸
+                </Link>
+              )}
+            </div>
             <div className="ml-3">
               <Button href="/login" size="md">
                 {isKo ? "로그인 / Login" : "Login"}
@@ -85,13 +117,46 @@ export function SiteHeader({ locale }: { locale: Locale }) {
                 {isKo ? item.labelKo : item.label}
               </Link>
             ))}
-            <Link
-              href={altHref}
-              onClick={() => setOpen(false)}
-              className="rounded-md px-3 py-2.5 text-sm font-medium text-navy-600 hover:bg-navy-50"
-            >
-              {isKo ? "English version" : "한국어 버전"}
-            </Link>
+            <div className="flex items-center gap-1.5 px-3 py-2">
+              {isKo ? (
+                <span
+                  aria-current="true"
+                  title="한국어"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-navy-100 text-xl ring-1 ring-navy-300"
+                >
+                  🇰🇷
+                </span>
+              ) : (
+                <Link
+                  href={altHref}
+                  onClick={() => setOpen(false)}
+                  aria-label="한국어로 전환"
+                  title="한국어"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full text-xl opacity-40 transition hover:bg-navy-50 hover:opacity-100"
+                >
+                  🇰🇷
+                </Link>
+              )}
+              {!isKo ? (
+                <span
+                  aria-current="true"
+                  title="English"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-navy-100 text-xl ring-1 ring-navy-300"
+                >
+                  🇺🇸
+                </span>
+              ) : (
+                <Link
+                  href={altHref}
+                  onClick={() => setOpen(false)}
+                  aria-label="Switch to English"
+                  title="English"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full text-xl opacity-40 transition hover:bg-navy-50 hover:opacity-100"
+                >
+                  🇺🇸
+                </Link>
+              )}
+            </div>
             <div className="mt-2">
               <Button href="/login" size="lg" className="w-full">
                 {isKo ? "로그인 / Login" : "Login"}

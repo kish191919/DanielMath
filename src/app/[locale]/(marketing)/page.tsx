@@ -7,7 +7,8 @@ import { HeroBackground } from "@/components/site/hero-background";
 import { Button } from "@/components/ui/button";
 import { getDictionary } from "@/dictionaries";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
-import { siteConfig } from "@/lib/site-config";
+import { pageAlternates } from "@/lib/seo";
+import { LocalBusinessJsonLd } from "@/components/seo/json-ld";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -18,10 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const isKo = locale === "ko";
   return {
     description: d.meta.description,
-    alternates: {
-      canonical: siteConfig.url,
-      languages: { ko: siteConfig.url, en: `${siteConfig.url}/en` },
-    },
+    alternates: pageAlternates(locale, "/"),
     openGraph: {
       locale: isKo ? "ko_KR" : "en_US",
       alternateLocale: isKo ? "en_US" : "ko_KR",
@@ -38,6 +36,7 @@ export default async function HomePage({ params }: Props) {
 
   return (
     <>
+      <LocalBusinessJsonLd />
       <HeroSection d={d.home} lp={lp} isKo={isKo} />
       <Stats d={d.home} isKo={isKo} />
       <ProgramsPreview d={d.home} lp={lp} isKo={isKo} />

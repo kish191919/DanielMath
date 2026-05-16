@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/site-config";
+import { blogPosts } from "@/lib/blog-posts";
 
 const marketingPaths = [
   "",
@@ -40,5 +41,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
     alternates: { languages: { ko: `${base}${p}`, en: `${base}/en${p}` } },
   }));
 
-  return [...koEntries, ...enEntries];
+  const blogKoEntries = blogPosts.map((p) => ({
+    url: `${base}/blog/${p.slug}`,
+    lastModified: new Date(p.publishedAt),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+    alternates: { languages: { ko: `${base}/blog/${p.slug}`, en: `${base}/en/blog/${p.slug}` } },
+  }));
+
+  const blogEnEntries = blogPosts.map((p) => ({
+    url: `${base}/en/blog/${p.slug}`,
+    lastModified: new Date(p.publishedAt),
+    changeFrequency: "monthly" as const,
+    priority: 0.63,
+    alternates: { languages: { ko: `${base}/blog/${p.slug}`, en: `${base}/en/blog/${p.slug}` } },
+  }));
+
+  return [...koEntries, ...enEntries, ...blogKoEntries, ...blogEnEntries];
 }

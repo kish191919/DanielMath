@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle, ExternalLink } from "lucide-react";
+import { ArrowLeft, CheckCircle, ExternalLink } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
 import { grades, gradeBySlug, type GradeData, type TrackData } from "@/lib/curriculum-data";
 import { gradeEquivalentEn, highlightsEn } from "@/lib/curriculum-data-en";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
+import { pageAlternates } from "@/lib/seo";
 import { QuarterTabs } from "@/components/site/curriculum-quarter-tabs";
 
 type Props = { params: Promise<{ locale: string; grade: string }> };
@@ -23,9 +24,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!hasLocale(locale)) return {};
   const g = gradeBySlug[slug];
   if (!g) return {};
+  const alt = pageAlternates(locale, `/resources/curriculum/${slug}`);
   return locale === "ko"
-    ? { title: `${g.gradeKo} 수학 커리큘럼`, description: `FCPS ${g.gradeKo} 일반·심화(AAP) 수학 분기별 학습 내용 비교.` }
-    : { title: `${g.grade} Math Curriculum — FCPS`, description: `FCPS ${g.grade} Standard and Advanced (AAP) math — quarter-by-quarter comparison.` };
+    ? { title: `${g.gradeKo} 수학 커리큘럼`, description: `FCPS ${g.gradeKo} 일반·심화(AAP) 수학 분기별 학습 내용 비교.`, alternates: alt }
+    : { title: `${g.grade} Math Curriculum — FCPS`, description: `FCPS ${g.grade} Standard and Advanced (AAP) math — quarter-by-quarter comparison.`, alternates: alt };
 }
 
 export default async function GradePage({ params }: Props) {
@@ -66,9 +68,10 @@ function GradeHeader({
         <div className="flex items-center justify-between">
           <Link
             href={lp("/resources/curriculum")}
-            className={`flex items-center gap-1 text-sm text-navy-500 hover:text-navy-800${isKo ? " font-ko" : ""}`}
+            className={`inline-flex items-center gap-1.5 rounded-full border border-navy-200 bg-white px-4 py-1.5 text-sm font-medium text-navy-600 shadow-sm transition hover:border-navy-400 hover:text-navy-900 hover:shadow${isKo ? " font-ko" : ""}`}
           >
-            {isKo ? "자료 센터로 돌아가기" : "Back to Curriculum"}
+            <ArrowLeft className="h-3.5 w-3.5 shrink-0" />
+            {isKo ? "커리큘럼으로 돌아가기" : "Back to Curriculum"}
           </Link>
           <div className="flex items-center gap-2">
             {prev && (

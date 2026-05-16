@@ -4,6 +4,7 @@ import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
 import { getDictionary } from "@/dictionaries";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
+import { pageAlternates } from "@/lib/seo";
 import { InquiryForm } from "./inquiry-form";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -15,6 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: d.inquire.meta.title,
     description: d.inquire.meta.description,
+    alternates: pageAlternates(locale, "/inquire"),
   };
 }
 

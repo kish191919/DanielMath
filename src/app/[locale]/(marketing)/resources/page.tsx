@@ -8,6 +8,7 @@ import { Section, SectionHeader } from "@/components/site/section";
 import { FaqAccordion } from "@/components/site/faq-accordion";
 import { getDictionary } from "@/dictionaries";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
+import { pageAlternates } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -18,6 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: d.resources.hub.meta.title,
     description: d.resources.hub.meta.description,
+    alternates: pageAlternates(locale, "/resources"),
   };
 }
 

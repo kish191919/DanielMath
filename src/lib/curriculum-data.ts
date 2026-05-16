@@ -992,6 +992,7 @@ export type TestEvent = {
   grades: string;
   gradesKo: string;
   description: string;
+  descriptionKo: string;
   color: "navy" | "gold" | "green" | "purple";
 };
 
@@ -1005,6 +1006,8 @@ export const testEvents: TestEvent[] = [
     gradesKo: "유치원~6학년 재학생",
     description:
       "Parents, teachers, or students themselves can submit a referral for AAP evaluation. Forms are available through each school's AAP contact. No cost. The referral window closes in early December each year.",
+    descriptionKo:
+      "학부모님, 담임 선생님, 또는 학생 본인이 AAP 심화 과정 평가를 신청할 수 있습니다. 신청서는 학교 AAP 담당자를 통해 받으시면 되고, 별도의 비용은 없습니다. 접수 창구는 매년 12월 초에 마감되니 미리 준비하세요.",
     color: "navy",
   },
   {
@@ -1016,6 +1019,8 @@ export const testEvents: TestEvent[] = [
     gradesKo: "의뢰된 학생 (유치원~5학년)",
     description:
       "FCPS administers two nationally normed tests: CogAT (Cognitive Abilities Test) measures reasoning in verbal, quantitative, and nonverbal areas. NNAT (Naglieri Nonverbal Ability Test) measures nonverbal reasoning. Scores plus portfolio evidence determine AAP placement.",
+    descriptionKo:
+      "FCPS에서 두 가지 표준화 검사를 실시합니다. CogAT(인지 능력 검사)는 언어·수리·비언어 추론 능력을, NNAT(비언어 능력 검사)는 비언어적 사고력을 측정합니다. 검사 점수와 포트폴리오 자료를 종합하여 AAP 배치가 결정됩니다.",
     color: "gold",
   },
   {
@@ -1027,6 +1032,8 @@ export const testEvents: TestEvent[] = [
     gradesKo: "검사를 받은 학생",
     description:
       "FCPS sends placement letters home. Full-Time AAP students move to a designated AAP center school the following year. Part-Time AAP (Level III) services begin at the home school. Parents may request reconsideration within the given window.",
+    descriptionKo:
+      "FCPS에서 가정으로 배치 결과 서한을 발송합니다. Full-Time AAP로 선발된 학생은 다음 학년도부터 지정 AAP 센터 학교로 이동하며, Part-Time AAP(레벨 III) 학생은 현재 학교에서 수업을 받습니다. 결과에 이의가 있으면 정해진 기간 내에 재심을 요청하실 수 있습니다.",
     color: "green",
   },
   {
@@ -1038,6 +1045,8 @@ export const testEvents: TestEvent[] = [
     gradesKo: "3학년 (수학·읽기), 4학년 (수학·읽기), 5학년 (수학·읽기·과학), 6학년 (수학·읽기)",
     description:
       "Virginia Standards of Learning (SOL) tests measure whether students have mastered the grade-level SOL. All public school students in Grades 3–8 are required to take these tests. Results are used for school accreditation and student promotion decisions.",
+    descriptionKo:
+      "버지니아 학습 기준(SOL) 시험은 학생들이 해당 학년 교육과정을 얼마나 충실히 익혔는지 평가합니다. 버지니아 공립학교 3~8학년은 모두 필수 응시 대상입니다. 결과는 학교 인증 평가와 학생 진급 결정에 활용됩니다.",
     color: "navy",
   },
   {
@@ -1049,6 +1058,21 @@ export const testEvents: TestEvent[] = [
     gradesKo: "4~6학년 (학교 팀 기반)",
     description:
       "Mathematical Olympiads for Elementary and Middle Schools (MOEMS) is held in monthly rounds. Schools form teams and students compete individually. Strong preparation for future math competitions.",
+    descriptionKo:
+      "초·중학교 수학 올림피아드(MOEMS)는 11월부터 3월까지 월 1회, 총 5회 진행됩니다. 학교별로 팀을 구성해 참가하며, 각 학생은 개인전 형식으로 문제를 풀게 됩니다. 수학 경시대회를 처음 접하는 아이들에게 훌륭한 경험이 됩니다.",
+    color: "purple",
+  },
+  {
+    name: "AMC 8",
+    nameKo: "AMC 8 수학 경시대회",
+    when: "Jan (annually)",
+    whenKo: "매년 1월",
+    grades: "Gr 8 and below",
+    gradesKo: "8학년 이하 (K–6 모두 참가 가능)",
+    description:
+      "The AMC 8 is a 25-question, 40-minute multiple-choice math exam for students in grade 8 and below, administered by the Mathematical Association of America (MAA). No penalty for wrong answers. An excellent first step toward AMC 10/12 and MATHCOUNTS.",
+    descriptionKo:
+      "미국수학협회(MAA)가 주관하는 25문항 40분 객관식 수학 경시대회로, 8학년 이하 학생이라면 누구나 참가할 수 있습니다. 오답 감점이 없어 부담 없이 도전할 수 있으며, 향후 AMC 10/12, MATHCOUNTS 같은 상위 대회를 준비하는 첫걸음으로 매우 좋습니다.",
     color: "purple",
   },
 ];

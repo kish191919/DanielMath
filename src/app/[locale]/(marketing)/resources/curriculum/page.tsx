@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle, Info } from "lucide-react";
+import Image from "next/image";
+import { ArrowLeft, CheckCircle, Info } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
 import { grades } from "@/lib/curriculum-data";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
+import { pageAlternates } from "@/lib/seo";
 
 const gradeConfig: Record<number, {
   accent: string; border: string; hoverBorder: string;
@@ -25,9 +27,10 @@ type Props = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   if (!hasLocale(locale)) return {};
+  const alt = pageAlternates(locale, "/resources/curriculum");
   return locale === "ko"
-    ? { title: "FCPS 초등 수학 커리큘럼", description: "Fairfax County 초등학교 수학 프로그램 전체 안내. 유치원~6학년 일반·심화(AAP) 수학 트랙을 한국어로 설명합니다." }
-    : { title: "FCPS Elementary Math Curriculum", description: "A complete guide to Fairfax County elementary math. Compare Standard and Advanced (AAP) tracks for grades K–6, quarter by quarter." };
+    ? { title: "FCPS 초등 수학 커리큘럼", description: "Fairfax County 초등학교 수학 프로그램 전체 안내. 유치원~6학년 일반·심화(AAP) 수학 트랙을 한국어로 설명합니다.", alternates: alt }
+    : { title: "FCPS Elementary Math Curriculum", description: "A complete guide to Fairfax County elementary math. Compare Standard and Advanced (AAP) tracks for grades K–6, quarter by quarter.", alternates: alt };
 }
 
 export default async function CurriculumOverviewPage({ params }: Props) {
@@ -126,19 +129,29 @@ export default async function CurriculumOverviewPage({ params }: Props) {
 
   return (
     <>
-      <section className="border-b border-navy-100 bg-white py-14 sm:py-20">
+      <section className="relative isolate overflow-hidden bg-navy-900 py-14 sm:py-20">
+        <Image
+          src="/hero/student-2.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="absolute inset-0 -z-20 object-cover object-center opacity-30"
+        />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-navy-950/60 via-navy-900/70 to-navy-950/80" />
         <Container>
-          <Link href={lp("/resources")} className={`flex w-fit items-center gap-1 text-sm text-navy-500 hover:text-navy-700${isKo ? " font-ko" : ""}`}>
+          <Link href={lp("/resources")} className={`inline-flex w-fit items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium text-white/80 shadow-sm transition hover:border-white/40 hover:text-white${isKo ? " font-ko" : ""}`}>
+            <ArrowLeft className="h-3.5 w-3.5 shrink-0" />
             {t.back}
           </Link>
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className={`mt-6 text-4xl font-bold tracking-tight text-navy-900 sm:text-5xl${isKo ? " font-ko" : ""}`}>
+            <h1 className={`mt-6 text-4xl font-bold tracking-tight text-white sm:text-5xl${isKo ? " font-ko" : ""}`}>
               {t.title}
             </h1>
-            <p className={`mt-2 text-xl font-semibold text-navy-700${isKo ? " font-ko" : ""}`}>
+            <p className={`mt-2 text-xl font-semibold text-white/80${isKo ? " font-ko" : ""}`}>
               {t.subtitle}
             </p>
-            <p className={`mx-auto mt-5 max-w-2xl text-sm leading-7 text-navy-700${isKo ? " font-ko" : ""}`}>
+            <p className={`mx-auto mt-5 max-w-2xl text-sm leading-7 text-white/70${isKo ? " font-ko" : ""}`}>
               {t.desc}
             </p>
           </div>

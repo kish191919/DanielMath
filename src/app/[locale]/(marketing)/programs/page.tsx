@@ -7,6 +7,7 @@ import { Section, SectionHeader } from "@/components/site/section";
 import { Button } from "@/components/ui/button";
 import { getDictionary } from "@/dictionaries";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
+import { pageAlternates } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -24,6 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: d.programs.meta.title,
     description: d.programs.meta.description,
+    alternates: pageAlternates(locale, "/programs"),
   };
 }
 
