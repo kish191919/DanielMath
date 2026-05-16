@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
+import { CheckCircle, ExternalLink } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
 import { grades, gradeBySlug, type GradeData, type TrackData } from "@/lib/curriculum-data";
@@ -68,7 +68,6 @@ function GradeHeader({
             href={lp("/resources/curriculum")}
             className={`flex items-center gap-1 text-sm text-navy-500 hover:text-navy-800${isKo ? " font-ko" : ""}`}
           >
-            <ChevronLeft className="h-4 w-4" />
             {isKo ? "자료 센터로 돌아가기" : "Back to Curriculum"}
           </Link>
           <div className="flex items-center gap-2">
@@ -77,7 +76,6 @@ function GradeHeader({
                 href={lp(`/resources/curriculum/${prev.slug}`)}
                 className="flex items-center gap-1 rounded-lg border border-navy-100 px-3 py-1.5 text-xs font-semibold text-navy-600 hover:bg-navy-50"
               >
-                <ChevronLeft className="h-3.5 w-3.5" />
                 {prev.gradeNum === 0 ? "K" : `${isKo ? prev.gradeNum + "학년" : "Gr " + prev.gradeNum}`}
               </Link>
             )}
@@ -87,7 +85,6 @@ function GradeHeader({
                 className="flex items-center gap-1 rounded-lg border border-navy-100 px-3 py-1.5 text-xs font-semibold text-navy-600 hover:bg-navy-50"
               >
                 {next.gradeNum === 0 ? "K" : `${isKo ? next.gradeNum + "학년" : "Gr " + next.gradeNum}`}
-                <ChevronRight className="h-3.5 w-3.5" />
               </Link>
             )}
           </div>
@@ -251,7 +248,7 @@ function HighlightSection({
               href={lp("/inquire")}
               className={`inline-flex items-center justify-center gap-2 rounded-xl bg-navy-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-navy-700${isKo ? " font-ko" : ""}`}
             >
-              {isKo ? "맞춤 상담 신청 →" : "Schedule a Consult →"}
+              {isKo ? "맞춤 상담 신청" : "Schedule a Consult"}
             </Link>
             <Link
               href={lp("/resources/curriculum")}

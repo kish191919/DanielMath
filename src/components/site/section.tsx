@@ -26,7 +26,7 @@ export function SectionHeader({
   isKo = false,
 }: {
   eyebrow?: string;
-  title: string;
+  title?: string;
   titleKo?: string;
   description?: string;
   align?: "center" | "left";
@@ -44,9 +44,11 @@ export function SectionHeader({
           {eyebrow}
         </p>
       )}
-      <h2 className={cn("text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl", isKo && "font-ko")}>
-        {title}
-      </h2>
+      {title && (
+        <h2 className={cn("text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl", isKo && "font-ko")}>
+          {title}
+        </h2>
+      )}
       {titleKo && (
         <p className="mt-2 text-lg text-navy-500">
           {titleKo}

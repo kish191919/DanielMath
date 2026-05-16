@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { BookOpen, GraduationCap, CalendarDays, ClipboardList, ArrowRight, Info } from "lucide-react";
+import Image from "next/image";
+import { BookOpen, GraduationCap, CalendarDays, ClipboardList, Info } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
+import { FaqAccordion } from "@/components/site/faq-accordion";
 import { getDictionary } from "@/dictionaries";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
-import { siteConfig } from "@/lib/site-config";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -35,7 +36,16 @@ export default async function ResourcesHubPage({ params }: Props) {
   return (
     <>
       {/* Hero */}
-      <section className="bg-navy-900 py-20 sm:py-28">
+      <section className="relative isolate overflow-hidden bg-navy-900 py-20 sm:py-28">
+        <Image
+          src="/hero/student-1.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="absolute inset-0 -z-20 object-cover object-center opacity-30"
+        />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-navy-950/60 via-navy-900/70 to-navy-950/80" />
         <Container>
           <div className="mx-auto max-w-3xl text-center">
             {hub.badge && (
@@ -92,7 +102,7 @@ export default async function ResourcesHubPage({ params }: Props) {
                     {s.desc}
                   </p>
                   <div className={`mt-5 flex items-center gap-1 text-sm font-semibold text-navy-900 group-hover:text-navy-600${isKo ? " font-ko" : ""}`}>
-                    {s.cta} <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+                    {s.cta}
                   </div>
                 </Link>
               );
@@ -149,22 +159,9 @@ export default async function ResourcesHubPage({ params }: Props) {
         <Container>
           <SectionHeader
             eyebrow={hub.faq.eyebrow}
-            title={hub.faq.title}
-            titleKo={isKo ? hub.faq.titleKo : undefined}
             isKo={isKo}
           />
-          <div className="mx-auto mt-10 max-w-3xl divide-y divide-navy-100">
-            {hub.faq.items.map((faq) => (
-              <div key={faq.q} className="py-6">
-                <h3 className={`text-base font-bold text-navy-900${isKo ? " font-ko" : ""}`}>
-                  Q. {faq.q}
-                </h3>
-                <p className={`mt-2 text-sm leading-7 text-navy-700${isKo ? " font-ko" : ""}`}>
-                  {faq.a}
-                </p>
-              </div>
-            ))}
-          </div>
+          <FaqAccordion items={hub.faq.items} isKo={isKo} />
         </Container>
       </Section>
     </>

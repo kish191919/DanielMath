@@ -27,7 +27,7 @@ export const blogPosts: BlogPost[] = [
     titleKo: "FCPS AAP 수학, 제대로 이해하기",
     titleEn: "Understanding FCPS AAP Math",
     descKo: "Fairfax County 초등학교의 Standard 수학과 AAP(심화) 수학의 차이, 배치 기준, 그리고 중학교·고등학교까지 이어지는 수학 경로를 정리했습니다.",
-    descEn: "A clear breakdown of Standard vs. Advanced (AAP) math in FCPS — including placement criteria and the long-term pathway through middle and high school.",
+    descEn: "A clear breakdown of Standard vs. Advanced (AAP) math in FCPS, covering placement criteria and the long-term pathway through middle and high school.",
     bodyKo: [
       {
         heading: "FCPS 수학에는 두 가지 트랙이 있습니다",
@@ -51,7 +51,7 @@ export const blogPosts: BlogPost[] = [
         ],
       },
       {
-        heading: "AAP 수학이 왜 중요한가요? — 중학교까지 이어지는 경로",
+        heading: "초등 AAP 수학이 중학교 이후 경로에 미치는 영향",
         paragraphs: [
           "초등 AAP 수학을 꾸준히 이수한 학생은 중학교에서 더 빠른 수학 경로를 밟을 수 있습니다. FCPS 기준으로, 6학년에 7학년 수준의 수학을 이수한 학생은 7학년에 Pre-Algebra, 8학년에 Algebra I를 수강하게 됩니다.",
           "이 경로를 따라가면 고등학교에서 AP Calculus AB 또는 BC를 수강할 수 있는 기반이 마련됩니다. 많은 대학에서 AP Calculus 이수 여부를 이공계 전공 지원 시 중요하게 봅니다. 초등학교의 수학 배치가 결국 대학 입시까지 영향을 미칠 수 있다는 점에서 조기에 준비하는 것이 중요합니다.",
@@ -76,7 +76,7 @@ export const blogPosts: BlogPost[] = [
       {
         heading: "What Is AAP?",
         paragraphs: [
-          "AAP (Advanced Academic Programs) is FCPS's enrichment program designed for academically advanced students. It covers all core subjects at an accelerated level — not just math.",
+          "AAP (Advanced Academic Programs) is FCPS's enrichment program designed for academically advanced students. It covers all core subjects at an accelerated level, not just math.",
           "There are two forms of AAP placement. Part-time (Level III) means the student stays at their home school but receives advanced instruction during math and language arts. Full-time (Level IV) means the student transfers to a designated AAP center school for all subjects. Full-time AAP is available starting in 3rd grade.",
         ],
       },
@@ -88,10 +88,10 @@ export const blogPosts: BlogPost[] = [
         ],
       },
       {
-        heading: "Why AAP Math Matters — The Long-Term Pathway",
+        heading: "Why AAP Math Matters for the Long-Term Pathway",
         paragraphs: [
           "Students who complete the elementary AAP math track consistently enter a faster math sequence in middle school. Under the FCPS pathway, a student who completes 7th-grade-level math in 6th grade proceeds to Pre-Algebra in 7th grade and Algebra I in 8th grade.",
-          "This trajectory makes AP Calculus AB or BC achievable in high school — a credential that carries weight for STEM college admissions. Elementary math placement has compounding effects that reach well beyond elementary school.",
+          "This trajectory makes AP Calculus AB or BC achievable in high school, a credential that carries weight for STEM college admissions. Elementary math placement has compounding effects that reach well beyond elementary school.",
         ],
       },
       {
@@ -112,7 +112,7 @@ export const blogPosts: BlogPost[] = [
     titleKo: "CogAT·NNAT 시험 완전 가이드",
     titleEn: "A Complete Guide to CogAT & NNAT",
     descKo: "FCPS AAP 배치에 사용되는 CogAT와 NNAT 시험의 구조, 점수 방식, 시험 시기, 그리고 준비 방법을 학부모 눈높이에서 정리했습니다.",
-    descEn: "Everything parents need to know about the CogAT and NNAT — the two ability tests used for FCPS AAP placement — including structure, scoring, timing, and preparation strategies.",
+    descEn: "Everything parents need to know about the CogAT and NNAT, the two ability tests used for FCPS AAP placement, including structure, scoring, timing, and preparation strategies.",
     bodyKo: [
       {
         heading: "CogAT란 무엇인가요?",
@@ -154,14 +154,14 @@ export const blogPosts: BlogPost[] = [
       {
         heading: "What Is the CogAT?",
         paragraphs: [
-          "The CogAT (Cognitive Abilities Test), developed by Riverside Insights, is a reasoning ability test — not an achievement test. It measures how students think and solve problems, not what they have memorized. FCPS and many other school districts use it as a key criterion for gifted and advanced program placement.",
+          "The CogAT (Cognitive Abilities Test), developed by Riverside Insights, is a reasoning ability test rather than an achievement test. It measures how students think and solve problems, not what they have memorized. FCPS and many other school districts use it as a key criterion for gifted and advanced program placement.",
           "The test has three sections: Verbal (word and sentence relationships), Quantitative (number patterns and mathematical reasoning), and Nonverbal (figure and spatial pattern reasoning). Each section yields a separate score.",
         ],
       },
       {
         heading: "What Is the NNAT?",
         paragraphs: [
-          "The NNAT (Naglieri Nonverbal Ability Test) measures pure reasoning ability using only geometric shapes and spatial patterns — no language or prior math knowledge required. This design ensures the test is equitable for students from diverse linguistic backgrounds.",
+          "The NNAT (Naglieri Nonverbal Ability Test) measures pure reasoning ability using only geometric shapes and spatial patterns, with no language or prior math knowledge required. This design ensures the test is equitable for students from diverse linguistic backgrounds.",
           "FCPS uses both the CogAT and NNAT together so that students who are not native English speakers are not disadvantaged in the AAP selection process.",
         ],
       },
@@ -175,14 +175,14 @@ export const blogPosts: BlogPost[] = [
       {
         heading: "When and How Is the Test Administered?",
         paragraphs: [
-          "FCPS conducts CogAT and NNAT screening primarily in the fall (October–November). Second-grade students are most commonly the first to take it, as 3rd grade is the entry point for full-time AAP placement. Testing is done in school groups — no separate registration is required.",
+          "FCPS conducts CogAT and NNAT screening primarily in the fall (October–November). Second-grade students are most commonly the first to take it, as 3rd grade is the entry point for full-time AAP placement. Testing is done in school groups with no separate registration required.",
           "After screening, parents receive score reports and eligible students may go through a Portfolio Review before final placement decisions are made.",
         ],
       },
       {
         heading: "How Can You Prepare?",
         paragraphs: [
-          "Since both tests measure reasoning rather than curriculum knowledge, memorization and formula drills are ineffective preparation. The most practical approach is familiarizing your child with each question format through official practice materials — so the structure of the test itself is not surprising on test day.",
+          "Since both tests measure reasoning rather than curriculum knowledge, memorization and formula drills are ineffective preparation. The most practical approach is familiarizing your child with each question format through official practice materials so the structure of the test itself is not surprising on test day.",
           "For the Quantitative section specifically, building conceptual math thinking through programs like Singapore Math or Beast Academy provides genuine preparation. Long-term, consistent development of mathematical reasoning is far more effective than last-minute test prep.",
         ],
       },
@@ -207,14 +207,14 @@ export const blogPosts: BlogPost[] = [
         ],
       },
       {
-        heading: "CPA 접근법 — 구체→그림→추상",
+        heading: "CPA 접근법: 구체에서 그림을 거쳐 추상으로",
         paragraphs: [
           "Singapore Math의 핵심 교육 방식은 CPA(Concrete-Pictorial-Abstract) 접근법입니다. 학생이 수학 개념을 처음 접할 때는 실물(구체물)로 직접 만지며 이해하고, 그 다음엔 그림이나 도식으로 표현하며, 마지막으로 추상적인 숫자와 기호로 다룹니다.",
           "예를 들어 분수를 배울 때, 먼저 피자나 블록 같은 실물을 반으로 나눠 보고, 이후 원이나 막대를 나눈 그림으로 표현하며, 마지막에 '1/2'이라는 기호를 사용합니다. 이 과정을 통해 학생들은 숫자 뒤에 있는 개념을 직관적으로 이해하게 됩니다.",
         ],
       },
       {
-        heading: "Bar Model — 워드 프로블럼을 시각적으로",
+        heading: "Bar Model로 워드 프로블럼 시각화하기",
         paragraphs: [
           "Singapore Math의 또 다른 특징은 Bar Model(막대 모델)입니다. 복잡한 워드 프로블럼을 막대 그림으로 시각화하여 문제의 구조를 파악하는 방법입니다.",
           "예를 들어 '민수는 영희보다 사탕을 12개 더 가지고 있고, 둘 합쳐서 48개다. 민수는 몇 개?'라는 문제를 막대로 그리면, 대수 방정식 없이도 초등학생이 논리적으로 풀 수 있습니다. 이 방법은 훗날 대수(Algebra)의 개념적 기초가 됩니다.",
@@ -240,27 +240,27 @@ export const blogPosts: BlogPost[] = [
         heading: "What Is Singapore Math?",
         paragraphs: [
           "Singapore Math is a mathematics curriculum developed by Singapore's Ministry of Education in the 1980s. Since its introduction, Singapore has consistently ranked among the top nations in international math and science assessments (TIMSS). Impressed by these results, many U.S. school districts and gifted education programs have adopted it.",
-          "The guiding philosophy is 'Teach Less, Learn More.' Rather than rushing through a wide range of topics, Singapore Math focuses deeply on fewer core concepts — ensuring students truly understand each idea before advancing.",
+          "The guiding philosophy is 'Teach Less, Learn More.' Rather than rushing through a wide range of topics, Singapore Math focuses deeply on fewer core concepts, ensuring students truly understand each idea before advancing.",
         ],
       },
       {
-        heading: "The CPA Approach — Concrete, Pictorial, Abstract",
+        heading: "The CPA Approach: Concrete, Pictorial, and Abstract",
         paragraphs: [
           "Singapore Math's signature teaching method is the CPA (Concrete-Pictorial-Abstract) progression. Students first explore concepts using physical objects, then represent them as pictures or diagrams, and finally work with abstract numbers and symbols.",
           "For example, when learning fractions, students first split physical objects (blocks, pizza), then draw diagrams of divided shapes, and only then write '1/2.' This ensures the abstract symbol is always tied to a real, understood concept.",
         ],
       },
       {
-        heading: "The Bar Model — Visual Problem Solving",
+        heading: "The Bar Model for Visual Problem Solving",
         paragraphs: [
           "Another hallmark of Singapore Math is the Bar Model: a technique for drawing complex word problems as rectangular bars to make their structure visible.",
-          "For example, 'Min has 12 more candies than Young, and together they have 48. How many does Min have?' can be solved visually with bars — no algebra required. This method also builds the conceptual foundation for algebraic thinking in later grades.",
+          "For example, 'Min has 12 more candies than Young, and together they have 48. How many does Min have?' can be solved visually with bars without any algebra. This method also builds the conceptual foundation for algebraic thinking in later grades.",
         ],
       },
       {
         heading: "How It Differs from Traditional U.S. Math",
         paragraphs: [
-          "Traditional U.S. math instruction often prioritizes procedure first — teaching formulas and having students drill many repetitions. Students can become fast calculators without understanding why the methods work.",
+          "Traditional U.S. math instruction often prioritizes procedure first, teaching formulas and having students drill many repetitions. Students can become fast calculators without understanding why the methods work.",
           "Singapore Math inverts this. Students who deeply understand division can reconstruct the concept even if they forget a formula. This is why Singapore Math students tend to perform well on reasoning-based tests like CogAT and NNAT, and in competitions like AMC 8.",
         ],
       },
@@ -268,7 +268,7 @@ export const blogPosts: BlogPost[] = [
         heading: "The Connection to Beast Academy",
         paragraphs: [
           "Beast Academy is a gifted math series for grades 2–5 created by Art of Problem Solving (AoPS), built on Singapore Math's foundational philosophy. It consists of comic-book-style Guide books and companion Practice workbooks that develop creative problem solving and mathematical discussion.",
-          "If Singapore Math builds deep conceptual roots, Beast Academy grows creative reasoning on top of them. The two programs complement each other — which is why using them together produces the strongest results.",
+          "If Singapore Math builds deep conceptual roots, Beast Academy grows creative reasoning on top of them. The two programs complement each other, which is why using them together produces the strongest results.",
         ],
       },
     ],
@@ -282,7 +282,7 @@ export const blogPosts: BlogPost[] = [
     titleKo: "FCPS 학생이 참가할 수 있는 수학 경시대회",
     titleEn: "Math Competitions Open to FCPS Students",
     descKo: "MOEMS, AMC 8, Math Kangaroo 등 Fairfax 지역 초등학생이 참가할 수 있는 주요 수학 경시대회를 정리했습니다. 각 대회의 수준, 일정, 참가 방법을 확인하세요.",
-    descEn: "An overview of major math competitions available to FCPS elementary students — including MOEMS, AMC 8, Math League, and Math Kangaroo — with details on difficulty, timing, and how to participate.",
+    descEn: "An overview of major math competitions available to FCPS elementary students, including MOEMS, AMC 8, Math League, and Math Kangaroo, with details on difficulty, timing, and how to participate.",
     bodyKo: [
       {
         heading: "왜 수학 경시대회에 참가하나요?",
@@ -292,21 +292,21 @@ export const blogPosts: BlogPost[] = [
         ],
       },
       {
-        heading: "MOEMS — 가장 접근하기 쉬운 경시대회",
+        heading: "MOEMS, 초등학생에게 가장 접근하기 쉬운 경시대회",
         paragraphs: [
           "MOEMS(Math Olympiad for Elementary and Middle Schools)는 1977년 설립된 비영리 단체가 운영하는 경시대회로, 전 세계 170,000명 이상이 참가하는 대형 대회입니다. 4~6학년(Division E)과 4~8학년(Division M) 두 부문이 있습니다.",
           "매년 11월부터 3월까지 5회에 걸쳐 각각 30분, 5문제씩 출제됩니다. 학교나 외부 팀 단위로 참가하며, 팀당 최대 35명이 등록 가능합니다. 문제 수준은 기발하고 창의적인 사고를 요구하지만 초등학생도 충분히 도전할 수 있는 수준입니다. MOEMS 공식 웹사이트(moems.org)에서 과거 기출문제를 무료로 내려받을 수 있습니다.",
         ],
       },
       {
-        heading: "AMC 8 — 미국수학협회 공인 대회",
+        heading: "AMC 8, 미국수학협회 공인 수학 경시대회",
         paragraphs: [
           "AMC 8(American Mathematics Competition 8)은 미국수학협회(MAA)가 주관하는 대회로, 8학년 이하 학생 전원이 참가할 수 있습니다. 매년 1월에 시행되며, 25문항, 40분이 주어집니다. 주관식 없이 전부 5지선다 객관식입니다.",
           "난이도는 MOEMS보다 높습니다. 특히 후반부 10문제는 상당한 수학적 창의성이 요구됩니다. 고득점자는 AMC 10/12 → AIME → USAMO로 이어지는 미국 수학 올림피아드 경로에 진입할 수 있어, 수학에 열정 있는 학생에게는 장기적인 목표가 됩니다.",
         ],
       },
       {
-        heading: "Math Kangaroo — 국제 대회의 경험",
+        heading: "Math Kangaroo로 경험하는 국제 수학 대회",
         paragraphs: [
           "Math Kangaroo는 1991년 프랑스에서 시작된 국제 수학 경시대회로, 현재 90개국 이상이 참가합니다. 매년 3월 셋째 목요일에 시행되며, K-12 전체 학년을 대상으로 학년별 난이도가 구분됩니다.",
           "각 학년에 맞는 30문항을 75분 안에 풀며, 참가 신청은 kangaroo.org에서 개인 단위로 할 수 있습니다. 참가비는 소정의 금액이 있으며, 전 세계 학생들과 비교할 수 있다는 점에서 흥미로운 경험이 됩니다.",
@@ -329,21 +329,21 @@ export const blogPosts: BlogPost[] = [
         ],
       },
       {
-        heading: "MOEMS — The Most Accessible Entry Point",
+        heading: "MOEMS, the Most Accessible Competition for Elementary Students",
         paragraphs: [
           "MOEMS (Math Olympiad for Elementary and Middle Schools) is run by a nonprofit founded in 1977, with over 170,000 participants worldwide. It has two divisions: Division E (grades 4–6) and Division M (grades 4–8).",
-          "Students take five contests from November through March — each 30 minutes, 5 questions. Teams of up to 35 students register together through a school or outside group. Problems require creative thinking but are accessible to prepared elementary students. Past contests are available free at moems.org.",
+          "Students take five contests from November through March, each 30 minutes with 5 questions. Teams of up to 35 students register together through a school or outside group. Problems require creative thinking but are accessible to prepared elementary students. Past contests are available free at moems.org.",
         ],
       },
       {
-        heading: "AMC 8 — The Official National Competition",
+        heading: "AMC 8, the Official National Math Competition",
         paragraphs: [
           "The AMC 8 (American Mathematics Competition 8), run by the Mathematical Association of America (MAA), is open to all students in 8th grade or below. Held each January, it consists of 25 multiple-choice questions in 40 minutes.",
-          "Difficulty is higher than MOEMS, especially in the last 10 questions, which demand substantial mathematical creativity. High scorers can advance through the AMC 10/12 → AIME → USAMO pathway — making AMC 8 a meaningful long-term goal for mathematically passionate students.",
+          "Difficulty is higher than MOEMS, especially in the last 10 questions, which demand substantial mathematical creativity. High scorers can advance through the AMC 10/12 → AIME → USAMO pathway, making AMC 8 a meaningful long-term goal for mathematically passionate students.",
         ],
       },
       {
-        heading: "Math Kangaroo — International Competition Experience",
+        heading: "Math Kangaroo as an International Competition Experience",
         paragraphs: [
           "Math Kangaroo began in France in 1991 and now runs in over 90 countries. Held annually on the third Thursday of March, it covers all grades K–12 with difficulty scaled by grade level.",
           "Students solve 30 questions in 75 minutes. Individual registration is available at kangaroo.org with a small participation fee. It's a unique opportunity to compare performance against students internationally.",
@@ -364,13 +364,13 @@ export const blogPosts: BlogPost[] = [
     readingMins: 5,
     category: "학습전략",
     categoryEn: "Study Tips",
-    titleKo: "집에서 수학 실력 쌓기 — 효과적인 방법 5가지",
-    titleEn: "Building Math Skills at Home — 5 Evidence-Based Strategies",
+    titleKo: "집에서 수학 실력을 쌓는 효과적인 방법 5가지",
+    titleEn: "5 Evidence-Based Strategies for Building Math Skills at Home",
     descKo: "학원을 다니지 않아도 집에서 수학 실력을 꾸준히 키울 수 있는 방법 5가지를 연구 근거와 함께 소개합니다. 학부모가 바로 실천할 수 있는 구체적인 팁입니다.",
-    descEn: "Five research-backed strategies parents can use at home to help their children build stronger math skills — no tutoring required to get started.",
+    descEn: "Five research-backed strategies parents can use at home to help their children build stronger math skills. No tutoring required to get started.",
     bodyKo: [
       {
-        heading: "1. 짧게, 자주 — 분산 학습의 힘",
+        heading: "1. 짧게, 자주 반복하는 분산 학습의 힘",
         paragraphs: [
           "인지과학 연구에서 반복적으로 확인된 '분산 학습(Spaced Practice)' 효과가 있습니다. 주말에 2시간 몰아서 공부하는 것보다 매일 15~20분씩 꾸준히 연습하는 것이 장기 기억과 실력 향상에 훨씬 효과적입니다.",
           "실천 방법: 매일 저녁 식사 후 15분을 수학 연습 시간으로 고정하세요. IXL Math처럼 짧게 집중적으로 연습할 수 있는 도구를 활용하면 지속하기 쉽습니다.",
@@ -398,7 +398,7 @@ export const blogPosts: BlogPost[] = [
         ],
       },
       {
-        heading: "5. '아직 못 한다'는 마음가짐으로 — 성장 마인드셋",
+        heading: "5. 성장 마인드셋으로 키우는 수학 자신감",
         paragraphs: [
           "Stanford 대학의 심리학자 Carol Dweck 박사의 연구에 따르면, '나는 수학을 못 해'처럼 능력을 고정된 것으로 보는 학생(Fixed Mindset)보다 '아직은 어렵지만 연습하면 할 수 있어'처럼 노력으로 성장한다고 믿는 학생(Growth Mindset)이 장기적으로 더 높은 수학 성취를 보입니다.",
           "실천 방법: 아이가 수학을 어려워할 때 '원래 이런 거야, 괜찮아'보다 '지금은 어렵지, 그런데 어떤 부분이 어려웠어?'라고 구체적으로 물어보세요. 어려움을 인정하되 포기하지 않는 태도를 함께 만들어가는 것이 중요합니다.",
@@ -407,7 +407,7 @@ export const blogPosts: BlogPost[] = [
     ],
     bodyEn: [
       {
-        heading: "1. Short and Frequent — The Power of Spaced Practice",
+        heading: "1. Short and Frequent: The Power of Spaced Practice",
         paragraphs: [
           "Cognitive science research consistently shows that distributed (spaced) practice outperforms massed practice for long-term retention. Practicing 15–20 minutes daily is far more effective than a single 2-hour session on the weekend.",
           "In practice: Set a fixed 15-minute math window each evening after dinner. Tools like IXL Math are designed for exactly this kind of short, focused daily practice.",
@@ -416,29 +416,29 @@ export const blogPosts: BlogPost[] = [
       {
         heading: "2. Build Mental Math Ability",
         paragraphs: [
-          "Mental math is not just about speed — it develops flexible number sense, which is the foundation for algebra and complex problem solving. Research shows students with stronger mental math skills tend to achieve higher on multi-step math problems.",
+          "Mental math is not just about speed. It develops flexible number sense, which is the foundation for algebra and complex problem solving. Research shows students with stronger mental math skills tend to achieve higher on multi-step math problems.",
           "In practice: During car rides, ask casual questions like 'What's 235 plus 78?' Focus on the method they used, not just the answer. Discussing different calculation strategies is the real learning.",
         ],
       },
       {
         heading: "3. Read Word Problems Aloud",
         paragraphs: [
-          "Many students who handle computation well still stumble on word problems — and the cause is usually comprehension, not math ability. Reading problems aloud increases understanding and naturally trains students to identify what's being asked versus what's extra information.",
+          "Many students who handle computation well still stumble on word problems, and the cause is usually comprehension rather than math ability. Reading problems aloud increases understanding and naturally trains students to identify what's being asked versus what's extra information.",
           "In practice: Require word problems to be read aloud during homework, and ask your child to say in their own words what the question is asking before they start solving.",
         ],
       },
       {
         heading: "4. Analyze Mistakes Together",
         paragraphs: [
-          "Wrong answers are the best raw material for improvement. Rather than moving past incorrect problems, look at them together and identify the cause — calculation slip, concept gap, or misreading the question. Understanding why reduces repetition of the same mistakes.",
+          "Wrong answers are the best raw material for improvement. Rather than moving past incorrect problems, look at them together and identify the cause: a calculation slip, a concept gap, or misreading the question. Understanding why reduces repetition of the same mistakes.",
           "In practice: When a test comes back, have your child re-solve only the wrong problems and explain out loud where they went wrong. This also builds metacognitive skills alongside math ability.",
         ],
       },
       {
-        heading: "5. 'Not Yet' — The Growth Mindset Approach",
+        heading: "5. 'Not Yet' and the Growth Mindset Approach",
         paragraphs: [
           "Stanford psychologist Carol Dweck's research shows that students who believe their ability is fixed ('I'm just not a math person') consistently underperform over time compared to students who believe ability grows with effort. The language used around math mistakes matters significantly.",
-          "In practice: When your child struggles, instead of 'It's fine, this is just hard,' try 'This is tough right now — which part felt hardest?' Acknowledging difficulty while maintaining forward momentum is the core of a growth mindset.",
+          "In practice: When your child struggles, instead of 'It's fine, this is just hard,' try 'This is tough right now. Which part felt hardest?' Acknowledging difficulty while maintaining forward momentum is the core of a growth mindset.",
         ],
       },
     ],

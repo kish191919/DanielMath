@@ -53,7 +53,7 @@ export default async function TestingPage({ params }: Props) {
         <Container>
           <div className="mx-auto max-w-3xl text-center">
             <Link href={lp("/resources")} className={`text-sm text-navy-500 hover:text-navy-700${isKo ? " font-ko" : ""}`}>
-              {isKo ? "← 자료 센터로 돌아가기" : "← Back to Resources"}
+              {isKo ? "자료 센터로 돌아가기" : "Back to Resources"}
             </Link>
             <h1 className={`mt-4 text-4xl font-bold tracking-tight text-navy-900 sm:text-5xl${isKo ? " font-ko" : ""}`}>
               {isKo ? "시험 & 대회 일정" : "Test & Competition Calendar"}
@@ -175,7 +175,7 @@ export default async function TestingPage({ params }: Props) {
               href={lp("/inquire")}
               className={`mt-6 inline-flex items-center gap-2 rounded-xl bg-navy-900 px-6 py-3 text-sm font-semibold text-white hover:bg-navy-700${isKo ? " font-ko" : ""}`}
             >
-              {isKo ? "무료 상담 신청 →" : "Schedule a Free Consult →"}
+              {isKo ? "무료 상담 신청" : "Schedule a Free Consult"}
             </Link>
           </div>
         </Container>

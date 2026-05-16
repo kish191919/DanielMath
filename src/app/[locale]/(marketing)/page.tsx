@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ArrowRight, Sparkles, Clock, Users, ClipboardCheck, BarChart2, BookOpen, MessageCircle, Target, Send } from "lucide-react";
+import { Sparkles, Clock, Users, ClipboardCheck, BarChart2, BookOpen, MessageCircle, Target, Send } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
 import { HeroBackground } from "@/components/site/hero-background";
@@ -82,15 +82,10 @@ function HeroSection({ d, lp, isKo }: { d: Awaited<ReturnType<typeof getDictiona
             {h.desc}
           </p>
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button href={lp("/inquire")} size="lg" variant="secondary">
-              {h.ctaInquire} <ArrowRight className="h-4 w-4" />
+            <Button href={lp("/inquire")} size="lg" variant="secondary" className="min-w-[10rem]">
+              {h.ctaInquire}
             </Button>
-            <Button
-              href={lp("/programs")}
-              size="lg"
-              variant="ghost"
-              className="border border-white/40 text-white hover:bg-white/10"
-            >
+            <Button href={lp("/programs")} size="lg" variant="secondary" className="min-w-[10rem]">
               {h.ctaPrograms}
             </Button>
           </div>
@@ -180,10 +175,10 @@ function ProgramsPreview({ d, lp, isKo }: { d: Awaited<ReturnType<typeof getDict
             </div>
 
             <div className="flex flex-col gap-3 lg:items-end lg:justify-end">
-              <Button href={lp("/programs")} variant="primary" size="lg">
-                {p.ctaDetails} <ArrowRight className="h-4 w-4" />
+              <Button href={lp("/programs")} variant="secondary" size="lg" className="min-w-[10rem]">
+                {p.ctaDetails}
               </Button>
-              <Button href={lp("/inquire")} variant="secondary" size="lg">
+              <Button href={lp("/inquire")} variant="secondary" size="lg" className="min-w-[10rem]">
                 {p.ctaInquire}
               </Button>
             </div>
@@ -254,13 +249,17 @@ function FinalCTA({ d, lp, isKo }: { d: Awaited<ReturnType<typeof getDictionary>
             </h2>
           )}
           <p className={`mx-auto mt-4 max-w-2xl text-base text-navy-100 sm:text-lg${isKo ? " font-ko" : ""}`}>
-            {c.desc}
+            {c.desc.split(". ").map((line, i, arr) => (
+              <span key={i}>
+                {line}{i < arr.length - 1 ? "." : ""}<br />
+              </span>
+            ))}
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button href={lp("/inquire")} size="lg" variant="secondary">
-              {c.ctaInquire} <ArrowRight className="h-4 w-4" />
+              {c.ctaInquire}
             </Button>
-            <Button href={lp("/programs")} size="lg" variant="ghost" className="text-white hover:bg-white/10">
+            <Button href={lp("/programs")} size="lg" variant="secondary">
               {c.ctaPrograms}
             </Button>
           </div>

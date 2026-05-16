@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 import { getDictionary } from "@/dictionaries";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
 import { Container } from "@/components/site/container";
@@ -55,7 +55,6 @@ export default async function BlogPostPage({ params }: Props) {
             href={lp("/blog")}
             className="inline-flex items-center gap-1.5 text-sm font-medium text-navy-500 hover:text-navy-900"
           >
-            <ArrowLeft className="h-4 w-4" />
             {d.blog.backToList}
           </Link>
         </Container>

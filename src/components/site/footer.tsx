@@ -105,7 +105,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
               </li>
               <li>
                 <Link href={lp("/inquire")} className={`font-medium text-navy-900 hover:underline${isKo ? " font-ko" : ""}`}>
-                  {isKo ? "상담 신청 →" : "Get in touch →"}
+                  {isKo ? "상담 신청" : "Get in touch"}
                 </Link>
               </li>
             </ul>

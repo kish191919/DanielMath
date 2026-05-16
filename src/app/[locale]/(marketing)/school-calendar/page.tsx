@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+
 import { SchoolCalendarSection } from "@/components/site/school-calendar-section";
 import { Container } from "@/components/site/container";
 import { getDictionary } from "@/dictionaries";
@@ -34,7 +34,6 @@ export default async function SchoolCalendarPage({ params }: Props) {
             href={lp("/")}
             className="inline-flex items-center gap-1.5 text-sm font-medium text-navy-500 hover:text-navy-900"
           >
-            <ArrowLeft className="h-4 w-4" />
             {isKo ? "홈으로" : "Home"}
           </Link>
         </Container>

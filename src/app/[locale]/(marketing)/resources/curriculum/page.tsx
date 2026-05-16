@@ -37,7 +37,7 @@ export default async function CurriculumOverviewPage({ params }: Props) {
   const isKo = locale === "ko";
 
   const t = isKo ? {
-    back: "← 자료 센터로 돌아가기",
+    back: "자료 센터로 돌아가기",
     title: "FCPS 초등 수학 커리큘럼",
     subtitle: "유치원 ~ 6학년 전체 안내",
     desc: "FCPS(Fairfax County Public Schools)는 모든 초등학년에 두 가지 수학 트랙을 운영합니다. 아래에서 각 학년을 선택해 일반 수학과 심화 수학의 분기별 학습 내용을 비교해보세요.",
@@ -80,7 +80,7 @@ export default async function CurriculumOverviewPage({ params }: Props) {
       note: "심화반 6학년이 Pre-Algebra까지 마치면 중학교 1학년(7학년)에서 Algebra I를 바로 시작할 수 있습니다.",
     },
   } : {
-    back: "← Back to Resources",
+    back: "Back to Resources",
     title: "FCPS Elementary Math Curriculum",
     subtitle: "Kindergarten – Grade 6 Overview",
     desc: "Fairfax County Public Schools (FCPS) runs two math tracks at every elementary grade. Select a grade below to compare Standard and Advanced (AAP) math content, quarter by quarter.",
@@ -145,7 +145,7 @@ export default async function CurriculumOverviewPage({ params }: Props) {
         </Container>
       </section>
 
-      <Section className="bg-navy-50/50">
+      <Section className="bg-white border-t border-navy-100">
         <Container>
           <SectionHeader
             eyebrow={t.tracks.eyebrow}
@@ -185,7 +185,7 @@ export default async function CurriculumOverviewPage({ params }: Props) {
         </Container>
       </Section>
 
-      <Section>
+      <Section className="bg-navy-50 border-t border-navy-100">
         <Container>
           <SectionHeader
             eyebrow={t.grades.eyebrow}
@@ -220,7 +220,7 @@ export default async function CurriculumOverviewPage({ params }: Props) {
         </Container>
       </Section>
 
-      <Section className="bg-navy-50/60">
+      <Section className="bg-amber-50/40 border-t border-navy-100">
         <Container>
           <SectionHeader
             eyebrow={t.progression.eyebrow}
@@ -232,7 +232,7 @@ export default async function CurriculumOverviewPage({ params }: Props) {
               <thead className="border-b border-navy-100">
                 <tr>
                   {t.progression.ths.map((th, i) => (
-                    <th key={i} className={`px-5 py-3.5 text-left font-semibold${i === 2 ? " text-gold-600" : " text-navy-900"}${isKo ? " font-ko" : ""}`}>
+                    <th key={i} className={`px-5 py-3.5 text-left font-semibold${i === 2 ? " bg-amber-50 text-gold-600" : " text-navy-900"}${isKo ? " font-ko" : ""}`}>
                       {th}
                     </th>
                   ))}

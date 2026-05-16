@@ -32,7 +32,7 @@ export default async function SolPage({ params }: Props) {
   const isKo = locale === "ko";
 
   const t = isKo ? {
-    back: "← 자료 센터로 돌아가기",
+    back: "자료 센터로 돌아가기",
     title: "Virginia SOL",
     subtitle: "수학 성취 기준 (Standards of Learning)",
     heroDesc: "버지니아 주 모든 공립학교는 주 교육부(VDOE)가 정한 SOL(Standards of Learning)을 기준으로 수업을 운영하고 평가합니다. 각 학년이 그 학년 말까지 반드시 알아야 할 내용이 정해져 있습니다.",
@@ -66,7 +66,7 @@ export default async function SolPage({ params }: Props) {
     disclaimerLink: "버지니아 주 교육부 공식 사이트",
     disclaimerSuffix: "에서 확인하세요.",
   } : {
-    back: "← Back to Resources",
+    back: "Back to Resources",
     title: "Virginia SOL",
     subtitle: "Mathematics Standards of Learning",
     heroDesc: "All Virginia public schools teach and assess math based on the Standards of Learning (SOL) set by the Virginia Department of Education (VDOE). Each grade has defined content that students are expected to master by year-end.",
