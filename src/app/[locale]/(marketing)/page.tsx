@@ -39,7 +39,7 @@ export default async function HomePage({ params }: Props) {
       <LocalBusinessJsonLd />
       <HeroSection d={d.home} lp={lp} isKo={isKo} />
       <Stats d={d.home} isKo={isKo} />
-      <ProgramsPreview d={d.home} lp={lp} isKo={isKo} />
+      <ProgramsPreview d={d.home} isKo={isKo} />
       <HowItWorks d={d.home} isKo={isKo} />
       <FinalCTA d={d.home} lp={lp} isKo={isKo} />
     </>
@@ -121,7 +121,7 @@ function Stats({ d, isKo }: { d: Awaited<ReturnType<typeof getDictionary>>["home
   );
 }
 
-function ProgramsPreview({ d, lp, isKo }: { d: Awaited<ReturnType<typeof getDictionary>>["home"]; lp: (p: string) => string; isKo: boolean }) {
+function ProgramsPreview({ d, isKo }: { d: Awaited<ReturnType<typeof getDictionary>>["home"]; isKo: boolean }) {
   const p = d.programs;
   return (
     <Section className="bg-navy-50/60">
@@ -173,14 +173,6 @@ function ProgramsPreview({ d, lp, isKo }: { d: Awaited<ReturnType<typeof getDict
               </p>
             </div>
 
-            <div className="flex flex-col gap-3 lg:items-end lg:justify-end">
-              <Button href={lp("/programs")} variant="secondary" size="lg" className="min-w-[10rem]">
-                {p.ctaDetails}
-              </Button>
-              <Button href={lp("/inquire")} variant="secondary" size="lg" className="min-w-[10rem]">
-                {p.ctaInquire}
-              </Button>
-            </div>
           </div>
         </div>
       </Container>
