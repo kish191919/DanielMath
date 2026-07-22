@@ -15,15 +15,15 @@ const cards = [
     href: "/dashboard/principal/worksheets",
     title: "학습지",
     titleEn: "Worksheets",
-    description: "AI로 학년별·유형별 영어 학습지를 생성하고 PDF로 출력합니다.",
-    ready: false,
+    description: "학생이 푼 프린트물을 업로드하면 AI가 채점하고 확인 후 학습이력에 저장합니다.",
+    ready: true,
   },
   {
     href: "/dashboard/principal/progress",
     title: "진행 상황",
     titleEn: "Progress",
-    description: "학생별 진도, 정답률, AAP/CogAT 모의 점수 트렌드를 확인합니다.",
-    ready: false,
+    description: "학생별 개념별 정답률과 최근 학습이력을 확인합니다.",
+    ready: true,
   },
 ];
 

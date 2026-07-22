@@ -1,0 +1,293 @@
+"use server";
+
+import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
+import { requireRole } from "@/lib/dal";
+import { createServerSupabase } from "@/lib/supabase/server";
+import { createAdminSupabase } from "@/lib/supabase/admin";
+import { gradeWorksheetScan } from "@/lib/ai/grade-worksheet";
+import { generateParentSummaryDraft } from "@/lib/ai/generate-parent-summary";
+import {
+  uploadMetaSchema,
+  reviewSubmissionSchema,
+  sessionNoteSchema,
+  noteTextSchema,
+  type LearningItemInputValues,
+} from "./schema";
+
+const BUCKET = "worksheet-scans";
+
+const EXT_BY_MIME: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "application/pdf": "pdf",
+};
+
+async function markGradingFailed(scanId: string, err: unknown) {
+  const supabase = await createServerSupabase();
+  await supabase
+    .from("worksheet_scans")
+    .update({
+      status: "grading_failed",
+      grading_error: err instanceof Error ? err.message : "채점 중 오류가 발생했습니다.",
+    })
+    .eq("id", scanId);
+}
+
+export type UploadUrlResult =
+  | { error: string }
+  | { scanId: string; path: string; signedUrl: string; token: string };
+
+export async function createUploadUrlAction(
+  studentId: string,
+  mimeType: string,
+): Promise<UploadUrlResult> {
+  await requireRole("principal");
+
+  const ext = EXT_BY_MIME[mimeType];
+  if (!ext) return { error: "지원하지 않는 파일 형식입니다." };
+  if (!studentId) return { error: "학생을 선택해주세요." };
+
+  const scanId = crypto.randomUUID();
+  const path = `${studentId}/${scanId}.${ext}`;
+
+  const admin = createAdminSupabase();
+  const { data, error } = await admin.storage.from(BUCKET).createSignedUploadUrl(path);
+  if (error || !data) {
+    return { error: error?.message ?? "업로드 URL 생성에 실패했습니다." };
+  }
+
+  return { scanId, path, signedUrl: data.signedUrl, token: data.token };
+}
+
+export type ConfirmUploadInput = {
+  scanId: string;
+  path: string;
+  studentId: string;
+  originalFilename: string;
+  mimeType: string;
+  fileSizeBytes: number;
+  sessionDate: string;
+};
+
+export type ConfirmUploadResult = { error: string };
+
+export async function confirmUploadAction(
+  input: ConfirmUploadInput,
+): Promise<ConfirmUploadResult | void> {
+  const session = await requireRole("principal");
+
+  const parsed = uploadMetaSchema.safeParse({
+    student_id: input.studentId,
+    original_filename: input.originalFilename,
+    mime_type: input.mimeType,
+    file_size_bytes: input.fileSizeBytes,
+    session_date: input.sessionDate,
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "입력값을 확인해주세요." };
+  }
+
+  const supabase = await createServerSupabase();
+  const { error } = await supabase.from("worksheet_scans").insert({
+    id: input.scanId,
+    student_id: parsed.data.student_id,
+    uploaded_by: session.userId,
+    storage_path: input.path,
+    original_filename: parsed.data.original_filename,
+    mime_type: parsed.data.mime_type,
+    file_size_bytes: parsed.data.file_size_bytes,
+    session_date: parsed.data.session_date,
+    status: "grading",
+  });
+  if (error) return { error: error.message };
+
+  try {
+    await gradeWorksheetScan(input.scanId);
+  } catch (err) {
+    await markGradingFailed(input.scanId, err);
+  }
+
+  revalidatePath("/dashboard/principal/worksheets");
+  redirect(`/dashboard/principal/worksheets/${input.scanId}`);
+}
+
+export async function retryGradingAction(scanId: string) {
+  await requireRole("principal");
+
+  const supabase = await createServerSupabase();
+  await supabase.from("learning_items").delete().eq("scan_id", scanId).eq("confirmed", false);
+  await supabase
+    .from("worksheet_scans")
+    .update({ status: "grading", grading_error: null })
+    .eq("id", scanId);
+
+  try {
+    await gradeWorksheetScan(scanId);
+  } catch (err) {
+    await markGradingFailed(scanId, err);
+  }
+
+  revalidatePath(`/dashboard/principal/worksheets/${scanId}`);
+}
+
+export type ReviewResult = { error: string } | { ok: true };
+
+export async function confirmReviewAction(
+  scanId: string,
+  studentId: string,
+  sessionDate: string,
+  items: LearningItemInputValues[],
+): Promise<ReviewResult> {
+  const session = await requireRole("principal");
+
+  const parsed = reviewSubmissionSchema.safeParse({
+    scan_id: scanId,
+    student_id: studentId,
+    session_date: sessionDate,
+    items,
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "입력값을 확인해주세요." };
+  }
+
+  const supabase = await createServerSupabase();
+
+  const { error: deleteError } = await supabase
+    .from("learning_items")
+    .delete()
+    .eq("scan_id", parsed.data.scan_id);
+  if (deleteError) return { error: deleteError.message };
+
+  const rows = parsed.data.items.map((item) => ({
+    scan_id: parsed.data.scan_id,
+    student_id: parsed.data.student_id,
+    problem_number: item.problem_number || null,
+    transcribed_problem: item.transcribed_problem,
+    transcribed_answer: item.transcribed_answer || null,
+    is_correct: item.is_correct,
+    concept_id: item.concept_id,
+    error_type: item.is_correct ? null : item.error_type,
+    source: item.source,
+    edited_by_teacher: item.edited_by_teacher,
+    confirmed: true,
+    session_date: parsed.data.session_date,
+  }));
+
+  const { error: insertError } = await supabase.from("learning_items").insert(rows);
+  if (insertError) return { error: insertError.message };
+
+  const { error: updateError } = await supabase
+    .from("worksheet_scans")
+    .update({
+      status: "reviewed",
+      reviewed_at: new Date().toISOString(),
+      reviewed_by: session.userId,
+    })
+    .eq("id", parsed.data.scan_id);
+  if (updateError) return { error: updateError.message };
+
+  try {
+    await generateParentSummaryDraft(
+      parsed.data.scan_id,
+      parsed.data.student_id,
+      parsed.data.session_date,
+      session.userId,
+    );
+  } catch (err) {
+    // Best-effort: the review itself already succeeded, and the principal
+    // can always write a manual note as a fallback (see SessionNoteForm).
+    console.error(`[confirmReviewAction] parent summary draft failed for scan ${parsed.data.scan_id}`, err);
+  }
+
+  revalidatePath("/dashboard/principal/worksheets");
+  revalidatePath(`/dashboard/principal/students/${parsed.data.student_id}/history`);
+  revalidatePath("/dashboard/principal/progress");
+  revalidatePath("/dashboard/parent/progress");
+  redirect(`/dashboard/principal/worksheets/${parsed.data.scan_id}`);
+}
+
+export type SessionNoteFormState = {
+  error?: string;
+  fieldErrors?: Partial<Record<"note", string>>;
+  success?: boolean;
+};
+
+export async function addSessionNoteAction(
+  studentId: string,
+  _prev: SessionNoteFormState | null,
+  formData: FormData,
+): Promise<SessionNoteFormState> {
+  const session = await requireRole("principal");
+
+  const parsed = sessionNoteSchema.safeParse({
+    student_id: studentId,
+    scan_id: formData.get("scan_id") ?? "",
+    session_date: formData.get("session_date") ?? "",
+    note: formData.get("note"),
+  });
+  if (!parsed.success) {
+    const fieldErrors: SessionNoteFormState["fieldErrors"] = {};
+    for (const issue of parsed.error.issues) {
+      if (issue.path[0] === "note") fieldErrors.note = issue.message;
+    }
+    return { error: "입력값을 확인해주세요.", fieldErrors };
+  }
+
+  const supabase = await createServerSupabase();
+  const { error } = await supabase.from("session_notes").insert({
+    student_id: parsed.data.student_id,
+    scan_id: parsed.data.scan_id || null,
+    session_date: parsed.data.session_date || new Date().toISOString().slice(0, 10),
+    note: parsed.data.note,
+    source: "teacher",
+    confirmed: true,
+    created_by: session.userId,
+  });
+  if (error) return { error: error.message };
+
+  revalidatePath(`/dashboard/principal/students/${studentId}/history`);
+  revalidatePath("/dashboard/parent/progress");
+  return { success: true };
+}
+
+export type PublishSessionNoteState = {
+  error?: string;
+  fieldErrors?: Partial<Record<"note", string>>;
+  success?: boolean;
+};
+
+export async function publishSessionNoteAction(
+  noteId: string,
+  studentId: string,
+  scanId: string,
+  originalNote: string,
+  _prev: PublishSessionNoteState | null,
+  formData: FormData,
+): Promise<PublishSessionNoteState> {
+  await requireRole("principal");
+
+  const parsed = noteTextSchema.safeParse(formData.get("note"));
+  if (!parsed.success) {
+    return {
+      error: "입력값을 확인해주세요.",
+      fieldErrors: { note: parsed.error.issues[0]?.message ?? "내용을 입력해주세요." },
+    };
+  }
+
+  const supabase = await createServerSupabase();
+  const { error } = await supabase
+    .from("session_notes")
+    .update({
+      note: parsed.data,
+      confirmed: true,
+      edited_by_teacher: parsed.data !== originalNote,
+    })
+    .eq("id", noteId);
+  if (error) return { error: error.message };
+
+  revalidatePath(`/dashboard/principal/worksheets/${scanId}`);
+  revalidatePath(`/dashboard/principal/students/${studentId}/history`);
+  revalidatePath("/dashboard/parent/progress");
+  return { success: true };
+}

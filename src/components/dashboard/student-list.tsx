@@ -45,6 +45,12 @@ export function StudentList({ students }: { students: Student[] }) {
             )}
             <div className="mt-auto flex items-center justify-end gap-2 pt-4">
               <Link
+                href={`/dashboard/principal/students/${student.id}/history`}
+                className="rounded-md border border-navy-200 px-3 py-1 text-xs font-medium text-navy-700 hover:bg-navy-50"
+              >
+                학습이력
+              </Link>
+              <Link
                 href={`/dashboard/principal/students/${student.id}`}
                 className="rounded-md border border-navy-200 px-3 py-1 text-xs font-medium text-navy-700 hover:bg-navy-50"
               >
