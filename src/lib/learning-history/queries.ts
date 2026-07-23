@@ -35,11 +35,14 @@ export async function listScansForStudent(studentId: string): Promise<WorksheetS
   return data ?? [];
 }
 
-export async function listRecentScans(limit = 50): Promise<WorksheetScan[]> {
+export async function listRecentScans(
+  limit = 50,
+  studentId?: string,
+): Promise<WorksheetScan[]> {
   const supabase = await createServerSupabase();
-  const { data, error } = await supabase
-    .from("worksheet_scans")
-    .select("*")
+  let query = supabase.from("worksheet_scans").select("*");
+  if (studentId) query = query.eq("student_id", studentId);
+  const { data, error } = await query
     .order("created_at", { ascending: false })
     .limit(limit)
     .returns<WorksheetScan[]>();
@@ -128,6 +131,9 @@ export async function listLearningItems(
   return data ?? [];
 }
 
+export const MIN_SAMPLE_SIZE = 3;
+export const WEAK_ACCURACY_THRESHOLD = 70;
+
 export type ConceptAccuracySummary = {
   conceptId: string | null;
   label: string;
@@ -135,6 +141,8 @@ export type ConceptAccuracySummary = {
   total: number;
   correct: number;
   accuracyRate: number;
+  isLowSample: boolean;
+  isWeak: boolean;
 };
 
 export async function getConceptAccuracySummary(
@@ -159,17 +167,25 @@ export async function getConceptAccuracySummary(
   const summaries: ConceptAccuracySummary[] = [];
   for (const [key, bucket] of buckets) {
     const concept = key === "unassigned" ? null : (conceptById.get(key) ?? null);
+    const accuracyRate = bucket.total > 0 ? Math.round((bucket.correct / bucket.total) * 100) : 0;
+    const isLowSample = bucket.total < MIN_SAMPLE_SIZE;
     summaries.push({
       conceptId: concept?.id ?? null,
       label: concept?.label_ko ?? "미분류",
       strand: concept?.strand ?? null,
       total: bucket.total,
       correct: bucket.correct,
-      accuracyRate: bucket.total > 0 ? Math.round((bucket.correct / bucket.total) * 100) : 0,
+      accuracyRate,
+      isLowSample,
+      isWeak: !isLowSample && accuracyRate < WEAK_ACCURACY_THRESHOLD,
     });
   }
 
-  return summaries.sort((a, b) => b.total - a.total);
+  return summaries.sort((a, b) => {
+    if (a.isWeak !== b.isWeak) return a.isWeak ? -1 : 1;
+    if (a.isWeak) return a.accuracyRate - b.accuracyRate;
+    return b.total - a.total;
+  });
 }
 
 export async function listSessionNotes(studentId: string, limit = 20): Promise<SessionNote[]> {

@@ -18,6 +18,8 @@ export type ScanStatus =
   | "reviewed"
   | "grading_failed";
 
+export type PracticeSheetStatus = "draft" | "confirmed";
+
 export interface Profile {
   id: string;
   role: Role;
@@ -99,6 +101,32 @@ export interface SessionNote {
   edited_by_teacher: boolean;
   confirmed: boolean;
   created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GeneratedWorksheet {
+  id: string;
+  student_id: string;
+  created_by: string;
+  status: PracticeSheetStatus;
+  title: string | null;
+  share_token: string;
+  created_at: string;
+  confirmed_at: string | null;
+}
+
+export interface GeneratedProblem {
+  id: string;
+  worksheet_id: string;
+  source_item_id: string | null;
+  concept_id: string | null;
+  problem_text: string;
+  answer_text: string;
+  sort_order: number;
+  source: "ai" | "teacher";
+  edited_by_teacher: boolean;
+  ai_suggested: unknown;
   created_at: string;
   updated_at: string;
 }
@@ -200,6 +228,36 @@ type SessionNoteInsert = {
 
 type SessionNoteUpdate = Partial<SessionNoteInsert>;
 
+type GeneratedWorksheetInsert = {
+  id?: string;
+  student_id: string;
+  created_by: string;
+  status?: PracticeSheetStatus;
+  title?: string | null;
+  share_token?: string;
+  created_at?: string;
+  confirmed_at?: string | null;
+};
+
+type GeneratedWorksheetUpdate = Partial<GeneratedWorksheetInsert>;
+
+type GeneratedProblemInsert = {
+  id?: string;
+  worksheet_id: string;
+  source_item_id?: string | null;
+  concept_id?: string | null;
+  problem_text: string;
+  answer_text: string;
+  sort_order?: number;
+  source?: "ai" | "teacher";
+  edited_by_teacher?: boolean;
+  ai_suggested?: unknown;
+  created_at?: string;
+  updated_at?: string;
+};
+
+type GeneratedProblemUpdate = Partial<GeneratedProblemInsert>;
+
 export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "12";
@@ -288,6 +346,48 @@ export type Database = {
           },
         ];
       };
+      generated_worksheets: {
+        Row: GeneratedWorksheet;
+        Insert: GeneratedWorksheetInsert;
+        Update: GeneratedWorksheetUpdate;
+        Relationships: [
+          {
+            foreignKeyName: "generated_worksheets_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      generated_problems: {
+        Row: GeneratedProblem;
+        Insert: GeneratedProblemInsert;
+        Update: GeneratedProblemUpdate;
+        Relationships: [
+          {
+            foreignKeyName: "generated_problems_worksheet_id_fkey";
+            columns: ["worksheet_id"];
+            isOneToOne: false;
+            referencedRelation: "generated_worksheets";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "generated_problems_source_item_id_fkey";
+            columns: ["source_item_id"];
+            isOneToOne: false;
+            referencedRelation: "learning_items";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "generated_problems_concept_id_fkey";
+            columns: ["concept_id"];
+            isOneToOne: false;
+            referencedRelation: "concepts";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: { [_ in never]: never };
     Functions: { [_ in never]: never };
@@ -295,6 +395,7 @@ export type Database = {
       user_role: Role;
       error_type: ErrorType;
       scan_status: ScanStatus;
+      practice_sheet_status: PracticeSheetStatus;
     };
     CompositeTypes: { [_ in never]: never };
   };

@@ -15,9 +15,17 @@ const STATUS_STYLES: Record<string, string> = {
   grading_failed: "bg-red-100 text-red-700",
 };
 
-export default async function PrincipalWorksheetsPage() {
+export default async function PrincipalWorksheetsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ studentId?: string }>;
+}) {
   await requireRole("principal");
-  const [scans, students] = await Promise.all([listRecentScans(), listStudents()]);
+  const { studentId } = await searchParams;
+  const [scans, students] = await Promise.all([
+    listRecentScans(50, studentId),
+    listStudents(),
+  ]);
   const studentNameById = new Map(students.map((s) => [s.id, s.full_name]));
 
   return (
@@ -36,6 +44,32 @@ export default async function PrincipalWorksheetsPage() {
             </p>
           </div>
           <Button href="/dashboard/principal/worksheets/new">새 업로드</Button>
+        </div>
+
+        <div className="mt-6 flex flex-wrap gap-2">
+          <Link
+            href="/dashboard/principal/worksheets"
+            className={`inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+              !studentId
+                ? "bg-navy-900 text-white"
+                : "bg-navy-50 text-navy-700 hover:bg-navy-100"
+            }`}
+          >
+            전체
+          </Link>
+          {students.map((student) => (
+            <Link
+              key={student.id}
+              href={`/dashboard/principal/worksheets?studentId=${student.id}`}
+              className={`inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+                studentId === student.id
+                  ? "bg-navy-900 text-white"
+                  : "bg-navy-50 text-navy-700 hover:bg-navy-100"
+              }`}
+            >
+              {student.full_name}
+            </Link>
+          ))}
         </div>
 
         <div className="mt-8 space-y-3">

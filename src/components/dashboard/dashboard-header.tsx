@@ -5,7 +5,7 @@ import { signOutAction } from "@/lib/auth/actions";
 
 export function DashboardHeader({ email }: { email: string }) {
   return (
-    <header className="border-b border-navy-100 bg-white">
+    <header className="border-b border-navy-100 bg-white print:hidden">
       <Container>
         <div className="flex h-14 items-center justify-between">
           <Link href="/dashboard" className="flex items-baseline gap-2">
@@ -18,6 +18,12 @@ export function DashboardHeader({ email }: { email: string }) {
           </Link>
           <div className="flex items-center gap-3">
             <span className="hidden text-xs text-navy-600 sm:inline">{email}</span>
+            <Link
+              href="/"
+              className="rounded-md border border-navy-200 px-3 py-1.5 text-xs font-medium text-navy-700 hover:bg-navy-50"
+            >
+              홈페이지 / Home
+            </Link>
             <form action={signOutAction}>
               <button
                 type="submit"

@@ -79,7 +79,10 @@ export function SiteHeader({ locale }: { locale: Locale }) {
                 </Link>
               )}
             </div>
-            <div className="ml-3">
+            <div className="ml-3 flex items-center gap-2">
+              <Button href="/dashboard" variant="secondary" size="md">
+                {isKo ? "대시보드 / Dashboard" : "Dashboard"}
+              </Button>
               <Button href="/login" size="md">
                 {isKo ? "로그인 / Login" : "Login"}
               </Button>
@@ -157,7 +160,10 @@ export function SiteHeader({ locale }: { locale: Locale }) {
                 </Link>
               )}
             </div>
-            <div className="mt-2">
+            <div className="mt-2 flex flex-col gap-2">
+              <Button href="/dashboard" variant="secondary" size="lg" className="w-full">
+                {isKo ? "대시보드 / Dashboard" : "Dashboard"}
+              </Button>
               <Button href="/login" size="lg" className="w-full">
                 {isKo ? "로그인 / Login" : "Login"}
               </Button>

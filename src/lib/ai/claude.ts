@@ -20,6 +20,14 @@ export const PARENT_SUMMARY_MODEL =
 export const PARENT_SUMMARY_EFFORT = (process.env.ANTHROPIC_PARENT_SUMMARY_EFFORT ||
   "low") as "low" | "medium" | "high" | "xhigh" | "max";
 
+// Similar-problem generation is text-only synthesis (no vision, no image
+// tokens) but numeric correctness matters more than parent-summary prose, so
+// effort defaults higher than PARENT_SUMMARY_EFFORT.
+export const PRACTICE_GEN_MODEL = process.env.ANTHROPIC_PRACTICE_GEN_MODEL || "claude-sonnet-5";
+
+export const PRACTICE_GEN_EFFORT = (process.env.ANTHROPIC_PRACTICE_GEN_EFFORT ||
+  "medium") as "low" | "medium" | "high" | "xhigh" | "max";
+
 export function getClaudeClient() {
   return new Anthropic();
 }

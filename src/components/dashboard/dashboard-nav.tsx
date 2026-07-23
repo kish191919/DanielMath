@@ -16,7 +16,7 @@ const parentLinks = [
 export function DashboardNav({ role }: { role: Role }) {
   const links = role === "principal" ? principalLinks : parentLinks;
   return (
-    <nav className="border-b border-navy-100 bg-navy-50/50">
+    <nav className="border-b border-navy-100 bg-navy-50/50 print:hidden">
       <Container>
         <ul className="flex gap-1 overflow-x-auto py-2">
           {links.map((link) => (
