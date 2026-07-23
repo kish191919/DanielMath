@@ -7,6 +7,7 @@ import type {
   LearningItem,
   SessionNote,
   Student,
+  Grade,
 } from "@/lib/supabase/types";
 
 const BUCKET = "worksheet-scans";
@@ -188,6 +189,53 @@ export async function getConceptAccuracySummary(
   });
 }
 
+export type ConceptHeatmapCell = {
+  conceptId: string;
+  label: string;
+  total: number;
+  accuracyRate: number | null;
+  isLowSample: boolean;
+  isWeak: boolean;
+};
+
+export type ConceptHeatmapStrand = {
+  strand: string;
+  cells: ConceptHeatmapCell[];
+};
+
+// Unlike getConceptAccuracySummary (which only lists concepts the student has
+// items for), this covers every concept tagged for the student's grade so
+// untouched concepts show up as "no data" rather than being omitted.
+export async function getConceptHeatmap(
+  studentId: string,
+  grade: Grade,
+  filters?: { from?: string; to?: string },
+): Promise<ConceptHeatmapStrand[]> {
+  const [concepts, summary] = await Promise.all([
+    listConcepts(),
+    getConceptAccuracySummary(studentId, filters),
+  ]);
+  const summaryByConceptId = new Map(summary.map((s) => [s.conceptId, s]));
+
+  const strands = new Map<string, ConceptHeatmapCell[]>();
+  for (const concept of concepts) {
+    if (!concept.grades.includes(grade)) continue;
+    const s = summaryByConceptId.get(concept.id);
+    const cells = strands.get(concept.strand) ?? [];
+    cells.push({
+      conceptId: concept.id,
+      label: concept.label_ko,
+      total: s?.total ?? 0,
+      accuracyRate: s?.accuracyRate ?? null,
+      isLowSample: s?.isLowSample ?? true,
+      isWeak: s?.isWeak ?? false,
+    });
+    strands.set(concept.strand, cells);
+  }
+
+  return [...strands.entries()].map(([strand, cells]) => ({ strand, cells }));
+}
+
 export async function listSessionNotes(studentId: string, limit = 20): Promise<SessionNote[]> {
   const supabase = await createServerSupabase();
   const { data, error } = await supabase
@@ -253,6 +301,61 @@ export async function listStudentsProgressOverview(): Promise<StudentProgressOve
     });
   }
   return overview;
+}
+
+export type StudentKpiSummary = {
+  recentAccuracyRate: number | null;
+  recentTotal: number;
+  allTimeAccuracyRate: number | null;
+  allTimeTotal: number;
+  lastSessionDate: string | null;
+  curriculumCoverage: { covered: number; total: number; rate: number | null };
+};
+
+export async function getStudentKpiSummary(
+  studentId: string,
+  grade: Grade,
+): Promise<StudentKpiSummary> {
+  const since = new Date();
+  since.setDate(since.getDate() - 30);
+  const sinceStr = since.toISOString().slice(0, 10);
+
+  const [allItems, scans, concepts] = await Promise.all([
+    listLearningItems(studentId),
+    listScansForStudent(studentId),
+    listConcepts(),
+  ]);
+
+  const recentItems = allItems.filter((i) => i.session_date >= sinceStr);
+  const recentCorrect = recentItems.filter((i) => i.is_correct).length;
+  const allCorrect = allItems.filter((i) => i.is_correct).length;
+
+  const gradeConceptIds = new Set(
+    concepts.filter((c) => c.grades.includes(grade)).map((c) => c.id),
+  );
+  const coveredConceptIds = new Set(
+    allItems
+      .filter((i) => i.concept_id && gradeConceptIds.has(i.concept_id))
+      .map((i) => i.concept_id as string),
+  );
+
+  return {
+    recentAccuracyRate:
+      recentItems.length > 0 ? Math.round((recentCorrect / recentItems.length) * 100) : null,
+    recentTotal: recentItems.length,
+    allTimeAccuracyRate:
+      allItems.length > 0 ? Math.round((allCorrect / allItems.length) * 100) : null,
+    allTimeTotal: allItems.length,
+    lastSessionDate: scans[0]?.session_date ?? null,
+    curriculumCoverage: {
+      covered: coveredConceptIds.size,
+      total: gradeConceptIds.size,
+      rate:
+        gradeConceptIds.size > 0
+          ? Math.round((coveredConceptIds.size / gradeConceptIds.size) * 100)
+          : null,
+    },
+  };
 }
 
 // --- Parent-scoped variants -------------------------------------------------

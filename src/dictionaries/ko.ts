@@ -24,13 +24,13 @@ const ko = {
     },
     stats: [
       { value: "무학년제", label: "학년 구분 없음", sublabel: "수준별 배정" },
-      { value: "4명", label: "클래스당 정원", sublabel: "" },
+      { value: "4명", label: "클래스당 정원", sublabel: "클래스당" },
       { value: "주 1~4회", label: "요일·횟수 자유 선택", sublabel: "월·화·목·금 중" },
-      { value: "70분", label: "수업 시간", sublabel: "" },
+      { value: "70분", label: "수업 시간", sublabel: "1회 기준" },
     ],
     programs: {
       eyebrow: "프로그램",
-      title: "4명 정원, 무학년 수준별 진단 관리",
+      title: "소수 정예, 학년이 아닌 실력별 반 편성",
       titleKo: "",
       desc: "학년이 아닌 실력 수준으로 반을 배정하고, 매 수업 오답을 기록해 다음 수업에 비슷한 문제로 다시 확인합니다. Singapore Math·Beast Academy·IXL Math 같은 정규 교재와 함께, 수학 교구와 보드게임으로 개념을 쉽게 이해하고 적용해봅니다.",
       h3en: "Not grade-based. Level-based.",

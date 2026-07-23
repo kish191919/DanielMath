@@ -16,7 +16,7 @@ type DictSlice = {
   types: Record<EventType, string>;
 };
 
-const YEAR_IDS: SchoolYearCalendar["id"][] = ["2025-26", "2026-27", "2027-28"];
+const YEAR_IDS: SchoolYearCalendar["id"][] = ["2026-27", "2027-28", "2028-29"];
 
 const BADGE_STYLES: Record<EventType, string> = {
   important: "bg-navy-900 text-white",
@@ -64,7 +64,7 @@ function formatRange(start: string, end: string | undefined, isKo: boolean): str
 }
 
 export function SchoolCalendarSection({ d, isKo }: { d: DictSlice; isKo: boolean }) {
-  const [activeYear, setActiveYear] = useState<SchoolYearCalendar["id"]>("2025-26");
+  const [activeYear, setActiveYear] = useState<SchoolYearCalendar["id"]>("2026-27");
   const [activeFilter, setActiveFilter] = useState<EventType | "all">("all");
 
   const yearData = schoolCalendars.find((y) => y.id === activeYear)!;

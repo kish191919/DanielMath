@@ -6,10 +6,16 @@ import { requireRole } from "@/lib/dal";
 import { getStudent } from "@/lib/students/queries";
 import {
   getConceptAccuracySummary,
+  getConceptHeatmap,
+  getStudentKpiSummary,
   listLearningItems,
   listSessionNotes,
+  WEAK_ACCURACY_THRESHOLD,
+  MIN_SAMPLE_SIZE,
+  type ConceptHeatmapCell,
 } from "@/lib/learning-history/queries";
 import { WrongAnswerWorkspace, type ItemGroup } from "@/components/dashboard/wrong-answer-workspace";
+import { GRADE_LABELS } from "@/lib/students/schema";
 import type { LearningItem } from "@/lib/supabase/types";
 
 const TABS = [
@@ -57,11 +63,13 @@ export default async function StudentHistoryPage({
   const student = await getStudent(id);
   if (!student) notFound();
 
-  const [recentSummary, allTimeSummary, items, notes] = await Promise.all([
+  const [recentSummary, allTimeSummary, items, notes, kpi, heatmap] = await Promise.all([
     getConceptAccuracySummary(id, { from: daysAgoIso(30) }),
     getConceptAccuracySummary(id),
     listLearningItems(id),
     listSessionNotes(id),
+    getStudentKpiSummary(id, student.grade),
+    getConceptHeatmap(id, student.grade, { from: daysAgoIso(30) }),
   ]);
 
   const allTimeByConceptId = new Map(allTimeSummary.map((s) => [s.conceptId, s]));
@@ -102,6 +110,31 @@ export default async function StudentHistoryPage({
           </h1>
         </div>
 
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          <KpiCard label="학년" value={GRADE_LABELS[student.grade]} />
+          <KpiCard
+            label="최근 30일 정답률"
+            value={kpi.recentAccuracyRate === null ? "기록 없음" : `${kpi.recentAccuracyRate}%`}
+            sub={kpi.recentTotal > 0 ? `${kpi.recentTotal}문항` : undefined}
+            warn={
+              kpi.recentAccuracyRate !== null &&
+              kpi.recentTotal >= MIN_SAMPLE_SIZE &&
+              kpi.recentAccuracyRate < WEAK_ACCURACY_THRESHOLD
+            }
+          />
+          <KpiCard
+            label="전체 누적 정답률"
+            value={kpi.allTimeAccuracyRate === null ? "기록 없음" : `${kpi.allTimeAccuracyRate}%`}
+            sub={kpi.allTimeTotal > 0 ? `${kpi.allTimeTotal}문항` : undefined}
+          />
+          <KpiCard label="마지막 수업일" value={kpi.lastSessionDate ?? "-"} />
+          <KpiCard
+            label="학년 커리큘럼 커버리지"
+            value={kpi.curriculumCoverage.rate === null ? "-" : `${kpi.curriculumCoverage.rate}%`}
+            sub={`${kpi.curriculumCoverage.covered}/${kpi.curriculumCoverage.total}개 개념`}
+          />
+        </div>
+
         <div className="mt-6 flex flex-wrap gap-2">
           {TABS.map((t) => (
             <Link
@@ -121,7 +154,40 @@ export default async function StudentHistoryPage({
 
         {tab === "concept" && (
           <div className="mt-8">
-            <h2 className="text-lg font-semibold text-navy-900 font-ko" lang="ko">
+            {heatmap.length > 0 && (
+              <div>
+                <h2 className="text-lg font-semibold text-navy-900 font-ko" lang="ko">
+                  학년 커리큘럼 현황
+                </h2>
+                <p className="mt-1 text-xs text-navy-500 font-ko" lang="ko">
+                  {GRADE_LABELS[student.grade]} 개념 · 최근 30일 기준 · 색으로 강/약 영역을 한눈에 확인하세요
+                </p>
+
+                <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-navy-600 font-ko" lang="ko">
+                  <LegendSwatch swatchClassName="border-green-300 bg-green-100" label="양호 (70%+)" />
+                  <LegendSwatch swatchClassName="border-red-300 bg-red-100" label="주의필요 (70% 미만)" />
+                  <LegendSwatch swatchClassName="border-amber-300 bg-amber-100" label="표본부족 (3문항 미만)" />
+                  <LegendSwatch swatchClassName="border-navy-200 bg-navy-50" label="데이터 없음" />
+                </div>
+
+                <div className="mt-4 space-y-5">
+                  {heatmap.map((group) => (
+                    <div key={group.strand}>
+                      <h3 className="text-sm font-semibold text-navy-800 font-ko" lang="ko">
+                        {group.strand}
+                      </h3>
+                      <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+                        {group.cells.map((cell) => (
+                          <HeatmapCell key={cell.conceptId} cell={cell} />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <h2 className="mt-10 text-lg font-semibold text-navy-900 font-ko" lang="ko">
               개념별 정답률
             </h2>
             <p className="mt-1 text-xs text-navy-500">
@@ -269,5 +335,63 @@ export default async function StudentHistoryPage({
         </div>
       </Container>
     </Section>
+  );
+}
+
+function LegendSwatch({ swatchClassName, label }: { swatchClassName: string; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <span className={`inline-block h-3 w-3 rounded-sm border ${swatchClassName}`} />
+      {label}
+    </span>
+  );
+}
+
+function heatmapCellClasses(cell: ConceptHeatmapCell): string {
+  if (cell.total === 0) return "border-navy-200 bg-navy-50 text-navy-400";
+  if (cell.isWeak) return "border-red-300 bg-red-100 text-red-700";
+  if (cell.isLowSample) return "border-amber-300 bg-amber-100 text-amber-700";
+  return "border-green-300 bg-green-100 text-green-700";
+}
+
+function HeatmapCell({ cell }: { cell: ConceptHeatmapCell }) {
+  const valueLabel = cell.total === 0 ? "데이터 없음" : `${cell.accuracyRate}% (${cell.total}문항)`;
+  return (
+    <div
+      title={`${cell.label} · ${valueLabel}`}
+      className={`flex flex-col justify-between rounded-lg border p-2.5 ${heatmapCellClasses(cell)}`}
+    >
+      <p className="text-xs font-medium leading-snug font-ko" lang="ko">
+        {cell.label}
+      </p>
+      <p className="mt-1.5 text-sm font-bold">{cell.total === 0 ? "–" : `${cell.accuracyRate}%`}</p>
+    </div>
+  );
+}
+
+function KpiCard({
+  label,
+  value,
+  sub,
+  warn,
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  warn?: boolean;
+}) {
+  return (
+    <div className="rounded-2xl border border-navy-100 bg-white p-4 shadow-sm">
+      <p className="text-xs font-medium text-navy-500 font-ko" lang="ko">
+        {label}
+      </p>
+      <p
+        className={`mt-1 text-lg font-bold font-ko ${warn ? "text-red-600" : "text-navy-900"}`}
+        lang="ko"
+      >
+        {value}
+      </p>
+      {sub && <p className="mt-0.5 text-xs text-navy-500">{sub}</p>}
+    </div>
   );
 }

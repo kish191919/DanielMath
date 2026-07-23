@@ -42,7 +42,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
             >
               {isKo
                 ? "북버지니아 한인 3–6학년을 위한 영재 수학 아카데미. AAP·CogAT 통합 커리큘럼, 4명 소수 정예."
-                : "Small-group gifted math for grades 3–6 in Northern Virginia. AAP & CogAT curriculum, 4 students per class."}
+                : "A gifted math academy for Korean-American families in Northern Virginia, grades 3–6. Integrated AAP & CogAT curriculum, small groups of 4."}
             </p>
             <p className={`mt-3 flex items-center gap-1.5 text-xs text-navy-500${isKo ? " font-ko" : ""}`}>
               <Clock className="h-3.5 w-3.5 shrink-0" />

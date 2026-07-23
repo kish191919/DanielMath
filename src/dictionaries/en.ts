@@ -3,7 +3,7 @@ import type { Dictionary } from './ko'
 const en: Dictionary = {
   meta: {
     description:
-      "A small-group, ungraded math academy in Northern Virginia that manages each student's math through leveled diagnostics and mistake tracking. AAP, CogAT/NNAT prep — 4 students per class, Mon/Tue/Thu/Fri.",
+      "A small-group, ungraded math academy for Korean-American families in Northern Virginia that manages each student's math through leveled diagnostics and mistake tracking. AAP, CogAT/NNAT prep — 4 students per class, Mon/Tue/Thu/Fri.",
   },
   nav: {
     programs: "Programs",
@@ -40,7 +40,7 @@ const en: Dictionary = {
       body: "A one-time placement diagnostic determines each student's ability level, regardless of school grade. Every 70-minute session runs: mistake review from last time (10 min) → leveled practice with regular workbooks (45 min) → math manipulatives, board games, or reinforcement (15 min).",
       classSize: { label: "Class Size", value: "Up to 4 students", sublabel: "" },
       time: { label: "Time", value: "1–4×/wk · 70 min", sublabel: "" },
-      schedule: "Mon/Tue/Thu/Fri afternoons · 70-minute sessions (exact time slots shared at consult)",
+      schedule: "Mon/Tue/Thu/Fri afternoons · 70-minute sessions (5:00–6:10 PM or 6:30–7:40 PM)",
       ctaDetails: "Program Details",
       ctaInquire: "Free Consultation",
     },
@@ -107,7 +107,7 @@ const en: Dictionary = {
     },
     cta: {
       titleEn: "Ready to start?",
-      titleKo: "Let us guide your child forward.",
+      titleKo: "Schedule your consult today.",
       highlightKo: "",
       desc: "Enrollment is limited. Share your child's current level, and we'll recommend the right group.",
       ctaInquire: "Schedule a Consult",
