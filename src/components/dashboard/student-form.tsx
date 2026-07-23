@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Field } from "@/components/forms/field";
-import { GRADES, GRADE_LABELS } from "@/lib/students/schema";
+import { GRADES, GRADE_LABELS, TRACKS, TRACK_LABELS } from "@/lib/students/schema";
 import type { StudentFormState } from "@/lib/students/actions";
 import type { Student } from "@/lib/supabase/types";
 
@@ -50,6 +50,16 @@ export function StudentForm({ mode, student, action }: Props) {
           {GRADES.map((g) => (
             <option key={g} value={g}>
               {GRADE_LABELS[g]}
+            </option>
+          ))}
+        </Select>
+      </Field>
+
+      <Field label="트랙 / Track" error={state?.fieldErrors?.track} required>
+        <Select name="track" defaultValue={student?.track ?? "standard"} aria-required>
+          {TRACKS.map((t) => (
+            <option key={t} value={t}>
+              {TRACK_LABELS[t]}
             </option>
           ))}
         </Select>

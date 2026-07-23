@@ -2,9 +2,17 @@ import { z } from "zod";
 
 export const GRADES = ["3", "4", "5", "6"] as const;
 
+export const TRACKS = ["standard", "advanced"] as const;
+
+export const TRACK_LABELS: Record<(typeof TRACKS)[number], string> = {
+  standard: "일반",
+  advanced: "AAP 심화",
+};
+
 export const studentSchema = z.object({
   full_name: z.string().min(1, "학생 이름을 입력해주세요."),
   grade: z.enum(GRADES),
+  track: z.enum(TRACKS),
   parent_email: z
     .string()
     .email("올바른 이메일을 입력해주세요.")

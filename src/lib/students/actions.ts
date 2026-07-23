@@ -8,13 +8,14 @@ import { studentSchema } from "./schema";
 
 export type StudentFormState = {
   error?: string;
-  fieldErrors?: Partial<Record<"full_name" | "grade" | "parent_email" | "notes", string>>;
+  fieldErrors?: Partial<Record<"full_name" | "grade" | "track" | "parent_email" | "notes", string>>;
 };
 
 function parseStudentForm(formData: FormData) {
   return studentSchema.safeParse({
     full_name: formData.get("full_name"),
     grade: formData.get("grade"),
+    track: formData.get("track") ?? "standard",
     parent_email: formData.get("parent_email") ?? "",
     notes: formData.get("notes") ?? "",
   });
@@ -30,6 +31,7 @@ function collectFieldErrors(
     if (
       key === "full_name" ||
       key === "grade" ||
+      key === "track" ||
       key === "parent_email" ||
       key === "notes"
     ) {
@@ -61,6 +63,7 @@ export async function createStudentAction(
   const { error } = await supabase.from("students").insert({
     full_name: parsed.data.full_name,
     grade: parsed.data.grade,
+    track: parsed.data.track,
     ...normalize(parsed.data),
   });
 
@@ -88,6 +91,7 @@ export async function updateStudentAction(
     .update({
       full_name: parsed.data.full_name,
       grade: parsed.data.grade,
+      track: parsed.data.track,
       ...normalize(parsed.data),
     })
     .eq("id", id);

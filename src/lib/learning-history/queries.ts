@@ -8,7 +8,9 @@ import type {
   SessionNote,
   Student,
   Grade,
+  Track,
 } from "@/lib/supabase/types";
+import { getCurrentQuarter, compareQuarters, type Quarter } from "@/lib/curriculum-quarter";
 
 const BUCKET = "worksheet-scans";
 
@@ -189,6 +191,8 @@ export async function getConceptAccuracySummary(
   });
 }
 
+export type PaceStatus = "ahead" | "on_pace" | "due" | "not_due" | "unscheduled";
+
 export type ConceptHeatmapCell = {
   conceptId: string;
   label: string;
@@ -196,6 +200,8 @@ export type ConceptHeatmapCell = {
   accuracyRate: number | null;
   isLowSample: boolean;
   isWeak: boolean;
+  quarter: Quarter | null;
+  paceStatus: PaceStatus;
 };
 
 export type ConceptHeatmapStrand = {
@@ -203,32 +209,53 @@ export type ConceptHeatmapStrand = {
   cells: ConceptHeatmapCell[];
 };
 
+function derivePaceStatus(
+  quarter: Quarter | null,
+  currentQuarter: Quarter,
+  total: number,
+): PaceStatus {
+  if (quarter === null) return "unscheduled";
+  const isDueOrPast = compareQuarters(quarter, currentQuarter) <= 0;
+  if (total > 0) return isDueOrPast ? "on_pace" : "ahead";
+  return isDueOrPast ? "due" : "not_due";
+}
+
 // Unlike getConceptAccuracySummary (which only lists concepts the student has
 // items for), this covers every concept tagged for the student's grade so
 // untouched concepts show up as "no data" rather than being omitted.
+//
+// Uses all-time accuracy (no date filter) rather than a rolling window —
+// "is my child ahead of the school's pace" is a whole-year question, not a
+// last-30-days one. Recent performance still has its own KPI card/table
+// elsewhere on the history page.
 export async function getConceptHeatmap(
   studentId: string,
   grade: Grade,
-  filters?: { from?: string; to?: string },
+  track: Track,
 ): Promise<ConceptHeatmapStrand[]> {
   const [concepts, summary] = await Promise.all([
     listConcepts(),
-    getConceptAccuracySummary(studentId, filters),
+    getConceptAccuracySummary(studentId),
   ]);
   const summaryByConceptId = new Map(summary.map((s) => [s.conceptId, s]));
+  const currentQuarter = getCurrentQuarter();
 
   const strands = new Map<string, ConceptHeatmapCell[]>();
   for (const concept of concepts) {
     if (!concept.grades.includes(grade)) continue;
     const s = summaryByConceptId.get(concept.id);
+    const total = s?.total ?? 0;
+    const quarter = track === "advanced" ? concept.quarter_advanced : concept.quarter_standard;
     const cells = strands.get(concept.strand) ?? [];
     cells.push({
       conceptId: concept.id,
       label: concept.label_ko,
-      total: s?.total ?? 0,
+      total,
       accuracyRate: s?.accuracyRate ?? null,
       isLowSample: s?.isLowSample ?? true,
       isWeak: s?.isWeak ?? false,
+      quarter,
+      paceStatus: derivePaceStatus(quarter, currentQuarter, total),
     });
     strands.set(concept.strand, cells);
   }
@@ -384,6 +411,30 @@ async function assertParentOwnsStudent(parentId: string, studentId: string): Pro
     .eq("parent_id", parentId)
     .maybeSingle<{ id: string }>();
   return !!data;
+}
+
+export async function getSignedScanViewUrlForParent(
+  parentId: string,
+  scanId: string,
+): Promise<{ url: string; scan: WorksheetScan } | null> {
+  const supabase = await createServerSupabase();
+  const { data: scan } = await supabase
+    .from("worksheet_scans")
+    .select("*")
+    .eq("id", scanId)
+    .maybeSingle<WorksheetScan>();
+  if (!scan) return null;
+
+  const owns = await assertParentOwnsStudent(parentId, scan.student_id);
+  if (!owns) return null;
+
+  const admin = createAdminSupabase();
+  const { data, error } = await admin.storage
+    .from(BUCKET)
+    .createSignedUrl(scan.storage_path, 300);
+  if (error || !data) return null;
+
+  return { url: data.signedUrl, scan };
 }
 
 export async function getConceptAccuracySummaryForParent(

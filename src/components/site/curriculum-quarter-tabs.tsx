@@ -2,30 +2,12 @@
 
 import { useState } from "react";
 import type { QuarterData, TopicCategory } from "@/lib/curriculum-data";
-
-type Quarter = "Q1" | "Q2" | "Q3" | "Q4";
-
-function getCurrentQuarter(): Quarter {
-  const m = new Date().getMonth() + 1;
-  if (m >= 9 && m <= 11) return "Q1";
-  if (m === 12 || m === 1 || m === 2) return "Q2";
-  if (m === 3) return "Q3";
-  if (m >= 4 && m <= 6) return "Q4";
-  return "Q1";
-}
-
-const QUARTER_LABELS_KO: Record<Quarter, string> = {
-  Q1: "1분기 (9~11월)",
-  Q2: "2분기 (12~2월)",
-  Q3: "3분기 (2~4월)",
-  Q4: "4분기 (4~6월)",
-};
-const QUARTER_LABELS_EN: Record<Quarter, string> = {
-  Q1: "Q1 · Sep–Nov",
-  Q2: "Q2 · Dec–Feb",
-  Q3: "Q3 · Feb–Apr",
-  Q4: "Q4 · Apr–Jun",
-};
+import {
+  getCurrentQuarter,
+  QUARTER_LABELS_KO,
+  QUARTER_LABELS_EN,
+  type Quarter,
+} from "@/lib/curriculum-quarter";
 
 const CATEGORY_STYLES: Record<TopicCategory, { badge: string; dot: string }> = {
   "수·연산":  { badge: "bg-blue-50 text-blue-700 border-blue-200",   dot: "bg-blue-400" },

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
 import { requireRole } from "@/lib/dal";
@@ -110,6 +111,14 @@ export default async function ParentProgressPage() {
                           <p className="mt-1 whitespace-pre-line text-sm text-navy-800 font-ko" lang="ko">
                             {note.note}
                           </p>
+                          {note.scan_id && (
+                            <Link
+                              href={`/dashboard/parent/worksheets/${note.scan_id}`}
+                              className="mt-2 inline-block text-xs font-medium text-navy-600 underline underline-offset-2 hover:text-navy-800"
+                            >
+                              원본 학습지 보기
+                            </Link>
+                          )}
                         </div>
                       ))}
                     </div>

@@ -1,6 +1,10 @@
+import type { Quarter } from "@/lib/curriculum-quarter";
+
 export type Role = "principal" | "parent";
 
 export type Grade = "3" | "4" | "5" | "6";
+
+export type Track = "standard" | "advanced";
 
 export type ErrorType =
   | "calculation_mistake"
@@ -33,6 +37,7 @@ export interface Student {
   id: string;
   full_name: string;
   grade: Grade;
+  track: Track;
   parent_email: string | null;
   parent_id: string | null;
   notes: string | null;
@@ -49,6 +54,8 @@ export interface Concept {
   grades: Grade[];
   sort_order: number;
   is_active: boolean;
+  quarter_standard: Quarter | null;
+  quarter_advanced: Quarter | null;
   created_at: string;
   updated_at: string;
 }
@@ -146,6 +153,7 @@ type StudentInsert = {
   id?: string;
   full_name: string;
   grade: Grade;
+  track?: Track;
   parent_email?: string | null;
   parent_id?: string | null;
   notes?: string | null;
@@ -164,6 +172,8 @@ type ConceptInsert = {
   grades?: Grade[];
   sort_order?: number;
   is_active?: boolean;
+  quarter_standard?: Quarter | null;
+  quarter_advanced?: Quarter | null;
   created_at?: string;
   updated_at?: string;
 };

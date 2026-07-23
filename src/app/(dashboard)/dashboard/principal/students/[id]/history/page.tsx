@@ -13,9 +13,11 @@ import {
   WEAK_ACCURACY_THRESHOLD,
   MIN_SAMPLE_SIZE,
   type ConceptHeatmapCell,
+  type PaceStatus,
 } from "@/lib/learning-history/queries";
 import { WrongAnswerWorkspace, type ItemGroup } from "@/components/dashboard/wrong-answer-workspace";
-import { GRADE_LABELS } from "@/lib/students/schema";
+import { GRADE_LABELS, TRACK_LABELS } from "@/lib/students/schema";
+import { getCurrentQuarter, QUARTER_LABELS_KO } from "@/lib/curriculum-quarter";
 import type { LearningItem } from "@/lib/supabase/types";
 
 const TABS = [
@@ -69,8 +71,9 @@ export default async function StudentHistoryPage({
     listLearningItems(id),
     listSessionNotes(id),
     getStudentKpiSummary(id, student.grade),
-    getConceptHeatmap(id, student.grade, { from: daysAgoIso(30) }),
+    getConceptHeatmap(id, student.grade, student.track),
   ]);
+  const currentQuarter = getCurrentQuarter();
 
   const allTimeByConceptId = new Map(allTimeSummary.map((s) => [s.conceptId, s]));
 
@@ -160,7 +163,8 @@ export default async function StudentHistoryPage({
                   학년 커리큘럼 현황
                 </h2>
                 <p className="mt-1 text-xs text-navy-500 font-ko" lang="ko">
-                  {GRADE_LABELS[student.grade]} 개념 · 최근 30일 기준 · 색으로 강/약 영역을 한눈에 확인하세요
+                  {GRADE_LABELS[student.grade]} · {TRACK_LABELS[student.track]} 트랙 · 전체 누적 데이터 · 현재{" "}
+                  {QUARTER_LABELS_KO[currentQuarter]}
                 </p>
 
                 <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-navy-600 font-ko" lang="ko">
@@ -168,6 +172,8 @@ export default async function StudentHistoryPage({
                   <LegendSwatch swatchClassName="border-red-300 bg-red-100" label="주의필요 (70% 미만)" />
                   <LegendSwatch swatchClassName="border-amber-300 bg-amber-100" label="표본부족 (3문항 미만)" />
                   <LegendSwatch swatchClassName="border-navy-200 bg-navy-50" label="데이터 없음" />
+                  <LegendSwatch swatchClassName="border-blue-300 bg-blue-100" label="선행 학습 중 (다음 분기 이후 개념)" />
+                  <LegendSwatch swatchClassName="border-red-600 bg-red-600" label="진도 지연 (이번 분기까지 학습 필요, 기록 없음)" />
                 </div>
 
                 <div className="mt-4 space-y-5">
@@ -328,6 +334,14 @@ export default async function StudentHistoryPage({
                   <p className="mt-1 whitespace-pre-line text-sm text-navy-800 font-ko" lang="ko">
                     {note.note}
                   </p>
+                  {note.scan_id && (
+                    <Link
+                      href={`/dashboard/principal/worksheets/${note.scan_id}`}
+                      className="mt-2 inline-block text-xs font-medium text-navy-600 underline underline-offset-2 hover:text-navy-800"
+                    >
+                      원본 학습지 보기
+                    </Link>
+                  )}
                 </div>
               ))
             )}
@@ -354,13 +368,28 @@ function heatmapCellClasses(cell: ConceptHeatmapCell): string {
   return "border-green-300 bg-green-100 text-green-700";
 }
 
+function paceBadge(status: PaceStatus): { label: string; className: string } | null {
+  if (status === "ahead") return { label: "선행", className: "bg-blue-100 text-blue-700" };
+  if (status === "due") return { label: "진도 지연", className: "bg-red-600 text-white" };
+  return null;
+}
+
 function HeatmapCell({ cell }: { cell: ConceptHeatmapCell }) {
   const valueLabel = cell.total === 0 ? "데이터 없음" : `${cell.accuracyRate}% (${cell.total}문항)`;
+  const quarterLabel = cell.quarter ? ` · ${QUARTER_LABELS_KO[cell.quarter]}` : "";
+  const badge = paceBadge(cell.paceStatus);
   return (
     <div
-      title={`${cell.label} · ${valueLabel}`}
-      className={`flex flex-col justify-between rounded-lg border p-2.5 ${heatmapCellClasses(cell)}`}
+      title={`${cell.label} · ${valueLabel}${quarterLabel}`}
+      className={`relative flex flex-col justify-between rounded-lg border p-2.5 ${heatmapCellClasses(cell)}`}
     >
+      {badge && (
+        <span
+          className={`absolute -top-1.5 -right-1.5 rounded-full px-1.5 py-0.5 text-[10px] font-bold ${badge.className}`}
+        >
+          {badge.label}
+        </span>
+      )}
       <p className="text-xs font-medium leading-snug font-ko" lang="ko">
         {cell.label}
       </p>
