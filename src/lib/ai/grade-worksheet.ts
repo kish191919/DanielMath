@@ -1,11 +1,20 @@
 import "server-only";
+import { PDFDocument } from "pdf-lib";
+import type Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { getClaudeClient, GRADING_MODEL, GRADING_EFFORT } from "./claude";
-import { WorksheetGradingSchema } from "./grading-schema";
+import { WorksheetGradingSchema, type GradedItem } from "./grading-schema";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import type { Concept, WorksheetScan } from "@/lib/supabase/types";
 
 const BUCKET = "worksheet-scans";
+
+// 15270자 지점에서 JSON이 잘리는 등, 문항이 많은 워크시트는 adaptive thinking이
+// max_tokens 예산을 대부분 소진해버려 정작 JSON 출력이 중간에 잘린다. 이를 막기
+// 위해 페이지 수가 많은 PDF는 여러 개의 작은 호출로 나눠 보낸다.
+const CHUNK_THRESHOLD_PAGES = 6;
+const PAGES_PER_CHUNK = 4;
+const MAX_TOKENS_PER_CALL = 32000;
 
 const GRADING_INSTRUCTIONS = `당신은 미국 북버지니아(NoVa) K-6 AAP 준비 수학 공부방의 채점 보조입니다.
 학생 한 명이 푼 프린트물 스캔/사진(여러 페이지일 수 있음)이 첨부되어 있습니다. 다음 지침에 따라 채점하세요.
@@ -25,14 +34,13 @@ function buildConceptListText(concepts: Concept[]): string {
     .join("\n");
 }
 
-async function downloadScanAsBase64(storagePath: string): Promise<string> {
+async function downloadScanBuffer(storagePath: string): Promise<Buffer> {
   const admin = createAdminSupabase();
   const { data, error } = await admin.storage.from(BUCKET).download(storagePath);
   if (error || !data) {
     throw new Error(error?.message ?? "스캔 파일을 다운로드할 수 없습니다.");
   }
-  const buffer = Buffer.from(await data.arrayBuffer());
-  return buffer.toString("base64");
+  return Buffer.from(await data.arrayBuffer());
 }
 
 function buildFileContentBlock(mimeType: WorksheetScan["mime_type"], base64: string) {
@@ -46,6 +54,138 @@ function buildFileContentBlock(mimeType: WorksheetScan["mime_type"], base64: str
     type: "image" as const,
     source: { type: "base64" as const, media_type: mimeType, data: base64 },
   };
+}
+
+interface PdfChunk {
+  base64: string;
+  startPage: number; // 1-indexed, inclusive
+  endPage: number; // 1-indexed, inclusive
+  totalPages: number;
+}
+
+// PDF 전체를 한 번에 보내면 문항이 많을 때 max_tokens 예산을 넘기 쉬우므로,
+// CHUNK_THRESHOLD_PAGES를 넘는 PDF는 PAGES_PER_CHUNK씩 잘라 여러 번 나눠 보낸다.
+async function buildPdfChunks(buffer: Buffer): Promise<PdfChunk[]> {
+  const srcDoc = await PDFDocument.load(buffer);
+  const totalPages = srcDoc.getPageCount();
+
+  if (totalPages <= CHUNK_THRESHOLD_PAGES) {
+    return [{ base64: buffer.toString("base64"), startPage: 1, endPage: totalPages, totalPages }];
+  }
+
+  const chunks: PdfChunk[] = [];
+  for (let start = 0; start < totalPages; start += PAGES_PER_CHUNK) {
+    const end = Math.min(start + PAGES_PER_CHUNK, totalPages);
+    const chunkDoc = await PDFDocument.create();
+    const pageIndices = Array.from({ length: end - start }, (_, i) => start + i);
+    const copiedPages = await chunkDoc.copyPages(srcDoc, pageIndices);
+    copiedPages.forEach((page) => chunkDoc.addPage(page));
+    const bytes = await chunkDoc.save();
+    chunks.push({
+      base64: Buffer.from(bytes).toString("base64"),
+      startPage: start + 1,
+      endPage: end,
+      totalPages,
+    });
+  }
+  return chunks;
+}
+
+function isWholeDocument(chunk: PdfChunk): boolean {
+  return chunk.startPage === 1 && chunk.endPage === chunk.totalPages;
+}
+
+function describeChunkRange(chunk: PdfChunk): string {
+  return isWholeDocument(chunk) ? "전체" : `${chunk.startPage}-${chunk.endPage}페이지`;
+}
+
+// 청크가 전체 문서가 아닐 때만 안내를 추가한다. system 프롬프트 캐시 프리픽스
+// 뒤(messages)에 붙기 때문에 청크마다 달라져도 캐시 히트에는 영향이 없다.
+function buildChunkContextNote(chunk: PdfChunk): string | null {
+  if (isWholeDocument(chunk)) return null;
+  return `참고: 이 파일은 전체 워크시트(총 ${chunk.totalPages}페이지) 중 ${chunk.startPage}~${chunk.endPage}페이지입니다. 이 범위 안에 있는 문제만 채점하세요. 문제 번호가 1번부터 시작하지 않거나 이 범위 끝에서 문제가 끝나 보여도 정상입니다 — 다른 페이지의 내용은 신경 쓰지 않아도 됩니다.`;
+}
+
+// 채점 지침과 개념 코드 목록은 청크마다 완전히 동일한 텍스트이므로 system
+// 파라미터에 cache_control로 표시해, 두 번째 청크부터는 캐시로 저렴하게
+// 처리되도록 한다. messages 쪽 콘텐츠(PDF 바이트)는 청크마다 달라지므로
+// 캐시 프리픽스 밖(system과 분리된 자리)에 둬야 캐시가 매번 깨지지 않는다.
+function buildSystemBlocks(conceptList: Concept[]) {
+  return [
+    {
+      type: "text" as const,
+      text: `${GRADING_INSTRUCTIONS}\n\n사용 가능한 개념 코드 목록:\n${buildConceptListText(conceptList)}`,
+      cache_control: { type: "ephemeral" as const },
+    },
+  ];
+}
+
+async function gradeChunk(
+  client: Anthropic,
+  systemBlocks: ReturnType<typeof buildSystemBlocks>,
+  mimeType: WorksheetScan["mime_type"],
+  chunk: PdfChunk,
+  scanId: string,
+): Promise<GradedItem[]> {
+  const fileBlock = buildFileContentBlock(mimeType, chunk.base64);
+  const note = buildChunkContextNote(chunk);
+  const content = note ? [fileBlock, { type: "text" as const, text: note }] : [fileBlock];
+
+  const stream = client.messages.stream({
+    model: GRADING_MODEL,
+    max_tokens: MAX_TOKENS_PER_CALL,
+    thinking: { type: "adaptive" },
+    system: systemBlocks,
+    output_config: {
+      format: zodOutputFormat(WorksheetGradingSchema),
+      effort: GRADING_EFFORT,
+    },
+    messages: [{ role: "user", content }],
+  });
+
+  let response;
+  try {
+    response = await stream.finalMessage();
+  } catch (err) {
+    // finalMessage() awaits the stream's internal endPromise, which the SDK
+    // rejects as soon as JSON parsing fails on message_stop — before our own
+    // stop_reason check below ever runs. stream.currentMessage still holds
+    // the last accumulated snapshot (including stop_reason from message_delta)
+    // even after that rejection, so we can still detect a max_tokens cutoff here.
+    if (stream.currentMessage?.stop_reason === "max_tokens") {
+      throw new Error(
+        `AI 채점 응답이 잘렸습니다 (${describeChunkRange(chunk)} 채점 중, max_tokens 도달). 문제 수가 많은 워크시트일 수 있습니다.`,
+      );
+    }
+    throw err;
+  }
+
+  if (response.stop_reason === "max_tokens") {
+    throw new Error(
+      `AI 채점 응답이 잘렸습니다 (${describeChunkRange(chunk)} 채점 중, max_tokens 도달). 문제 수가 많은 워크시트일 수 있습니다.`,
+    );
+  }
+  if (!response.parsed_output) {
+    // Log the raw content (text + thinking blocks) so a failure — including
+    // the model validly returning zero items, which now fails schema
+    // validation via WorksheetGradingSchema's items.min(1) — is diagnosable
+    // from the server console instead of being a silent black box.
+    const rawContent = response.content
+      .map((block) => {
+        if (block.type === "text") return `[text] ${block.text}`;
+        if (block.type === "thinking") return `[thinking] ${block.thinking}`;
+        return `[${block.type}]`;
+      })
+      .join("\n---\n");
+    console.error(
+      `[gradeWorksheetScan] scan ${scanId} (${describeChunkRange(chunk)}): parsed_output missing (stop_reason=${response.stop_reason})\n${rawContent.slice(0, 4000)}`,
+    );
+    throw new Error(
+      `AI 채점 결과를 파싱하지 못했습니다 (${describeChunkRange(chunk)}, stop_reason: ${response.stop_reason}). 서버 콘솔에 상세 로그가 남았습니다.`,
+    );
+  }
+
+  return response.parsed_output.items;
 }
 
 export async function gradeWorksheetScan(scanId: string): Promise<void> {
@@ -70,68 +210,28 @@ export async function gradeWorksheetScan(scanId: string): Promise<void> {
   const conceptList = concepts ?? [];
   const conceptByCode = new Map(conceptList.map((c) => [c.code, c]));
 
-  const base64 = await downloadScanAsBase64(scan.storage_path);
-  const fileBlock = buildFileContentBlock(scan.mime_type, base64);
+  const buffer = await downloadScanBuffer(scan.storage_path);
+  const chunks: PdfChunk[] =
+    scan.mime_type === "application/pdf"
+      ? await buildPdfChunks(buffer)
+      : [{ base64: buffer.toString("base64"), startPage: 1, endPage: 1, totalPages: 1 }];
 
   const client = getClaudeClient();
-  // Adaptive thinking tokens count against max_tokens too, and a dense
-  // multi-page worksheet can burn through a lot of that budget before the
-  // JSON output even starts — 8192, then 16000, both got cut off mid-response
-  // on real worksheets. Streaming (+ a generous max_tokens) removes the SDK
-  // HTTP timeout risk of waiting on one huge non-streamed response, and only
-  // the tokens actually generated are billed either way.
-  const stream = client.messages.stream({
-    model: GRADING_MODEL,
-    max_tokens: 32000,
-    thinking: { type: "adaptive" },
-    output_config: {
-      format: zodOutputFormat(WorksheetGradingSchema),
-      effort: GRADING_EFFORT,
-    },
-    messages: [
-      {
-        role: "user",
-        content: [
-          fileBlock,
-          {
-            type: "text",
-            text: `${GRADING_INSTRUCTIONS}\n\n사용 가능한 개념 코드 목록:\n${buildConceptListText(conceptList)}`,
-          },
-        ],
-      },
-    ],
-  });
-  const response = await stream.finalMessage();
+  const systemBlocks = buildSystemBlocks(conceptList);
 
-  if (response.stop_reason === "max_tokens") {
-    throw new Error(
-      "AI 채점 응답이 잘렸습니다 (max_tokens 도달). 문제 수가 많은 워크시트일 수 있습니다.",
-    );
-  }
-  if (!response.parsed_output) {
-    // Log the raw content (text + thinking blocks) so a failure — including
-    // the model validly returning zero items, which now fails schema
-    // validation via WorksheetGradingSchema's items.min(1) — is diagnosable
-    // from the server console instead of being a silent black box.
-    const rawContent = response.content
-      .map((block) => {
-        if (block.type === "text") return `[text] ${block.text}`;
-        if (block.type === "thinking") return `[thinking] ${block.thinking}`;
-        return `[${block.type}]`;
-      })
-      .join("\n---\n");
-    console.error(
-      `[gradeWorksheetScan] scan ${scanId}: parsed_output missing (stop_reason=${response.stop_reason})\n${rawContent.slice(0, 4000)}`,
-    );
-    throw new Error(
-      `AI 채점 결과를 파싱하지 못했습니다 (stop_reason: ${response.stop_reason}). 서버 콘솔에 상세 로그가 남았습니다.`,
-    );
+  // Sequential, not Promise.all: chunk 2+ can only read the prompt cache
+  // chunk 1 just wrote if they run one at a time, and a specific chunk's
+  // page range is only meaningful to report in an error if calls aren't
+  // interleaved. One failing chunk aborts the whole grading attempt (no
+  // partial writes below), matching the previous all-or-nothing behavior.
+  const allItems: GradedItem[] = [];
+  for (const chunk of chunks) {
+    const items = await gradeChunk(client, systemBlocks, scan.mime_type, chunk, scanId);
+    allItems.push(...items);
   }
 
-  const items = response.parsed_output.items;
-
-  if (items.length > 0) {
-    const rows = items.map((item) => {
+  if (allItems.length > 0) {
+    const rows = allItems.map((item) => {
       const concept = item.concept_code ? conceptByCode.get(item.concept_code) : undefined;
       return {
         scan_id: scanId,

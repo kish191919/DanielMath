@@ -59,12 +59,21 @@ function CreateNoteForm({
     >
       <input type="hidden" name="scan_id" value={scanId ?? ""} />
       <input type="hidden" name="session_date" value={sessionDate} />
-      <label className="block text-sm font-medium text-navy-800">
-        오늘 수업 메모 / Session Note
-      </label>
+      <label className="block text-sm font-medium text-navy-800">오늘의 학습 리포트</label>
       <Textarea
         name="note"
-        placeholder="예: 분수 개념을 확실히 이해했어요. 다음엔 이분모 덧셈 복습이 필요해요."
+        placeholder={`예:
+학습 결과
+오늘 20문제 중 18개를 정확히 풀었습니다 (정답률 90%).
+
+잘한 점
+분수 개념을 확실히 이해했습니다.
+
+보완할 점
+이분모 덧셈에서 오답이 있어 추가 연습이 필요합니다.
+
+숙제
+4학년 IXL C단원 풀어오기`}
         maxLength={2000}
       />
       {state?.fieldErrors?.note && (
@@ -110,16 +119,19 @@ function PublishNoteForm({
       className="space-y-3 rounded-2xl border border-navy-100 bg-white p-4 shadow-sm sm:p-5"
     >
       <div className="flex items-center justify-between gap-3">
-        <label className="block text-sm font-medium text-navy-800">
-          오늘 수업 메모 / Session Note
-        </label>
+        <label className="block text-sm font-medium text-navy-800">오늘의 학습 리포트</label>
         {isDraft && existingNote.source === "ai" && (
           <span className="shrink-0 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
             AI 초안 — 검토 후 전달해주세요
           </span>
         )}
       </div>
-      <Textarea name="note" defaultValue={existingNote.note} maxLength={2000} />
+      <Textarea
+        name="note"
+        defaultValue={existingNote.note}
+        maxLength={2000}
+        className="min-h-48"
+      />
       {state?.fieldErrors?.note && (
         <p className="text-xs text-red-600" role="alert">
           {state.fieldErrors.note}

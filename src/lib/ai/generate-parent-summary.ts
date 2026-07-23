@@ -6,15 +6,14 @@ import { createAdminSupabase } from "@/lib/supabase/admin";
 import { ERROR_TYPE_LABELS } from "@/lib/learning-history/schema";
 import type { Concept, ErrorType, LearningItem } from "@/lib/supabase/types";
 
-const INSTRUCTIONS = `당신은 미국 북버지니아(NoVa) K-6 AAP 준비 수학 공부방의 선생님을 대신해, 학부모님께 보내는 학습 보고 편지의 문장을 작성하는 보조입니다.
+const INSTRUCTIONS = `당신은 미국 북버지니아(NoVa) K-6 AAP 준비 수학 공부방의 선생님을 대신해, 학부모님께 보내는 학습 리포트의 문장을 작성하는 보조입니다.
 
-이 글은 선생님이 학부모님께 아이의 학습 상황을 차분히 전하는 보고체 편지입니다. 학생에게 직접 말을 거는 어투("잘했어요!", "~랍니다", "-네요!")가 아니라, 선생님이 학부모님께 설명하듯 "~했습니다", "~하는 모습을 보였습니다", "~필요해 보입니다"와 같은 문어체·보고체로 써주세요. 느낌표는 쓰지 마세요.
+이 글은 선생님이 학부모님께 아이의 학습 상황을 차분히 전하는 보고체 리포트입니다. 학생에게 직접 말을 거는 어투("잘했어요!", "~랍니다", "-네요!")가 아니라, 선생님이 학부모님께 설명하듯 "~했습니다", "~하는 모습을 보였습니다", "~필요해 보입니다"와 같은 문어체·보고체로 써주세요. 느낌표는 쓰지 마세요.
 
-편지는 아래 "시작 문장"으로 이미 시작하며(학생 이름과 정답률 언급 완료), 그 뒤에 당신이 작성할 세 문단이 자연스럽게 이어 붙습니다. 학생 이름은 이미 나왔으니 각 문단에서 이름을 반복하지 말고 자연스럽게 이어서 쓰세요.
+리포트는 "학습 결과" 섹션에서 이미 학생 이름과 정답률을 밝혔으므로, 아래 두 항목에서는 이름을 반복하지 말고 바로 내용으로 시작하세요. 각 항목은 한두 문장으로 간결하게 씁니다.
 
-1. strengths: 오늘 잘한 점 한두 문장. 정답을 맞힌 개념을 근거로 구체적으로.
-2. improvements: 보완이 필요한 부분 한두 문장. 오답 유형과 관련 개념을 근거로. 오답이 하나도 없으면 null로 두세요.
-3. practice_plan: 아래 제공된 "가장 많이 틀린 개념"과 "주요 오답 유형"을 근거로, 그 부분과 비슷한 유형의 문제를 다음 시간에 더 연습하며 보완하겠다는 내용을 한 문장으로 쓰세요. 오늘 확인된 약점을 반복 연습하겠다는 내용만 다루고, 아직 다루지 않은 새로운 개념이나 커리큘럼 주제를 미리 예고하지 마세요. "가장 많이 틀린 개념"이 없다면(오답 없음), 오늘 배운 내용을 유지할 수 있도록 이어서 연습하겠다는 내용으로 간단히 쓰세요.
+1. strengths: 오늘 잘한 점. 정답을 맞힌 개념을 근거로 구체적으로.
+2. improvements: 보완이 필요한 부분. 아래 제공된 "가장 많이 틀린 개념"과 "주요 오답 유형"을 근거로, 어떤 부분에서 어려움을 겪었는지와 추가 연습이 필요하다는 점을 함께 다루세요. "다음 시간에는", "다음 수업에서" 등 특정 회차를 지목해 무엇을 하겠다고 예고하거나 약속하는 표현은 쓰지 마세요. 아직 다루지 않은 새로운 개념이나 커리큘럼 주제를 미리 예고하지도 마세요. 오답이 하나도 없으면 null로 두세요.
 
 문제 수·정답 수·정답률 같은 숫자는 이미 정해져 있으니 문장에서 새로 지어내지 말고, 주어진 개념/오답 유형 정보만 근거로 쓰세요.`;
 
@@ -81,7 +80,7 @@ function buildIntroLine(studentName: string, stats: SessionStats): string {
   return `${studentName} 학생은 오늘 ${stats.total}문제 중 ${stats.correct}개를 정확히 풀었습니다 (정답률 ${stats.accuracyRate}%).`;
 }
 
-// Which concept/error type to ground the practice_plan paragraph in —
+// Which concept/error type to ground the improvements paragraph in —
 // determined here (from data), not left for the model to infer, same as
 // every other number in this file.
 function findWeakestConcept(stats: SessionStats): ConceptBreakdown | null {
@@ -95,21 +94,33 @@ function findTopErrorType(stats: SessionStats): ErrorTypeBreakdown | null {
   return [...stats.byErrorType].sort((a, b) => b.count - a.count)[0];
 }
 
+// "3학년이면 3학년 또는 4학년 IXL 교재" 식의 힌트만 제공 — 실제 숙제 내용은
+// 교사가 PublishNoteForm에서 직접 채워 넣는다.
+function buildHomeworkHint(grade: string): string {
+  const current = Number(grade);
+  const next = current + 1;
+  return next <= 6 ? `${current}학년 또는 ${next}학년 IXL 교재` : `${current}학년 IXL 교재`;
+}
+
 export function buildParentNoteText(
-  sessionDate: string,
   studentName: string,
   stats: SessionStats,
   fields: ParentSummaryFields,
+  gradeLevel: string,
 ): string {
-  const improvementsLine = fields.improvements ?? "보완이 필요한 부분은 특별히 없었습니다.";
+  const improvementsText = fields.improvements ?? "오늘은 특별히 보완이 필요한 부분이 없었습니다.";
 
-  return `${sessionDate} 학습 요약
+  return `학습 결과
+${buildIntroLine(studentName, stats)}
 
-${buildIntroLine(studentName, stats)} ${fields.strengths}
+잘한 점
+${fields.strengths}
 
-${improvementsLine}
+보완할 점
+${improvementsText}
 
-${fields.practice_plan}`;
+숙제
+(선생님이 직접 작성해주세요 — 예: ${buildHomeworkHint(gradeLevel)} 등)`;
 }
 
 function buildStatsPromptText(studentName: string, stats: SessionStats): string {
@@ -192,9 +203,9 @@ export async function generateParentSummaryDraft(
     admin.from("concepts").select("*").returns<Concept[]>(),
     admin
       .from("students")
-      .select("full_name")
+      .select("full_name, grade")
       .eq("id", studentId)
-      .maybeSingle<{ full_name: string }>(),
+      .maybeSingle<{ full_name: string; grade: string }>(),
   ]);
   if (itemsError) throw new Error(itemsError.message);
   if (conceptsError) throw new Error(conceptsError.message);
@@ -204,7 +215,7 @@ export async function generateParentSummaryDraft(
 
   const stats = computeSessionStats(items, concepts ?? []);
   const fields = await generateFields(student.full_name, stats);
-  const note = buildParentNoteText(sessionDate, student.full_name, stats, fields);
+  const note = buildParentNoteText(student.full_name, stats, fields, student.grade);
 
   const { data: existing } = await admin
     .from("session_notes")

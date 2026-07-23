@@ -106,7 +106,7 @@ export default async function StudentHistoryPage({
             Learning History
           </p>
           <h1 className="mt-2 text-2xl font-bold text-navy-900 font-ko sm:text-3xl" lang="ko">
-            {student.full_name} — 학습이력 / 오답노트
+            {student.full_name} - 학습 리포트
           </h1>
         </div>
 
@@ -313,7 +313,7 @@ export default async function StudentHistoryPage({
 
         <div className="mt-10">
           <h2 className="text-lg font-semibold text-navy-900 font-ko" lang="ko">
-            수업 메모
+            학습 리포트
           </h2>
           <div className="mt-4 space-y-2">
             {notes.length === 0 ? (
@@ -325,7 +325,7 @@ export default async function StudentHistoryPage({
                   className="rounded-2xl border border-navy-100 bg-white p-4 shadow-sm"
                 >
                   <p className="text-xs text-navy-500">{note.session_date}</p>
-                  <p className="mt-1 text-sm text-navy-800 font-ko" lang="ko">
+                  <p className="mt-1 whitespace-pre-line text-sm text-navy-800 font-ko" lang="ko">
                     {note.note}
                   </p>
                 </div>

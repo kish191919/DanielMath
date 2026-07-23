@@ -39,7 +39,7 @@ export default async function ParentProgressPage() {
             우리 아이 진행 상황
           </h1>
           <p className="mt-2 text-sm text-navy-700 font-ko" lang="ko">
-            최근 30일간 개념별 정답률과 선생님이 남긴 수업 메모입니다.
+            최근 30일간 개념별 정답률과 선생님이 남긴 학습 리포트입니다.
           </p>
         </div>
 
@@ -95,7 +95,7 @@ export default async function ParentProgressPage() {
 
                 <div className="mt-4">
                   <h3 className="text-sm font-semibold text-navy-700 font-ko" lang="ko">
-                    선생님 메모
+                    학습 리포트
                   </h3>
                   {notes.length === 0 ? (
                     <p className="mt-2 text-sm text-navy-600">아직 남겨진 메모가 없습니다.</p>
@@ -107,7 +107,7 @@ export default async function ParentProgressPage() {
                           className="rounded-2xl border border-navy-100 bg-white p-4 shadow-sm"
                         >
                           <p className="text-xs text-navy-500">{note.session_date}</p>
-                          <p className="mt-1 text-sm text-navy-800 font-ko" lang="ko">
+                          <p className="mt-1 whitespace-pre-line text-sm text-navy-800 font-ko" lang="ko">
                             {note.note}
                           </p>
                         </div>

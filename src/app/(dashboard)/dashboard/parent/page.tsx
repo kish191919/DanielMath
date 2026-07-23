@@ -15,7 +15,7 @@ const cards = [
     href: "/dashboard/parent/progress",
     title: "진행 상황",
     titleEn: "Progress",
-    description: "개념별 정답률과 선생님이 남긴 수업 메모를 확인합니다.",
+    description: "개념별 정답률과 선생님이 남긴 학습 리포트를 확인합니다.",
     ready: true,
   },
 ];
