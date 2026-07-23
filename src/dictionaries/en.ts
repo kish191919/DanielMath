@@ -27,7 +27,7 @@ const en: Dictionary = {
     stats: [
       { value: "Ungraded", label: "No grade levels", sublabel: "Placed by ability" },
       { value: "4", label: "Per class", sublabel: "Students per class" },
-      { value: "1–4×/wk", label: "Flexible days & sessions", sublabel: "Sessions per week" },
+      { value: "1–4×/wk", label: "Flexible days & sessions", sublabel: "Mon/Tue/Thu/Fri" },
       { value: "70 min", label: "Session length", sublabel: "Per session" },
     ],
     programs: {
@@ -39,7 +39,7 @@ const en: Dictionary = {
       h3ko: "",
       body: "A one-time placement diagnostic determines each student's ability level, regardless of school grade. Every 70-minute session runs: mistake review from last time (10 min) → leveled practice with regular workbooks (45 min) → math manipulatives, board games, or reinforcement (15 min).",
       classSize: { label: "Class Size", value: "Up to 4 students", sublabel: "" },
-      time: { label: "Time", value: "1–2×/wk · 70 min", sublabel: "" },
+      time: { label: "Time", value: "1–4×/wk · 70 min", sublabel: "" },
       schedule: "Mon/Tue/Thu/Fri afternoons · 70-minute sessions (exact time slots shared at consult)",
       ctaDetails: "Program Details",
       ctaInquire: "Free Consultation",
@@ -136,13 +136,13 @@ const en: Dictionary = {
   programs: {
     meta: {
       title: "Program",
-      description: "Grade-separated small group classes for grades 3–6. Each grade studies the same proven curriculum at their own level, in dedicated 90-minute sessions.",
+      description: "Ungraded small group classes for grades 3–6. Students are placed by ability level, not grade, and study the same proven curriculum in dedicated 70-minute sessions.",
     },
     header: {
       eyebrow: "Program",
-      title: "Grade-separated. Small groups. Proven materials.",
+      title: "Ungraded. Small groups. Proven materials.",
       titleKo: "",
-      desc: "Each grade meets separately in small groups of up to 4, working through the same proven curriculum materials at their grade's level.",
+      desc: "Students are grouped by ability level, not grade, in small classes of up to 4, working through the same proven curriculum materials.",
     },
     pillars: [
       {
@@ -184,13 +184,13 @@ const en: Dictionary = {
       titleKo: "",
       items: [
         { label: "Days", value: "Mon · Tue · Thu · Fri", sublabel: "" },
-        { label: "Hours", value: "5:00 PM – 8:00 PM", sublabel: "" },
+        { label: "Hours", value: "5:00 PM – 7:40 PM", sublabel: "" },
         { label: "Class Size", value: "Up to 4 students per class", sublabel: "" },
       ],
-      noteHeader: "2 sessions/week · 90 min each",
+      noteHeader: "Pick your days & period · 70 min each",
       scheduleRows: [
-        "Mon/Thu  ·  Grade 3 (5:00–6:30 PM)  /  Grade 5 (6:30–8:00 PM)",
-        "Tue/Fri  ·  Grade 4 (5:00–6:30 PM)  /  Grade 6 (6:30–8:00 PM)",
+        "Period 1  ·  5:00–6:10 PM",
+        "Period 2  ·  6:30–7:40 PM",
       ],
       cta: "Free Consult & Assessment",
     },
