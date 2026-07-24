@@ -23,6 +23,11 @@ export type AttendanceSummary = {
   late: number;
   absentNames: string[];
   lateNames: string[];
+  homeworkDone: number;
+  homeworkPartial: number;
+  homeworkNotDone: number;
+  homeworkNa: number;
+  homeworkNotDoneNames: string[];
 };
 
 export async function listAttendanceSummaries(
@@ -33,9 +38,11 @@ export async function listAttendanceSummaries(
   const supabase = await createServerSupabase();
   const { data: attendance, error: attendanceError } = await supabase
     .from("class_session_attendance")
-    .select("session_id, student_id, status")
+    .select("session_id, student_id, status, homework_status")
     .in("session_id", sessionIds)
-    .returns<Pick<ClassSessionAttendance, "session_id" | "student_id" | "status">[]>();
+    .returns<
+      Pick<ClassSessionAttendance, "session_id" | "student_id" | "status" | "homework_status">[]
+    >();
   if (attendanceError) throw new Error(attendanceError.message);
 
   const attendanceList = attendance ?? [];
@@ -60,6 +67,11 @@ export async function listAttendanceSummaries(
       late: 0,
       absentNames: [],
       lateNames: [],
+      homeworkDone: 0,
+      homeworkPartial: 0,
+      homeworkNotDone: 0,
+      homeworkNa: 0,
+      homeworkNotDoneNames: [],
     });
     summary.total += 1;
     const studentName = studentById.get(row.student_id)?.full_name ?? "알 수 없음";
@@ -71,6 +83,13 @@ export async function listAttendanceSummaries(
     if (row.status === "late") {
       summary.late += 1;
       summary.lateNames.push(studentName);
+    }
+    if (row.homework_status === "done") summary.homeworkDone += 1;
+    if (row.homework_status === "partial") summary.homeworkPartial += 1;
+    if (row.homework_status === "na") summary.homeworkNa += 1;
+    if (row.homework_status === "not_done") {
+      summary.homeworkNotDone += 1;
+      summary.homeworkNotDoneNames.push(studentName);
     }
   }
 

@@ -4,8 +4,8 @@ import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/dal";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { getClassRoster } from "@/lib/classes/queries";
-import { classSessionSchema } from "./schema";
-import type { AttendanceStatus } from "@/lib/supabase/types";
+import { classSessionSchema, HOMEWORK_STATUSES } from "./schema";
+import type { AttendanceStatus, HomeworkStatus } from "@/lib/supabase/types";
 
 export type ClassSessionFormState = {
   error?: string;
@@ -75,16 +75,52 @@ export async function createClassSessionAction(
 
   if (rosterData.roster.length > 0) {
     const attendanceRows = rosterData.roster.map(({ student }) => {
-      const submitted = formData.get(`status_${student.id}`);
+      const submittedStatus = formData.get(`status_${student.id}`);
       const status: AttendanceStatus =
-        submitted === "absent" || submitted === "late" ? submitted : "present";
-      return { session_id: inserted.id, student_id: student.id, status };
+        submittedStatus === "absent" || submittedStatus === "late" ? submittedStatus : "present";
+
+      const submittedHomework = formData.get(`homework_${student.id}`);
+      const homework_status: HomeworkStatus = HOMEWORK_STATUSES.includes(
+        submittedHomework as HomeworkStatus,
+      )
+        ? (submittedHomework as HomeworkStatus)
+        : "na";
+
+      return { session_id: inserted.id, student_id: student.id, status, homework_status };
     });
 
     const { error: attendanceError } = await supabase
       .from("class_session_attendance")
       .insert(attendanceRows);
     if (attendanceError) return { error: attendanceError.message };
+
+    const noteRows = rosterData.roster
+      .map(({ student }) => {
+        const rawNote = formData.get(`note_${student.id}`);
+        const note = typeof rawNote === "string" ? rawNote.trim().slice(0, 2000) : "";
+        return note ? { student_id: student.id, note } : null;
+      })
+      .filter((row): row is { student_id: string; note: string } => row !== null);
+
+    if (noteRows.length > 0) {
+      const { error: noteError } = await supabase.from("session_notes").insert(
+        noteRows.map((row) => ({
+          student_id: row.student_id,
+          scan_id: null,
+          session_date: parsed.data.session_date,
+          note: row.note,
+          source: "teacher" as const,
+          confirmed: true,
+          created_by: session.userId,
+        })),
+      );
+      if (noteError) return { error: noteError.message };
+
+      for (const row of noteRows) {
+        revalidatePath(`/dashboard/principal/students/${row.student_id}/history`);
+      }
+      revalidatePath("/dashboard/parent/progress");
+    }
   }
 
   revalidatePath(`/dashboard/principal/classes/${classId}`);

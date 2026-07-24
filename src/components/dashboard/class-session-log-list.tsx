@@ -60,6 +60,13 @@ export function ClassSessionLogList({
                     {summary.lateNames.length > 0 && ` · 지각: ${summary.lateNames.join(", ")}`}
                   </p>
                 )}
+                {summary && summary.total - summary.homeworkNa > 0 && (
+                  <p className="text-xs text-navy-500">
+                    {summary.homeworkDone}/{summary.total - summary.homeworkNa}명 숙제 완료
+                    {summary.homeworkNotDoneNames.length > 0 &&
+                      ` · 숙제 안함: ${summary.homeworkNotDoneNames.join(", ")}`}
+                  </p>
+                )}
               </li>
             );
           })}

@@ -91,6 +91,7 @@ export interface ClassEnrollment {
 }
 
 export type AttendanceStatus = "present" | "absent" | "late";
+export type HomeworkStatus = "done" | "partial" | "not_done" | "na";
 
 export interface ClassSession {
   id: string;
@@ -109,6 +110,7 @@ export interface ClassSessionAttendance {
   session_id: string;
   student_id: string;
   status: AttendanceStatus;
+  homework_status: HomeworkStatus;
   created_at: string;
 }
 
@@ -301,6 +303,7 @@ type ClassSessionAttendanceInsert = {
   session_id: string;
   student_id: string;
   status: AttendanceStatus;
+  homework_status?: HomeworkStatus;
   created_at?: string;
 };
 

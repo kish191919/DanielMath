@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { AttendanceStatus } from "@/lib/supabase/types";
+import type { AttendanceStatus, HomeworkStatus } from "@/lib/supabase/types";
 
 export const ATTENDANCE_STATUSES: readonly AttendanceStatus[] = ["present", "absent", "late"];
 
@@ -7,6 +7,15 @@ export const ATTENDANCE_LABELS: Record<AttendanceStatus, string> = {
   present: "출석",
   absent: "결석",
   late: "지각",
+};
+
+export const HOMEWORK_STATUSES: readonly HomeworkStatus[] = ["done", "partial", "not_done", "na"];
+
+export const HOMEWORK_LABELS: Record<HomeworkStatus, string> = {
+  done: "완료",
+  partial: "부분 완료",
+  not_done: "미완료",
+  na: "해당없음",
 };
 
 export const classSessionSchema = z.object({
