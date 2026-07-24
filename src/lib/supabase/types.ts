@@ -45,6 +45,8 @@ export interface Student {
   updated_at: string;
 }
 
+export type InquiryStatus = "new" | "contacted" | "enrolled" | "closed";
+
 export interface Inquiry {
   id: string;
   parent_name: string;
@@ -55,6 +57,27 @@ export interface Inquiry {
   school: string | null;
   language: "ko" | "en";
   message: string | null;
+  status: InquiryStatus;
+  created_at: string;
+}
+
+export interface Class {
+  id: string;
+  name: string;
+  days_of_week: number[];
+  start_time: string;
+  end_time: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ClassEnrollment {
+  id: string;
+  class_id: string;
+  student_id: string;
+  enrolled_at: string;
+  unenrolled_at: string | null;
   created_at: string;
 }
 
@@ -187,10 +210,35 @@ type InquiryInsert = {
   school?: string | null;
   language?: "ko" | "en";
   message?: string | null;
+  status?: InquiryStatus;
   created_at?: string;
 };
 
 type InquiryUpdate = Partial<InquiryInsert>;
+
+type ClassInsert = {
+  id?: string;
+  name: string;
+  days_of_week: number[];
+  start_time: string;
+  end_time: string;
+  is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
+};
+
+type ClassUpdate = Partial<ClassInsert>;
+
+type ClassEnrollmentInsert = {
+  id?: string;
+  class_id: string;
+  student_id: string;
+  enrolled_at?: string;
+  unenrolled_at?: string | null;
+  created_at?: string;
+};
+
+type ClassEnrollmentUpdate = Partial<ClassEnrollmentInsert>;
 
 type ConceptInsert = {
   id?: string;
@@ -329,6 +377,33 @@ export type Database = {
         Insert: InquiryInsert;
         Update: InquiryUpdate;
         Relationships: [];
+      };
+      classes: {
+        Row: Class;
+        Insert: ClassInsert;
+        Update: ClassUpdate;
+        Relationships: [];
+      };
+      class_enrollments: {
+        Row: ClassEnrollment;
+        Insert: ClassEnrollmentInsert;
+        Update: ClassEnrollmentUpdate;
+        Relationships: [
+          {
+            foreignKeyName: "class_enrollments_class_id_fkey";
+            columns: ["class_id"];
+            isOneToOne: false;
+            referencedRelation: "classes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "class_enrollments_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       concepts: {
         Row: Concept;

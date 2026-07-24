@@ -5,6 +5,7 @@ import type { Role } from "@/lib/supabase/types";
 const principalLinks = [
   { href: "/dashboard/principal", label: "홈", labelEn: "Home" },
   { href: "/dashboard/principal/students", label: "학생", labelEn: "Students" },
+  { href: "/dashboard/principal/classes", label: "반", labelEn: "Classes" },
   { href: "/dashboard/principal/inquiries", label: "상담 문의", labelEn: "Inquiries" },
 ];
 

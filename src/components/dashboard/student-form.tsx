@@ -12,16 +12,25 @@ import { GRADES, GRADE_LABELS, TRACKS, TRACK_LABELS } from "@/lib/students/schem
 import type { StudentFormState } from "@/lib/students/actions";
 import type { Student } from "@/lib/supabase/types";
 
+type Prefill = {
+  full_name: string;
+  grade: Student["grade"];
+  parent_email: string;
+  notes: string;
+};
+
 type Props = {
   mode: "create" | "edit";
   student?: Student;
+  prefill?: Prefill;
+  fromInquiryId?: string;
   action: (
     prev: StudentFormState | null,
     formData: FormData,
   ) => Promise<StudentFormState>;
 };
 
-export function StudentForm({ mode, student, action }: Props) {
+export function StudentForm({ mode, student, prefill, fromInquiryId, action }: Props) {
   const [state, formAction, isPending] = useActionState<StudentFormState | null, FormData>(
     action,
     null,
@@ -33,17 +42,19 @@ export function StudentForm({ mode, student, action }: Props) {
       noValidate
       className="space-y-6 rounded-2xl border border-navy-100 bg-white p-6 shadow-sm sm:p-8"
     >
+      {fromInquiryId && <input type="hidden" name="from_inquiry_id" value={fromInquiryId} />}
+
       <Field label="학생 이름 / Name" error={state?.fieldErrors?.full_name} required>
         <Input
           name="full_name"
-          defaultValue={student?.full_name ?? ""}
+          defaultValue={student?.full_name ?? prefill?.full_name ?? ""}
           aria-required
           placeholder="Alice Kim"
         />
       </Field>
 
       <Field label="학년 / Grade" error={state?.fieldErrors?.grade} required>
-        <Select name="grade" defaultValue={student?.grade ?? ""} aria-required>
+        <Select name="grade" defaultValue={student?.grade ?? prefill?.grade ?? ""} aria-required>
           <option value="" disabled>
             Select grade
           </option>
@@ -72,7 +83,7 @@ export function StudentForm({ mode, student, action }: Props) {
         <Input
           type="email"
           name="parent_email"
-          defaultValue={student?.parent_email ?? ""}
+          defaultValue={student?.parent_email ?? prefill?.parent_email ?? ""}
           autoComplete="off"
           placeholder="parent@example.com"
         />
@@ -81,7 +92,7 @@ export function StudentForm({ mode, student, action }: Props) {
       <Field label="메모 / Notes (선택)" error={state?.fieldErrors?.notes}>
         <Textarea
           name="notes"
-          defaultValue={student?.notes ?? ""}
+          defaultValue={student?.notes ?? prefill?.notes ?? ""}
           maxLength={2000}
           placeholder="현재 학습 수준, 목표, 강점/약점 등."
         />

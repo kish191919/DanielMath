@@ -1,8 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { requireRole } from "@/lib/dal";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { inquirySchema, type InquiryValues } from "./schema";
+import type { InquiryStatus } from "@/lib/supabase/types";
+import { INQUIRY_STATUSES, inquirySchema, type InquiryValues } from "./schema";
 
 export type InquiryFormState = {
   ok: boolean;
@@ -53,4 +55,25 @@ export async function submitInquiryAction(
 
   revalidatePath("/dashboard/principal/inquiries");
   return { ok: true };
+}
+
+export async function updateInquiryStatusAction(id: string, status: InquiryStatus) {
+  await requireRole("principal");
+  if (!INQUIRY_STATUSES.includes(status)) throw new Error("Invalid status");
+
+  const supabase = await createServerSupabase();
+  const { error } = await supabase.from("inquiries").update({ status }).eq("id", id);
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/dashboard/principal/inquiries");
+}
+
+export async function deleteInquiryAction(id: string) {
+  await requireRole("principal");
+
+  const supabase = await createServerSupabase();
+  const { error } = await supabase.from("inquiries").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/dashboard/principal/inquiries");
 }

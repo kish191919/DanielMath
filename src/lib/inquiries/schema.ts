@@ -1,7 +1,22 @@
 import { z } from "zod";
+import type { InquiryStatus } from "@/lib/supabase/types";
 
 export const INQUIRY_GRADES = ["3", "4", "5", "6"] as const;
 export const INQUIRY_LANGUAGES = ["ko", "en"] as const;
+
+export const INQUIRY_STATUSES: readonly InquiryStatus[] = [
+  "new",
+  "contacted",
+  "enrolled",
+  "closed",
+];
+
+export const INQUIRY_STATUS_LABELS: Record<InquiryStatus, string> = {
+  new: "신규",
+  contacted: "연락함",
+  enrolled: "등록완료",
+  closed: "보류",
+};
 
 // Keep field shapes (enum values, min/max) in sync with the client-side
 // schema in src/app/[locale]/(marketing)/inquire/inquiry-form.tsx — that

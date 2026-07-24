@@ -13,3 +13,14 @@ export async function listInquiries(): Promise<Inquiry[]> {
   if (error) throw new Error(error.message);
   return data ?? [];
 }
+
+export async function getInquiry(id: string): Promise<Inquiry | null> {
+  const supabase = await createServerSupabase();
+  const { data } = await supabase
+    .from("inquiries")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle<Inquiry>();
+
+  return data ?? null;
+}

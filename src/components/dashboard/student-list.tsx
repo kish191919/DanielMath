@@ -2,9 +2,24 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { GRADE_LABELS } from "@/lib/students/schema";
 import { deleteStudentAction } from "@/lib/students/actions";
+import { WEEKDAYS, WEEKDAY_LABELS } from "@/lib/classes/schema";
 import type { StudentProgressOverview } from "@/lib/learning-history/queries";
+import type { Class } from "@/lib/supabase/types";
 
-export function StudentList({ overview }: { overview: StudentProgressOverview[] }) {
+function scheduleLabel(days: number[], startTime: string, endTime: string) {
+  const dayLabel = WEEKDAYS.filter((d) => days.includes(d))
+    .map((d) => WEEKDAY_LABELS[d])
+    .join("");
+  return `${dayLabel} ${startTime.slice(0, 5)}-${endTime.slice(0, 5)}`;
+}
+
+export function StudentList({
+  overview,
+  classBadgesByStudent = {},
+}: {
+  overview: StudentProgressOverview[];
+  classBadgesByStudent?: Record<string, Class[]>;
+}) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <Link
@@ -38,6 +53,18 @@ export function StudentList({ overview }: { overview: StudentProgressOverview[] 
                 {GRADE_LABELS[student.grade]}
               </span>
             </div>
+            {(classBadgesByStudent[student.id]?.length ?? 0) > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1">
+                {classBadgesByStudent[student.id].map((classRow) => (
+                  <span
+                    key={classRow.id}
+                    className="inline-flex items-center rounded-full bg-gold-300/20 px-2 py-0.5 text-xs font-medium text-navy-800"
+                  >
+                    {scheduleLabel(classRow.days_of_week, classRow.start_time, classRow.end_time)}
+                  </span>
+                ))}
+              </div>
+            )}
             {student.notes && (
               <p className="mt-3 line-clamp-3 text-xs text-navy-700 font-ko" lang="ko">
                 {student.notes}

@@ -69,6 +69,16 @@ export async function createStudentAction(
 
   if (error) return { error: error.message };
 
+  // If this registration started from an inquiry card ("학생으로 등록"
+  // link), close the loop by marking that inquiry enrolled. Best-effort:
+  // the student is already saved, so a failure here shouldn't block the
+  // redirect — it would just leave the inquiry's status stale.
+  const fromInquiryId = formData.get("from_inquiry_id");
+  if (typeof fromInquiryId === "string" && fromInquiryId.length > 0) {
+    await supabase.from("inquiries").update({ status: "enrolled" }).eq("id", fromInquiryId);
+    revalidatePath("/dashboard/principal/inquiries");
+  }
+
   revalidatePath("/dashboard/principal/students");
   redirect("/dashboard/principal/students");
 }
