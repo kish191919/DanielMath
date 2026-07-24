@@ -3,9 +3,9 @@ import { Container } from "@/components/site/container";
 import type { Role } from "@/lib/supabase/types";
 
 const principalLinks = [
+  { href: "/dashboard/principal", label: "홈", labelEn: "Home" },
   { href: "/dashboard/principal/students", label: "학생", labelEn: "Students" },
-  { href: "/dashboard/principal/worksheets", label: "학습지", labelEn: "Worksheets" },
-  { href: "/dashboard/principal/progress", label: "진행 상황", labelEn: "Progress" },
+  { href: "/dashboard/principal/inquiries", label: "상담 문의", labelEn: "Inquiries" },
 ];
 
 const parentLinks = [

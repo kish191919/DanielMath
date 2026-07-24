@@ -221,6 +221,7 @@ const ko = {
       phone: "연락처를 입력해주세요.",
       childName: "자녀 이름을 입력해주세요.",
       grade: "학년을 선택해주세요.",
+      submitFailed: "제출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
     },
   },
   thanks: {

@@ -202,7 +202,7 @@ export async function confirmReviewAction(
 
   revalidatePath("/dashboard/principal/worksheets");
   revalidatePath(`/dashboard/principal/students/${parsed.data.student_id}/history`);
-  revalidatePath("/dashboard/principal/progress");
+  revalidatePath("/dashboard/principal/students");
   revalidatePath("/dashboard/parent/progress");
   redirect(`/dashboard/principal/worksheets/${parsed.data.scan_id}`);
 }

@@ -15,7 +15,7 @@ function parseStudentForm(formData: FormData) {
   return studentSchema.safeParse({
     full_name: formData.get("full_name"),
     grade: formData.get("grade"),
-    track: formData.get("track") ?? "standard",
+    track: formData.get("track") ?? "advanced",
     parent_email: formData.get("parent_email") ?? "",
     notes: formData.get("notes") ?? "",
   });

@@ -223,6 +223,7 @@ const en: Dictionary = {
       phone: "Please enter a phone number.",
       childName: "Please enter your child's name.",
       grade: "Please select a grade.",
+      submitFailed: "Something went wrong. Please try again in a moment.",
     },
   },
   thanks: {

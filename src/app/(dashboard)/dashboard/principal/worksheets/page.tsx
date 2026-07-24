@@ -2,18 +2,10 @@ import Link from "next/link";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
 import { Button } from "@/components/ui/button";
+import { ScanStatusBadge } from "@/components/dashboard/scan-status-badge";
 import { requireRole } from "@/lib/dal";
 import { listRecentScans } from "@/lib/learning-history/queries";
 import { listStudents } from "@/lib/students/queries";
-import { SCAN_STATUS_LABELS } from "@/lib/learning-history/schema";
-
-const STATUS_STYLES: Record<string, string> = {
-  uploaded: "bg-navy-50 text-navy-800",
-  grading: "bg-gold-300/30 text-navy-800",
-  pending_review: "bg-gold-300/30 text-navy-800",
-  reviewed: "bg-green-100 text-green-800",
-  grading_failed: "bg-red-100 text-red-700",
-};
 
 export default async function PrincipalWorksheetsPage({
   searchParams,
@@ -90,13 +82,7 @@ export default async function PrincipalWorksheetsPage({
                   </p>
                   <p className="mt-1 text-xs text-navy-600">{scan.session_date}</p>
                 </div>
-                <span
-                  className={`inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                    STATUS_STYLES[scan.status] ?? "bg-navy-50 text-navy-800"
-                  }`}
-                >
-                  {SCAN_STATUS_LABELS[scan.status]}
-                </span>
+                <ScanStatusBadge status={scan.status} />
               </Link>
             ))
           )}

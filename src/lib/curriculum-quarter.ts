@@ -34,3 +34,12 @@ export const QUARTER_LABELS_EN: Record<Quarter, string> = {
   Q3: "Q3 · Feb–Apr",
   Q4: "Q4 · Apr–Jun",
 };
+
+// Marks an advanced-track concept that has no quarter_advanced value not
+// because it's untagged, but because the advanced-pace student already
+// covered it in an earlier grade — distinct from a genuine data gap.
+export type AdvancedStatus = "mastered_prior_grade";
+
+export const ADVANCED_STATUS_LABELS_KO: Record<AdvancedStatus, string> = {
+  mastered_prior_grade: "이전 학년에서 학습 완료",
+};

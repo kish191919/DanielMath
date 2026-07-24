@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Field, Radio } from "@/components/forms/field";
+import { submitInquiryAction } from "@/lib/inquiries/actions";
 import type { Dictionary } from "@/dictionaries";
 
 type FormLabels = Dictionary["inquire"]["form"];
@@ -30,6 +31,7 @@ const grades = [
 export function InquiryForm({ labels, errors: errMsgs, thanksPath }: Props) {
   const router = useRouter();
   const [submitting, setSubmitting] = React.useState(false);
+  const [serverError, setServerError] = React.useState<string | null>(null);
 
   const schema = z.object({
     parentName: z.string().min(1, errMsgs.parentName),
@@ -47,6 +49,7 @@ export function InquiryForm({ labels, errors: errMsgs, thanksPath }: Props) {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -55,9 +58,24 @@ export function InquiryForm({ labels, errors: errMsgs, thanksPath }: Props) {
 
   const onSubmit = async (values: FormValues) => {
     setSubmitting(true);
-    console.log("[inquiry]", values);
-    await new Promise((r) => setTimeout(r, 400));
-    router.push(thanksPath);
+    setServerError(null);
+    try {
+      const result = await submitInquiryAction(values);
+      if (result.ok) {
+        router.push(thanksPath);
+        return;
+      }
+      if (result.fieldErrors) {
+        for (const [key, message] of Object.entries(result.fieldErrors)) {
+          if (message) setError(key as keyof FormValues, { type: "server", message });
+        }
+      }
+      setServerError(result.error ?? errMsgs.submitFailed);
+      setSubmitting(false);
+    } catch {
+      setServerError(errMsgs.submitFailed);
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -141,6 +159,12 @@ export function InquiryForm({ labels, errors: errMsgs, thanksPath }: Props) {
           maxLength={2000}
         />
       </Field>
+
+      {serverError && (
+        <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+          {serverError}
+        </p>
+      )}
 
       <div className="border-t border-navy-100 pt-5">
         <Button size="lg" disabled={submitting} className="w-full">

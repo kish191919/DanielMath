@@ -1,4 +1,14 @@
 import Link from "next/link";
+import {
+  ChevronRight,
+  GraduationCap,
+  TrendingUp,
+  AlertTriangle,
+  Award,
+  CalendarClock,
+  BookOpenCheck,
+  type LucideIcon,
+} from "lucide-react";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
@@ -9,13 +19,16 @@ import {
   getConceptHeatmap,
   getStudentKpiSummary,
   listLearningItems,
+  listScansForStudent,
   listSessionNotes,
   WEAK_ACCURACY_THRESHOLD,
   MIN_SAMPLE_SIZE,
   type ConceptHeatmapCell,
+  type ConceptHeatmapQuarterGroup,
   type PaceStatus,
 } from "@/lib/learning-history/queries";
 import { WrongAnswerWorkspace, type ItemGroup } from "@/components/dashboard/wrong-answer-workspace";
+import { ScanStatusBadge } from "@/components/dashboard/scan-status-badge";
 import { GRADE_LABELS, TRACK_LABELS } from "@/lib/students/schema";
 import { getCurrentQuarter, QUARTER_LABELS_KO } from "@/lib/curriculum-quarter";
 import type { LearningItem } from "@/lib/supabase/types";
@@ -23,7 +36,7 @@ import type { LearningItem } from "@/lib/supabase/types";
 const TABS = [
   { value: "concept", label: "단원별 취약 유형" },
   { value: "period", label: "기간별 오답" },
-  { value: "session", label: "학습지별 오답" },
+  { value: "session", label: "학습지" },
 ] as const;
 type Tab = (typeof TABS)[number]["value"];
 
@@ -65,17 +78,19 @@ export default async function StudentHistoryPage({
   const student = await getStudent(id);
   if (!student) notFound();
 
-  const [recentSummary, allTimeSummary, items, notes, kpi, heatmap] = await Promise.all([
+  const [recentSummary, allTimeSummary, items, notes, kpi, heatmap, scans] = await Promise.all([
     getConceptAccuracySummary(id, { from: daysAgoIso(30) }),
     getConceptAccuracySummary(id),
     listLearningItems(id),
     listSessionNotes(id),
     getStudentKpiSummary(id, student.grade),
     getConceptHeatmap(id, student.grade, student.track),
+    listScansForStudent(id),
   ]);
   const currentQuarter = getCurrentQuarter();
 
   const allTimeByConceptId = new Map(allTimeSummary.map((s) => [s.conceptId, s]));
+  const weakConceptCount = recentSummary.filter((s) => s.isWeak).length;
 
   const periodFrom = rawFrom || daysAgoIso(30);
   const periodTo = rawTo || todayIso();
@@ -113,9 +128,10 @@ export default async function StudentHistoryPage({
           </h1>
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          <KpiCard label="학년" value={GRADE_LABELS[student.grade]} />
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          <KpiCard icon={GraduationCap} label="학년" value={GRADE_LABELS[student.grade]} />
           <KpiCard
+            icon={TrendingUp}
             label="최근 30일 정답률"
             value={kpi.recentAccuracyRate === null ? "기록 없음" : `${kpi.recentAccuracyRate}%`}
             sub={kpi.recentTotal > 0 ? `${kpi.recentTotal}문항` : undefined}
@@ -126,12 +142,21 @@ export default async function StudentHistoryPage({
             }
           />
           <KpiCard
+            icon={AlertTriangle}
+            label="주의필요 개념 수"
+            value={`${weakConceptCount}개`}
+            sub={recentSummary.length > 0 ? `${recentSummary.length}개 개념 중` : undefined}
+            warn={weakConceptCount > 0}
+          />
+          <KpiCard
+            icon={Award}
             label="전체 누적 정답률"
             value={kpi.allTimeAccuracyRate === null ? "기록 없음" : `${kpi.allTimeAccuracyRate}%`}
             sub={kpi.allTimeTotal > 0 ? `${kpi.allTimeTotal}문항` : undefined}
           />
-          <KpiCard label="마지막 수업일" value={kpi.lastSessionDate ?? "-"} />
+          <KpiCard icon={CalendarClock} label="마지막 수업일" value={kpi.lastSessionDate ?? "-"} />
           <KpiCard
+            icon={BookOpenCheck}
             label="학년 커리큘럼 커버리지"
             value={kpi.curriculumCoverage.rate === null ? "-" : `${kpi.curriculumCoverage.rate}%`}
             sub={`${kpi.curriculumCoverage.covered}/${kpi.curriculumCoverage.total}개 개념`}
@@ -157,48 +182,18 @@ export default async function StudentHistoryPage({
 
         {tab === "concept" && (
           <div className="mt-8">
-            {heatmap.length > 0 && (
-              <div>
-                <h2 className="text-lg font-semibold text-navy-900 font-ko" lang="ko">
-                  학년 커리큘럼 현황
-                </h2>
-                <p className="mt-1 text-xs text-navy-500 font-ko" lang="ko">
-                  {GRADE_LABELS[student.grade]} · {TRACK_LABELS[student.track]} 트랙 · 전체 누적 데이터 · 현재{" "}
-                  {QUARTER_LABELS_KO[currentQuarter]}
-                </p>
-
-                <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-navy-600 font-ko" lang="ko">
-                  <LegendSwatch swatchClassName="border-green-300 bg-green-100" label="양호 (70%+)" />
-                  <LegendSwatch swatchClassName="border-red-300 bg-red-100" label="주의필요 (70% 미만)" />
-                  <LegendSwatch swatchClassName="border-amber-300 bg-amber-100" label="표본부족 (3문항 미만)" />
-                  <LegendSwatch swatchClassName="border-navy-200 bg-navy-50" label="데이터 없음" />
-                  <LegendSwatch swatchClassName="border-blue-300 bg-blue-100" label="선행 학습 중 (다음 분기 이후 개념)" />
-                  <LegendSwatch swatchClassName="border-red-600 bg-red-600" label="진도 지연 (이번 분기까지 학습 필요, 기록 없음)" />
-                </div>
-
-                <div className="mt-4 space-y-5">
-                  {heatmap.map((group) => (
-                    <div key={group.strand}>
-                      <h3 className="text-sm font-semibold text-navy-800 font-ko" lang="ko">
-                        {group.strand}
-                      </h3>
-                      <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
-                        {group.cells.map((cell) => (
-                          <HeatmapCell key={cell.conceptId} cell={cell} />
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <h2 className="mt-10 text-lg font-semibold text-navy-900 font-ko" lang="ko">
+            <h2 className="text-lg font-semibold text-navy-900 font-ko" lang="ko">
               개념별 정답률
             </h2>
-            <p className="mt-1 text-xs text-navy-500">
-              최근 30일 vs 전체 누적 · 취약(주의필요) 개념이 상단에 정렬됩니다
-            </p>
+            <details className="group mt-1">
+              <summary className="flex w-fit cursor-pointer list-none items-center gap-1 text-xs text-navy-500 hover:text-navy-700 [&::-webkit-details-marker]:hidden">
+                <ChevronRight className="h-3.5 w-3.5 shrink-0 transition-transform group-open:rotate-90" />
+                설명 보기
+              </summary>
+              <p className="mt-1 text-xs text-navy-500">
+                최근 30일 vs 전체 누적 · 취약(주의필요) 개념이 상단에 정렬됩니다
+              </p>
+            </details>
 
             {recentSummary.length === 0 ? (
               <div className="mt-4 rounded-2xl border border-navy-100 bg-white p-8 text-center text-sm text-navy-600">
@@ -264,6 +259,131 @@ export default async function StudentHistoryPage({
                 </table>
               </div>
             )}
+
+            {heatmap.length > 0 && (
+              <div className="mt-10">
+                <h2 className="text-lg font-semibold text-navy-900 font-ko" lang="ko">
+                  학년 커리큘럼 현황
+                </h2>
+                <details className="group mt-1">
+                  <summary className="flex w-fit cursor-pointer list-none items-center gap-1 text-xs text-navy-500 hover:text-navy-700 [&::-webkit-details-marker]:hidden">
+                    <ChevronRight className="h-3.5 w-3.5 shrink-0 transition-transform group-open:rotate-90" />
+                    설명 및 범례 보기
+                  </summary>
+                  <p className="mt-1 text-xs text-navy-500 font-ko" lang="ko">
+                    {GRADE_LABELS[student.grade]} · {TRACK_LABELS[student.track]} 트랙 · 전체 누적 데이터 · 현재{" "}
+                    {QUARTER_LABELS_KO[currentQuarter]}
+                  </p>
+
+                  <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-navy-600 font-ko" lang="ko">
+                    <LegendSwatch swatchClassName="border-green-300 bg-green-100" label="양호 (70%+)" />
+                    <LegendSwatch swatchClassName="border-red-300 bg-red-100" label="주의필요 (70% 미만)" />
+                    <LegendSwatch swatchClassName="border-amber-300 bg-amber-100" label="표본부족 (3문항 미만)" />
+                    <LegendSwatch swatchClassName="border-navy-200 bg-navy-50" label="데이터 없음" />
+                    <LegendSwatch swatchClassName="border-blue-300 bg-blue-100" label="선행 학습 중 (다음 분기 이후 개념)" />
+                    <LegendSwatch swatchClassName="border-red-600 bg-red-600" label="진도 지연 (이번 분기까지 학습 필요, 기록 없음)" />
+                    <LegendSwatch swatchClassName="border-emerald-300 bg-emerald-100" label="이전 학년 완료 (이미 학습한 선행 개념)" />
+                  </div>
+                </details>
+
+                <div className="mt-5 space-y-3">
+                  {heatmap.map((group) => {
+                    const isCurrent = group.groupKind === "quarter" && group.quarter === currentQuarter;
+                    const heading =
+                      group.groupKind === "quarter" && group.quarter
+                        ? QUARTER_LABELS_KO[group.quarter]
+                        : group.groupKind === "mastered_prior_grade"
+                          ? "이전 학년에서 학습 완료"
+                          : "선수 학습 개념 (분기 미지정)";
+                    const description =
+                      group.groupKind === "mastered_prior_grade"
+                        ? "특정 분기에 새로 배우는 개념이 아니라, 이전 학년 심화 과정에서 이미 학습한 개념입니다."
+                        : group.groupKind === "unscheduled"
+                          ? "특정 분기에 새로 배우는 개념이 아니라, 이미 알고 있다고 가정하는 기초 개념입니다."
+                          : null;
+                    const { total, dueCount, aheadCount } = summarizeGroup(group);
+                    const key = group.quarter ?? group.groupKind;
+                    const body = (
+                      <div className="space-y-4">
+                        {group.strands.map((strand) => (
+                          <div key={strand.strand}>
+                            <h4 className="text-sm font-semibold text-navy-800 font-ko" lang="ko">
+                              {strand.strand}
+                            </h4>
+                            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+                              {strand.cells.map((cell) => (
+                                <HeatmapCell key={cell.conceptId} cell={cell} />
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+
+                    if (isCurrent) {
+                      return (
+                        <div
+                          key={key}
+                          className="rounded-xl border border-blue-200 bg-blue-50/40 p-4"
+                        >
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="text-base font-bold text-navy-900 font-ko" lang="ko">
+                              {heading}
+                            </h3>
+                            <span
+                              className="rounded-full bg-navy-900 px-2 py-0.5 text-[10px] font-bold text-white"
+                              lang="ko"
+                            >
+                              현재
+                            </span>
+                            <span className="text-xs text-navy-500 font-ko" lang="ko">
+                              개념 {total}개
+                            </span>
+                            <GroupStatusChips dueCount={dueCount} aheadCount={aheadCount} />
+                          </div>
+                          {description && (
+                            <p className="mt-1 text-xs text-navy-500 font-ko" lang="ko">
+                              {description}
+                            </p>
+                          )}
+                          <div className="mt-3">{body}</div>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <details
+                        key={key}
+                        className="group overflow-hidden rounded-xl border border-navy-100 bg-white"
+                      >
+                        <summary
+                          className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 hover:bg-navy-50/60 [&::-webkit-details-marker]:hidden"
+                        >
+                          <ChevronRight className="h-4 w-4 shrink-0 text-navy-400 transition-transform group-open:rotate-90" />
+                          <h3 className="text-base font-bold text-navy-900 font-ko" lang="ko">
+                            {heading}
+                          </h3>
+                          <span className="text-xs text-navy-500 font-ko" lang="ko">
+                            개념 {total}개
+                          </span>
+                          <span className="ml-auto">
+                            <GroupStatusChips dueCount={dueCount} aheadCount={aheadCount} />
+                          </span>
+                        </summary>
+                        <div className="space-y-3 px-4 pb-4 pt-1">
+                          {description && (
+                            <p className="text-xs text-navy-500 font-ko" lang="ko">
+                              {description}
+                            </p>
+                          )}
+                          {body}
+                        </div>
+                      </details>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -309,8 +429,28 @@ export default async function StudentHistoryPage({
         {tab === "session" && (
           <div className="mt-8">
             <h2 className="text-lg font-semibold text-navy-900 font-ko" lang="ko">
-              학습지별 오답
+              학습지 목록
             </h2>
+            <div className="mt-4 space-y-2">
+              {scans.length === 0 ? (
+                <p className="text-sm text-navy-600">아직 업로드된 학습지가 없습니다.</p>
+              ) : (
+                scans.map((scan) => (
+                  <Link
+                    key={scan.id}
+                    href={`/dashboard/principal/worksheets/${scan.id}`}
+                    className="flex items-center justify-between gap-3 rounded-xl border border-navy-100 bg-white p-3 shadow-sm transition-colors hover:border-navy-300 hover:bg-navy-50"
+                  >
+                    <span className="text-sm text-navy-800">{scan.session_date}</span>
+                    <ScanStatusBadge status={scan.status} />
+                  </Link>
+                ))
+              )}
+            </div>
+
+            <h3 className="mt-8 text-base font-semibold text-navy-900 font-ko" lang="ko">
+              학습지별 오답
+            </h3>
             <div className="mt-4">
               <WrongAnswerWorkspace studentId={id} groups={sessionItemGroups} />
             </div>
@@ -361,6 +501,39 @@ function LegendSwatch({ swatchClassName, label }: { swatchClassName: string; lab
   );
 }
 
+function summarizeGroup(group: ConceptHeatmapQuarterGroup) {
+  const cells = group.strands.flatMap((s) => s.cells);
+  return {
+    total: cells.length,
+    dueCount: cells.filter((c) => c.paceStatus === "due").length,
+    aheadCount: cells.filter((c) => c.paceStatus === "ahead").length,
+  };
+}
+
+function GroupStatusChips({ dueCount, aheadCount }: { dueCount: number; aheadCount: number }) {
+  if (dueCount === 0 && aheadCount === 0) return null;
+  return (
+    <span className="flex items-center gap-1.5">
+      {dueCount > 0 && (
+        <span
+          className="rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white"
+          lang="ko"
+        >
+          진도 지연 {dueCount}
+        </span>
+      )}
+      {aheadCount > 0 && (
+        <span
+          className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold text-blue-700"
+          lang="ko"
+        >
+          선행 {aheadCount}
+        </span>
+      )}
+    </span>
+  );
+}
+
 function heatmapCellClasses(cell: ConceptHeatmapCell): string {
   if (cell.total === 0) return "border-navy-200 bg-navy-50 text-navy-400";
   if (cell.isWeak) return "border-red-300 bg-red-100 text-red-700";
@@ -371,6 +544,8 @@ function heatmapCellClasses(cell: ConceptHeatmapCell): string {
 function paceBadge(status: PaceStatus): { label: string; className: string } | null {
   if (status === "ahead") return { label: "선행", className: "bg-blue-100 text-blue-700" };
   if (status === "due") return { label: "진도 지연", className: "bg-red-600 text-white" };
+  if (status === "mastered_prior_grade")
+    return { label: "이전 학년 완료", className: "bg-emerald-100 text-emerald-700" };
   return null;
 }
 
@@ -399,23 +574,34 @@ function HeatmapCell({ cell }: { cell: ConceptHeatmapCell }) {
 }
 
 function KpiCard({
+  icon: Icon,
   label,
   value,
   sub,
   warn,
 }: {
+  icon: LucideIcon;
   label: string;
   value: string;
   sub?: string;
   warn?: boolean;
 }) {
   return (
-    <div className="rounded-2xl border border-navy-100 bg-white p-4 shadow-sm">
-      <p className="text-xs font-medium text-navy-500 font-ko" lang="ko">
-        {label}
-      </p>
+    <div className={`rounded-2xl border bg-white p-4 shadow-sm ${warn ? "border-red-200" : "border-navy-100"}`}>
+      <div className="flex items-center gap-2">
+        <span
+          className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
+            warn ? "bg-red-100 text-red-600" : "bg-navy-50 text-navy-500"
+          }`}
+        >
+          <Icon className="h-4 w-4" strokeWidth={2} />
+        </span>
+        <p className="text-xs font-medium text-navy-500 font-ko" lang="ko">
+          {label}
+        </p>
+      </div>
       <p
-        className={`mt-1 text-lg font-bold font-ko ${warn ? "text-red-600" : "text-navy-900"}`}
+        className={`mt-2 text-lg font-bold font-ko ${warn ? "text-red-600" : "text-navy-900"}`}
         lang="ko"
       >
         {value}

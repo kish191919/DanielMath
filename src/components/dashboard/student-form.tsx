@@ -56,7 +56,7 @@ export function StudentForm({ mode, student, action }: Props) {
       </Field>
 
       <Field label="트랙 / Track" error={state?.fieldErrors?.track} required>
-        <Select name="track" defaultValue={student?.track ?? "standard"} aria-required>
+        <Select name="track" defaultValue={student?.track ?? "advanced"} aria-required>
           {TRACKS.map((t) => (
             <option key={t} value={t}>
               {TRACK_LABELS[t]}

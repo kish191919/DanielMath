@@ -1,4 +1,4 @@
-import type { Quarter } from "@/lib/curriculum-quarter";
+import type { AdvancedStatus, Quarter } from "@/lib/curriculum-quarter";
 
 export type Role = "principal" | "parent";
 
@@ -45,6 +45,19 @@ export interface Student {
   updated_at: string;
 }
 
+export interface Inquiry {
+  id: string;
+  parent_name: string;
+  contact_email: string;
+  phone: string;
+  child_name: string;
+  grade: Grade;
+  school: string | null;
+  language: "ko" | "en";
+  message: string | null;
+  created_at: string;
+}
+
 export interface Concept {
   id: string;
   code: string;
@@ -56,6 +69,7 @@ export interface Concept {
   is_active: boolean;
   quarter_standard: Quarter | null;
   quarter_advanced: Quarter | null;
+  advanced_status: AdvancedStatus | null;
   created_at: string;
   updated_at: string;
 }
@@ -163,6 +177,21 @@ type StudentInsert = {
 
 type StudentUpdate = Partial<StudentInsert>;
 
+type InquiryInsert = {
+  id?: string;
+  parent_name: string;
+  contact_email: string;
+  phone: string;
+  child_name: string;
+  grade: Grade;
+  school?: string | null;
+  language?: "ko" | "en";
+  message?: string | null;
+  created_at?: string;
+};
+
+type InquiryUpdate = Partial<InquiryInsert>;
+
 type ConceptInsert = {
   id?: string;
   code: string;
@@ -174,6 +203,7 @@ type ConceptInsert = {
   is_active?: boolean;
   quarter_standard?: Quarter | null;
   quarter_advanced?: Quarter | null;
+  advanced_status?: AdvancedStatus | null;
   created_at?: string;
   updated_at?: string;
 };
@@ -293,6 +323,12 @@ export type Database = {
             referencedColumns: ["id"];
           },
         ];
+      };
+      inquiries: {
+        Row: Inquiry;
+        Insert: InquiryInsert;
+        Update: InquiryUpdate;
+        Relationships: [];
       };
       concepts: {
         Row: Concept;

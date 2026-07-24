@@ -1,34 +1,18 @@
 import Link from "next/link";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
+import { Button } from "@/components/ui/button";
+import { ScanStatusBadge } from "@/components/dashboard/scan-status-badge";
 import { requireRole } from "@/lib/dal";
-
-const cards = [
-  {
-    href: "/dashboard/principal/students",
-    title: "학생 관리",
-    titleEn: "Students",
-    description: "학생을 등록하고 학년·학부모 정보를 관리합니다.",
-    ready: true,
-  },
-  {
-    href: "/dashboard/principal/worksheets",
-    title: "학습지",
-    titleEn: "Worksheets",
-    description: "학생이 푼 프린트물을 업로드하면 AI가 채점하고 확인 후 학습이력에 저장합니다.",
-    ready: true,
-  },
-  {
-    href: "/dashboard/principal/progress",
-    title: "진행 상황",
-    titleEn: "Progress",
-    description: "학생별 개념별 정답률과 최근 학습이력을 확인합니다.",
-    ready: true,
-  },
-];
+import { listPendingScans, listRecentScans } from "@/lib/learning-history/queries";
+import { listStudents } from "@/lib/students/queries";
 
 export default async function PrincipalHome() {
   const session = await requireRole("principal");
+  const [pendingScans, students] = await Promise.all([listPendingScans(), listStudents()]);
+  const widgetScans =
+    pendingScans.length > 0 ? pendingScans.slice(0, 6) : await listRecentScans(6);
+  const studentNameById = new Map(students.map((s) => [s.id, s.full_name]));
 
   return (
     <Section className="py-10 sm:py-14">
@@ -45,31 +29,49 @@ export default async function PrincipalHome() {
           </p>
         </div>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {cards.map((card) => (
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Button href="/dashboard/principal/students/new" variant="secondary">
+            학생 등록
+          </Button>
+          <Button href="/dashboard/principal/worksheets/new">새 학습지 업로드</Button>
+        </div>
+
+        <div className="mt-10">
+          <div className="flex items-baseline justify-between gap-3">
+            <h2 className="text-lg font-semibold text-navy-900 font-ko" lang="ko">
+              최근 업로드 · 검토 대기
+            </h2>
             <Link
-              key={card.href}
-              href={card.href}
-              className="group flex flex-col rounded-2xl border border-navy-100 bg-white p-6 shadow-sm transition-colors hover:border-navy-300 hover:bg-navy-50"
+              href="/dashboard/principal/worksheets"
+              className="text-sm font-medium text-navy-600 underline underline-offset-2 hover:text-navy-800"
             >
-              <div className="flex items-baseline justify-between">
-                <h2 className="text-lg font-semibold text-navy-900 font-ko" lang="ko">
-                  {card.title}
-                </h2>
-                <span className="text-xs font-medium text-navy-500">
-                  {card.titleEn}
-                </span>
-              </div>
-              <p className="mt-3 flex-1 text-sm text-navy-700 font-ko" lang="ko">
-                {card.description}
-              </p>
-              {!card.ready && (
-                <p className="mt-4 inline-flex w-fit items-center rounded-full bg-gold-300/30 px-2 py-0.5 text-xs font-medium text-navy-800">
-                  Phase B-2 예정
-                </p>
-              )}
+              전체보기
             </Link>
-          ))}
+          </div>
+
+          <div className="mt-4 space-y-3">
+            {widgetScans.length === 0 ? (
+              <div className="rounded-2xl border border-navy-100 bg-white p-8 text-center text-sm text-navy-600">
+                아직 업로드된 학습지가 없습니다.
+              </div>
+            ) : (
+              widgetScans.map((scan) => (
+                <Link
+                  key={scan.id}
+                  href={`/dashboard/principal/worksheets/${scan.id}`}
+                  className="flex items-center justify-between gap-3 rounded-2xl border border-navy-100 bg-white p-4 shadow-sm transition-colors hover:border-navy-300 hover:bg-navy-50"
+                >
+                  <div>
+                    <p className="text-sm font-semibold text-navy-900">
+                      {studentNameById.get(scan.student_id) ?? "알 수 없는 학생"}
+                    </p>
+                    <p className="mt-1 text-xs text-navy-600">{scan.session_date}</p>
+                  </div>
+                  <ScanStatusBadge status={scan.status} />
+                </Link>
+              ))
+            )}
+          </div>
         </div>
       </Container>
     </Section>

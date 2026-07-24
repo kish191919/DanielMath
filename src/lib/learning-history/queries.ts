@@ -10,7 +10,13 @@ import type {
   Grade,
   Track,
 } from "@/lib/supabase/types";
-import { getCurrentQuarter, compareQuarters, type Quarter } from "@/lib/curriculum-quarter";
+import {
+  getCurrentQuarter,
+  compareQuarters,
+  QUARTERS,
+  type Quarter,
+  type AdvancedStatus,
+} from "@/lib/curriculum-quarter";
 
 const BUCKET = "worksheet-scans";
 
@@ -191,7 +197,7 @@ export async function getConceptAccuracySummary(
   });
 }
 
-export type PaceStatus = "ahead" | "on_pace" | "due" | "not_due" | "unscheduled";
+export type PaceStatus = "ahead" | "on_pace" | "due" | "not_due" | "unscheduled" | "mastered_prior_grade";
 
 export type ConceptHeatmapCell = {
   conceptId: string;
@@ -201,6 +207,7 @@ export type ConceptHeatmapCell = {
   isLowSample: boolean;
   isWeak: boolean;
   quarter: Quarter | null;
+  advancedStatus: AdvancedStatus | null;
   paceStatus: PaceStatus;
 };
 
@@ -209,12 +216,26 @@ export type ConceptHeatmapStrand = {
   cells: ConceptHeatmapCell[];
 };
 
+export type ConceptHeatmapQuarterGroup = {
+  // "quarter": quarter is a real Q1-Q4 value. "mastered_prior_grade": no
+  // quarter this year because the advanced-track student already covered it
+  // in an earlier grade. "unscheduled": genuinely no quarter data (assumed
+  // prerequisite skill / untagged gap). quarter is only meaningful when
+  // groupKind === "quarter".
+  groupKind: "quarter" | "mastered_prior_grade" | "unscheduled";
+  quarter: Quarter | null;
+  strands: ConceptHeatmapStrand[];
+};
+
 function derivePaceStatus(
   quarter: Quarter | null,
+  advancedStatus: AdvancedStatus | null,
   currentQuarter: Quarter,
   total: number,
 ): PaceStatus {
-  if (quarter === null) return "unscheduled";
+  if (quarter === null) {
+    return advancedStatus === "mastered_prior_grade" ? "mastered_prior_grade" : "unscheduled";
+  }
   const isDueOrPast = compareQuarters(quarter, currentQuarter) <= 0;
   if (total > 0) return isDueOrPast ? "on_pace" : "ahead";
   return isDueOrPast ? "due" : "not_due";
@@ -232,7 +253,7 @@ export async function getConceptHeatmap(
   studentId: string,
   grade: Grade,
   track: Track,
-): Promise<ConceptHeatmapStrand[]> {
+): Promise<ConceptHeatmapQuarterGroup[]> {
   const [concepts, summary] = await Promise.all([
     listConcepts(),
     getConceptAccuracySummary(studentId),
@@ -240,12 +261,17 @@ export async function getConceptHeatmap(
   const summaryByConceptId = new Map(summary.map((s) => [s.conceptId, s]));
   const currentQuarter = getCurrentQuarter();
 
-  const strands = new Map<string, ConceptHeatmapCell[]>();
+  type GroupKey = Quarter | "mastered_prior_grade" | "unscheduled";
+  const quarterGroups = new Map<GroupKey, Map<string, ConceptHeatmapCell[]>>();
   for (const concept of concepts) {
     if (!concept.grades.includes(grade)) continue;
     const s = summaryByConceptId.get(concept.id);
     const total = s?.total ?? 0;
     const quarter = track === "advanced" ? concept.quarter_advanced : concept.quarter_standard;
+    const advancedStatus = track === "advanced" ? concept.advanced_status : null;
+    const groupKey: GroupKey =
+      quarter ?? (advancedStatus === "mastered_prior_grade" ? "mastered_prior_grade" : "unscheduled");
+    const strands = quarterGroups.get(groupKey) ?? new Map<string, ConceptHeatmapCell[]>();
     const cells = strands.get(concept.strand) ?? [];
     cells.push({
       conceptId: concept.id,
@@ -255,12 +281,21 @@ export async function getConceptHeatmap(
       isLowSample: s?.isLowSample ?? true,
       isWeak: s?.isWeak ?? false,
       quarter,
-      paceStatus: derivePaceStatus(quarter, currentQuarter, total),
+      advancedStatus,
+      paceStatus: derivePaceStatus(quarter, advancedStatus, currentQuarter, total),
     });
     strands.set(concept.strand, cells);
+    quarterGroups.set(groupKey, strands);
   }
 
-  return [...strands.entries()].map(([strand, cells]) => ({ strand, cells }));
+  const orderedKeys: GroupKey[] = [...QUARTERS, "mastered_prior_grade", "unscheduled"];
+  return orderedKeys
+    .filter((key) => quarterGroups.has(key))
+    .map((key) => ({
+      groupKind: key === "mastered_prior_grade" || key === "unscheduled" ? key : "quarter",
+      quarter: key === "mastered_prior_grade" || key === "unscheduled" ? null : key,
+      strands: [...quarterGroups.get(key)!.entries()].map(([strand, cells]) => ({ strand, cells })),
+    }));
 }
 
 export async function listSessionNotes(studentId: string, limit = 20): Promise<SessionNote[]> {
@@ -309,25 +344,59 @@ export async function listStudentsProgressOverview(): Promise<StudentProgressOve
     .returns<Student[]>();
   if (error) throw new Error(error.message);
 
+  const studentList = students ?? [];
+  if (studentList.length === 0) return [];
+
+  const studentIds = studentList.map((s) => s.id);
   const since = new Date();
   since.setDate(since.getDate() - 30);
   const sinceStr = since.toISOString().slice(0, 10);
 
-  const overview: StudentProgressOverview[] = [];
-  for (const student of students ?? []) {
-    const [items, scans] = await Promise.all([
-      listLearningItems(student.id, { from: sinceStr }),
-      listScansForStudent(student.id),
-    ]);
-    const correct = items.filter((i) => i.is_correct).length;
-    overview.push({
-      student,
-      lastSessionDate: scans[0]?.session_date ?? null,
-      recentAccuracyRate: items.length > 0 ? Math.round((correct / items.length) * 100) : null,
-      recentTotal: items.length,
-    });
+  const [itemsResult, scansResult] = await Promise.all([
+    supabase
+      .from("learning_items")
+      .select("student_id, is_correct")
+      .in("student_id", studentIds)
+      .eq("confirmed", true)
+      .gte("session_date", sinceStr)
+      .returns<Pick<LearningItem, "student_id" | "is_correct">[]>(),
+    supabase
+      .from("worksheet_scans")
+      .select("student_id, session_date")
+      .in("student_id", studentIds)
+      .order("session_date", { ascending: false })
+      .returns<Pick<WorksheetScan, "student_id" | "session_date">[]>(),
+  ]);
+  if (itemsResult.error) throw new Error(itemsResult.error.message);
+  if (scansResult.error) throw new Error(scansResult.error.message);
+
+  const accuracyByStudent = new Map<string, { total: number; correct: number }>();
+  for (const item of itemsResult.data ?? []) {
+    const bucket = accuracyByStudent.get(item.student_id) ?? { total: 0, correct: 0 };
+    bucket.total += 1;
+    if (item.is_correct) bucket.correct += 1;
+    accuracyByStudent.set(item.student_id, bucket);
   }
-  return overview;
+
+  // scansResult.data is ordered desc by session_date, so the first row seen
+  // per student_id is that student's most recent session.
+  const lastSessionByStudent = new Map<string, string>();
+  for (const scan of scansResult.data ?? []) {
+    if (!lastSessionByStudent.has(scan.student_id)) {
+      lastSessionByStudent.set(scan.student_id, scan.session_date);
+    }
+  }
+
+  return studentList.map((student) => {
+    const bucket = accuracyByStudent.get(student.id);
+    return {
+      student,
+      lastSessionDate: lastSessionByStudent.get(student.id) ?? null,
+      recentAccuracyRate:
+        bucket && bucket.total > 0 ? Math.round((bucket.correct / bucket.total) * 100) : null,
+      recentTotal: bucket?.total ?? 0,
+    };
+  });
 }
 
 export type StudentKpiSummary = {
