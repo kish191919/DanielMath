@@ -60,20 +60,6 @@ export function ClassSessionLogForm({
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-navy-800" htmlFor="topic">
-          진도 / Topic
-        </label>
-        <Input name="topic" id="topic" placeholder="3단원 분수의 덧셈" />
-      </div>
-
-      <div>
-        <label className="mb-2 block text-sm font-medium text-navy-800" htmlFor="materials">
-          공통 문제지 / Materials
-        </label>
-        <Input name="materials" id="materials" placeholder="분수 프린트 1~20번" />
-      </div>
-
-      <div>
         <label className="mb-2 block text-sm font-medium text-navy-800" htmlFor="note">
           특이사항 / Note
         </label>
