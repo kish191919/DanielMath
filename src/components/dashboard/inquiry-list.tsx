@@ -1,8 +1,9 @@
 import Link from "next/link";
-import type { Inquiry, InquiryStatus } from "@/lib/supabase/types";
+import type { Inquiry, InquiryNote, InquiryStatus } from "@/lib/supabase/types";
 import { GRADE_LABELS } from "@/lib/students/schema";
 import { INQUIRY_STATUS_LABELS } from "@/lib/inquiries/schema";
 import { updateInquiryStatusAction, deleteInquiryAction } from "@/lib/inquiries/actions";
+import { InquiryNotes } from "@/components/dashboard/inquiry-notes";
 
 const STATUS_BADGE: Record<InquiryStatus, string> = {
   new: "bg-blue-50 text-blue-800",
@@ -24,7 +25,13 @@ function StatusButton({ id, status, label }: { id: string; status: InquiryStatus
   );
 }
 
-export function InquiryList({ inquiries }: { inquiries: Inquiry[] }) {
+export function InquiryList({
+  inquiries,
+  notesByInquiry,
+}: {
+  inquiries: Inquiry[];
+  notesByInquiry: Record<string, InquiryNote[]>;
+}) {
   if (inquiries.length === 0) {
     return (
       <div className="rounded-2xl border border-navy-100 bg-white p-8 text-center text-sm text-navy-600">
@@ -112,6 +119,8 @@ export function InquiryList({ inquiries }: { inquiries: Inquiry[] }) {
           <p className="mt-3 text-right text-xs text-navy-500">
             {new Date(inquiry.created_at).toLocaleString("ko-KR")}
           </p>
+
+          <InquiryNotes inquiryId={inquiry.id} notes={notesByInquiry[inquiry.id] ?? []} />
         </article>
       ))}
     </div>

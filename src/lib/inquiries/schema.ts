@@ -34,3 +34,10 @@ export const inquirySchema = z.object({
 });
 
 export type InquiryValues = z.infer<typeof inquirySchema>;
+
+export const inquiryNoteTextSchema = z.string().min(1, "내용을 입력해주세요.").max(2000);
+
+export const inquiryNoteSchema = z.object({
+  inquiry_id: z.string().uuid(),
+  note: inquiryNoteTextSchema,
+});

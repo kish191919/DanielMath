@@ -4,7 +4,13 @@ import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/dal";
 import { createServerSupabase } from "@/lib/supabase/server";
 import type { InquiryStatus } from "@/lib/supabase/types";
-import { INQUIRY_STATUSES, inquirySchema, type InquiryValues } from "./schema";
+import {
+  INQUIRY_STATUSES,
+  inquirySchema,
+  inquiryNoteSchema,
+  inquiryNoteTextSchema,
+  type InquiryValues,
+} from "./schema";
 
 export type InquiryFormState = {
   ok: boolean;
@@ -73,6 +79,78 @@ export async function deleteInquiryAction(id: string) {
 
   const supabase = await createServerSupabase();
   const { error } = await supabase.from("inquiries").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/dashboard/principal/inquiries");
+}
+
+export type InquiryNoteFormState = {
+  error?: string;
+  fieldErrors?: Partial<Record<"note", string>>;
+  success?: boolean;
+};
+
+export async function addInquiryNoteAction(
+  inquiryId: string,
+  _prev: InquiryNoteFormState | null,
+  formData: FormData,
+): Promise<InquiryNoteFormState> {
+  const session = await requireRole("principal");
+
+  const parsed = inquiryNoteSchema.safeParse({
+    inquiry_id: inquiryId,
+    note: formData.get("note"),
+  });
+  if (!parsed.success) {
+    return {
+      error: "입력값을 확인해주세요.",
+      fieldErrors: { note: parsed.error.issues[0]?.message ?? "내용을 입력해주세요." },
+    };
+  }
+
+  const supabase = await createServerSupabase();
+  const { error } = await supabase.from("inquiry_notes").insert({
+    inquiry_id: parsed.data.inquiry_id,
+    note: parsed.data.note,
+    created_by: session.userId,
+  });
+  if (error) return { error: error.message };
+
+  revalidatePath("/dashboard/principal/inquiries");
+  return { success: true };
+}
+
+export async function updateInquiryNoteAction(
+  noteId: string,
+  _prev: InquiryNoteFormState | null,
+  formData: FormData,
+): Promise<InquiryNoteFormState> {
+  await requireRole("principal");
+
+  const parsed = inquiryNoteTextSchema.safeParse(formData.get("note"));
+  if (!parsed.success) {
+    return {
+      error: "입력값을 확인해주세요.",
+      fieldErrors: { note: parsed.error.issues[0]?.message ?? "내용을 입력해주세요." },
+    };
+  }
+
+  const supabase = await createServerSupabase();
+  const { error } = await supabase
+    .from("inquiry_notes")
+    .update({ note: parsed.data, updated_at: new Date().toISOString() })
+    .eq("id", noteId);
+  if (error) return { error: error.message };
+
+  revalidatePath("/dashboard/principal/inquiries");
+  return { success: true };
+}
+
+export async function deleteInquiryNoteAction(noteId: string) {
+  await requireRole("principal");
+
+  const supabase = await createServerSupabase();
+  const { error } = await supabase.from("inquiry_notes").delete().eq("id", noteId);
   if (error) throw new Error(error.message);
 
   revalidatePath("/dashboard/principal/inquiries");

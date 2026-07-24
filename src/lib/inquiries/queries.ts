@@ -1,6 +1,6 @@
 import "server-only";
 import { createServerSupabase } from "@/lib/supabase/server";
-import type { Inquiry } from "@/lib/supabase/types";
+import type { Inquiry, InquiryNote } from "@/lib/supabase/types";
 
 export async function listInquiries(): Promise<Inquiry[]> {
   const supabase = await createServerSupabase();
@@ -23,4 +23,21 @@ export async function getInquiry(id: string): Promise<Inquiry | null> {
     .maybeSingle<Inquiry>();
 
   return data ?? null;
+}
+
+export async function listInquiryNotesForInquiries(
+  inquiryIds: string[],
+): Promise<InquiryNote[]> {
+  if (inquiryIds.length === 0) return [];
+
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from("inquiry_notes")
+    .select("*")
+    .in("inquiry_id", inquiryIds)
+    .order("created_at", { ascending: false })
+    .returns<InquiryNote[]>();
+
+  if (error) throw new Error(error.message);
+  return data ?? [];
 }

@@ -3,8 +3,11 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
 import { ClassRoster } from "@/components/dashboard/class-roster";
+import { ClassSessionLogForm } from "@/components/dashboard/class-session-log-form";
+import { ClassSessionLogList } from "@/components/dashboard/class-session-log-list";
 import { deleteClassAction } from "@/lib/classes/actions";
 import { getClassRoster, listAvailableStudentsForClass } from "@/lib/classes/queries";
+import { listClassSessions, listAttendanceSummaries } from "@/lib/class-sessions/queries";
 import { requireRole } from "@/lib/dal";
 
 export default async function ClassDetailPage({
@@ -19,6 +22,8 @@ export default async function ClassDetailPage({
   if (!data) notFound();
 
   const availableStudents = await listAvailableStudentsForClass(id);
+  const sessions = await listClassSessions(id);
+  const attendanceBySession = await listAttendanceSummaries(sessions.map((s) => s.id));
 
   return (
     <Section className="py-10 sm:py-14">
@@ -53,6 +58,15 @@ export default async function ClassDetailPage({
             classRow={data.classRow}
             roster={data.roster}
             availableStudents={availableStudents}
+          />
+        </div>
+
+        <div className="mt-8 space-y-6">
+          <ClassSessionLogForm classId={id} roster={data.roster} />
+          <ClassSessionLogList
+            classId={id}
+            sessions={sessions}
+            attendanceBySession={attendanceBySession}
           />
         </div>
       </Container>

@@ -61,6 +61,15 @@ export interface Inquiry {
   created_at: string;
 }
 
+export interface InquiryNote {
+  id: string;
+  inquiry_id: string;
+  note: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Class {
   id: string;
   name: string;
@@ -78,6 +87,28 @@ export interface ClassEnrollment {
   student_id: string;
   enrolled_at: string;
   unenrolled_at: string | null;
+  created_at: string;
+}
+
+export type AttendanceStatus = "present" | "absent" | "late";
+
+export interface ClassSession {
+  id: string;
+  class_id: string;
+  session_date: string;
+  topic: string | null;
+  materials: string | null;
+  note: string | null;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ClassSessionAttendance {
+  id: string;
+  session_id: string;
+  student_id: string;
+  status: AttendanceStatus;
   created_at: string;
 }
 
@@ -216,6 +247,17 @@ type InquiryInsert = {
 
 type InquiryUpdate = Partial<InquiryInsert>;
 
+type InquiryNoteInsert = {
+  id?: string;
+  inquiry_id: string;
+  note: string;
+  created_by: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
+type InquiryNoteUpdate = Partial<InquiryNoteInsert>;
+
 type ClassInsert = {
   id?: string;
   name: string;
@@ -239,6 +281,30 @@ type ClassEnrollmentInsert = {
 };
 
 type ClassEnrollmentUpdate = Partial<ClassEnrollmentInsert>;
+
+type ClassSessionInsert = {
+  id?: string;
+  class_id: string;
+  session_date?: string;
+  topic?: string | null;
+  materials?: string | null;
+  note?: string | null;
+  created_by: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
+type ClassSessionUpdate = Partial<ClassSessionInsert>;
+
+type ClassSessionAttendanceInsert = {
+  id?: string;
+  session_id: string;
+  student_id: string;
+  status: AttendanceStatus;
+  created_at?: string;
+};
+
+type ClassSessionAttendanceUpdate = Partial<ClassSessionAttendanceInsert>;
 
 type ConceptInsert = {
   id?: string;
@@ -378,6 +444,20 @@ export type Database = {
         Update: InquiryUpdate;
         Relationships: [];
       };
+      inquiry_notes: {
+        Row: InquiryNote;
+        Insert: InquiryNoteInsert;
+        Update: InquiryNoteUpdate;
+        Relationships: [
+          {
+            foreignKeyName: "inquiry_notes_inquiry_id_fkey";
+            columns: ["inquiry_id"];
+            isOneToOne: false;
+            referencedRelation: "inquiries";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       classes: {
         Row: Class;
         Insert: ClassInsert;
@@ -398,6 +478,41 @@ export type Database = {
           },
           {
             foreignKeyName: "class_enrollments_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      class_sessions: {
+        Row: ClassSession;
+        Insert: ClassSessionInsert;
+        Update: ClassSessionUpdate;
+        Relationships: [
+          {
+            foreignKeyName: "class_sessions_class_id_fkey";
+            columns: ["class_id"];
+            isOneToOne: false;
+            referencedRelation: "classes";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      class_session_attendance: {
+        Row: ClassSessionAttendance;
+        Insert: ClassSessionAttendanceInsert;
+        Update: ClassSessionAttendanceUpdate;
+        Relationships: [
+          {
+            foreignKeyName: "class_session_attendance_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: false;
+            referencedRelation: "class_sessions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "class_session_attendance_student_id_fkey";
             columns: ["student_id"];
             isOneToOne: false;
             referencedRelation: "students";
