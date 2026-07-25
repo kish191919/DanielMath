@@ -31,6 +31,7 @@ import { WrongAnswerWorkspace, type ItemGroup } from "@/components/dashboard/wro
 import { ScanStatusBadge } from "@/components/dashboard/scan-status-badge";
 import { GRADE_LABELS, TRACK_LABELS } from "@/lib/students/schema";
 import { getCurrentQuarter, QUARTER_LABELS_KO } from "@/lib/curriculum-quarter";
+import { todayInEasternTime } from "@/lib/dates";
 import type { LearningItem } from "@/lib/supabase/types";
 
 const TABS = [
@@ -46,10 +47,6 @@ function daysAgoIso(days: number) {
   const d = new Date();
   d.setDate(d.getDate() - days);
   return d.toISOString().slice(0, 10);
-}
-
-function todayIso() {
-  return new Date().toISOString().slice(0, 10);
 }
 
 function resolveTab(raw: string | undefined): Tab {
@@ -93,7 +90,7 @@ export default async function StudentHistoryPage({
   const weakConceptCount = recentSummary.filter((s) => s.isWeak).length;
 
   const periodFrom = rawFrom || daysAgoIso(30);
-  const periodTo = rawTo || todayIso();
+  const periodTo = rawTo || todayInEasternTime();
   const periodItems = items.filter(
     (i) => !i.is_correct && i.session_date >= periodFrom && i.session_date <= periodTo,
   );

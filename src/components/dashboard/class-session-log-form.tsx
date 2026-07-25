@@ -14,10 +14,7 @@ import {
 import { createClassSessionAction, type ClassSessionFormState } from "@/lib/class-sessions/actions";
 import type { ClassRosterEntry } from "@/lib/classes/queries";
 import type { AttendanceStatus, HomeworkStatus } from "@/lib/supabase/types";
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
+import { todayInEasternTime } from "@/lib/dates";
 
 export function ClassSessionLogForm({
   classId,
@@ -51,7 +48,13 @@ export function ClassSessionLogForm({
         <label className="mb-2 block text-sm font-medium text-navy-800" htmlFor="session_date">
           날짜 / Date
         </label>
-        <Input type="date" name="session_date" id="session_date" defaultValue={todayStr()} required />
+        <Input
+          type="date"
+          name="session_date"
+          id="session_date"
+          defaultValue={todayInEasternTime()}
+          required
+        />
         {state?.fieldErrors?.session_date && (
           <p className="mt-1 text-xs text-red-600" role="alert">
             {state.fieldErrors.session_date}

@@ -129,6 +129,7 @@ export async function retryGradingAction(scanId: string) {
   }
 
   revalidatePath(`/dashboard/principal/worksheets/${scanId}`);
+  revalidatePath("/dashboard/principal");
 }
 
 export type ReviewResult = { error: string } | { ok: true };

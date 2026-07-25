@@ -16,6 +16,19 @@ export async function listClassSessions(classId: string): Promise<ClassSession[]
   return data ?? [];
 }
 
+export async function listSessionsByDate(date: string): Promise<ClassSession[]> {
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from("class_sessions")
+    .select("*")
+    .eq("session_date", date)
+    .order("created_at", { ascending: false })
+    .returns<ClassSession[]>();
+
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
 export type AttendanceSummary = {
   total: number;
   present: number;

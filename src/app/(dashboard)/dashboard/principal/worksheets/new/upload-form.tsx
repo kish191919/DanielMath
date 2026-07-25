@@ -9,18 +9,15 @@ import { Select } from "@/components/ui/select";
 import { GRADE_LABELS } from "@/lib/students/schema";
 import { createUploadUrlAction, confirmUploadAction } from "@/lib/learning-history/actions";
 import { createBrowserSupabase } from "@/lib/supabase/browser";
+import { todayInEasternTime } from "@/lib/dates";
 import type { Student } from "@/lib/supabase/types";
 
 const BUCKET = "worksheet-scans";
 
-function todayIso() {
-  return new Date().toISOString().slice(0, 10);
-}
-
 export function UploadForm({ students }: { students: Student[] }) {
   const router = useRouter();
   const [studentId, setStudentId] = React.useState("");
-  const [sessionDate, setSessionDate] = React.useState(todayIso());
+  const [sessionDate, setSessionDate] = React.useState(todayInEasternTime());
   const [file, setFile] = React.useState<File | null>(null);
   const [status, setStatus] = React.useState<"idle" | "uploading" | "grading">("idle");
   const [error, setError] = React.useState<string | null>(null);
