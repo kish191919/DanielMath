@@ -13,7 +13,7 @@ export function DashboardHeader({ email }: { email: string }) {
               {siteConfig.name}
             </span>
             <span className="hidden text-xs text-navy-600 sm:inline font-ko" lang="ko">
-              Dashboard
+              대시보드
             </span>
           </Link>
           <div className="flex items-center gap-3">
@@ -22,14 +22,14 @@ export function DashboardHeader({ email }: { email: string }) {
               href="/"
               className="rounded-md border border-navy-200 px-3 py-1.5 text-xs font-medium text-navy-700 hover:bg-navy-50"
             >
-              홈페이지 / Home
+              홈페이지
             </Link>
             <form action={signOutAction}>
               <button
                 type="submit"
                 className="rounded-md border border-navy-200 px-3 py-1.5 text-xs font-medium text-navy-700 hover:bg-navy-50"
               >
-                로그아웃 / Sign out
+                로그아웃
               </button>
             </form>
           </div>

@@ -24,7 +24,7 @@ export default async function NewWorksheetScanPage() {
             학습지 업로드
           </h1>
           <p className="mt-2 text-sm text-navy-700 font-ko" lang="ko">
-            사진(JPG/PNG) 또는 스캔한 PDF 한 파일을 학생 1명당 업로드하세요.
+            카메라로 여러 페이지를 연속 촬영하거나, 사진(JPG/PNG) 또는 스캔한 PDF 파일을 학생 1명당 업로드하세요.
           </p>
         </div>
         <div className="mt-8">

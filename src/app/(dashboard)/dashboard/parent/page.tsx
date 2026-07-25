@@ -7,14 +7,12 @@ const cards = [
   {
     href: "/dashboard/parent/children",
     title: "자녀",
-    titleEn: "Children",
     description: "등록된 자녀와 학년 정보를 확인합니다.",
     ready: true,
   },
   {
     href: "/dashboard/parent/progress",
     title: "진행 상황",
-    titleEn: "Progress",
     description: "개념별 정답률과 선생님이 남긴 학습 리포트를 확인합니다.",
     ready: true,
   },
@@ -28,7 +26,7 @@ export default async function ParentHome() {
       <Container>
         <div className="max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-wider text-navy-500">
-            Parent · 학부모
+            학부모
           </p>
           <h1 className="mt-2 text-2xl font-bold text-navy-900 sm:text-3xl">
             안녕하세요, {session.profile.full_name ?? session.email} 학부모님
@@ -46,9 +44,6 @@ export default async function ParentHome() {
                 <h2 className="text-lg font-semibold text-navy-900 font-ko" lang="ko">
                   {card.title}
                 </h2>
-                <span className="text-xs font-medium text-navy-500">
-                  {card.titleEn}
-                </span>
               </div>
               <p className="mt-3 flex-1 text-sm text-navy-700 font-ko" lang="ko">
                 {card.description}

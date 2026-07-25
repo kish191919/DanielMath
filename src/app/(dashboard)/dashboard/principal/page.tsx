@@ -52,7 +52,7 @@ export default async function PrincipalHome() {
       <Container>
         <div className="max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-wider text-navy-500">
-            Principal · 원장
+            원장
           </p>
           <h1 className="mt-2 text-2xl font-bold text-navy-900 sm:text-3xl">
             안녕하세요, {session.profile.full_name ?? session.email} 선생님
