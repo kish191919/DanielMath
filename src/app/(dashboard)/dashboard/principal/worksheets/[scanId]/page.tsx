@@ -13,8 +13,11 @@ import {
 import { retryGradingAction } from "@/lib/learning-history/actions";
 import { getStudent } from "@/lib/students/queries";
 import { SCAN_STATUS_LABELS } from "@/lib/learning-history/schema";
+import { GradingStatusPoller } from "./grading-status-poller";
 
-// retryGradingAction re-runs the same potentially slow Claude Vision call.
+// retryGradingAction kicks off the same potentially slow Claude Vision call
+// via after(), which shares this route's duration budget even though it now
+// runs after the response is sent rather than blocking it.
 export const maxDuration = 180;
 
 export default async function WorksheetScanReviewPage({
@@ -64,6 +67,20 @@ export default async function WorksheetScanReviewPage({
               // eslint-disable-next-line @next/next/no-img-element
               <img src={viewUrl} alt="원본 스캔" className="max-h-[600px] w-full object-contain" />
             )}
+          </div>
+        )}
+
+        <GradingStatusPoller isGrading={scan.status === "grading"} />
+
+        {scan.status === "grading" && (
+          <div className="mt-6 flex items-center gap-3 rounded-2xl border border-navy-100 bg-navy-50/50 p-5">
+            <span
+              className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-navy-300 border-t-navy-700"
+              aria-hidden="true"
+            />
+            <p className="text-sm font-medium text-navy-800 font-ko" lang="ko">
+              AI가 채점 중입니다. 완료되면 화면이 자동으로 갱신됩니다.
+            </p>
           </div>
         )}
 

@@ -11,7 +11,7 @@ import { GRADE_LABELS } from "@/lib/students/schema";
 import { createUploadUrlAction, confirmUploadAction } from "@/lib/learning-history/actions";
 import { createBrowserSupabase } from "@/lib/supabase/browser";
 import { todayInEasternTime } from "@/lib/dates";
-import { assembleScanPdf, type CapturedPage } from "@/lib/images/build-scan-pdf";
+import { assembleScanPdf, compressImageFileToJpeg, type CapturedPage } from "@/lib/images/build-scan-pdf";
 import { CameraCapture } from "./camera-capture";
 import type { Student } from "@/lib/supabase/types";
 
@@ -67,7 +67,17 @@ export function UploadForm({ students }: { students: Student[] }) {
   }
 
   async function resolveUploadFile(): Promise<File | null> {
-    if (pickedFile) return pickedFile;
+    if (pickedFile) {
+      // Camera-captured pages are already resized/compressed by
+      // assembleScanPdf below; directly picked image files aren't, so a
+      // multi-MB phone photo would otherwise upload (and get graded) at full
+      // size. PDFs are left untouched — recompressing them is out of scope.
+      if (pickedFile.type === "image/jpeg" || pickedFile.type === "image/png") {
+        const compressed = await compressImageFileToJpeg(pickedFile);
+        return new File([compressed], pickedFile.name, { type: "image/jpeg" });
+      }
+      return pickedFile;
+    }
     if (cameraPages && cameraPages.length > 0) {
       const pdfBlob = await assembleScanPdf(cameraPages.map((p) => p.blob));
       return new File([pdfBlob], "scan.pdf", { type: "application/pdf" });

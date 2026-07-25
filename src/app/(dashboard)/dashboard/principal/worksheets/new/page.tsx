@@ -5,8 +5,9 @@ import { requireRole } from "@/lib/dal";
 import { listStudents } from "@/lib/students/queries";
 
 // Grading a multi-page scan can take a while (Claude Vision + adaptive
-// thinking); give the Server Action triggered from this page room to finish
-// on serverless deployments instead of the platform's default timeout.
+// thinking). It now runs via after() rather than blocking the response, but
+// after() callbacks still share this route's duration budget, so this stays
+// well above the platform's default timeout.
 export const maxDuration = 180;
 
 export default async function NewWorksheetScanPage() {

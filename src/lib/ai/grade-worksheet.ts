@@ -219,16 +219,24 @@ export async function gradeWorksheetScan(scanId: string): Promise<void> {
   const client = getClaudeClient();
   const systemBlocks = buildSystemBlocks(conceptList);
 
-  // Sequential, not Promise.all: chunk 2+ can only read the prompt cache
-  // chunk 1 just wrote if they run one at a time, and a specific chunk's
-  // page range is only meaningful to report in an error if calls aren't
-  // interleaved. One failing chunk aborts the whole grading attempt (no
-  // partial writes below), matching the previous all-or-nothing behavior.
-  const allItems: GradedItem[] = [];
-  for (const chunk of chunks) {
-    const items = await gradeChunk(client, systemBlocks, scan.mime_type, chunk, scanId);
-    allItems.push(...items);
-  }
+  // Chunk 1 runs alone and awaited so it finishes writing the prompt cache
+  // before any other chunk starts reading it. Chunks 2+ only need that
+  // cache to already exist (not to run one-at-a-time themselves), so once
+  // it's warm they fire concurrently via Promise.all — turning total
+  // latency from sum(chunk times) into roughly chunk1 + max(rest). One
+  // failing chunk still aborts the whole grading attempt (no partial writes
+  // below): Promise.all rejects with that chunk's error, which still
+  // reports its correct page range via the describeChunkRange() closure in
+  // gradeChunk(), matching the previous all-or-nothing behavior.
+  const [firstChunk, ...restChunks] = chunks;
+  const firstItems = await gradeChunk(client, systemBlocks, scan.mime_type, firstChunk, scanId);
+  const restItems =
+    restChunks.length > 0
+      ? await Promise.all(
+          restChunks.map((chunk) => gradeChunk(client, systemBlocks, scan.mime_type, chunk, scanId)),
+        )
+      : [];
+  const allItems: GradedItem[] = [firstItems, ...restItems].flat();
 
   if (allItems.length > 0) {
     const rows = allItems.map((item) => {

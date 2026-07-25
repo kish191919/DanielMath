@@ -44,6 +44,41 @@ export async function compressFrameToJpeg(
   return blob;
 }
 
+// Directly picked files (vs. camera-captured frames) skip the resize/compress
+// step above, so a multi-MB phone photo gets base64-encoded and uploaded at
+// full size. This mirrors compressFrameToJpeg's canvas-based approach for
+// that upload path. PNGs can carry transparency, which canvas composites as
+// black by default, so the canvas is filled white before drawing to avoid a
+// black background appearing after the JPEG conversion.
+export async function compressImageFileToJpeg(
+  file: File,
+  maxDimension = MAX_DIMENSION_PX,
+  quality = JPEG_QUALITY,
+): Promise<Blob> {
+  const objectUrl = URL.createObjectURL(file);
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image();
+      el.onload = () => resolve(el);
+      el.onerror = () => reject(new Error("이미지를 불러오지 못했습니다."));
+      el.src = objectUrl;
+    });
+
+    const canvas = document.createElement("canvas");
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("캔버스를 생성할 수 없습니다.");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0);
+
+    return compressFrameToJpeg(canvas, maxDimension, quality);
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
 export async function assembleScanPdf(pages: Blob[]): Promise<Blob> {
   const pdfDoc = await PDFDocument.create();
   for (const pageBlob of pages) {

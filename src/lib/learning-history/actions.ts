@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { requireRole } from "@/lib/dal";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { createAdminSupabase } from "@/lib/supabase/admin";
@@ -24,8 +25,13 @@ const EXT_BY_MIME: Record<string, string> = {
 };
 
 async function markGradingFailed(scanId: string, err: unknown) {
-  const supabase = await createServerSupabase();
-  await supabase
+  // Runs inside after() below, after the response/redirect has already been
+  // sent — uses the admin client (not createServerSupabase()) so it doesn't
+  // depend on request cookies still being valid in that deferred context.
+  // Authorization already happened synchronously via requireRole() before
+  // after() was registered.
+  const admin = createAdminSupabase();
+  await admin
     .from("worksheet_scans")
     .update({
       status: "grading_failed",
@@ -102,11 +108,16 @@ export async function confirmUploadAction(
   });
   if (error) return { error: error.message };
 
-  try {
-    await gradeWorksheetScan(input.scanId);
-  } catch (err) {
-    await markGradingFailed(input.scanId, err);
-  }
+  // Grading (Claude Vision, tens of seconds) runs after this response is
+  // sent instead of blocking it, so the principal lands on the "grading"
+  // page immediately; GradingStatusPoller there picks up completion.
+  after(async () => {
+    try {
+      await gradeWorksheetScan(input.scanId);
+    } catch (err) {
+      await markGradingFailed(input.scanId, err);
+    }
+  });
 
   revalidatePath("/dashboard/principal/worksheets");
   redirect(`/dashboard/principal/worksheets/${input.scanId}`);
@@ -122,11 +133,13 @@ export async function retryGradingAction(scanId: string) {
     .update({ status: "grading", grading_error: null })
     .eq("id", scanId);
 
-  try {
-    await gradeWorksheetScan(scanId);
-  } catch (err) {
-    await markGradingFailed(scanId, err);
-  }
+  after(async () => {
+    try {
+      await gradeWorksheetScan(scanId);
+    } catch (err) {
+      await markGradingFailed(scanId, err);
+    }
+  });
 
   revalidatePath(`/dashboard/principal/worksheets/${scanId}`);
   revalidatePath("/dashboard/principal");
