@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ERROR_TYPE_LABELS } from "@/lib/learning-history/schema";
 import { generatePracticeSheetAction } from "@/lib/practice-sheets/actions";
@@ -11,6 +12,27 @@ export type ItemGroup = {
   label?: string;
   items: LearningItem[];
 };
+
+function InfoTooltip({ text }: { text: string }) {
+  return (
+    <span className="group relative inline-flex">
+      <button
+        type="button"
+        tabIndex={0}
+        aria-label="설명"
+        className="inline-flex h-4 w-4 items-center justify-center rounded-full text-navy-400 hover:text-navy-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy-500 focus-visible:ring-offset-2"
+      >
+        <Info className="h-3.5 w-3.5" />
+      </button>
+      <span
+        role="tooltip"
+        className="pointer-events-none absolute bottom-full left-1/2 mb-2 w-56 -translate-x-1/2 rounded-lg bg-navy-900 px-3 py-2 text-xs leading-snug text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+      >
+        {text}
+      </span>
+    </span>
+  );
+}
 
 export function WrongAnswerWorkspace({
   studentId,
@@ -97,7 +119,10 @@ export function WrongAnswerWorkspace({
       <div className="fixed inset-x-0 bottom-0 z-10 border-t border-navy-100 bg-white/95 px-4 py-3 backdrop-blur">
         <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3 text-sm text-navy-700">
-            <span>{selectedIds.length}개 선택됨</span>
+            <span className="inline-flex items-center gap-1.5">
+              {selectedIds.length}개 선택됨
+              <InfoTooltip text="체크한 오답을 바탕으로 AI가 비슷한 유형의 연습 문제를 생성합니다. '문항당 개수'는 오답 1개마다 만들 유사문제 수입니다." />
+            </span>
             <label className="flex items-center gap-1.5">
               문항당
               <input

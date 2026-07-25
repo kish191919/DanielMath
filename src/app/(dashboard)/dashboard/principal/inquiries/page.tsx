@@ -5,9 +5,18 @@ import { listInquiries, listInquiryNotesForInquiries } from "@/lib/inquiries/que
 import { requireRole } from "@/lib/dal";
 import type { InquiryNote } from "@/lib/supabase/types";
 
-export default async function PrincipalInquiriesPage() {
+export default async function PrincipalInquiriesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
   await requireRole("principal");
-  const inquiries = await listInquiries();
+  const { status } = await searchParams;
+  const isNewFilter = status === "new";
+  const allInquiries = await listInquiries();
+  const inquiries = isNewFilter
+    ? allInquiries.filter((inquiry) => inquiry.status === "new")
+    : allInquiries;
   const notes = await listInquiryNotesForInquiries(inquiries.map((inquiry) => inquiry.id));
   const notesByInquiry: Record<string, InquiryNote[]> = {};
   for (const note of notes) {
@@ -26,7 +35,9 @@ export default async function PrincipalInquiriesPage() {
               상담 문의
             </h1>
           </div>
-          <p className="text-sm text-navy-600">총 {inquiries.length}건</p>
+          <p className="text-sm text-navy-600">
+            {isNewFilter ? `신규 문의 ${inquiries.length}건` : `총 ${inquiries.length}건`}
+          </p>
         </div>
 
         <div className="mt-8">

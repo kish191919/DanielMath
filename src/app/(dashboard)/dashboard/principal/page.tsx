@@ -63,10 +63,18 @@ export default async function PrincipalHome() {
         </div>
 
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <StatTile label="학생" value={students.length} />
-          <StatTile label="반" value={classesWithCounts.length} />
-          <StatTile label="채점 대기" value={pendingScans.length} />
-          <StatTile label="신규 문의" value={allNewInquiries.length} />
+          <StatTile label="학생" value={students.length} href="/dashboard/principal/students" />
+          <StatTile label="반" value={classesWithCounts.length} href="/dashboard/principal/classes" />
+          <StatTile
+            label="채점 대기"
+            value={pendingScans.length}
+            href="/dashboard/principal/worksheets?status=pending"
+          />
+          <StatTile
+            label="신규 문의"
+            value={allNewInquiries.length}
+            href="/dashboard/principal/inquiries?status=new"
+          />
         </div>
 
         <div className="mt-6">

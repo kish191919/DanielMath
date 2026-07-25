@@ -60,6 +60,17 @@ function buildConceptTrend(items: LearningItem[], conceptId: string | null) {
     .slice(-TREND_WINDOW);
 }
 
+function groupByStrand<T extends { strand: string | null }>(rows: T[]): [string, T[]][] {
+  const groups = new Map<string, T[]>();
+  for (const row of rows) {
+    const key = row.strand ?? "미분류";
+    const group = groups.get(key) ?? [];
+    group.push(row);
+    groups.set(key, group);
+  }
+  return [...groups.entries()];
+}
+
 export default async function StudentHistoryPage({
   params,
   searchParams,
@@ -88,12 +99,15 @@ export default async function StudentHistoryPage({
 
   const allTimeByConceptId = new Map(allTimeSummary.map((s) => [s.conceptId, s]));
   const weakConceptCount = recentSummary.filter((s) => s.isWeak).length;
+  const strandGroups = groupByStrand(recentSummary);
 
   const periodFrom = rawFrom || daysAgoIso(30);
   const periodTo = rawTo || todayInEasternTime();
   const periodItems = items.filter(
     (i) => !i.is_correct && i.session_date >= periodFrom && i.session_date <= periodTo,
   );
+
+  const scansById = new Map(scans.map((s) => [s.id, s]));
 
   const sessionGroups = new Map<string, LearningItem[]>();
   for (const item of items) {
@@ -107,11 +121,14 @@ export default async function StudentHistoryPage({
   );
 
   const periodGroups: ItemGroup[] = [{ key: "period", items: periodItems }];
-  const sessionItemGroups: ItemGroup[] = sortedSessionGroups.map(([scanId, groupItems]) => ({
-    key: scanId,
-    label: `학습지 (${groupItems[0].session_date}) · ${groupItems.length}문항`,
-    items: groupItems,
-  }));
+  const sessionItemGroups: ItemGroup[] = sortedSessionGroups.map(([scanId, groupItems]) => {
+    const name = scansById.get(scanId)?.original_filename ?? groupItems[0].session_date;
+    return {
+      key: scanId,
+      label: `학습지 (${name}) · ${groupItems.length}문항`,
+      items: groupItems,
+    };
+  });
 
   return (
     <Section className="py-10 sm:py-14">
@@ -188,7 +205,7 @@ export default async function StudentHistoryPage({
                 설명 보기
               </summary>
               <p className="mt-1 text-xs text-navy-500">
-                최근 30일 vs 전체 누적 · 취약(주의필요) 개념이 상단에 정렬됩니다
+                단원(strand)별로 묶여 표시됩니다 · 최근 30일 vs 전체 누적 · 취약(주의필요) 개념이 상단에 정렬됩니다
               </p>
             </details>
 
@@ -197,63 +214,69 @@ export default async function StudentHistoryPage({
                 아직 확정된 학습이력이 없습니다.
               </div>
             ) : (
-              <div className="mt-4 overflow-x-auto rounded-2xl border border-navy-100 bg-white shadow-sm">
-                <table className="w-full text-left text-sm">
-                  <thead className="bg-navy-50/50 text-xs uppercase tracking-wide text-navy-500">
-                    <tr>
-                      <th className="px-4 py-2.5">개념</th>
-                      <th className="px-4 py-2.5">최근 30일</th>
-                      <th className="px-4 py-2.5">전체 누적</th>
-                      <th className="px-4 py-2.5">최근 추이</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recentSummary.map((row) => {
-                      const allTime = allTimeByConceptId.get(row.conceptId);
-                      const trend = buildConceptTrend(items, row.conceptId);
-                      return (
-                        <tr key={row.conceptId ?? "unassigned"} className="border-t border-navy-100">
-                          <td className="px-4 py-2.5">
-                            <div className="flex flex-wrap items-center gap-1.5">
-                              <span className="font-medium text-navy-900">{row.label}</span>
-                              {row.strand && (
-                                <span className="text-xs text-navy-500">{row.strand}</span>
-                              )}
-                              {row.isWeak && (
-                                <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
-                                  주의필요
-                                </span>
-                              )}
-                              {row.isLowSample && (
-                                <span className="rounded-full bg-navy-50 px-2 py-0.5 text-xs font-medium text-navy-500">
-                                  표본부족
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-4 py-2.5 text-navy-700">
-                            {row.accuracyRate}% ({row.correct}/{row.total})
-                          </td>
-                          <td className="px-4 py-2.5 text-navy-700">
-                            {allTime ? `${allTime.accuracyRate}% (${allTime.correct}/${allTime.total})` : "-"}
-                          </td>
-                          <td className="px-4 py-2.5 tracking-widest">
-                            {trend.length === 0
-                              ? "-"
-                              : trend.map((t, idx) => (
-                                  <span
-                                    key={idx}
-                                    className={t.is_correct ? "text-green-600" : "text-red-600"}
-                                  >
-                                    {t.is_correct ? "✓" : "✗"}
-                                  </span>
-                                ))}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+              <div className="mt-4 space-y-6">
+                {strandGroups.map(([strand, rows]) => (
+                  <div key={strand}>
+                    <h3 className="text-sm font-semibold text-navy-800 font-ko" lang="ko">
+                      {strand}
+                    </h3>
+                    <div className="mt-2 overflow-x-auto rounded-2xl border border-navy-100 bg-white shadow-sm">
+                      <table className="w-full text-left text-sm">
+                        <thead className="bg-navy-50/50 text-xs uppercase tracking-wide text-navy-500">
+                          <tr>
+                            <th className="px-4 py-2.5">개념</th>
+                            <th className="px-4 py-2.5">최근 30일</th>
+                            <th className="px-4 py-2.5">전체 누적</th>
+                            <th className="px-4 py-2.5">최근 추이</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {rows.map((row) => {
+                            const allTime = allTimeByConceptId.get(row.conceptId);
+                            const trend = buildConceptTrend(items, row.conceptId);
+                            return (
+                              <tr key={row.conceptId ?? "unassigned"} className="border-t border-navy-100">
+                                <td className="px-4 py-2.5">
+                                  <div className="flex flex-wrap items-center gap-1.5">
+                                    <span className="font-medium text-navy-900">{row.label}</span>
+                                    {row.isWeak && (
+                                      <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
+                                        주의필요
+                                      </span>
+                                    )}
+                                    {row.isLowSample && (
+                                      <span className="rounded-full bg-navy-50 px-2 py-0.5 text-xs font-medium text-navy-500">
+                                        표본부족
+                                      </span>
+                                    )}
+                                  </div>
+                                </td>
+                                <td className="px-4 py-2.5 text-navy-700">
+                                  {row.accuracyRate}% ({row.correct}/{row.total})
+                                </td>
+                                <td className="px-4 py-2.5 text-navy-700">
+                                  {allTime ? `${allTime.accuracyRate}% (${allTime.correct}/${allTime.total})` : "-"}
+                                </td>
+                                <td className="px-4 py-2.5 tracking-widest">
+                                  {trend.length === 0
+                                    ? "-"
+                                    : trend.map((t, idx) => (
+                                        <span
+                                          key={idx}
+                                          className={t.is_correct ? "text-green-600" : "text-red-600"}
+                                        >
+                                          {t.is_correct ? "✓" : "✗"}
+                                        </span>
+                                      ))}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
 
@@ -387,7 +410,7 @@ export default async function StudentHistoryPage({
         {tab === "period" && (
           <div className="mt-8">
             <h2 className="text-lg font-semibold text-navy-900 font-ko" lang="ko">
-              기간별 오답
+              기간별 오답 · 유사문제 생성
             </h2>
             <form method="get" className="mt-3 flex flex-wrap items-end gap-3">
               <input type="hidden" name="tab" value="period" />
@@ -438,7 +461,14 @@ export default async function StudentHistoryPage({
                     href={`/dashboard/principal/worksheets/${scan.id}`}
                     className="flex items-center justify-between gap-3 rounded-xl border border-navy-100 bg-white p-3 shadow-sm transition-colors hover:border-navy-300 hover:bg-navy-50"
                   >
-                    <span className="text-sm text-navy-800">{scan.session_date}</span>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-navy-800">
+                        {scan.original_filename ?? scan.session_date}
+                      </span>
+                      {scan.original_filename && (
+                        <span className="text-xs text-navy-500">{scan.session_date}</span>
+                      )}
+                    </div>
                     <ScanStatusBadge status={scan.status} />
                   </Link>
                 ))
@@ -446,7 +476,7 @@ export default async function StudentHistoryPage({
             </div>
 
             <h3 className="mt-8 text-base font-semibold text-navy-900 font-ko" lang="ko">
-              학습지별 오답
+              학습지별 오답 · 유사문제 생성
             </h3>
             <div className="mt-4">
               <WrongAnswerWorkspace studentId={id} groups={sessionItemGroups} />

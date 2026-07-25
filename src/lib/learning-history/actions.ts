@@ -252,6 +252,28 @@ export async function addSessionNoteAction(
   return { success: true };
 }
 
+export async function deleteWorksheetScanAction(scanId: string, studentId: string) {
+  await requireRole("principal");
+
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from("worksheet_scans")
+    .delete()
+    .eq("id", scanId)
+    .select("storage_path")
+    .single();
+  if (error) throw new Error(error.message);
+
+  if (data?.storage_path) {
+    const admin = createAdminSupabase();
+    await admin.storage.from(BUCKET).remove([data.storage_path]);
+  }
+
+  revalidatePath("/dashboard/principal/worksheets");
+  revalidatePath(`/dashboard/principal/students/${studentId}/history`);
+  revalidatePath("/dashboard/parent/progress");
+}
+
 export type PublishSessionNoteState = {
   error?: string;
   fieldErrors?: Partial<Record<"note", string>>;
