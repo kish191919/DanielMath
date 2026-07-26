@@ -3,6 +3,12 @@ import type { InquiryStatus } from "@/lib/supabase/types";
 
 export const INQUIRY_GRADES = ["3", "4", "5", "6"] as const;
 export const INQUIRY_LANGUAGES = ["ko", "en"] as const;
+export const INQUIRY_TYPES = ["consult", "trial"] as const;
+
+export const INQUIRY_TYPE_LABELS: Record<(typeof INQUIRY_TYPES)[number], string> = {
+  consult: "상담 문의",
+  trial: "무료 진단·체험 수업",
+};
 
 export const INQUIRY_STATUSES: readonly InquiryStatus[] = [
   "new",
@@ -31,6 +37,8 @@ export const inquirySchema = z.object({
   school: z.string().max(200).optional().or(z.literal("")),
   language: z.enum(INQUIRY_LANGUAGES),
   message: z.string().max(2000).optional().or(z.literal("")),
+  inquiryType: z.enum(INQUIRY_TYPES).default("consult"),
+  referredBy: z.string().max(100).optional().or(z.literal("")),
 });
 
 export type InquiryValues = z.infer<typeof inquirySchema>;

@@ -10,8 +10,10 @@ export function SiteFooter({ locale }: { locale: Locale }) {
 
   const navLinks = [
     { href: "/programs", label: "Programs", labelKo: "프로그램" },
+    { href: "/pricing", label: "Pricing", labelKo: "수업료 안내" },
     { href: "/resources", label: "Math Curriculum", labelKo: "수학 교육과정" },
     { href: "/school-calendar", label: "School Calendar", labelKo: "학교 캘린더" },
+    { href: "/referral", label: "Referral Program", labelKo: "추천 프로그램" },
     { href: "/blog", label: "Blog", labelKo: "블로그" },
   ];
 

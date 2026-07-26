@@ -20,6 +20,7 @@ const ko = {
       subtitle: "4명 정원, 학년 구분 없이 실력별로 배정됩니다.",
       desc: "배치 진단부터 오답 관리까지, 한 수업에",
       ctaInquire: "상담 신청",
+      ctaTrial: "무료 진단·체험 신청",
       ctaPrograms: "프로그램 보기",
     },
     stats: [
@@ -109,6 +110,7 @@ const ko = {
       highlightKo: "상담 신청",
       desc: "등록 가능 인원이 제한적입니다. 자녀의 현재 수준을 알려주시면 가장 적합한 반으로 안내해드립니다.",
       ctaInquire: "상담 신청",
+      ctaTrial: "무료 진단·체험 신청",
       ctaPrograms: "프로그램 보기",
     },
   },
@@ -203,12 +205,14 @@ const ko = {
     titleKo: "Tell us about your child.",
     desc: "아래 정보를 남겨주시면 24시간 내 회신드립니다. 무료 진단 일정도 함께 안내해드립니다.",
     form: {
+      inquiryType: { label: "문의 유형", consult: "상담 문의", trial: "무료 진단·체험 수업 신청" },
       parentName: { label: "학부모 성함", placeholder: "홍길동" },
       email: { label: "이메일" },
       phone: { label: "연락처" },
       childName: { label: "자녀 이름", placeholder: "자녀 이름" },
       grade: { label: "학년", placeholder: "학년 선택" },
       school: { label: "현재 학교 (선택)" },
+      referredBy: { label: "추천인 (선택)", placeholder: "추천해주신 학부모님 성함" },
       language: { label: "응답 선호 언어" },
       message: { label: "문의 내용 (선택)", placeholder: "자녀의 현재 수학 수준, 목표, 또는 궁금한 점을 자유롭게 적어주세요." },
       submit: "상담 신청하기",
@@ -223,6 +227,45 @@ const ko = {
       grade: "학년을 선택해주세요.",
       submitFailed: "제출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
     },
+  },
+  pricing: {
+    meta: {
+      title: "수업료 안내",
+      description: "Daniel Math Academy 수업료는 배치 진단 후 학생별 맞춤 상담으로 안내됩니다.",
+    },
+    eyebrow: "수업료 안내",
+    title: "수업료는 상담 후 맞춤 안내해드립니다",
+    titleKo: "",
+    desc: "무학년 소수 정예 수업 특성상, 학생의 배치 진단 결과와 선택하시는 요일·횟수에 따라 수업료가 달라집니다. 문의 주시면 자녀에게 맞는 반과 수업료를 함께 안내해드립니다.",
+    points: [
+      {
+        title: "배치 진단 후 맞춤 안내",
+        desc: "등록 전 무료 배치 진단으로 실력 수준을 확인한 뒤, 가장 적합한 반과 수업료를 안내해드립니다.",
+      },
+      {
+        title: "요일·횟수에 따라 달라집니다",
+        desc: "주 1~4회 중 원하시는 횟수를 선택할 수 있어, 선택하시는 스케줄에 따라 월 수업료가 달라집니다.",
+      },
+      {
+        title: "형제·자매 등록 안내",
+        desc: "두 자녀 이상 등록하시는 경우 별도 안내가 가능합니다. 상담 시 문의해주세요.",
+      },
+    ],
+    cta: "상담 신청하고 수업료 안내받기",
+  },
+  referral: {
+    meta: {
+      title: "추천 프로그램",
+      description: "Daniel Math Academy를 주변 학부모님께 추천해주세요. 추천으로 등록하신 가정에는 감사의 마음을 전해드립니다.",
+    },
+    eyebrow: "추천 프로그램",
+    title: "함께한 학부모님이 가장 큰 힘이 됩니다",
+    titleKo: "",
+    desc: "이미 Daniel Math Academy를 경험하신 학부모님의 추천은 무엇보다 소중합니다. 주변에 추천해주시면, 추천으로 등록한 가정과 추천해주신 가정 모두에게 감사의 마음을 전해드립니다.",
+    howTitle: "추천 방법",
+    howDesc: "새로 등록을 원하시는 학부모님이 상담 신청 폼에서 추천인 성함을 남겨주시면 됩니다. 별도 코드나 절차 없이, 자연스럽게 추천해주세요.",
+    note: "리워드 내용과 지급 방식은 상담 시 안내드립니다.",
+    cta: "상담 신청하기",
   },
   thanks: {
     meta: {

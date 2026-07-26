@@ -22,6 +22,7 @@ const en: Dictionary = {
       subtitle: "4 students per class. No grade levels — placed by ability.",
       desc: "From placement diagnostic to mistake tracking, all in one class",
       ctaInquire: "Schedule a Consult",
+      ctaTrial: "Book a Free Trial",
       ctaPrograms: "View Program",
     },
     stats: [
@@ -111,6 +112,7 @@ const en: Dictionary = {
       highlightKo: "",
       desc: "Enrollment is limited. Share your child's current level, and we'll recommend the right group.",
       ctaInquire: "Schedule a Consult",
+      ctaTrial: "Book a Free Trial",
       ctaPrograms: "View Program",
     },
   },
@@ -205,12 +207,14 @@ const en: Dictionary = {
     titleKo: "",
     desc: "Fill out the form below and we'll respond within 24 hours. We'll also help schedule a free assessment.",
     form: {
+      inquiryType: { label: "Inquiry Type", consult: "Consultation", trial: "Free Trial / Assessment Class" },
       parentName: { label: "Parent Name", placeholder: "Jane Smith" },
       email: { label: "Email" },
       phone: { label: "Phone" },
       childName: { label: "Child Name", placeholder: "Child's name" },
       grade: { label: "Grade", placeholder: "Select grade" },
       school: { label: "Current School (optional)" },
+      referredBy: { label: "Referred By (optional)", placeholder: "Name of the parent who referred you" },
       language: { label: "Preferred Response Language" },
       message: { label: "Message (optional)", placeholder: "Tell us about your child's current math level, goals, or any questions." },
       submit: "Submit",
@@ -225,6 +229,45 @@ const en: Dictionary = {
       grade: "Please select a grade.",
       submitFailed: "Something went wrong. Please try again in a moment.",
     },
+  },
+  pricing: {
+    meta: {
+      title: "Pricing",
+      description: "Daniel Math Academy tuition is shared after a placement diagnostic and a personalized consultation.",
+    },
+    eyebrow: "Pricing",
+    title: "We share tuition after a personal consultation",
+    titleKo: "",
+    desc: "Because classes are small, ungraded, and level-based, tuition depends on your child's placement diagnostic and the days/frequency you choose. Reach out and we'll walk you through the right class and tuition together.",
+    points: [
+      {
+        title: "Personalized after placement",
+        desc: "A free placement diagnostic determines your child's level before we share the right class and tuition.",
+      },
+      {
+        title: "Depends on days & frequency",
+        desc: "Choose 1–4 sessions per week — monthly tuition varies with the schedule you pick.",
+      },
+      {
+        title: "Sibling enrollment",
+        desc: "Enrolling more than one child? Ask us about sibling arrangements during your consultation.",
+      },
+    ],
+    cta: "Schedule a Consult to Get Pricing",
+  },
+  referral: {
+    meta: {
+      title: "Referral Program",
+      description: "Refer Daniel Math Academy to families you know. Referred enrollments come with a thank-you for both families.",
+    },
+    eyebrow: "Referral Program",
+    title: "Our current families are our biggest strength",
+    titleKo: "",
+    desc: "A referral from a parent who's already experienced Daniel Math Academy means the most to us. Refer a family, and when they enroll, we'll thank both families.",
+    howTitle: "How to Refer",
+    howDesc: "Just have the family you refer mention your name in the referred-by field on our inquiry form — no code or extra steps needed.",
+    note: "Reward details are shared during your consultation.",
+    cta: "Schedule a Consult",
   },
   thanks: {
     meta: {

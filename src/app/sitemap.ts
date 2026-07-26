@@ -5,6 +5,8 @@ import { blogPosts } from "@/lib/blog-posts";
 const marketingPaths = [
   "",
   "/programs",
+  "/pricing",
+  "/referral",
   "/inquire",
   "/resources",
   "/resources/curriculum",

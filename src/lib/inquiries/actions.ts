@@ -53,6 +53,8 @@ export async function submitInquiryAction(
     school: parsed.data.school ? parsed.data.school : null,
     language: parsed.data.language,
     message: parsed.data.message ? parsed.data.message : null,
+    inquiry_type: parsed.data.inquiryType,
+    referred_by: parsed.data.referredBy ? parsed.data.referredBy : null,
   });
 
   if (error) {

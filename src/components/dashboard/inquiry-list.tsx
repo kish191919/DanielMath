@@ -1,7 +1,7 @@
 import Link from "next/link";
-import type { Inquiry, InquiryNote, InquiryStatus } from "@/lib/supabase/types";
+import type { Inquiry, InquiryNote, InquiryStatus, InquiryType } from "@/lib/supabase/types";
 import { GRADE_LABELS } from "@/lib/students/schema";
-import { INQUIRY_STATUS_LABELS } from "@/lib/inquiries/schema";
+import { INQUIRY_STATUS_LABELS, INQUIRY_TYPE_LABELS } from "@/lib/inquiries/schema";
 import { updateInquiryStatusAction, deleteInquiryAction } from "@/lib/inquiries/actions";
 import { InquiryNotes } from "@/components/dashboard/inquiry-notes";
 
@@ -10,6 +10,11 @@ const STATUS_BADGE: Record<InquiryStatus, string> = {
   contacted: "bg-amber-50 text-amber-800",
   enrolled: "bg-green-50 text-green-800",
   closed: "bg-gray-100 text-gray-600",
+};
+
+const TYPE_BADGE: Record<InquiryType, string> = {
+  consult: "bg-navy-50 text-navy-700",
+  trial: "bg-gold-100 text-gold-800",
 };
 
 function StatusButton({ id, status, label }: { id: string; status: InquiryStatus; label: string }) {
@@ -62,6 +67,13 @@ export function InquiryList({
               >
                 {INQUIRY_STATUS_LABELS[inquiry.status]}
               </span>
+              {inquiry.inquiry_type === "trial" && (
+                <span
+                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_BADGE.trial}`}
+                >
+                  {INQUIRY_TYPE_LABELS.trial}
+                </span>
+              )}
               <span className="text-xs text-navy-500">
                 {inquiry.language === "ko" ? "한국어" : "English"}
               </span>
@@ -72,6 +84,7 @@ export function InquiryList({
             <p>{inquiry.contact_email}</p>
             <p>{inquiry.phone}</p>
             {inquiry.school && <p>{inquiry.school}</p>}
+            {inquiry.referred_by && <p>추천: {inquiry.referred_by}</p>}
           </div>
 
           {inquiry.message && (

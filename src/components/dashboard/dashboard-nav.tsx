@@ -14,6 +14,7 @@ const parentLinks = [
   { href: "/dashboard/parent/children", label: "자녀" },
   { href: "/dashboard/parent/progress", label: "진행 상황" },
   { href: "/dashboard/parent/messages", label: "메시지" },
+  { href: "/dashboard/parent/settings", label: "설정" },
 ];
 
 export function DashboardNav({ role, unreadCount = 0 }: { role: Role; unreadCount?: number }) {

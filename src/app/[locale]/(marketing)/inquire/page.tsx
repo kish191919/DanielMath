@@ -7,7 +7,10 @@ import { hasLocale, localePath, type Locale } from "@/lib/i18n";
 import { pageAlternates } from "@/lib/seo";
 import { InquiryForm } from "./inquiry-form";
 
-type Props = { params: Promise<{ locale: string }> };
+type Props = {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ type?: string }>;
+};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
@@ -20,13 +23,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function InquirePage({ params }: Props) {
+export default async function InquirePage({ params, searchParams }: Props) {
   const { locale } = await params;
   if (!hasLocale(locale)) notFound();
+  const { type } = await searchParams;
   const d = await getDictionary(locale as Locale);
   const q = d.inquire;
   const lp = (path: string) => localePath(locale as Locale, path);
   const isKo = locale === "ko";
+  const defaultInquiryType = type === "trial" ? "trial" : "consult";
 
   return (
     <Section>
@@ -43,6 +48,7 @@ export default async function InquirePage({ params }: Props) {
             labels={q.form}
             errors={q.errors}
             thanksPath={lp("/thanks")}
+            defaultInquiryType={defaultInquiryType}
           />
         </div>
       </Container>

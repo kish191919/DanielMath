@@ -29,6 +29,8 @@ export interface Profile {
   role: Role;
   full_name: string | null;
   email: string;
+  phone: string | null;
+  sms_opt_in: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -51,6 +53,7 @@ export interface StudentGuardian {
 }
 
 export type InquiryStatus = "new" | "contacted" | "enrolled" | "closed";
+export type InquiryType = "consult" | "trial";
 
 export interface Inquiry {
   id: string;
@@ -63,6 +66,8 @@ export interface Inquiry {
   language: "ko" | "en";
   message: string | null;
   status: InquiryStatus;
+  inquiry_type: InquiryType;
+  referred_by: string | null;
   created_at: string;
 }
 
@@ -236,6 +241,8 @@ type ProfileInsert = {
   role: Role;
   email: string;
   full_name?: string | null;
+  phone?: string | null;
+  sms_opt_in?: boolean;
   created_at?: string;
   updated_at?: string;
 };
@@ -274,6 +281,8 @@ type InquiryInsert = {
   language?: "ko" | "en";
   message?: string | null;
   status?: InquiryStatus;
+  inquiry_type?: InquiryType;
+  referred_by?: string | null;
   created_at?: string;
 };
 

@@ -19,6 +19,7 @@ type Props = {
   labels: FormLabels;
   errors: FormErrors;
   thanksPath: string;
+  defaultInquiryType?: "consult" | "trial";
 };
 
 const grades = [
@@ -28,7 +29,7 @@ const grades = [
   { v: "6", l: "6th Grade" },
 ];
 
-export function InquiryForm({ labels, errors: errMsgs, thanksPath }: Props) {
+export function InquiryForm({ labels, errors: errMsgs, thanksPath, defaultInquiryType }: Props) {
   const router = useRouter();
   const [submitting, setSubmitting] = React.useState(false);
   const [serverError, setServerError] = React.useState<string | null>(null);
@@ -42,6 +43,8 @@ export function InquiryForm({ labels, errors: errMsgs, thanksPath }: Props) {
     school: z.string().optional(),
     language: z.enum(["ko", "en"]),
     message: z.string().max(2000).optional(),
+    inquiryType: z.enum(["consult", "trial"]),
+    referredBy: z.string().max(100).optional(),
   });
 
   type FormValues = z.infer<typeof schema>;
@@ -53,7 +56,7 @@ export function InquiryForm({ labels, errors: errMsgs, thanksPath }: Props) {
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { language: "ko" },
+    defaultValues: { language: "ko", inquiryType: defaultInquiryType ?? "consult" },
   });
 
   const onSubmit = async (values: FormValues) => {
@@ -84,6 +87,13 @@ export function InquiryForm({ labels, errors: errMsgs, thanksPath }: Props) {
       noValidate
       className="space-y-6 rounded-2xl border border-navy-100 bg-white p-6 shadow-sm sm:p-8"
     >
+      <Field label={labels.inquiryType.label}>
+        <div className="flex flex-col gap-2 sm:flex-row sm:gap-5">
+          <Radio {...register("inquiryType")} value="consult" label={labels.inquiryType.consult} />
+          <Radio {...register("inquiryType")} value="trial" label={labels.inquiryType.trial} />
+        </div>
+      </Field>
+
       <Field label={labels.parentName.label} error={errors.parentName?.message} required>
         <Input
           {...register("parentName")}
@@ -137,13 +147,21 @@ export function InquiryForm({ labels, errors: errMsgs, thanksPath }: Props) {
         </Field>
       </div>
 
-      <Field label={labels.school.label} error={errors.school?.message}>
-        <Input
-          {...register("school")}
-          autoComplete="organization"
-          placeholder="e.g. Wakefield Forest ES"
-        />
-      </Field>
+      <div className="grid gap-6 sm:grid-cols-2">
+        <Field label={labels.school.label} error={errors.school?.message}>
+          <Input
+            {...register("school")}
+            autoComplete="organization"
+            placeholder="e.g. Wakefield Forest ES"
+          />
+        </Field>
+        <Field label={labels.referredBy.label} error={errors.referredBy?.message}>
+          <Input
+            {...register("referredBy")}
+            placeholder={labels.referredBy.placeholder}
+          />
+        </Field>
+      </div>
 
       <Field label={labels.language.label}>
         <div className="flex gap-5">

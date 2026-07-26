@@ -81,6 +81,14 @@ function HeroSection({ d, lp, isKo }: { d: Awaited<ReturnType<typeof getDictiona
             {h.desc}
           </p>
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Button
+              href={lp("/inquire?type=trial")}
+              size="lg"
+              variant="secondary"
+              className="min-w-[10rem] border-gold-500 bg-gold-500 text-navy-900 hover:bg-gold-400 hover:border-gold-400"
+            >
+              {h.ctaTrial}
+            </Button>
             <Button href={lp("/inquire")} size="lg" variant="secondary" className="min-w-[10rem]">
               {h.ctaInquire}
             </Button>
@@ -247,6 +255,14 @@ function FinalCTA({ d, lp, isKo }: { d: Awaited<ReturnType<typeof getDictionary>
             ))}
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Button
+              href={lp("/inquire?type=trial")}
+              size="lg"
+              variant="secondary"
+              className="border-gold-500 bg-gold-500 text-navy-900 hover:bg-gold-400 hover:border-gold-400"
+            >
+              {c.ctaTrial}
+            </Button>
             <Button href={lp("/inquire")} size="lg" variant="secondary">
               {c.ctaInquire}
             </Button>

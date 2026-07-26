@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireSession } from "@/lib/dal";
 import { createServerSupabase } from "@/lib/supabase/server";
 import type { MessageThread } from "@/lib/supabase/types";
+import { notifyNewMessage } from "@/lib/notifications/message-notify";
 import { messageBodySchema } from "./schema";
 
 export type SendMessageFormState = {
@@ -38,7 +39,7 @@ export async function sendMessageAction(
     return { error: parsed.error.issues[0]?.message ?? "메시지를 입력해주세요." };
   }
 
-  await verifyParticipant(threadId, session.userId, isPrincipal);
+  const thread = await verifyParticipant(threadId, session.userId, isPrincipal);
 
   const supabase = await createServerSupabase();
   const { error } = await supabase.from("messages").insert({
@@ -58,6 +59,10 @@ export async function sendMessageAction(
       last_sender_id: session.userId,
     })
     .eq("id", threadId);
+
+  // Best-effort email/SMS notification — see notifyNewMessage for why this
+  // never throws.
+  await notifyNewMessage({ thread, isPrincipalSender: isPrincipal });
 
   revalidatePath(isPrincipal ? "/dashboard/principal/messages" : "/dashboard/parent/messages");
   return {};
