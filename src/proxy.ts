@@ -5,6 +5,7 @@ import { locales, defaultLocale, type Locale } from "@/lib/i18n";
 const NON_MARKETING = [
   "/dashboard",
   "/login",
+  "/signup",
   "/api",
   "/_next",
   "/favicon.ico",

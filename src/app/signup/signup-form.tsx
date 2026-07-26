@@ -8,21 +8,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/forms/field";
-import { signInAction, type SignInState } from "@/lib/auth/actions";
-import { signInSchema, type SignInValues } from "@/lib/auth/schema";
+import { signUpAction, type SignUpState } from "@/lib/auth/actions";
+import { signUpSchema, type SignUpValues } from "@/lib/auth/schema";
 
-export function LoginForm() {
-  const [state, formAction, isPending] = useActionState<SignInState | null, FormData>(
-    signInAction,
+export function SignUpForm() {
+  const [state, formAction, isPending] = useActionState<SignUpState | null, FormData>(
+    signUpAction,
     null,
   );
 
   const {
     register,
     formState: { errors },
-  } = useForm<SignInValues>({
-    resolver: zodResolver(signInSchema),
-    defaultValues: { email: "", password: "" },
+  } = useForm<SignUpValues>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: { fullName: "", email: "", password: "", confirmPassword: "" },
   });
 
   return (
@@ -31,6 +31,20 @@ export function LoginForm() {
       noValidate
       className="space-y-6 rounded-2xl border border-navy-100 bg-white p-6 shadow-sm sm:p-8"
     >
+      <Field
+        label="이름 / Full Name"
+        error={errors.fullName?.message ?? state?.fieldErrors?.fullName}
+        required
+      >
+        <Input
+          type="text"
+          {...register("fullName")}
+          aria-required
+          autoComplete="name"
+          placeholder="홍길동"
+        />
+      </Field>
+
       <Field
         label="이메일 / Email"
         error={errors.email?.message ?? state?.fieldErrors?.email}
@@ -54,7 +68,21 @@ export function LoginForm() {
           type="password"
           {...register("password")}
           aria-required
-          autoComplete="current-password"
+          autoComplete="new-password"
+          placeholder="••••••••"
+        />
+      </Field>
+
+      <Field
+        label="비밀번호 확인 / Confirm Password"
+        error={errors.confirmPassword?.message ?? state?.fieldErrors?.confirmPassword}
+        required
+      >
+        <Input
+          type="password"
+          {...register("confirmPassword")}
+          aria-required
+          autoComplete="new-password"
           placeholder="••••••••"
         />
       </Field>
@@ -67,15 +95,12 @@ export function LoginForm() {
 
       <div className="border-t border-navy-100 pt-5">
         <Button size="lg" type="submit" disabled={isPending} className="w-full">
-          {isPending ? "로그인 중..." : "로그인 / Sign in"}
+          {isPending ? "가입 중..." : "회원가입 / Sign up"}
         </Button>
         <p className="mt-3 text-center text-xs text-navy-600 font-ko" lang="ko">
-          비밀번호를 잊으셨나요? 관리자에게 문의해주세요.
-        </p>
-        <p className="mt-2 text-center text-xs text-navy-600 font-ko" lang="ko">
-          계정이 없으신가요?{" "}
-          <Link href="/signup" className="text-navy-800 underline underline-offset-2">
-            회원가입
+          이미 계정이 있으신가요?{" "}
+          <Link href="/login" className="text-navy-800 underline underline-offset-2">
+            로그인
           </Link>
         </p>
       </div>
