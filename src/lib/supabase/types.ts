@@ -29,8 +29,6 @@ export interface Profile {
   role: Role;
   full_name: string | null;
   email: string;
-  phone: string | null;
-  sms_opt_in: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -241,8 +239,6 @@ type ProfileInsert = {
   role: Role;
   email: string;
   full_name?: string | null;
-  phone?: string | null;
-  sms_opt_in?: boolean;
   created_at?: string;
   updated_at?: string;
 };

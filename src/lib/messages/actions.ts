@@ -60,7 +60,7 @@ export async function sendMessageAction(
     })
     .eq("id", threadId);
 
-  // Best-effort email/SMS notification — see notifyNewMessage for why this
+  // Best-effort email notification — see notifyNewMessage for why this
   // never throws.
   await notifyNewMessage({ thread, isPrincipalSender: isPrincipal });
 
