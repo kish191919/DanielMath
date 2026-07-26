@@ -38,11 +38,16 @@ export interface Student {
   full_name: string;
   grade: Grade;
   track: Track;
-  parent_email: string | null;
-  parent_id: string | null;
   notes: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface StudentGuardian {
+  id: string;
+  student_id: string;
+  guardian_id: string;
+  created_at: string;
 }
 
 export type InquiryStatus = "new" | "contacted" | "enrolled" | "closed";
@@ -193,6 +198,24 @@ export interface GeneratedWorksheet {
   confirmed_at: string | null;
 }
 
+export interface MessageThread {
+  id: string;
+  parent_id: string;
+  last_message_at: string | null;
+  last_message_body: string | null;
+  last_sender_id: string | null;
+  created_at: string;
+}
+
+export interface Message {
+  id: string;
+  thread_id: string;
+  sender_id: string;
+  body: string;
+  read_at: string | null;
+  created_at: string;
+}
+
 export interface GeneratedProblem {
   id: string;
   worksheet_id: string;
@@ -224,14 +247,21 @@ type StudentInsert = {
   full_name: string;
   grade: Grade;
   track?: Track;
-  parent_email?: string | null;
-  parent_id?: string | null;
   notes?: string | null;
   created_at?: string;
   updated_at?: string;
 };
 
 type StudentUpdate = Partial<StudentInsert>;
+
+type StudentGuardianInsert = {
+  id?: string;
+  student_id: string;
+  guardian_id: string;
+  created_at?: string;
+};
+
+type StudentGuardianUpdate = Partial<StudentGuardianInsert>;
 
 type InquiryInsert = {
   id?: string;
@@ -415,6 +445,28 @@ type GeneratedProblemInsert = {
 
 type GeneratedProblemUpdate = Partial<GeneratedProblemInsert>;
 
+type MessageThreadInsert = {
+  id?: string;
+  parent_id: string;
+  last_message_at?: string | null;
+  last_message_body?: string | null;
+  last_sender_id?: string | null;
+  created_at?: string;
+};
+
+type MessageThreadUpdate = Partial<MessageThreadInsert>;
+
+type MessageInsert = {
+  id?: string;
+  thread_id: string;
+  sender_id: string;
+  body: string;
+  read_at?: string | null;
+  created_at?: string;
+};
+
+type MessageUpdate = Partial<MessageInsert>;
+
 export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "12";
@@ -431,10 +483,23 @@ export type Database = {
         Row: Student;
         Insert: StudentInsert;
         Update: StudentUpdate;
+        Relationships: [];
+      };
+      student_guardians: {
+        Row: StudentGuardian;
+        Insert: StudentGuardianInsert;
+        Update: StudentGuardianUpdate;
         Relationships: [
           {
-            foreignKeyName: "students_parent_id_fkey";
-            columns: ["parent_id"];
+            foreignKeyName: "student_guardians_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "student_guardians_guardian_id_fkey";
+            columns: ["guardian_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
@@ -623,6 +688,48 @@ export type Database = {
             columns: ["concept_id"];
             isOneToOne: false;
             referencedRelation: "concepts";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      message_threads: {
+        Row: MessageThread;
+        Insert: MessageThreadInsert;
+        Update: MessageThreadUpdate;
+        Relationships: [
+          {
+            foreignKeyName: "message_threads_parent_id_fkey";
+            columns: ["parent_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "message_threads_last_sender_id_fkey";
+            columns: ["last_sender_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      messages: {
+        Row: Message;
+        Insert: MessageInsert;
+        Update: MessageUpdate;
+        Relationships: [
+          {
+            foreignKeyName: "messages_thread_id_fkey";
+            columns: ["thread_id"];
+            isOneToOne: false;
+            referencedRelation: "message_threads";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey";
+            columns: ["sender_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
         ];

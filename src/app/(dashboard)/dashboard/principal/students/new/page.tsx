@@ -27,6 +27,9 @@ export default async function NewStudentPage({ searchParams }: Props) {
           {inquiry && (
             <p className="mt-2 text-sm text-navy-600">
               {inquiry.parent_name}님의 상담 문의에서 이어짐 — 아래 내용이 미리 채워져 있습니다.
+              <br />
+              상담 문의 이메일: {inquiry.contact_email} (학생 등록 후 학생 상세 페이지의
+              &ldquo;보호자&rdquo; 섹션에서 이 이메일로 연결하세요.)
             </p>
           )}
         </div>
@@ -39,7 +42,6 @@ export default async function NewStudentPage({ searchParams }: Props) {
                 ? {
                     full_name: inquiry.child_name,
                     grade: inquiry.grade,
-                    parent_email: inquiry.contact_email,
                     notes: inquiry.message ? `학부모 문의 내용: ${inquiry.message}` : "",
                   }
                 : undefined

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Noto_Sans_KR } from "next/font/google";
 import { headers } from "next/headers";
 import { siteConfig } from "@/lib/site-config";
@@ -55,6 +55,17 @@ export const metadata: Metadata = {
     images: [`${siteConfig.url}${siteConfig.ogImage}`],
   },
   robots: { index: true, follow: true },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: siteConfig.nameKo,
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#0a1f3d",
 };
 
 export default async function RootLayout({

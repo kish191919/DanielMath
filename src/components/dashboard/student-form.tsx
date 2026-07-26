@@ -15,7 +15,6 @@ import type { Student } from "@/lib/supabase/types";
 type Prefill = {
   full_name: string;
   grade: Student["grade"];
-  parent_email: string;
   notes: string;
 };
 
@@ -74,19 +73,6 @@ export function StudentForm({ mode, student, prefill, fromInquiryId, action }: P
             </option>
           ))}
         </Select>
-      </Field>
-
-      <Field
-        label="학부모 이메일 / Parent Email (선택)"
-        error={state?.fieldErrors?.parent_email}
-      >
-        <Input
-          type="email"
-          name="parent_email"
-          defaultValue={student?.parent_email ?? prefill?.parent_email ?? ""}
-          autoComplete="off"
-          placeholder="parent@example.com"
-        />
       </Field>
 
       <Field label="메모 / Notes (선택)" error={state?.fieldErrors?.notes}>

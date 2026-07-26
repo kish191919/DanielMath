@@ -1,12 +1,12 @@
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
-import { listStudents } from "@/lib/students/queries";
+import { listChildrenForParent } from "@/lib/learning-history/queries";
 import { GRADE_LABELS } from "@/lib/students/schema";
 import { requireRole } from "@/lib/dal";
 
 export default async function ParentChildrenPage() {
-  await requireRole("parent");
-  const children = await listStudents(); // RLS limits to this parent's children
+  const session = await requireRole("parent");
+  const children = await listChildrenForParent(session.userId);
 
   return (
     <Section className="py-10 sm:py-14">

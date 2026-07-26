@@ -45,9 +45,6 @@ export function StudentList({
                 <h3 className="text-base font-semibold text-navy-900">
                   {student.full_name}
                 </h3>
-                {student.parent_email && (
-                  <p className="mt-1 text-xs text-navy-600">{student.parent_email}</p>
-                )}
               </div>
               <span className="inline-flex shrink-0 items-center rounded-full bg-navy-50 px-2 py-0.5 text-xs font-medium text-navy-800">
                 {GRADE_LABELS[student.grade]}

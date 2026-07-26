@@ -2,8 +2,9 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
 import { StudentForm } from "@/components/dashboard/student-form";
+import { StudentGuardians } from "@/components/dashboard/student-guardians";
 import { updateStudentAction } from "@/lib/students/actions";
-import { getStudent } from "@/lib/students/queries";
+import { getStudent, listGuardiansForStudent } from "@/lib/students/queries";
 import { requireRole } from "@/lib/dal";
 
 export default async function EditStudentPage({
@@ -16,6 +17,7 @@ export default async function EditStudentPage({
   const student = await getStudent(id);
   if (!student) notFound();
 
+  const guardians = await listGuardiansForStudent(id);
   const action = updateStudentAction.bind(null, id);
 
   return (
@@ -29,8 +31,9 @@ export default async function EditStudentPage({
             학생 수정 — {student.full_name}
           </h1>
         </div>
-        <div className="mt-8">
+        <div className="mt-8 space-y-6">
           <StudentForm mode="edit" student={student} action={action} />
+          <StudentGuardians studentId={id} guardians={guardians} />
         </div>
       </Container>
     </Section>

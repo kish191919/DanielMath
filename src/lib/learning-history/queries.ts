@@ -461,10 +461,20 @@ export async function getStudentKpiSummary(
 
 export async function listChildrenForParent(parentId: string): Promise<Student[]> {
   const supabase = await createServerSupabase();
+  const { data: links, error: linksError } = await supabase
+    .from("student_guardians")
+    .select("student_id")
+    .eq("guardian_id", parentId)
+    .returns<{ student_id: string }[]>();
+  if (linksError) throw new Error(linksError.message);
+
+  const studentIds = (links ?? []).map((l) => l.student_id);
+  if (studentIds.length === 0) return [];
+
   const { data, error } = await supabase
     .from("students")
     .select("*")
-    .eq("parent_id", parentId)
+    .in("id", studentIds)
     .order("full_name", { ascending: true })
     .returns<Student[]>();
   if (error) throw new Error(error.message);
@@ -474,10 +484,10 @@ export async function listChildrenForParent(parentId: string): Promise<Student[]
 async function assertParentOwnsStudent(parentId: string, studentId: string): Promise<boolean> {
   const supabase = await createServerSupabase();
   const { data } = await supabase
-    .from("students")
+    .from("student_guardians")
     .select("id")
-    .eq("id", studentId)
-    .eq("parent_id", parentId)
+    .eq("student_id", studentId)
+    .eq("guardian_id", parentId)
     .maybeSingle<{ id: string }>();
   return !!data;
 }
