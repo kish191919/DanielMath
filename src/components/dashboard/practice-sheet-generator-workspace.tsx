@@ -1,8 +1,10 @@
 "use client";
 
 import * as React from "react";
+import { ChevronDown } from "lucide-react";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { ConfirmSubmitButton } from "@/components/dashboard/confirm-submit-button";
 import { GradingStatusPoller } from "@/components/dashboard/grading-status-poller";
 import { ReferenceScanUploadForm } from "@/components/dashboard/reference-scan-upload-form";
@@ -35,10 +37,30 @@ const SCAN_STATE_LABELS: Record<string, string> = {
   grading_failed: "추출 실패",
 };
 
+function isGroupFullySelected(items: { id: string }[], selected: Record<string, boolean>) {
+  return items.length > 0 && items.every((item) => selected[item.id]);
+}
+
+function toggleGroupSelection(
+  items: { id: string }[],
+  setSelected: React.Dispatch<React.SetStateAction<Record<string, boolean>>>,
+) {
+  setSelected((prev) => {
+    const allSelected = isGroupFullySelected(items, prev);
+    const next = { ...prev };
+    for (const item of items) next[item.id] = !allSelected;
+    return next;
+  });
+}
+
 // Copies WrongAnswerWorkspace's checkbox-list + sticky-bottom-bar shape and
 // extends it with a second section for scanned problems, grouped by scan
 // (like wrong answers are grouped by session) — scanned problems have no
 // tag/confirm gate, so they're usable the moment OCR extraction finishes.
+// The scan/camera uploader sits above both lists (rather than nested inside
+// the reference section) since it's the entry point most sessions start
+// from, and the two lists live behind a tab switch with collapsible groups
+// so a long problem-bank history doesn't turn this into one giant scroll.
 export function PracticeSheetGeneratorWorkspace({
   studentId,
   wrongAnswerGroups,
@@ -58,6 +80,22 @@ export function PracticeSheetGeneratorWorkspace({
   const [countPerItem, setCountPerItem] = React.useState(3);
   const [error, setError] = React.useState<string | null>(null);
   const [isPending, startTransition] = React.useTransition();
+
+  const hasNoWrongAnswers = wrongAnswerGroups.every((g) => g.items.length === 0);
+  const [activeTab, setActiveTab] = React.useState<"wrong" | "reference">(() =>
+    hasNoWrongAnswers ? "reference" : "wrong",
+  );
+
+  // Per-group expand/collapse state. Absent = default (first group in each
+  // section starts open, the rest start collapsed); present = explicit user
+  // (or auto-select) override, keyed "wrong:<scanId>" / "ref:<scanId>".
+  const [expandedOverrides, setExpandedOverrides] = React.useState<Record<string, boolean>>({});
+  function isGroupExpanded(groupKey: string, isFirst: boolean) {
+    return expandedOverrides[groupKey] ?? isFirst;
+  }
+  function toggleGroupExpanded(groupKey: string, currentlyExpanded: boolean) {
+    setExpandedOverrides((prev) => ({ ...prev, [groupKey]: !currentlyExpanded }));
+  }
 
   // Fast path: after uploading a scan, once its items land (via the poller
   // refreshing the page), auto-select just those items exactly once so a
@@ -81,6 +119,7 @@ export function PracticeSheetGeneratorWorkspace({
       for (const item of group.items) next[item.id] = true;
       return next;
     });
+    setExpandedOverrides((prev) => ({ ...prev, [`ref:${justUploadedScanId}`]: true }));
   }, [justUploadedScanId, referenceGroups]);
 
   const isAnyScanGrading = referenceGroups.some((g) => g.scan.status === "grading");
@@ -140,216 +179,325 @@ export function PracticeSheetGeneratorWorkspace({
     });
   }
 
-  const hasNoWrongAnswers = wrongAnswerGroups.every((g) => g.items.length === 0);
-
   return (
     <div className="space-y-8 pb-24">
       <GradingStatusPoller isGrading={isAnyScanGrading} />
 
       <section>
         <h2 className="text-lg font-semibold text-navy-900 font-ko" lang="ko">
-          오답에서 선택
+          문제집 스캔하여 추가
         </h2>
-        {hasNoWrongAnswers ? (
-          <div className="mt-3 rounded-2xl border border-navy-100 bg-white p-6 text-center text-sm text-navy-600">
-            기록된 오답이 없습니다.
-          </div>
-        ) : (
-          <div className="mt-3 space-y-6">
-            {wrongAnswerGroups.map((group) => (
-              <div key={group.key}>
-                {group.label && (
-                  <p className="text-xs font-semibold uppercase tracking-wide text-navy-500">
-                    {group.label}
-                  </p>
-                )}
-                <div className="mt-2 space-y-2">
-                  {group.items.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-start gap-3 rounded-2xl border border-navy-100 bg-white p-4 shadow-sm"
-                    >
-                      <label className="flex flex-1 items-start gap-3">
-                        <input
-                          type="checkbox"
-                          className="mt-1 h-4 w-4 shrink-0 accent-navy-700"
-                          checked={!!selectedWrongAnswers[item.id]}
-                          onChange={() => toggleWrongAnswer(item.id)}
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-start justify-between gap-3">
-                            <p className="text-sm text-navy-900">
-                              {item.problem_number && (
-                                <span className="mr-2 font-medium">#{item.problem_number}</span>
-                              )}
-                              {item.transcribed_problem}
-                            </p>
-                            <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
-                              오답
-                            </span>
-                          </div>
-                          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-navy-500">
-                            <span>{item.session_date}</span>
-                            {item.transcribed_answer && <span>학생 답: {item.transcribed_answer}</span>}
-                            {item.error_type && <span>{ERROR_TYPE_LABELS[item.error_type]}</span>}
-                          </div>
-                        </div>
-                      </label>
-                      <form action={deleteLearningItemAction.bind(null, item.id)}>
-                        <ConfirmSubmitButton
-                          label="삭제"
-                          confirmMessage="이 오답을 삭제하시겠습니까?"
-                          className="shrink-0 rounded-md border border-red-200 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
-                        />
-                      </form>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <div className="mt-3">
+          <ReferenceScanUploadForm
+            onUploaded={(scanId) => {
+              setJustUploadedScanId(scanId);
+              setActiveTab("reference");
+            }}
+          />
+        </div>
       </section>
 
       <section>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold text-navy-900 font-ko" lang="ko">
-            스캔한 문제에서 선택
-          </h2>
-          <Select
-            value={conceptFilter}
-            onChange={(e) => setConceptFilter(e.target.value)}
-            className="max-w-[220px]"
+        <div className="inline-flex rounded-full border border-navy-200 bg-navy-50 p-1">
+          <button
+            type="button"
+            onClick={() => setActiveTab("wrong")}
+            className={cn(
+              "rounded-full px-4 py-1.5 text-sm font-medium font-ko transition",
+              activeTab === "wrong"
+                ? "bg-white text-navy-900 shadow-sm"
+                : "text-navy-500 hover:text-navy-700",
+            )}
           >
-            <option value="">전체 개념</option>
-            {concepts.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.label_ko}
-              </option>
-            ))}
-          </Select>
+            오답에서 선택
+            {selectedWrongAnswerIds.length > 0 && ` (${selectedWrongAnswerIds.length})`}
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("reference")}
+            className={cn(
+              "rounded-full px-4 py-1.5 text-sm font-medium font-ko transition",
+              activeTab === "reference"
+                ? "bg-white text-navy-900 shadow-sm"
+                : "text-navy-500 hover:text-navy-700",
+            )}
+          >
+            스캔한 문제에서 선택
+            {selectedReferenceIds.length > 0 && ` (${selectedReferenceIds.length})`}
+          </button>
         </div>
 
-        <div className="mt-3">
-          <ReferenceScanUploadForm onUploaded={setJustUploadedScanId} />
-        </div>
-
-        {referenceGroups.length === 0 ? (
-          <div className="mt-3 rounded-2xl border border-navy-100 bg-white p-6 text-center text-sm text-navy-600">
-            아직 스캔한 문제가 없습니다.
-          </div>
-        ) : (
-          <div className="mt-3 space-y-6">
-            {referenceGroups.map((group) => {
-              const filteredItems = conceptFilter
-                ? group.items.filter((p) => p.concept_id === conceptFilter)
-                : group.items;
-              const isJustUploaded = group.scan.id === justUploadedScanId;
-              const isFastPathReady =
-                isJustUploaded && group.scan.status !== "grading" && filteredItems.length > 0;
-
-              return (
-                <div key={group.scan.id}>
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-navy-500">
-                      {group.scan.original_filename ?? "업로드된 문제"} ·{" "}
-                      {SCAN_STATE_LABELS[group.scan.status] ?? group.scan.status}
-                    </p>
-                    <div className="flex items-center gap-2">
-                      {isFastPathReady && (
+        {activeTab === "wrong" ? (
+          <div className="mt-4">
+            {hasNoWrongAnswers ? (
+              <div className="rounded-2xl border border-navy-100 bg-white p-6 text-center text-sm text-navy-600">
+                기록된 오답이 없습니다.
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {wrongAnswerGroups.map((group, index) => {
+                  const groupKey = `wrong:${group.key}`;
+                  const expanded = isGroupExpanded(groupKey, index === 0);
+                  const allSelected = isGroupFullySelected(group.items, selectedWrongAnswers);
+                  return (
+                    <div
+                      key={group.key}
+                      className="overflow-hidden rounded-2xl border border-navy-100 bg-white shadow-sm"
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
                         <button
                           type="button"
-                          onClick={() => handleGenerateFromScan(filteredItems.map((i) => i.id))}
-                          disabled={isPending}
-                          className="rounded-md bg-navy-900 px-2 py-1 text-xs font-medium text-white hover:bg-navy-800 disabled:opacity-50"
+                          onClick={() => toggleGroupExpanded(groupKey, expanded)}
+                          className="flex flex-1 items-center gap-2 text-left"
                         >
-                          이 스캔으로 바로 생성
+                          <ChevronDown
+                            className={cn(
+                              "h-4 w-4 shrink-0 text-navy-400 transition-transform",
+                              !expanded && "-rotate-90",
+                            )}
+                          />
+                          {group.label && (
+                            <span className="text-xs font-semibold uppercase tracking-wide text-navy-500">
+                              {group.label}
+                            </span>
+                          )}
                         </button>
+                        <button
+                          type="button"
+                          onClick={() => toggleGroupSelection(group.items, setSelectedWrongAnswers)}
+                          className="shrink-0 text-xs font-medium text-navy-600 hover:underline"
+                        >
+                          {allSelected ? "전체 해제" : "전체 선택"}
+                        </button>
+                      </div>
+                      {expanded && (
+                        <div className="space-y-2 border-t border-navy-100 p-4">
+                          {group.items.map((item) => (
+                            <div
+                              key={item.id}
+                              className="flex items-start gap-3 rounded-2xl border border-navy-100 bg-white p-4 shadow-sm"
+                            >
+                              <label className="flex flex-1 items-start gap-3">
+                                <input
+                                  type="checkbox"
+                                  className="mt-1 h-4 w-4 shrink-0 accent-navy-700"
+                                  checked={!!selectedWrongAnswers[item.id]}
+                                  onChange={() => toggleWrongAnswer(item.id)}
+                                />
+                                <div className="flex-1">
+                                  <div className="flex items-start justify-between gap-3">
+                                    <p className="text-sm text-navy-900">
+                                      {item.problem_number && (
+                                        <span className="mr-2 font-medium">#{item.problem_number}</span>
+                                      )}
+                                      {item.transcribed_problem}
+                                    </p>
+                                    <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
+                                      오답
+                                    </span>
+                                  </div>
+                                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-navy-500">
+                                    <span>{item.session_date}</span>
+                                    {item.transcribed_answer && (
+                                      <span>학생 답: {item.transcribed_answer}</span>
+                                    )}
+                                    {item.error_type && <span>{ERROR_TYPE_LABELS[item.error_type]}</span>}
+                                  </div>
+                                </div>
+                              </label>
+                              <form action={deleteLearningItemAction.bind(null, item.id)}>
+                                <ConfirmSubmitButton
+                                  label="삭제"
+                                  confirmMessage="이 오답을 삭제하시겠습니까?"
+                                  className="shrink-0 rounded-md border border-red-200 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
+                                />
+                              </form>
+                            </div>
+                          ))}
+                        </div>
                       )}
-                      {group.scan.status === "grading_failed" && (
-                        <form action={retryReferenceExtractionAction.bind(null, group.scan.id)}>
-                          <button
-                            type="submit"
-                            className="rounded-md border border-red-200 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
-                          >
-                            다시 추출하기
-                          </button>
-                        </form>
-                      )}
-                      <form action={deleteReferenceScanAction.bind(null, group.scan.id)}>
-                        <ConfirmSubmitButton
-                          label="스캔 삭제"
-                          confirmMessage="이 업로드를 삭제하시겠습니까? 추출된 문항과 원본 파일도 함께 삭제되며 되돌릴 수 없습니다."
-                          className="rounded-md border border-red-200 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
-                        />
-                      </form>
                     </div>
-                  </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="mt-4">
+            <div className="flex justify-end">
+              <Select
+                value={conceptFilter}
+                onChange={(e) => setConceptFilter(e.target.value)}
+                className="max-w-[220px]"
+              >
+                <option value="">전체 개념</option>
+                {concepts.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.label_ko}
+                  </option>
+                ))}
+              </Select>
+            </div>
 
-                  {group.scan.status === "grading" ? (
-                    <div className="mt-2 flex items-center gap-3 rounded-2xl border border-navy-100 bg-navy-50/50 p-4">
-                      <span
-                        className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-navy-300 border-t-navy-700"
-                        aria-hidden="true"
-                      />
-                      <p className="text-sm text-navy-700 font-ko" lang="ko">
-                        AI가 문제를 추출하고 있습니다. 완료되면 자동으로 나타납니다.
-                      </p>
-                    </div>
-                  ) : group.scan.status === "grading_failed" ? (
-                    <div className="mt-2 rounded-2xl border border-red-200 bg-red-50 p-4">
-                      <p className="text-sm text-red-800">문제 추출에 실패했습니다.</p>
-                      {group.scan.grading_error && (
-                        <p className="mt-1 text-xs text-red-700">{group.scan.grading_error}</p>
+            {referenceGroups.length === 0 ? (
+              <div className="mt-3 rounded-2xl border border-navy-100 bg-white p-6 text-center text-sm text-navy-600">
+                아직 스캔한 문제가 없습니다.
+              </div>
+            ) : (
+              <div className="mt-3 space-y-4">
+                {referenceGroups.map((group, index) => {
+                  const filteredItems = conceptFilter
+                    ? group.items.filter((p) => p.concept_id === conceptFilter)
+                    : group.items;
+                  const isJustUploaded = group.scan.id === justUploadedScanId;
+                  const isFastPathReady =
+                    isJustUploaded && group.scan.status !== "grading" && filteredItems.length > 0;
+                  const groupKey = `ref:${group.scan.id}`;
+                  const expanded = isGroupExpanded(groupKey, index === 0);
+                  const allSelected = isGroupFullySelected(filteredItems, selectedReferences);
+                  const canSelectAll =
+                    filteredItems.length > 0 &&
+                    group.scan.status !== "grading" &&
+                    group.scan.status !== "grading_failed";
+
+                  return (
+                    <div
+                      key={group.scan.id}
+                      className="overflow-hidden rounded-2xl border border-navy-100 bg-white shadow-sm"
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
+                        <button
+                          type="button"
+                          onClick={() => toggleGroupExpanded(groupKey, expanded)}
+                          className="flex flex-1 items-center gap-2 text-left"
+                        >
+                          <ChevronDown
+                            className={cn(
+                              "h-4 w-4 shrink-0 text-navy-400 transition-transform",
+                              !expanded && "-rotate-90",
+                            )}
+                          />
+                          <span className="text-xs font-semibold uppercase tracking-wide text-navy-500">
+                            {group.scan.original_filename ?? "업로드된 문제"} ·{" "}
+                            {SCAN_STATE_LABELS[group.scan.status] ?? group.scan.status}
+                          </span>
+                        </button>
+                        <div className="flex flex-wrap items-center gap-2">
+                          {canSelectAll && (
+                            <button
+                              type="button"
+                              onClick={() => toggleGroupSelection(filteredItems, setSelectedReferences)}
+                              className="text-xs font-medium text-navy-600 hover:underline"
+                            >
+                              {allSelected ? "전체 해제" : "전체 선택"}
+                            </button>
+                          )}
+                          {isFastPathReady && (
+                            <button
+                              type="button"
+                              onClick={() => handleGenerateFromScan(filteredItems.map((i) => i.id))}
+                              disabled={isPending}
+                              className="rounded-md bg-navy-900 px-2 py-1 text-xs font-medium text-white hover:bg-navy-800 disabled:opacity-50"
+                            >
+                              이 스캔으로 바로 생성
+                            </button>
+                          )}
+                          {group.scan.status === "grading_failed" && (
+                            <form action={retryReferenceExtractionAction.bind(null, group.scan.id)}>
+                              <button
+                                type="submit"
+                                className="rounded-md border border-red-200 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
+                              >
+                                다시 추출하기
+                              </button>
+                            </form>
+                          )}
+                          <form action={deleteReferenceScanAction.bind(null, group.scan.id)}>
+                            <ConfirmSubmitButton
+                              label="스캔 삭제"
+                              confirmMessage="이 업로드를 삭제하시겠습니까? 추출된 문항과 원본 파일도 함께 삭제되며 되돌릴 수 없습니다."
+                              className="rounded-md border border-red-200 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
+                            />
+                          </form>
+                        </div>
+                      </div>
+
+                      {expanded && (
+                        <div className="border-t border-navy-100 p-4">
+                          {group.scan.status === "grading" ? (
+                            <div className="flex items-center gap-3 rounded-2xl border border-navy-100 bg-navy-50/50 p-4">
+                              <span
+                                className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-navy-300 border-t-navy-700"
+                                aria-hidden="true"
+                              />
+                              <p className="text-sm text-navy-700 font-ko" lang="ko">
+                                AI가 문제를 추출하고 있습니다. 완료되면 자동으로 나타납니다.
+                              </p>
+                            </div>
+                          ) : group.scan.status === "grading_failed" ? (
+                            <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
+                              <p className="text-sm text-red-800">문제 추출에 실패했습니다.</p>
+                              {group.scan.grading_error && (
+                                <p className="mt-1 text-xs text-red-700">{group.scan.grading_error}</p>
+                              )}
+                            </div>
+                          ) : filteredItems.length === 0 ? (
+                            <div className="rounded-2xl border border-navy-100 bg-white p-4 text-center text-sm text-navy-600">
+                              {conceptFilter
+                                ? "이 개념에 해당하는 문제가 없습니다."
+                                : "인식된 문항이 없습니다."}
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              {filteredItems.map((problem) => {
+                                const concept = problem.concept_id
+                                  ? conceptById.get(problem.concept_id)
+                                  : undefined;
+                                return (
+                                  <div
+                                    key={problem.id}
+                                    className="flex items-start gap-3 rounded-2xl border border-navy-100 bg-white p-4 shadow-sm"
+                                  >
+                                    <label className="flex flex-1 items-start gap-3">
+                                      <input
+                                        type="checkbox"
+                                        className="mt-1 h-4 w-4 shrink-0 accent-navy-700"
+                                        checked={!!selectedReferences[problem.id]}
+                                        onChange={() => toggleReference(problem.id)}
+                                      />
+                                      <div className="flex-1">
+                                        <p className="text-xs font-semibold uppercase tracking-wide text-navy-500">
+                                          {concept ? `${concept.strand} · ${concept.label_ko}` : "미분류"}
+                                        </p>
+                                        <p className="mt-1 text-sm text-navy-900">
+                                          {problem.problem_number && (
+                                            <span className="mr-2 font-medium">
+                                              #{problem.problem_number}
+                                            </span>
+                                          )}
+                                          {problem.transcribed_problem}
+                                        </p>
+                                      </div>
+                                    </label>
+                                    <form action={deleteReferenceProblemAction.bind(null, problem.id)}>
+                                      <ConfirmSubmitButton
+                                        label="삭제"
+                                        confirmMessage="이 문제를 삭제하시겠습니까?"
+                                        className="shrink-0 rounded-md border border-red-200 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
+                                      />
+                                    </form>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
                       )}
                     </div>
-                  ) : filteredItems.length === 0 ? (
-                    <div className="mt-2 rounded-2xl border border-navy-100 bg-white p-4 text-center text-sm text-navy-600">
-                      {conceptFilter ? "이 개념에 해당하는 문제가 없습니다." : "인식된 문항이 없습니다."}
-                    </div>
-                  ) : (
-                    <div className="mt-2 space-y-2">
-                      {filteredItems.map((problem) => {
-                        const concept = problem.concept_id ? conceptById.get(problem.concept_id) : undefined;
-                        return (
-                          <div
-                            key={problem.id}
-                            className="flex items-start gap-3 rounded-2xl border border-navy-100 bg-white p-4 shadow-sm"
-                          >
-                            <label className="flex flex-1 items-start gap-3">
-                              <input
-                                type="checkbox"
-                                className="mt-1 h-4 w-4 shrink-0 accent-navy-700"
-                                checked={!!selectedReferences[problem.id]}
-                                onChange={() => toggleReference(problem.id)}
-                              />
-                              <div className="flex-1">
-                                <p className="text-xs font-semibold uppercase tracking-wide text-navy-500">
-                                  {concept ? `${concept.strand} · ${concept.label_ko}` : "미분류"}
-                                </p>
-                                <p className="mt-1 text-sm text-navy-900">
-                                  {problem.problem_number && (
-                                    <span className="mr-2 font-medium">#{problem.problem_number}</span>
-                                  )}
-                                  {problem.transcribed_problem}
-                                </p>
-                              </div>
-                            </label>
-                            <form action={deleteReferenceProblemAction.bind(null, problem.id)}>
-                              <ConfirmSubmitButton
-                                label="삭제"
-                                confirmMessage="이 문제를 삭제하시겠습니까?"
-                                className="shrink-0 rounded-md border border-red-200 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
-                              />
-                            </form>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
       </section>
