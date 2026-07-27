@@ -7,7 +7,9 @@ import { Input } from "@/components/ui/input";
 import {
   addGuardianAction,
   removeGuardianAction,
+  updateGuardianPhoneAction,
   type AddGuardianFormState,
+  type UpdateGuardianPhoneState,
 } from "@/lib/students/actions";
 import type { GuardianLink } from "@/lib/students/queries";
 
@@ -30,13 +32,19 @@ export function StudentGuardians({
         <ul className="mt-4 divide-y divide-navy-100">
           {guardians.map(({ linkId, guardian }) => (
             <li key={linkId} className="flex items-center justify-between gap-3 py-3">
-              <div>
+              <div className="flex-1">
                 <p className="text-sm font-medium text-navy-900">
                   {guardian.full_name ?? guardian.email}
                 </p>
                 {guardian.full_name && (
                   <p className="text-xs text-navy-500">{guardian.email}</p>
                 )}
+                <GuardianPhoneEdit
+                  key={guardian.phone ?? "unset"}
+                  guardianId={guardian.id}
+                  studentId={studentId}
+                  phone={guardian.phone}
+                />
               </div>
               <form action={removeGuardianAction.bind(null, studentId, linkId)}>
                 <button
@@ -53,6 +61,62 @@ export function StudentGuardians({
 
       <AddGuardianForm studentId={studentId} />
     </div>
+  );
+}
+
+function GuardianPhoneEdit({
+  guardianId,
+  studentId,
+  phone,
+}: {
+  guardianId: string;
+  studentId: string;
+  phone: string | null;
+}) {
+  const action = updateGuardianPhoneAction.bind(null, guardianId, studentId);
+  const [state, formAction, isPending] = useActionState<UpdateGuardianPhoneState | null, FormData>(
+    action,
+    null,
+  );
+  const [editing, setEditing] = React.useState(false);
+
+  if (!editing) {
+    return (
+      <button
+        type="button"
+        onClick={() => setEditing(true)}
+        className="mt-1 text-xs text-navy-600 underline underline-offset-2 hover:text-navy-800"
+      >
+        {phone ?? "연락처 미등록 — 입력하기"}
+      </button>
+    );
+  }
+
+  return (
+    <form action={formAction} className="mt-1 flex items-center gap-2">
+      <Input
+        type="tel"
+        name="phone"
+        defaultValue={phone ?? ""}
+        placeholder="010-1234-5678"
+        className="h-8 w-36 text-xs"
+      />
+      <Button type="submit" size="md" className="h-8 px-3 text-xs" disabled={isPending}>
+        저장
+      </Button>
+      <button
+        type="button"
+        onClick={() => setEditing(false)}
+        className="text-xs text-navy-500 hover:text-navy-700"
+      >
+        취소
+      </button>
+      {state?.error && (
+        <p className="text-xs text-red-600" role="alert">
+          {state.error}
+        </p>
+      )}
+    </form>
   );
 }
 

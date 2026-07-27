@@ -8,6 +8,10 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { gradeWorksheetScan } from "@/lib/ai/grade-worksheet";
 import { generateParentSummaryDraft } from "@/lib/ai/generate-parent-summary";
+import { listGuardiansForStudent } from "@/lib/students/queries";
+import { getOrCreateThreadForParent } from "@/lib/messages/queries";
+import { generateParentMagicLink } from "@/lib/auth/magic-link";
+import { sendReportAlimTalk } from "@/lib/notifications/kakao-alimtalk";
 import {
   uploadMetaSchema,
   reviewSubmissionSchema,
@@ -301,7 +305,7 @@ export async function publishSessionNoteAction(
   _prev: PublishSessionNoteState | null,
   formData: FormData,
 ): Promise<PublishSessionNoteState> {
-  await requireRole("principal");
+  const session = await requireRole("principal");
 
   const parsed = noteTextSchema.safeParse(formData.get("note"));
   if (!parsed.success) {
@@ -322,8 +326,88 @@ export async function publishSessionNoteAction(
     .eq("id", noteId);
   if (error) return { error: error.message };
 
+  try {
+    await notifyGuardiansOfReport(studentId, scanId, session.userId, parsed.data);
+  } catch (err) {
+    // Best-effort — the publish itself already succeeded (same pattern as
+    // generateParentSummaryDraft above in confirmReviewAction).
+    console.error(`[publishSessionNoteAction] guardian notify failed for ${noteId}`, err);
+  }
+
   revalidatePath(`/dashboard/principal/worksheets/${scanId}`);
   revalidatePath(`/dashboard/principal/students/${studentId}/history`);
   revalidatePath("/dashboard/parent/progress");
   return { success: true };
+}
+
+// Posts the published report into each guardian's own chat thread (one
+// thread per parent, never per-student — see 0019_messages.sql) and, for
+// guardians with a phone on file, sends a short Kakao AlimTalk summary
+// with a passwordless magic link straight into that thread. Both steps
+// are best-effort per-guardian: one guardian's failure shouldn't stop the
+// others, and this whole function's caller already treats it as
+// best-effort overall.
+async function notifyGuardiansOfReport(
+  studentId: string,
+  scanId: string,
+  principalId: string,
+  reportText: string,
+): Promise<void> {
+  const guardians = await listGuardiansForStudent(studentId);
+  if (guardians.length === 0) return;
+
+  const supabase = await createServerSupabase();
+
+  const { data: student } = await supabase
+    .from("students")
+    .select("full_name")
+    .eq("id", studentId)
+    .maybeSingle<{ full_name: string }>();
+  const studentName = student?.full_name ?? "학생";
+
+  const { data: items } = await supabase
+    .from("learning_items")
+    .select("is_correct")
+    .eq("scan_id", scanId)
+    .eq("confirmed", true)
+    .returns<{ is_correct: boolean }[]>();
+  const total = items?.length ?? 0;
+  const correct = items?.filter((i) => i.is_correct).length ?? 0;
+  const accuracyRate = total > 0 ? Math.round((correct / total) * 100) : null;
+
+  for (const { guardian } of guardians) {
+    try {
+      const thread = await getOrCreateThreadForParent(guardian.id);
+      const { error: msgError } = await supabase.from("messages").insert({
+        thread_id: thread.id,
+        sender_id: principalId,
+        body: reportText,
+      });
+      if (!msgError) {
+        await supabase
+          .from("message_threads")
+          .update({
+            last_message_at: new Date().toISOString(),
+            last_message_body: reportText.slice(0, 200),
+            last_sender_id: principalId,
+          })
+          .eq("id", thread.id);
+      }
+    } catch (err) {
+      console.error(`[notifyGuardiansOfReport] chat message failed for guardian ${guardian.id}`, err);
+    }
+
+    if (!guardian.phone) continue;
+    const link = await generateParentMagicLink(guardian.email);
+    if (!link) continue;
+
+    await sendReportAlimTalk({
+      toPhone: guardian.phone,
+      variables: {
+        학생명: studentName,
+        정답률: accuracyRate !== null ? `${accuracyRate}` : "-",
+        링크: link,
+      },
+    });
+  }
 }

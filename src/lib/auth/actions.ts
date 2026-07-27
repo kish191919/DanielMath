@@ -48,7 +48,9 @@ export async function signOutAction() {
 
 export type SignUpState = {
   error?: string;
-  fieldErrors?: Partial<Record<"fullName" | "email" | "password" | "confirmPassword", string>>;
+  fieldErrors?: Partial<
+    Record<"fullName" | "email" | "phone" | "password" | "confirmPassword", string>
+  >;
 };
 
 export async function signUpAction(
@@ -58,6 +60,7 @@ export async function signUpAction(
   const parsed = signUpSchema.safeParse({
     fullName: formData.get("fullName"),
     email: formData.get("email"),
+    phone: formData.get("phone"),
     password: formData.get("password"),
     confirmPassword: formData.get("confirmPassword"),
   });
@@ -69,6 +72,7 @@ export async function signUpAction(
       if (
         key === "fullName" ||
         key === "email" ||
+        key === "phone" ||
         key === "password" ||
         key === "confirmPassword"
       ) {
@@ -78,7 +82,7 @@ export async function signUpAction(
     return { error: "입력값을 확인해주세요.", fieldErrors };
   }
 
-  const { fullName, email, password } = parsed.data;
+  const { fullName, email, phone, password } = parsed.data;
   const admin = createAdminSupabase();
 
   // No email-confirmation template is configured in this project, so we
@@ -111,7 +115,10 @@ export async function signUpAction(
   // idempotent in case a live DB trigger already inserted a profiles row.
   const { error: profileError } = await admin
     .from("profiles")
-    .upsert({ id: userId, role: "parent", email, full_name: fullName }, { onConflict: "id" });
+    .upsert(
+      { id: userId, role: "parent", email, full_name: fullName, phone },
+      { onConflict: "id" },
+    );
 
   if (profileError) {
     // Roll back the auth user so we never leave an orphaned auth.users row

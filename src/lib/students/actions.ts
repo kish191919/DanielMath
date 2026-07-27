@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/dal";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { createAdminSupabase } from "@/lib/supabase/admin";
-import { addGuardianSchema, studentSchema } from "./schema";
+import { addGuardianSchema, guardianPhoneSchema, studentSchema } from "./schema";
 import type { Profile } from "@/lib/supabase/types";
 
 export type StudentFormState = {
@@ -163,6 +163,39 @@ export async function addGuardianAction(
     }
     return { error: error.message };
   }
+
+  revalidatePath(`/dashboard/principal/students/${studentId}`);
+  return { success: true };
+}
+
+export type UpdateGuardianPhoneState = {
+  error?: string;
+  success?: boolean;
+};
+
+export async function updateGuardianPhoneAction(
+  guardianId: string,
+  studentId: string,
+  _prev: UpdateGuardianPhoneState | null,
+  formData: FormData,
+): Promise<UpdateGuardianPhoneState> {
+  await requireRole("principal");
+
+  const parsed = guardianPhoneSchema.safeParse(formData.get("phone"));
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "연락처를 확인해주세요." };
+  }
+
+  // admin client, not the principal's session client — there's no existing
+  // precedent of the principal writing another user's profiles row (only
+  // addGuardianAction's admin-client read precedent), and profiles' RLS is
+  // hand-managed outside this repo, so this avoids gambling on it.
+  const admin = createAdminSupabase();
+  const { error } = await admin
+    .from("profiles")
+    .update({ phone: parsed.data })
+    .eq("id", guardianId);
+  if (error) return { error: error.message };
 
   revalidatePath(`/dashboard/principal/students/${studentId}`);
   return { success: true };

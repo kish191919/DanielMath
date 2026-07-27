@@ -29,6 +29,7 @@ export interface Profile {
   role: Role;
   full_name: string | null;
   email: string;
+  phone: string | null;
   created_at: string;
   updated_at: string;
 }

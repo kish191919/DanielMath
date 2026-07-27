@@ -22,7 +22,7 @@ export function SignUpForm() {
     formState: { errors },
   } = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
-    defaultValues: { fullName: "", email: "", password: "", confirmPassword: "" },
+    defaultValues: { fullName: "", email: "", phone: "", password: "", confirmPassword: "" },
   });
 
   return (
@@ -56,6 +56,20 @@ export function SignUpForm() {
           aria-required
           autoComplete="email"
           placeholder="you@example.com"
+        />
+      </Field>
+
+      <Field
+        label="연락처 / Phone"
+        error={errors.phone?.message ?? state?.fieldErrors?.phone}
+        required
+      >
+        <Input
+          type="tel"
+          {...register("phone")}
+          aria-required
+          autoComplete="tel"
+          placeholder="010-1234-5678"
         />
       </Field>
 

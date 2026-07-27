@@ -6,6 +6,7 @@ const NON_MARKETING = [
   "/dashboard",
   "/login",
   "/signup",
+  "/auth",
   "/api",
   "/_next",
   "/favicon.ico",

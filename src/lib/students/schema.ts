@@ -22,6 +22,8 @@ export const addGuardianSchema = z.object({
   email: z.string().email("올바른 이메일을 입력해주세요."),
 });
 
+export const guardianPhoneSchema = z.string().trim().min(7, "연락처를 입력해주세요.");
+
 export const GRADE_LABELS: Record<(typeof GRADES)[number], string> = {
   "3": "3rd Grade",
   "4": "4th Grade",
