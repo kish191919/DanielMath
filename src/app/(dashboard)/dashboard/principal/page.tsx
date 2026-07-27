@@ -89,6 +89,7 @@ export default async function PrincipalHome() {
             학생 등록
           </Button>
           <Button href="/dashboard/principal/worksheets/new">새 학습지 업로드</Button>
+          <Button href="/dashboard/principal/practice-sheets/new">유사문제 생성</Button>
         </div>
 
         <div className="mt-8">

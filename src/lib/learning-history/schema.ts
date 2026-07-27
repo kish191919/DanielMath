@@ -1,4 +1,7 @@
 import { z } from "zod";
+import { SCAN_MIME_TYPES } from "@/lib/storage/mime";
+
+export { SCAN_MIME_TYPES };
 
 export const ERROR_TYPES = [
   "calculation_mistake",
@@ -19,8 +22,6 @@ export const ERROR_TYPE_LABELS: Record<(typeof ERROR_TYPES)[number], string> = {
   pattern_recognition: "패턴 인식",
   time_pressure: "시간 부족",
 };
-
-export const SCAN_MIME_TYPES = ["image/jpeg", "image/png", "application/pdf"] as const;
 
 export const SCAN_STATUS_LABELS: Record<
   "uploaded" | "grading" | "pending_review" | "reviewed" | "grading_failed",

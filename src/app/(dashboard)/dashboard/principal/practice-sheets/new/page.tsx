@@ -1,0 +1,118 @@
+import { notFound } from "next/navigation";
+import { Container } from "@/components/site/container";
+import { Section } from "@/components/site/section";
+import { Select } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { requireRole } from "@/lib/dal";
+import { listStudents, getStudent } from "@/lib/students/queries";
+import { listLearningItems, listConcepts, listScansForStudent } from "@/lib/learning-history/queries";
+import { listReferenceProblems } from "@/lib/problem-bank/queries";
+import {
+  PracticeSheetGeneratorWorkspace,
+  type ItemGroup,
+} from "@/components/dashboard/practice-sheet-generator-workspace";
+import { GRADE_LABELS } from "@/lib/students/schema";
+
+export default async function NewPracticeSheetPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ studentId?: string }>;
+}) {
+  await requireRole("principal");
+  const { studentId } = await searchParams;
+
+  const students = await listStudents();
+
+  if (!studentId) {
+    return (
+      <Section className="py-10 sm:py-14">
+        <Container className="max-w-xl">
+          <p className="text-sm font-semibold uppercase tracking-wider text-navy-500">
+            Practice Sheet
+          </p>
+          <h1 className="mt-2 text-2xl font-bold text-navy-900 font-ko sm:text-3xl" lang="ko">
+            유사문제 생성
+          </h1>
+          <p className="mt-2 text-sm text-navy-700 font-ko" lang="ko">
+            학생의 오답과 문제 보관함의 참고문제를 함께 선택해 AI로 유사문제를 생성합니다. 먼저
+            학생을 선택하세요.
+          </p>
+          <form method="get" className="mt-6 flex items-end gap-3">
+            <div className="flex-1">
+              <label
+                className="text-xs font-semibold uppercase tracking-wide text-navy-500"
+                htmlFor="studentId"
+              >
+                학생
+              </label>
+              <Select id="studentId" name="studentId" defaultValue="" required className="mt-2">
+                <option value="" disabled>
+                  학생 선택
+                </option>
+                {students.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.full_name} ({GRADE_LABELS[s.grade]})
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <Button type="submit">다음</Button>
+          </form>
+        </Container>
+      </Section>
+    );
+  }
+
+  const [student, wrongAnswerItems, concepts, referenceProblems, scans] = await Promise.all([
+    getStudent(studentId),
+    listLearningItems(studentId, { onlyIncorrect: true }),
+    listConcepts(),
+    listReferenceProblems({}),
+    listScansForStudent(studentId),
+  ]);
+  if (!student) notFound();
+
+  const scansById = new Map(scans.map((s) => [s.id, s]));
+  const sessionGroups = new Map<string, typeof wrongAnswerItems>();
+  for (const item of wrongAnswerItems) {
+    const group = sessionGroups.get(item.scan_id) ?? [];
+    group.push(item);
+    sessionGroups.set(item.scan_id, group);
+  }
+  const wrongAnswerGroups: ItemGroup[] = [...sessionGroups.entries()]
+    .sort((a, b) => b[1][0].session_date.localeCompare(a[1][0].session_date))
+    .map(([scanId, groupItems]) => {
+      const name = scansById.get(scanId)?.original_filename ?? groupItems[0].session_date;
+      return {
+        key: scanId,
+        label: `학습지 (${name}) · ${groupItems.length}문항`,
+        items: groupItems,
+      };
+    });
+
+  return (
+    <Section className="py-10 sm:py-14">
+      <Container className="max-w-3xl">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-wider text-navy-500">
+            Practice Sheet
+          </p>
+          <h1 className="mt-2 text-2xl font-bold text-navy-900 font-ko sm:text-3xl" lang="ko">
+            {student.full_name} — 유사문제 생성
+          </h1>
+          <p className="mt-2 text-sm text-navy-700 font-ko" lang="ko">
+            오답과 문제 보관함의 참고문제를 함께 선택할 수 있습니다.
+          </p>
+        </div>
+        <div className="mt-8">
+          <PracticeSheetGeneratorWorkspace
+            studentId={studentId}
+            wrongAnswerGroups={wrongAnswerGroups}
+            referenceProblems={referenceProblems}
+            concepts={concepts}
+          />
+        </div>
+      </Container>
+    </Section>
+  );
+}

@@ -3,11 +3,12 @@ import { z } from "zod";
 export const generateSelectionSchema = z
   .array(
     z.object({
+      sourceType: z.enum(["wrong_answer", "reference"]),
       itemId: z.string().uuid(),
       count: z.number().int().min(1).max(5),
     }),
   )
-  .min(1, "오답 문항을 1개 이상 선택해주세요");
+  .min(1, "문항을 1개 이상 선택해주세요");
 
 export type GenerateSelection = z.infer<typeof generateSelectionSchema>;
 
@@ -16,6 +17,7 @@ export const practiceProblemInputSchema = z.object({
   problem_text: z.string().min(1, "문제 내용을 입력해주세요"),
   answer_text: z.string().min(1, "정답을 입력해주세요"),
   source_item_id: z.string().uuid().nullable().optional(),
+  source_reference_id: z.string().uuid().nullable().optional(),
   concept_id: z.string().uuid().nullable().optional(),
   source: z.enum(["ai", "teacher"]),
   edited_by_teacher: z.boolean(),

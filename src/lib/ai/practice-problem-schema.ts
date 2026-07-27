@@ -6,9 +6,11 @@ export const GeneratedProblemSchema = z.object({
 });
 
 export const PracticeProblemSetSchema = z.object({
-  // Echoes the source learning_items.id back so results can be matched to
-  // the wrong-answer item they were generated from.
-  source_item_id: z.string(),
+  // Echoes the source id back (a learning_items.id or a reference_problems.id,
+  // disambiguated by source_kind) so results can be matched to the seed item
+  // they were generated from.
+  source_id: z.string(),
+  source_kind: z.enum(["wrong_answer", "reference"]),
   problems: z.array(GeneratedProblemSchema).min(1),
 });
 

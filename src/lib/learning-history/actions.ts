@@ -11,7 +11,9 @@ import { generateParentSummaryDraft } from "@/lib/ai/generate-parent-summary";
 import { listGuardiansForStudent } from "@/lib/students/queries";
 import { getOrCreateThreadForParent } from "@/lib/messages/queries";
 import { generateParentMagicLink } from "@/lib/auth/magic-link";
-import { sendReportAlimTalk } from "@/lib/notifications/kakao-alimtalk";
+import { sendSms, normalizeUsPhone } from "@/lib/notifications/sms";
+import { EXT_BY_MIME } from "@/lib/storage/mime";
+import { mintSignedUploadUrl } from "@/lib/storage/signed-upload";
 import {
   uploadMetaSchema,
   reviewSubmissionSchema,
@@ -21,12 +23,6 @@ import {
 } from "./schema";
 
 const BUCKET = "worksheet-scans";
-
-const EXT_BY_MIME: Record<string, string> = {
-  "image/jpeg": "jpg",
-  "image/png": "png",
-  "application/pdf": "pdf",
-};
 
 async function markGradingFailed(scanId: string, err: unknown) {
   // Runs inside after() below, after the response/redirect has already been
@@ -61,13 +57,10 @@ export async function createUploadUrlAction(
   const scanId = crypto.randomUUID();
   const path = `${studentId}/${scanId}.${ext}`;
 
-  const admin = createAdminSupabase();
-  const { data, error } = await admin.storage.from(BUCKET).createSignedUploadUrl(path);
-  if (error || !data) {
-    return { error: error?.message ?? "업로드 URL 생성에 실패했습니다." };
-  }
+  const result = await mintSignedUploadUrl(BUCKET, path);
+  if ("error" in result) return result;
 
-  return { scanId, path, signedUrl: data.signedUrl, token: data.token };
+  return { scanId, path: result.path, signedUrl: result.signedUrl, token: result.token };
 }
 
 export type ConfirmUploadInput = {
@@ -342,9 +335,9 @@ export async function publishSessionNoteAction(
 
 // Posts the published report into each guardian's own chat thread (one
 // thread per parent, never per-student — see 0019_messages.sql) and, for
-// guardians with a phone on file, sends a short Kakao AlimTalk summary
-// with a passwordless magic link straight into that thread. Both steps
-// are best-effort per-guardian: one guardian's failure shouldn't stop the
+// guardians with a phone on file, texts a short summary with a
+// passwordless magic link straight into that thread. Both steps are
+// best-effort per-guardian: one guardian's failure shouldn't stop the
 // others, and this whole function's caller already treats it as
 // best-effort overall.
 async function notifyGuardiansOfReport(
@@ -398,16 +391,23 @@ async function notifyGuardiansOfReport(
     }
 
     if (!guardian.phone) continue;
+    const phone = normalizeUsPhone(guardian.phone);
+    if (!phone) {
+      console.error(`[notifyGuardiansOfReport] invalid phone for guardian ${guardian.id}`);
+      continue;
+    }
+
     const link = await generateParentMagicLink(guardian.email);
     if (!link) continue;
 
-    await sendReportAlimTalk({
-      toPhone: guardian.phone,
-      variables: {
-        학생명: studentName,
-        정답률: accuracyRate !== null ? `${accuracyRate}` : "-",
-        링크: link,
-      },
-    });
+    const rateText = accuracyRate !== null ? `정답률 ${accuracyRate}%. ` : "";
+    try {
+      await sendSms({
+        to: phone,
+        body: `[다니엘 수학] ${studentName} 학생의 학습 리포트가 도착했습니다. ${rateText}전체 내용 확인 및 답장: ${link}`,
+      });
+    } catch (err) {
+      console.error(`[notifyGuardiansOfReport] SMS failed for guardian ${guardian.id}`, err);
+    }
   }
 }

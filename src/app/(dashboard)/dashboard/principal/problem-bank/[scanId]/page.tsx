@@ -1,26 +1,22 @@
 import { notFound } from "next/navigation";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
-import { ReviewTable } from "@/components/dashboard/review-table";
-import { SessionNoteForm } from "@/components/dashboard/session-note-form";
+import { ReferenceReviewTable } from "@/components/dashboard/reference-review-table";
+import { GradingStatusPoller } from "@/components/dashboard/grading-status-poller";
 import { requireRole } from "@/lib/dal";
 import {
-  getScanWithItems,
-  getSignedScanViewUrl,
-  getSessionNoteForScan,
-  listConcepts,
-} from "@/lib/learning-history/queries";
-import { retryGradingAction } from "@/lib/learning-history/actions";
-import { getStudent } from "@/lib/students/queries";
+  getReferenceScanWithItems,
+  getSignedReferenceScanViewUrl,
+} from "@/lib/problem-bank/queries";
+import { listConcepts } from "@/lib/learning-history/queries";
+import { retryReferenceExtractionAction } from "@/lib/problem-bank/actions";
 import { SCAN_STATUS_LABELS } from "@/lib/learning-history/schema";
-import { GradingStatusPoller } from "@/components/dashboard/grading-status-poller";
 
-// retryGradingAction kicks off the same potentially slow Claude Vision call
-// via after(), which shares this route's duration budget even though it now
-// runs after the response is sent rather than blocking it.
+// retryReferenceExtractionAction kicks off the same potentially slow Claude
+// Vision call via after() — see worksheets/[scanId]/page.tsx.
 export const maxDuration = 180;
 
-export default async function WorksheetScanReviewPage({
+export default async function ReferenceScanReviewPage({
   params,
 }: {
   params: Promise<{ scanId: string }>;
@@ -28,17 +24,14 @@ export default async function WorksheetScanReviewPage({
   await requireRole("principal");
   const { scanId } = await params;
 
-  const result = await getScanWithItems(scanId);
+  const result = await getReferenceScanWithItems(scanId);
   if (!result) notFound();
   const { scan, items } = result;
 
-  const [student, viewUrl, concepts, existingNote] = await Promise.all([
-    getStudent(scan.student_id),
-    getSignedScanViewUrl(scanId),
+  const [viewUrl, concepts] = await Promise.all([
+    getSignedReferenceScanViewUrl(scanId),
     listConcepts(),
-    getSessionNoteForScan(scanId),
   ]);
-  if (!student) notFound();
 
   const readOnly = scan.status === "reviewed";
 
@@ -48,10 +41,10 @@ export default async function WorksheetScanReviewPage({
         <div className="flex items-end justify-between gap-3">
           <div>
             <p className="text-sm font-semibold uppercase tracking-wider text-navy-500">
-              Worksheet Review
+              Reference Problem Scan
             </p>
             <h1 className="mt-2 text-2xl font-bold text-navy-900 font-ko sm:text-3xl" lang="ko">
-              {student.full_name} — {scan.session_date}
+              {scan.original_filename ?? "업로드된 문제"}
             </h1>
           </div>
           <span className="inline-flex shrink-0 items-center rounded-full bg-navy-50 px-2.5 py-0.5 text-xs font-medium text-navy-800">
@@ -62,10 +55,10 @@ export default async function WorksheetScanReviewPage({
         {viewUrl && (
           <div className="mt-6 overflow-hidden rounded-2xl border border-navy-100 bg-white shadow-sm">
             {scan.mime_type === "application/pdf" ? (
-              <iframe src={viewUrl} className="h-[500px] w-full" title="원본 스캔" />
+              <iframe src={viewUrl} className="h-[500px] w-full" title="원본 파일" />
             ) : (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={viewUrl} alt="원본 스캔" className="max-h-[600px] w-full object-contain" />
+              <img src={viewUrl} alt="원본 파일" className="max-h-[600px] w-full object-contain" />
             )}
           </div>
         )}
@@ -79,7 +72,7 @@ export default async function WorksheetScanReviewPage({
               aria-hidden="true"
             />
             <p className="text-sm font-medium text-navy-800 font-ko" lang="ko">
-              AI가 채점 중입니다. 완료되면 화면이 자동으로 갱신됩니다.
+              AI가 문제를 추출하고 있습니다. 완료되면 화면이 자동으로 갱신됩니다.
             </p>
           </div>
         )}
@@ -89,18 +82,18 @@ export default async function WorksheetScanReviewPage({
           <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-5">
             <p className="text-sm font-medium text-red-800">
               {scan.status === "grading_failed"
-                ? "채점에 실패했습니다."
+                ? "문제 추출에 실패했습니다."
                 : "AI가 문항을 인식하지 못했습니다. 응답이 중간에 잘렸을 수 있습니다."}
             </p>
             {scan.grading_error && (
               <p className="mt-1 text-xs text-red-700">{scan.grading_error}</p>
             )}
-            <form action={retryGradingAction.bind(null, scanId)} className="mt-3">
+            <form action={retryReferenceExtractionAction.bind(null, scanId)} className="mt-3">
               <button
                 type="submit"
                 className="rounded-md border border-red-300 bg-white px-3 py-1.5 text-sm font-medium text-red-800 hover:bg-red-100"
               >
-                다시 채점하기
+                다시 추출하기
               </button>
             </form>
           </div>
@@ -108,32 +101,21 @@ export default async function WorksheetScanReviewPage({
 
         <div className="mt-8">
           <h2 className="text-lg font-semibold text-navy-900 font-ko" lang="ko">
-            {readOnly ? "확정된 문항" : "AI 채점 결과 확인"}
+            {readOnly ? "확정된 문항" : "AI 추출 결과 확인"}
           </h2>
           <p className="mt-1 text-sm text-navy-600 font-ko" lang="ko">
             {readOnly
-              ? "이 스캔은 이미 확정되어 학습이력에 반영되었습니다."
-              : "원본과 대조하여 필요한 부분을 수정한 뒤 확정하세요."}
+              ? "이 스캔은 이미 확정되어 문제 보관함에 반영되었습니다."
+              : "원본과 대조하여 필요한 부분을 수정하고, 모든 문항에 개념을 지정한 뒤 확정하세요."}
           </p>
           <div className="mt-4">
-            <ReviewTable
+            <ReferenceReviewTable
               scanId={scanId}
-              studentId={scan.student_id}
-              sessionDate={scan.session_date}
               initialItems={items}
               concepts={concepts}
               readOnly={readOnly}
             />
           </div>
-        </div>
-
-        <div className="mt-8">
-          <SessionNoteForm
-            studentId={scan.student_id}
-            scanId={scanId}
-            sessionDate={scan.session_date}
-            existingNote={existingNote}
-          />
         </div>
       </Container>
     </Section>

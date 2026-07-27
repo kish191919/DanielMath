@@ -54,7 +54,11 @@ export function WrongAnswerWorkspace({
 
   function handleGenerate() {
     setError(null);
-    const selections = selectedIds.map((itemId) => ({ itemId, count: countPerItem }));
+    const selections = selectedIds.map((itemId) => ({
+      sourceType: "wrong_answer" as const,
+      itemId,
+      count: countPerItem,
+    }));
     startTransition(async () => {
       const result = await generatePracticeSheetAction(studentId, selections);
       if (result && "error" in result) {

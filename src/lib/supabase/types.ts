@@ -224,6 +224,7 @@ export interface GeneratedProblem {
   id: string;
   worksheet_id: string;
   source_item_id: string | null;
+  source_reference_id: string | null;
   concept_id: string | null;
   problem_text: string;
   answer_text: string;
@@ -231,6 +232,38 @@ export interface GeneratedProblem {
   source: "ai" | "teacher";
   edited_by_teacher: boolean;
   ai_suggested: unknown;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ReferenceProblemScan {
+  id: string;
+  uploaded_by: string;
+  storage_path: string;
+  original_filename: string | null;
+  mime_type: "image/jpeg" | "image/png" | "application/pdf";
+  file_size_bytes: number | null;
+  status: ScanStatus;
+  grading_error: string | null;
+  graded_at: string | null;
+  reviewed_at: string | null;
+  reviewed_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ReferenceProblem {
+  id: string;
+  scan_id: string;
+  problem_number: string | null;
+  transcribed_problem: string;
+  transcribed_answer: string | null;
+  concept_id: string | null;
+  ai_confidence_note: string | null;
+  ai_suggested: unknown;
+  source: "ai" | "teacher";
+  edited_by_teacher: boolean;
+  confirmed: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -438,6 +471,7 @@ type GeneratedProblemInsert = {
   id?: string;
   worksheet_id: string;
   source_item_id?: string | null;
+  source_reference_id?: string | null;
   concept_id?: string | null;
   problem_text: string;
   answer_text: string;
@@ -450,6 +484,42 @@ type GeneratedProblemInsert = {
 };
 
 type GeneratedProblemUpdate = Partial<GeneratedProblemInsert>;
+
+type ReferenceProblemScanInsert = {
+  id?: string;
+  uploaded_by: string;
+  storage_path: string;
+  original_filename?: string | null;
+  mime_type: "image/jpeg" | "image/png" | "application/pdf";
+  file_size_bytes?: number | null;
+  status?: ScanStatus;
+  grading_error?: string | null;
+  graded_at?: string | null;
+  reviewed_at?: string | null;
+  reviewed_by?: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+type ReferenceProblemScanUpdate = Partial<ReferenceProblemScanInsert>;
+
+type ReferenceProblemInsert = {
+  id?: string;
+  scan_id: string;
+  problem_number?: string | null;
+  transcribed_problem: string;
+  transcribed_answer?: string | null;
+  concept_id?: string | null;
+  ai_confidence_note?: string | null;
+  ai_suggested?: unknown;
+  source?: "ai" | "teacher";
+  edited_by_teacher?: boolean;
+  confirmed?: boolean;
+  created_at?: string;
+  updated_at?: string;
+};
+
+type ReferenceProblemUpdate = Partial<ReferenceProblemInsert>;
 
 type MessageThreadInsert = {
   id?: string;
@@ -690,7 +760,49 @@ export type Database = {
             referencedColumns: ["id"];
           },
           {
+            foreignKeyName: "generated_problems_source_reference_id_fkey";
+            columns: ["source_reference_id"];
+            isOneToOne: false;
+            referencedRelation: "reference_problems";
+            referencedColumns: ["id"];
+          },
+          {
             foreignKeyName: "generated_problems_concept_id_fkey";
+            columns: ["concept_id"];
+            isOneToOne: false;
+            referencedRelation: "concepts";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      reference_problem_scans: {
+        Row: ReferenceProblemScan;
+        Insert: ReferenceProblemScanInsert;
+        Update: ReferenceProblemScanUpdate;
+        Relationships: [
+          {
+            foreignKeyName: "reference_problem_scans_uploaded_by_fkey";
+            columns: ["uploaded_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      reference_problems: {
+        Row: ReferenceProblem;
+        Insert: ReferenceProblemInsert;
+        Update: ReferenceProblemUpdate;
+        Relationships: [
+          {
+            foreignKeyName: "reference_problems_scan_id_fkey";
+            columns: ["scan_id"];
+            isOneToOne: false;
+            referencedRelation: "reference_problem_scans";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "reference_problems_concept_id_fkey";
             columns: ["concept_id"];
             isOneToOne: false;
             referencedRelation: "concepts";

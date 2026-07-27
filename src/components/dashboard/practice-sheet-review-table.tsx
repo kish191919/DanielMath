@@ -17,6 +17,7 @@ function toRow(problem: GeneratedProblem): Row {
     problem_text: problem.problem_text,
     answer_text: problem.answer_text,
     source_item_id: problem.source_item_id,
+    source_reference_id: problem.source_reference_id,
     concept_id: problem.concept_id,
     source: problem.source,
     edited_by_teacher: problem.edited_by_teacher,
