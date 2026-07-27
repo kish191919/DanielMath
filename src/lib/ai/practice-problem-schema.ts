@@ -1,8 +1,12 @@
 import { z } from "zod";
 
 export const GeneratedProblemSchema = z.object({
-  problem_text: z.string(),
-  answer_text: z.string(),
+  problem_text: z.string().describe(
+    "The newly generated problem statement. Must be written entirely in English, regardless of what language the source problem was in.",
+  ),
+  answer_text: z.string().describe(
+    "The final answer only, no work shown. Must be written entirely in English, regardless of what language the source problem was in.",
+  ),
 });
 
 export const PracticeProblemSetSchema = z.object({

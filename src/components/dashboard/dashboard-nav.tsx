@@ -4,11 +4,11 @@ import type { Role } from "@/lib/supabase/types";
 
 const principalLinks = [
   { href: "/dashboard/principal", label: "홈" },
-  { href: "/dashboard/principal/students", label: "학생" },
   { href: "/dashboard/principal/classes", label: "반" },
-  { href: "/dashboard/principal/inquiries", label: "상담 문의" },
+  { href: "/dashboard/principal/students", label: "학생" },
+  { href: "/dashboard/principal/practice-sheets/new", label: "문제 생성" },
   { href: "/dashboard/principal/messages", label: "메시지" },
-  { href: "/dashboard/principal/practice-sheets/new", label: "연습문제 생성" },
+  { href: "/dashboard/principal/inquiries", label: "상담 문의" },
 ];
 
 const parentLinks = [

@@ -96,7 +96,8 @@ export async function generatePracticeSheetAction(
         ? wrongAnswerById.get(set.source_id)
         : referenceById.get(set.source_id);
     if (!source) continue; // model echoed back an id we never sent
-    for (const problem of set.problems) {
+    const requestedCount = countById.get(set.source_id) ?? set.problems.length;
+    for (const problem of set.problems.slice(0, requestedCount)) {
       problemRows.push({
         source_item_id: set.source_kind === "wrong_answer" ? source.id : null,
         source_reference_id: set.source_kind === "reference" ? source.id : null,

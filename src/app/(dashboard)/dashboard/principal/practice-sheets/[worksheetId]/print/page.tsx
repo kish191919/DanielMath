@@ -6,6 +6,21 @@ import { getPracticeSheetWithProblems } from "@/lib/practice-sheets/queries";
 import { getStudent } from "@/lib/students/queries";
 import { siteConfig } from "@/lib/site-config";
 
+type ArrayChunk<T> = { items: T[]; startIndex: number };
+
+function chunkArray<T>(items: T[], numChunks: number): ArrayChunk<T>[] {
+  const chunks: ArrayChunk<T>[] = [];
+  const base = Math.floor(items.length / numChunks);
+  const remainder = items.length % numChunks;
+  let start = 0;
+  for (let i = 0; i < numChunks; i++) {
+    const size = base + (i < remainder ? 1 : 0);
+    chunks.push({ items: items.slice(start, start + size), startIndex: start });
+    start += size;
+  }
+  return chunks;
+}
+
 export default async function PracticeSheetPrintPage({
   params,
 }: {
@@ -23,6 +38,9 @@ export default async function PracticeSheetPrintPage({
 
   const student = await getStudent(worksheet.student_id);
   if (!student) notFound();
+
+  const problemColumns = chunkArray(problems, 2);
+  const answerColumns = chunkArray(problems, 3);
 
   const title = worksheet.title?.trim() || "연습문제";
   const answersUrl = `${siteConfig.url}/answers/${worksheet.share_token}`;
@@ -91,22 +109,28 @@ export default async function PracticeSheetPrintPage({
           </div>
         </header>
 
-        <ol className="mt-8 columns-1 gap-6 sm:columns-2 print:columns-2">
-          {problems.map((problem, index) => (
-            <li
-              key={problem.id}
-              className="mb-6 break-inside-avoid rounded-xl border border-navy-200 p-4"
-            >
-              <div className="flex items-start gap-2.5">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-navy-900 text-xs font-bold text-white">
-                  {index + 1}
-                </span>
-                <p className="text-sm font-medium text-navy-900">{problem.problem_text}</p>
-              </div>
-              <div className="mt-8 border-b border-navy-300">&nbsp;</div>
-            </li>
-          ))}
-        </ol>
+        <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 print:grid-cols-2">
+          {problemColumns
+            .filter((column) => column.items.length > 0)
+            .map((column) => (
+              <ol key={column.startIndex}>
+                {column.items.map((problem, localIndex) => (
+                  <li
+                    key={problem.id}
+                    className="mb-6 break-inside-avoid rounded-xl border border-navy-200 p-4 [page-break-inside:avoid]"
+                  >
+                    <div className="flex items-start gap-2.5">
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-navy-900 text-xs font-bold text-white">
+                        {column.startIndex + localIndex + 1}
+                      </span>
+                      <p className="text-sm font-medium text-navy-900">{problem.problem_text}</p>
+                    </div>
+                    <div className="mt-8 border-b border-navy-300">&nbsp;</div>
+                  </li>
+                ))}
+              </ol>
+            ))}
+        </div>
       </section>
 
       <section className="page-break mt-10 pt-10">
@@ -121,13 +145,19 @@ export default async function PracticeSheetPrintPage({
             {student.full_name}
           </p>
         </header>
-        <ol className="mt-6 columns-2 gap-6 text-sm text-navy-800 sm:columns-3 print:columns-3">
-          {problems.map((problem, index) => (
-            <li key={problem.id} className="mb-2 break-inside-avoid">
-              {index + 1}. {problem.answer_text}
-            </li>
-          ))}
-        </ol>
+        <div className="mt-6 grid grid-cols-2 gap-6 text-sm text-navy-800 sm:grid-cols-3 print:grid-cols-3">
+          {answerColumns
+            .filter((column) => column.items.length > 0)
+            .map((column) => (
+              <ol key={column.startIndex}>
+                {column.items.map((problem, localIndex) => (
+                  <li key={problem.id} className="mb-2 break-inside-avoid [page-break-inside:avoid]">
+                    {column.startIndex + localIndex + 1}. {problem.answer_text}
+                  </li>
+                ))}
+              </ol>
+            ))}
+        </div>
       </section>
     </div>
   );
