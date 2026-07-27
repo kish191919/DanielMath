@@ -20,7 +20,6 @@ const ko = {
       subtitle: "4명 정원, 학년 구분 없이 실력별로 배정됩니다.",
       desc: "배치 진단부터 오답 관리까지, 한 수업에",
       ctaInquire: "상담 신청",
-      ctaTrial: "무료 진단·체험 신청",
       ctaPrograms: "프로그램 보기",
     },
     stats: [
@@ -110,7 +109,6 @@ const ko = {
       highlightKo: "상담 신청",
       desc: "등록 가능 인원이 제한적입니다. 자녀의 현재 수준을 알려주시면 가장 적합한 반으로 안내해드립니다.",
       ctaInquire: "상담 신청",
-      ctaTrial: "무료 진단·체험 신청",
       ctaPrograms: "프로그램 보기",
     },
   },

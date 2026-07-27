@@ -22,7 +22,6 @@ const en: Dictionary = {
       subtitle: "4 students per class. No grade levels — placed by ability.",
       desc: "From placement diagnostic to mistake tracking, all in one class",
       ctaInquire: "Schedule a Consult",
-      ctaTrial: "Book a Free Trial",
       ctaPrograms: "View Program",
     },
     stats: [
@@ -112,7 +111,6 @@ const en: Dictionary = {
       highlightKo: "",
       desc: "Enrollment is limited. Share your child's current level, and we'll recommend the right group.",
       ctaInquire: "Schedule a Consult",
-      ctaTrial: "Book a Free Trial",
       ctaPrograms: "View Program",
     },
   },

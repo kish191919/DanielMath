@@ -1,10 +1,34 @@
 import QRCode from "qrcode";
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { PrintButton } from "@/components/dashboard/print-button";
 import { requireRole } from "@/lib/dal";
 import { getPracticeSheetWithProblems } from "@/lib/practice-sheets/queries";
 import { getStudent } from "@/lib/students/queries";
 import { siteConfig } from "@/lib/site-config";
+
+const LAYOUTS = {
+  "2": {
+    problemCols: 2,
+    answerCols: 3,
+    problemGridClass: "mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 print:grid-cols-2",
+    answerGridClass:
+      "mt-6 grid grid-cols-2 gap-6 text-sm text-navy-800 sm:grid-cols-3 print:grid-cols-3",
+  },
+  "1": {
+    problemCols: 1,
+    answerCols: 1,
+    problemGridClass: "mt-8 grid grid-cols-1 gap-6",
+    answerGridClass: "mt-6 grid grid-cols-1 gap-6 text-sm text-navy-800",
+  },
+} as const;
+type Layout = keyof typeof LAYOUTS;
+
+function pillClass(active: boolean) {
+  return `inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium transition-colors font-ko ${
+    active ? "bg-navy-900 text-white" : "bg-navy-50 text-navy-700 hover:bg-navy-100"
+  }`;
+}
 
 type ArrayChunk<T> = { items: T[]; startIndex: number };
 
@@ -23,11 +47,16 @@ function chunkArray<T>(items: T[], numChunks: number): ArrayChunk<T>[] {
 
 export default async function PracticeSheetPrintPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ worksheetId: string }>;
+  searchParams: Promise<{ layout?: string }>;
 }) {
   await requireRole("principal");
   const { worksheetId } = await params;
+  const { layout: rawLayout } = await searchParams;
+  const layout: Layout = rawLayout === "1" ? "1" : "2";
+  const { problemCols, answerCols, problemGridClass, answerGridClass } = LAYOUTS[layout];
 
   const result = await getPracticeSheetWithProblems(worksheetId);
   if (!result) notFound();
@@ -39,8 +68,8 @@ export default async function PracticeSheetPrintPage({
   const student = await getStudent(worksheet.student_id);
   if (!student) notFound();
 
-  const problemColumns = chunkArray(problems, 2);
-  const answerColumns = chunkArray(problems, 3);
+  const problemColumns = chunkArray(problems, problemCols);
+  const answerColumns = chunkArray(problems, answerCols);
 
   const title = worksheet.title?.trim() || "연습문제";
   const answersUrl = `${siteConfig.url}/answers/${worksheet.share_token}`;
@@ -54,11 +83,20 @@ export default async function PracticeSheetPrintPage({
           margin: 15mm;
         }
         @media print {
+          html, body { width: auto; overflow: visible; }
           .page-break { break-before: page; }
         }
       `}</style>
 
-      <div className="print:hidden mb-6 flex justify-end">
+      <div className="print:hidden mb-6 flex items-center justify-between">
+        <div className="flex gap-2">
+          <Link href="?layout=2" className={pillClass(layout === "2")}>
+            2열
+          </Link>
+          <Link href="?layout=1" className={pillClass(layout === "1")}>
+            1열 (전체 폭)
+          </Link>
+        </div>
         <PrintButton />
       </div>
 
@@ -109,7 +147,7 @@ export default async function PracticeSheetPrintPage({
           </div>
         </header>
 
-        <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 print:grid-cols-2">
+        <div className={problemGridClass}>
           {problemColumns
             .filter((column) => column.items.length > 0)
             .map((column) => (
@@ -145,7 +183,7 @@ export default async function PracticeSheetPrintPage({
             {student.full_name}
           </p>
         </header>
-        <div className="mt-6 grid grid-cols-2 gap-6 text-sm text-navy-800 sm:grid-cols-3 print:grid-cols-3">
+        <div className={answerGridClass}>
           {answerColumns
             .filter((column) => column.items.length > 0)
             .map((column) => (

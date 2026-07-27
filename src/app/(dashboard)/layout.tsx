@@ -20,7 +20,7 @@ export default async function DashboardLayout({
     <>
       <DashboardHeader email={session.email} />
       <DashboardNav role={session.profile.role} unreadCount={unreadCount} />
-      <main className="flex-1 bg-navy-50/30">{children}</main>
+      <main className="flex-1 bg-navy-50/30 print:bg-white">{children}</main>
     </>
   );
 }
