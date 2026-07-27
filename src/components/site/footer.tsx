@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Mail, MapPin, Clock } from "lucide-react";
 import { Container } from "./container";
 import { siteConfig } from "@/lib/site-config";
@@ -10,10 +11,8 @@ export function SiteFooter({ locale }: { locale: Locale }) {
 
   const navLinks = [
     { href: "/programs", label: "Programs", labelKo: "프로그램" },
-    { href: "/pricing", label: "Pricing", labelKo: "수업료 안내" },
     { href: "/resources", label: "Math Curriculum", labelKo: "수학 교육과정" },
     { href: "/school-calendar", label: "School Calendar", labelKo: "학교 캘린더" },
-    { href: "/referral", label: "Referral Program", labelKo: "추천 프로그램" },
     { href: "/blog", label: "Blog", labelKo: "블로그" },
   ];
 
@@ -30,7 +29,14 @@ export function SiteFooter({ locale }: { locale: Locale }) {
 
           {/* Brand */}
           <div className="col-span-2 lg:col-span-1">
-            <Link href={lp("/")} className="flex items-baseline gap-2">
+            <Link href={lp("/")} className="flex items-center gap-2">
+              <Image
+                src="/brand/daniel-math-academy-logo.png"
+                alt={siteConfig.name}
+                width={44}
+                height={44}
+                className="h-11 w-11 rounded-full"
+              />
               <span className="text-lg font-bold text-navy-900">{siteConfig.name}</span>
               {isKo && (
                 <span className="text-sm text-navy-600 font-ko" lang="ko">

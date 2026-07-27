@@ -230,45 +230,6 @@ const en: Dictionary = {
       submitFailed: "Something went wrong. Please try again in a moment.",
     },
   },
-  pricing: {
-    meta: {
-      title: "Pricing",
-      description: "Daniel Math Academy tuition is shared after a placement diagnostic and a personalized consultation.",
-    },
-    eyebrow: "Pricing",
-    title: "We share tuition after a personal consultation",
-    titleKo: "",
-    desc: "Because classes are small, ungraded, and level-based, tuition depends on your child's placement diagnostic and the days/frequency you choose. Reach out and we'll walk you through the right class and tuition together.",
-    points: [
-      {
-        title: "Personalized after placement",
-        desc: "A free placement diagnostic determines your child's level before we share the right class and tuition.",
-      },
-      {
-        title: "Depends on days & frequency",
-        desc: "Choose 1–4 sessions per week — monthly tuition varies with the schedule you pick.",
-      },
-      {
-        title: "Sibling enrollment",
-        desc: "Enrolling more than one child? Ask us about sibling arrangements during your consultation.",
-      },
-    ],
-    cta: "Schedule a Consult to Get Pricing",
-  },
-  referral: {
-    meta: {
-      title: "Referral Program",
-      description: "Refer Daniel Math Academy to families you know. Referred enrollments come with a thank-you for both families.",
-    },
-    eyebrow: "Referral Program",
-    title: "Our current families are our biggest strength",
-    titleKo: "",
-    desc: "A referral from a parent who's already experienced Daniel Math Academy means the most to us. Refer a family, and when they enroll, we'll thank both families.",
-    howTitle: "How to Refer",
-    howDesc: "Just have the family you refer mention your name in the referred-by field on our inquiry form — no code or extra steps needed.",
-    note: "Reward details are shared during your consultation.",
-    cta: "Schedule a Consult",
-  },
   thanks: {
     meta: {
       title: "Thank you",

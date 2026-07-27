@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { Container } from "./container";
@@ -24,7 +25,15 @@ export function SiteHeader({ locale }: { locale: Locale }) {
     <header className="sticky top-0 z-40 w-full border-b border-navy-100 bg-white/85 backdrop-blur supports-[backdrop-filter]:bg-white/70">
       <Container>
         <div className="flex h-16 items-center justify-between">
-          <Link href={lp("/")} className="flex items-baseline gap-2">
+          <Link href={lp("/")} className="flex items-center gap-2">
+            <Image
+              src="/brand/daniel-math-academy-logo.png"
+              alt={siteConfig.name}
+              width={40}
+              height={40}
+              className="h-10 w-10 rounded-full"
+              priority
+            />
             <span className="text-lg font-bold tracking-tight text-navy-900" lang={isKo ? "ko" : undefined}>
               {isKo ? siteConfig.nameKo : siteConfig.name}
             </span>
@@ -81,10 +90,10 @@ export function SiteHeader({ locale }: { locale: Locale }) {
             </div>
             <div className="ml-3 flex items-center gap-2">
               <Button href="/dashboard" variant="secondary" size="md">
-                {isKo ? "대시보드 / Dashboard" : "Dashboard"}
+                {isKo ? "대시보드" : "Dashboard"}
               </Button>
               <Button href="/login" size="md">
-                {isKo ? "로그인 / Login" : "Login"}
+                {isKo ? "로그인" : "Login"}
               </Button>
             </div>
           </nav>
@@ -162,10 +171,10 @@ export function SiteHeader({ locale }: { locale: Locale }) {
             </div>
             <div className="mt-2 flex flex-col gap-2">
               <Button href="/dashboard" variant="secondary" size="lg" className="w-full">
-                {isKo ? "대시보드 / Dashboard" : "Dashboard"}
+                {isKo ? "대시보드" : "Dashboard"}
               </Button>
               <Button href="/login" size="lg" className="w-full">
-                {isKo ? "로그인 / Login" : "Login"}
+                {isKo ? "로그인" : "Login"}
               </Button>
             </div>
           </nav>
