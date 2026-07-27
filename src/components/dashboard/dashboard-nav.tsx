@@ -9,7 +9,6 @@ const principalLinks = [
   { href: "/dashboard/principal/inquiries", label: "상담 문의" },
   { href: "/dashboard/principal/messages", label: "메시지" },
   { href: "/dashboard/principal/practice-sheets/new", label: "연습문제 생성" },
-  { href: "/dashboard/principal/problem-bank", label: "문제 은행" },
 ];
 
 const parentLinks = [

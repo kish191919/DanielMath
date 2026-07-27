@@ -1,6 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { requireRole } from "@/lib/dal";
@@ -9,14 +8,10 @@ import { createAdminSupabase } from "@/lib/supabase/admin";
 import { extractReferenceProblems } from "@/lib/ai/extract-reference-problems";
 import { EXT_BY_MIME } from "@/lib/storage/mime";
 import { mintSignedUploadUrl } from "@/lib/storage/signed-upload";
-import {
-  referenceUploadMetaSchema,
-  referenceReviewSubmissionSchema,
-  updateReferenceProblemSchema,
-  type ReferenceProblemInputValues,
-} from "./schema";
+import { referenceUploadMetaSchema } from "./schema";
 
 const BUCKET = "problem-bank";
+const PRACTICE_SHEETS_NEW_PATH = "/dashboard/principal/practice-sheets/new";
 
 async function markExtractionFailed(scanId: string, err: unknown) {
   // Runs inside after(), after the response/redirect has already been sent —
@@ -99,15 +94,17 @@ export async function confirmReferenceUploadAction(
     }
   });
 
-  revalidatePath("/dashboard/principal/problem-bank");
-  redirect(`/dashboard/principal/problem-bank/${input.scanId}`);
+  // No redirect — this is called from an embedded widget on
+  // practice-sheets/new, which polls (GradingStatusPoller) and refreshes
+  // itself once extraction completes.
+  revalidatePath(PRACTICE_SHEETS_NEW_PATH);
 }
 
 export async function retryReferenceExtractionAction(scanId: string) {
   await requireRole("principal");
 
   const supabase = await createServerSupabase();
-  await supabase.from("reference_problems").delete().eq("scan_id", scanId).eq("confirmed", false);
+  await supabase.from("reference_problems").delete().eq("scan_id", scanId);
   await supabase
     .from("reference_problem_scans")
     .update({ status: "grading", grading_error: null })
@@ -121,57 +118,7 @@ export async function retryReferenceExtractionAction(scanId: string) {
     }
   });
 
-  revalidatePath(`/dashboard/principal/problem-bank/${scanId}`);
-  revalidatePath("/dashboard/principal/problem-bank");
-}
-
-export type ReviewResult = { error: string } | { ok: true };
-
-export async function confirmReferenceReviewAction(
-  scanId: string,
-  items: ReferenceProblemInputValues[],
-): Promise<ReviewResult> {
-  const session = await requireRole("principal");
-
-  const parsed = referenceReviewSubmissionSchema.safeParse({ scan_id: scanId, items });
-  if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "입력값을 확인해주세요." };
-  }
-
-  const supabase = await createServerSupabase();
-
-  const { error: deleteError } = await supabase
-    .from("reference_problems")
-    .delete()
-    .eq("scan_id", parsed.data.scan_id);
-  if (deleteError) return { error: deleteError.message };
-
-  const rows = parsed.data.items.map((item) => ({
-    scan_id: parsed.data.scan_id,
-    problem_number: item.problem_number || null,
-    transcribed_problem: item.transcribed_problem,
-    transcribed_answer: item.transcribed_answer || null,
-    concept_id: item.concept_id,
-    source: item.source,
-    edited_by_teacher: item.edited_by_teacher,
-    confirmed: true,
-  }));
-
-  const { error: insertError } = await supabase.from("reference_problems").insert(rows);
-  if (insertError) return { error: insertError.message };
-
-  const { error: updateError } = await supabase
-    .from("reference_problem_scans")
-    .update({
-      status: "reviewed",
-      reviewed_at: new Date().toISOString(),
-      reviewed_by: session.userId,
-    })
-    .eq("id", parsed.data.scan_id);
-  if (updateError) return { error: updateError.message };
-
-  revalidatePath("/dashboard/principal/problem-bank");
-  redirect(`/dashboard/principal/problem-bank/${parsed.data.scan_id}`);
+  revalidatePath(PRACTICE_SHEETS_NEW_PATH);
 }
 
 export async function deleteReferenceScanAction(scanId: string) {
@@ -191,40 +138,7 @@ export async function deleteReferenceScanAction(scanId: string) {
     await admin.storage.from(BUCKET).remove([data.storage_path]);
   }
 
-  revalidatePath("/dashboard/principal/problem-bank");
-}
-
-export type UpdateReferenceProblemResult = { error: string } | { ok: true };
-
-// Lets a teacher edit or re-tag an already-confirmed catalog entry from the
-// problem-bank browse page — unlike a worksheet review (one-shot, per
-// scan), the bank is long-lived and reused across many generations, so it
-// needs ongoing light maintenance outside the initial review flow.
-export async function updateReferenceProblemAction(
-  id: string,
-  patch: { transcribed_problem: string; transcribed_answer: string; concept_id: string },
-): Promise<UpdateReferenceProblemResult> {
-  await requireRole("principal");
-
-  const parsed = updateReferenceProblemSchema.safeParse({ id, ...patch });
-  if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "입력값을 확인해주세요." };
-  }
-
-  const supabase = await createServerSupabase();
-  const { error } = await supabase
-    .from("reference_problems")
-    .update({
-      transcribed_problem: parsed.data.transcribed_problem,
-      transcribed_answer: parsed.data.transcribed_answer || null,
-      concept_id: parsed.data.concept_id,
-      edited_by_teacher: true,
-    })
-    .eq("id", parsed.data.id);
-  if (error) return { error: error.message };
-
-  revalidatePath("/dashboard/principal/problem-bank");
-  return { ok: true };
+  revalidatePath(PRACTICE_SHEETS_NEW_PATH);
 }
 
 export async function deleteReferenceProblemAction(id: string) {
@@ -234,5 +148,5 @@ export async function deleteReferenceProblemAction(id: string) {
   const { error } = await supabase.from("reference_problems").delete().eq("id", id);
   if (error) throw new Error(error.message);
 
-  revalidatePath("/dashboard/principal/problem-bank");
+  revalidatePath(PRACTICE_SHEETS_NEW_PATH);
 }

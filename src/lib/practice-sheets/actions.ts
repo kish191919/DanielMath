@@ -33,9 +33,9 @@ export async function generatePracticeSheetAction(
 
   // Never trust problem content from the client — re-fetch every source item
   // from the DB by id. Wrong-answer items are scoped to this student and to
-  // confirmed incorrect items only; reference items come from the global
-  // bank (no student scoping) and are scoped to confirmed catalog entries
-  // only, per the same "confirmed-only" rule as wrong-answer items.
+  // confirmed incorrect items only; reference items come from the global,
+  // scan-derived pool (no student scoping, no confirm gate — usable as soon
+  // as extracted, see extractReferenceProblems).
   const [wrongAnswerResult, referenceResult] = await Promise.all([
     wrongAnswerIds.length > 0
       ? supabase
@@ -52,7 +52,6 @@ export async function generatePracticeSheetAction(
           .from("reference_problems")
           .select("*")
           .in("id", referenceIds)
-          .eq("confirmed", true)
           .returns<ReferenceProblem[]>()
       : Promise.resolve({ data: [] as ReferenceProblem[], error: null }),
   ]);

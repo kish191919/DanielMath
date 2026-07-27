@@ -71,14 +71,14 @@ export type ReferenceProblemFilters = {
   conceptId?: string;
 };
 
-// Catalog browse query — only ever returns confirmed rows, mirroring how
-// listLearningItems requires confirmed=true (an unreviewed AI draft isn't
-// usable as a generation source yet).
+// Scanned problems are usable as soon as they're extracted — no separate
+// human tag/confirm gate (see extractReferenceProblems, which now inserts
+// with confirmed: true).
 export async function listReferenceProblems(
   filters?: ReferenceProblemFilters,
 ): Promise<ReferenceProblem[]> {
   const supabase = await createServerSupabase();
-  let query = supabase.from("reference_problems").select("*").eq("confirmed", true);
+  let query = supabase.from("reference_problems").select("*");
   if (filters?.conceptId) query = query.eq("concept_id", filters.conceptId);
   const { data, error } = await query
     .order("created_at", { ascending: false })

@@ -71,7 +71,9 @@ export async function extractReferenceProblems(scanId: string): Promise<void> {
         ai_suggested: item,
         source: "ai" as const,
         edited_by_teacher: false,
-        confirmed: false,
+        // Usable immediately once extracted — no separate human tag/confirm
+        // gate (see practice-sheets/new, which lists scans regardless).
+        confirmed: true,
       };
     });
 

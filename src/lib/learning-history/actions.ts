@@ -411,3 +411,16 @@ async function notifyGuardiansOfReport(
     }
   }
 }
+
+// Lets a teacher drop a single wrong-answer item from the practice-sheet
+// generation workspace (e.g. it's stale or was miscategorized) without
+// deleting the whole scan it came from — unlike deleteWorksheetScanAction.
+export async function deleteLearningItemAction(id: string) {
+  await requireRole("principal");
+
+  const supabase = await createServerSupabase();
+  const { error } = await supabase.from("learning_items").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/dashboard/principal/practice-sheets/new");
+}

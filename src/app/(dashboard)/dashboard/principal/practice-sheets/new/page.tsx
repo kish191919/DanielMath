@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button";
 import { requireRole } from "@/lib/dal";
 import { listStudents, getStudent } from "@/lib/students/queries";
 import { listLearningItems, listConcepts, listScansForStudent } from "@/lib/learning-history/queries";
-import { listReferenceProblems } from "@/lib/problem-bank/queries";
+import { listReferenceProblems, listReferenceScans } from "@/lib/problem-bank/queries";
 import {
   PracticeSheetGeneratorWorkspace,
   type ItemGroup,
+  type ReferenceScanGroup,
 } from "@/components/dashboard/practice-sheet-generator-workspace";
 import { GRADE_LABELS } from "@/lib/students/schema";
 
@@ -34,7 +35,7 @@ export default async function NewPracticeSheetPage({
             유사문제 생성
           </h1>
           <p className="mt-2 text-sm text-navy-700 font-ko" lang="ko">
-            학생의 오답과 문제 보관함의 참고문제를 함께 선택해 AI로 유사문제를 생성합니다. 먼저
+            학생의 오답과 스캔한 문제를 함께 선택해 AI로 유사문제를 생성합니다. 먼저
             학생을 선택하세요.
           </p>
           <form method="get" className="mt-6 flex items-end gap-3">
@@ -63,13 +64,15 @@ export default async function NewPracticeSheetPage({
     );
   }
 
-  const [student, wrongAnswerItems, concepts, referenceProblems, scans] = await Promise.all([
-    getStudent(studentId),
-    listLearningItems(studentId, { onlyIncorrect: true }),
-    listConcepts(),
-    listReferenceProblems({}),
-    listScansForStudent(studentId),
-  ]);
+  const [student, wrongAnswerItems, concepts, referenceProblems, referenceScans, scans] =
+    await Promise.all([
+      getStudent(studentId),
+      listLearningItems(studentId, { onlyIncorrect: true }),
+      listConcepts(),
+      listReferenceProblems({}),
+      listReferenceScans(),
+      listScansForStudent(studentId),
+    ]);
   if (!student) notFound();
 
   const scansById = new Map(scans.map((s) => [s.id, s]));
@@ -90,6 +93,23 @@ export default async function NewPracticeSheetPage({
       };
     });
 
+  // Scanned problems are global (not student-scoped) — every practice-sheet
+  // session sees the same pool of scans, grouped by scan like wrong answers
+  // are grouped by session, so a teacher can tell which photo a problem
+  // came from.
+  const referenceItemsByScan = new Map<string, typeof referenceProblems>();
+  for (const item of referenceProblems) {
+    const group = referenceItemsByScan.get(item.scan_id) ?? [];
+    group.push(item);
+    referenceItemsByScan.set(item.scan_id, group);
+  }
+  const referenceGroups: ReferenceScanGroup[] = [...referenceScans]
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .map((scan) => ({
+      scan,
+      items: referenceItemsByScan.get(scan.id) ?? [],
+    }));
+
   return (
     <Section className="py-10 sm:py-14">
       <Container className="max-w-3xl">
@@ -101,14 +121,14 @@ export default async function NewPracticeSheetPage({
             {student.full_name} — 유사문제 생성
           </h1>
           <p className="mt-2 text-sm text-navy-700 font-ko" lang="ko">
-            오답과 문제 보관함의 참고문제를 함께 선택할 수 있습니다.
+            오답과 스캔한 문제를 함께 선택할 수 있습니다. 사진을 찍어 올리면 아래 목록에 바로 추가됩니다.
           </p>
         </div>
         <div className="mt-8">
           <PracticeSheetGeneratorWorkspace
             studentId={studentId}
             wrongAnswerGroups={wrongAnswerGroups}
-            referenceProblems={referenceProblems}
+            referenceGroups={referenceGroups}
             concepts={concepts}
           />
         </div>
