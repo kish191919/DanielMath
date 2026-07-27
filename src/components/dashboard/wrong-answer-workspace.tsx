@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
 import { ERROR_TYPE_LABELS } from "@/lib/learning-history/schema";
 import { generatePracticeSheetAction } from "@/lib/practice-sheets/actions";
 import type { LearningItem } from "@/lib/supabase/types";
@@ -129,16 +130,17 @@ export function WrongAnswerWorkspace({
             </span>
             <label className="flex items-center gap-1.5">
               문항당
-              <input
-                type="number"
-                min={1}
-                max={5}
+              <Select
                 value={countPerItem}
-                onChange={(e) =>
-                  setCountPerItem(Math.min(5, Math.max(1, Number(e.target.value) || 1)))
-                }
-                className="w-14 rounded-lg border border-navy-200 px-2 py-1 text-sm"
-              />
+                onChange={(e) => setCountPerItem(Number(e.target.value))}
+                className="h-8 w-16 rounded-lg border border-navy-200 px-2 py-1 text-sm"
+              >
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
+                ))}
+              </Select>
               개 생성
             </label>
           </div>
