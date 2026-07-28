@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Paperclip } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
 import { requireRole } from "@/lib/dal";
@@ -7,6 +7,7 @@ import {
   listChildrenForParent,
   getConceptAccuracySummaryForParent,
   listSessionNotesForParent,
+  getSignedScanViewUrlForParent,
 } from "@/lib/learning-history/queries";
 
 function daysAgoIso(days: number) {
@@ -25,7 +26,14 @@ export default async function ParentProgressPage() {
         getConceptAccuracySummaryForParent(session.userId, child.id, { from: daysAgoIso(30) }),
         listSessionNotesForParent(session.userId, child.id, 10),
       ]);
-      return { child, recentSummary, notes };
+      const notesWithWorksheetUrls = await Promise.all(
+        notes.map(async (note) => {
+          if (!note.scan_id) return { ...note, worksheetUrl: null };
+          const result = await getSignedScanViewUrlForParent(session.userId, note.scan_id);
+          return { ...note, worksheetUrl: result?.url ?? null };
+        }),
+      );
+      return { child, recentSummary, notes: notesWithWorksheetUrls };
     }),
   );
 
@@ -50,8 +58,12 @@ export default async function ParentProgressPage() {
           </div>
         ) : (
           <div className="mt-8 space-y-10">
-            {childData.map(({ child, recentSummary, notes }) => (
-              <div key={child.id}>
+            {childData.map(({ child, recentSummary, notes }) => {
+              // Unassigned ("미분류") rows are an internal data-tagging gap,
+              // not something a parent can act on, so they're hidden here.
+              const visibleSummary = recentSummary.filter((row) => row.conceptId !== null);
+              return (
+                <div key={child.id} id={`child-${child.id}`}>
                 <div className="flex items-center gap-3">
                   <h2 className="text-lg font-semibold text-navy-900">{child.full_name}</h2>
                   <span className="inline-flex items-center rounded-full bg-navy-50 px-2 py-0.5 text-xs font-medium text-navy-800">
@@ -63,7 +75,7 @@ export default async function ParentProgressPage() {
                   <h3 className="text-sm font-semibold text-navy-700 font-ko" lang="ko">
                     개념별 정답률 (최근 30일)
                   </h3>
-                  {recentSummary.length === 0 ? (
+                  {visibleSummary.length === 0 ? (
                     <p className="mt-2 text-sm text-navy-600">아직 기록된 학습이력이 없습니다.</p>
                   ) : (
                     <div className="mt-2 overflow-hidden rounded-2xl border border-navy-100 bg-white shadow-sm">
@@ -75,13 +87,25 @@ export default async function ParentProgressPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {recentSummary.map((row) => (
-                            <tr key={row.conceptId ?? "unassigned"} className="border-t border-navy-100">
+                          {visibleSummary.map((row) => (
+                            <tr key={row.conceptId} className="border-t border-navy-100">
                               <td className="px-4 py-2.5">
-                                <span className="font-medium text-navy-900">{row.label}</span>
-                                {row.strand && (
-                                  <span className="ml-2 text-xs text-navy-500">{row.strand}</span>
-                                )}
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                  <span className="font-medium text-navy-900">{row.label}</span>
+                                  {row.strand && (
+                                    <span className="text-xs text-navy-500">{row.strand}</span>
+                                  )}
+                                  {row.isWeak && (
+                                    <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
+                                      주의필요
+                                    </span>
+                                  )}
+                                  {row.isLowSample && (
+                                    <span className="rounded-full bg-navy-50 px-2 py-0.5 text-xs font-medium text-navy-500">
+                                      표본부족
+                                    </span>
+                                  )}
+                                </div>
                               </td>
                               <td className="px-4 py-2.5 text-navy-700">
                                 {row.accuracyRate}% ({row.correct}/{row.total})
@@ -111,13 +135,16 @@ export default async function ParentProgressPage() {
                           <p className="mt-1 whitespace-pre-line text-sm text-navy-800 font-ko" lang="ko">
                             {note.note}
                           </p>
-                          {note.scan_id && (
-                            <Link
-                              href={`/dashboard/parent/worksheets/${note.scan_id}`}
-                              className="mt-2 inline-block text-xs font-medium text-navy-600 underline underline-offset-2 hover:text-navy-800"
+                          {note.worksheetUrl && (
+                            <a
+                              href={note.worksheetUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="mt-2 inline-flex items-center gap-1 text-xs text-navy-400 underline-offset-2 hover:text-navy-600 hover:underline"
                             >
+                              <Paperclip className="h-3 w-3" />
                               원본 학습지 보기
-                            </Link>
+                            </a>
                           )}
                         </div>
                       ))}
@@ -125,7 +152,8 @@ export default async function ParentProgressPage() {
                   )}
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </Container>

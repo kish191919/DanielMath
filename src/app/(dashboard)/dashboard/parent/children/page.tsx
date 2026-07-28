@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
 import { listChildrenForParent } from "@/lib/learning-history/queries";
@@ -27,9 +28,10 @@ export default async function ParentChildrenPage() {
             </div>
           ) : (
             children.map((child) => (
-              <article
+              <Link
                 key={child.id}
-                className="rounded-2xl border border-navy-100 bg-white p-5 shadow-sm"
+                href={`/dashboard/parent/progress#child-${child.id}`}
+                className="rounded-2xl border border-navy-100 bg-white p-5 shadow-sm transition-colors hover:border-navy-300 hover:bg-navy-50"
               >
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="text-base font-semibold text-navy-900">
@@ -44,7 +46,7 @@ export default async function ParentChildrenPage() {
                     {child.notes}
                   </p>
                 )}
-              </article>
+              </Link>
             ))
           )}
         </div>

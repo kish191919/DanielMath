@@ -320,7 +320,7 @@ export async function publishSessionNoteAction(
   if (error) return { error: error.message };
 
   try {
-    await notifyGuardiansOfReport(studentId, scanId, session.userId, parsed.data);
+    await notifyGuardiansOfReport(studentId, scanId, session.userId);
   } catch (err) {
     // Best-effort — the publish itself already succeeded (same pattern as
     // generateParentSummaryDraft above in confirmReviewAction).
@@ -344,7 +344,6 @@ async function notifyGuardiansOfReport(
   studentId: string,
   scanId: string,
   principalId: string,
-  reportText: string,
 ): Promise<void> {
   const guardians = await listGuardiansForStudent(studentId);
   if (guardians.length === 0) return;
@@ -367,6 +366,12 @@ async function notifyGuardiansOfReport(
   const total = items?.length ?? 0;
   const correct = items?.filter((i) => i.is_correct).length ?? 0;
   const accuracyRate = total > 0 ? Math.round((correct / total) * 100) : null;
+  const rateText = accuracyRate !== null ? `정답률 ${accuracyRate}%. ` : "";
+
+  // Chat gets a short arrival notice rather than the full report text — the
+  // full report already lives on the "진행 상황" page (session_notes), and
+  // duplicating it into the thread just meant parents saw it twice.
+  const notificationText = `${studentName} 학생의 학습 리포트가 도착했습니다. ${rateText}'진행 상황' 메뉴에서 전체 내용을 확인해보세요.`;
 
   for (const { guardian } of guardians) {
     try {
@@ -374,14 +379,14 @@ async function notifyGuardiansOfReport(
       const { error: msgError } = await supabase.from("messages").insert({
         thread_id: thread.id,
         sender_id: principalId,
-        body: reportText,
+        body: notificationText,
       });
       if (!msgError) {
         await supabase
           .from("message_threads")
           .update({
             last_message_at: new Date().toISOString(),
-            last_message_body: reportText.slice(0, 200),
+            last_message_body: notificationText.slice(0, 200),
             last_sender_id: principalId,
           })
           .eq("id", thread.id);
@@ -400,7 +405,6 @@ async function notifyGuardiansOfReport(
     const link = await generateParentMagicLink(guardian.email);
     if (!link) continue;
 
-    const rateText = accuracyRate !== null ? `정답률 ${accuracyRate}%. ` : "";
     try {
       await sendSms({
         to: phone,

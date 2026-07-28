@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Sparkles, Clock, Users, ClipboardCheck, BarChart2, BookOpen, MessageCircle, Target, Send } from "lucide-react";
+import Image from "next/image";
+import { Sparkles, Clock, Users, BarChart2, BookOpen, Puzzle } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
 import { HeroBackground } from "@/components/site/hero-background";
@@ -139,45 +140,40 @@ function ProgramsPreview({ d, isKo }: { d: Awaited<ReturnType<typeof getDictiona
           isKo={isKo}
         />
 
-        <div className="mt-12 rounded-2xl border border-navy-100 bg-white p-8 shadow-sm sm:p-10">
-          <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:gap-12">
-            <div>
-              {isKo ? (
-                <h3 className="text-xl font-bold text-navy-900 font-ko" lang="ko">{p.h3ko}</h3>
-              ) : (
-                <h3 className="text-xl font-bold text-navy-900">{p.h3en}</h3>
-              )}
-              <p className={`mt-4 text-sm leading-7 text-navy-700${isKo ? " font-ko" : ""}`}>
-                {p.body}
-              </p>
+        <div className="mt-12 grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-sm ring-1 ring-navy-100">
+            <Image
+              src="/hero/student-1.jpg"
+              alt=""
+              fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              className="object-cover"
+            />
+          </div>
 
-              <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                {[p.classSize, p.time].map((f) => (
-                  <div
-                    key={f.label}
-                    className="rounded-xl border border-navy-100 bg-navy-50/60 p-4"
-                  >
-                    <div className="flex items-center gap-2 text-navy-700">
-                      {f.label === p.classSize.label ? (
-                        <Users className="h-4 w-4" />
-                      ) : (
-                        <Clock className="h-4 w-4" />
-                      )}
-                      <span className={`text-[11px] font-semibold uppercase tracking-wider text-navy-500${isKo ? " font-ko" : ""}`}>
-                        {f.label}
-                      </span>
-                    </div>
-                    <p className={`mt-2 text-base font-semibold text-navy-900${isKo ? " font-ko" : ""}`}>{f.value}</p>
-                    {f.sublabel && <p className="text-xs text-navy-600">{f.sublabel}</p>}
-                  </div>
-                ))}
+          <div className="grid gap-3 sm:grid-cols-2">
+            {[p.classSize, p.time].map((f) => (
+              <div
+                key={f.label}
+                className="rounded-xl border border-navy-100 bg-white p-4 shadow-sm"
+              >
+                <div className="flex items-center gap-2 text-navy-700">
+                  {f.label === p.classSize.label ? (
+                    <Users className="h-4 w-4" />
+                  ) : (
+                    <Clock className="h-4 w-4" />
+                  )}
+                  <span className={`text-[11px] font-semibold uppercase tracking-wider text-navy-500${isKo ? " font-ko" : ""}`}>
+                    {f.label}
+                  </span>
+                </div>
+                <p className={`mt-2 text-base font-semibold text-navy-900${isKo ? " font-ko" : ""}`}>{f.value}</p>
+                {f.sublabel && <p className="text-xs text-navy-600">{f.sublabel}</p>}
               </div>
-
-              <p className={`mt-6 text-sm text-navy-700${isKo ? " font-ko" : ""}`}>
-                <strong className="text-navy-900">{p.schedule}</strong>
-              </p>
+            ))}
+            <div className="col-span-full rounded-xl border border-navy-100 bg-white p-4 shadow-sm">
+              <p className={`text-sm font-semibold text-navy-900${isKo ? " font-ko" : ""}`}>{p.schedule}</p>
             </div>
-
           </div>
         </div>
       </Container>
@@ -186,7 +182,7 @@ function ProgramsPreview({ d, isKo }: { d: Awaited<ReturnType<typeof getDictiona
 }
 
 function HowItWorks({ d, isKo }: { d: Awaited<ReturnType<typeof getDictionary>>["home"]; isKo: boolean }) {
-  const icons = [ClipboardCheck, BarChart2, BookOpen, MessageCircle, Target, Send];
+  const icons = [BarChart2, BookOpen, Puzzle];
   return (
     <Section className="bg-white">
       <Container>
@@ -198,28 +194,40 @@ function HowItWorks({ d, isKo }: { d: Awaited<ReturnType<typeof getDictionary>>[
           isKo={isKo}
         />
 
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {d.how.steps.map((s, i) => {
-            const Icon = icons[i];
-            return (
-              <div key={s.title} className="flex flex-col rounded-2xl border border-navy-100 bg-white p-6 shadow-sm">
-                <div className="flex items-center gap-3">
-                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-navy-900 text-sm font-bold text-white">
+        <div className="mt-12 grid items-center gap-8 lg:grid-cols-[1fr_1.2fr] lg:gap-12">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-sm ring-1 ring-navy-100">
+            <Image
+              src="/hero/student-2.jpg"
+              alt=""
+              fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              className="object-cover"
+            />
+          </div>
+
+          <div className="grid gap-4">
+            {d.how.steps.map((s, i) => {
+              const Icon = icons[i];
+              return (
+                <div key={s.title} className="flex items-center gap-4 rounded-2xl border border-navy-100 bg-white p-5 shadow-sm">
+                  <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-navy-900 text-sm font-bold text-white">
                     {i + 1}
                   </span>
-                  <Icon className="h-5 w-5 text-navy-500" />
+                  <Icon className="h-5 w-5 shrink-0 text-navy-500" />
+                  <div>
+                    {isKo ? (
+                      <h3 className="text-sm font-bold text-navy-900 font-ko" lang="ko">{s.titleKo}</h3>
+                    ) : (
+                      <h3 className="text-sm font-bold text-navy-900">{s.title}</h3>
+                    )}
+                    <p className={`mt-1 text-sm text-navy-700${isKo ? " font-ko" : ""}`}>
+                      {s.desc}
+                    </p>
+                  </div>
                 </div>
-                {isKo ? (
-                  <h3 className="mt-4 text-base font-bold text-navy-900 font-ko" lang="ko">{s.titleKo}</h3>
-                ) : (
-                  <h3 className="mt-4 text-base font-bold text-navy-900">{s.title}</h3>
-                )}
-                <p className={`mt-3 text-sm leading-6 text-navy-700${isKo ? " font-ko" : ""}`}>
-                  {s.desc}
-                </p>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </Container>
     </Section>
