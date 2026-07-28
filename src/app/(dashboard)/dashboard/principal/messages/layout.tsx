@@ -27,7 +27,7 @@ export default async function PrincipalMessagesLayout({
   }
 
   return (
-    <div className="grid h-[calc(100vh-8rem)] grid-cols-1 sm:grid-cols-[280px_1fr]">
+    <div className="grid h-[calc(100dvh-8rem)] grid-cols-1 sm:grid-cols-[280px_1fr]">
       <div className="overflow-y-auto border-r border-navy-100 bg-white p-2">
         <UnreadNavListener />
         <ThreadSidebar

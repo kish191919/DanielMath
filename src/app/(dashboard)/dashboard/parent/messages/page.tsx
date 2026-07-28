@@ -10,7 +10,7 @@ export default async function ParentMessagesPage() {
   const messages = await listMessagesForThread(thread.id);
 
   return (
-    <div className="h-[calc(100vh-8rem)]">
+    <div className="h-[calc(100dvh-8rem)]">
       <UnreadNavListener />
       <ThreadView
         threadId={thread.id}
