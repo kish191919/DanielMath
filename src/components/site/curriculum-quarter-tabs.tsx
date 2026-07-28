@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Calculator, PieChart, Hash, Shapes, Ruler, BarChart3, Repeat, type LucideIcon } from "lucide-react";
 import type { QuarterData, TopicCategory } from "@/lib/curriculum-data";
 import {
   getCurrentQuarter,
@@ -9,14 +10,14 @@ import {
   type Quarter,
 } from "@/lib/curriculum-quarter";
 
-const CATEGORY_STYLES: Record<TopicCategory, { badge: string; dot: string }> = {
-  "수·연산":  { badge: "bg-blue-50 text-blue-700 border-blue-200",   dot: "bg-blue-400" },
-  "분수":     { badge: "bg-purple-50 text-purple-700 border-purple-200", dot: "bg-purple-400" },
-  "소수":     { badge: "bg-teal-50 text-teal-700 border-teal-200",   dot: "bg-teal-400" },
-  "도형":     { badge: "bg-orange-50 text-orange-700 border-orange-200", dot: "bg-orange-400" },
-  "측정":     { badge: "bg-amber-50 text-amber-700 border-amber-200", dot: "bg-amber-400" },
-  "확률·자료": { badge: "bg-rose-50 text-rose-700 border-rose-200",  dot: "bg-rose-400" },
-  "대수·패턴": { badge: "bg-indigo-50 text-indigo-700 border-indigo-200", dot: "bg-indigo-400" },
+const CATEGORY_STYLES: Record<TopicCategory, { badge: string; dot: string; icon: LucideIcon }> = {
+  "수·연산":  { badge: "bg-blue-50 text-blue-700 border-blue-200",   dot: "bg-blue-400",   icon: Calculator },
+  "분수":     { badge: "bg-purple-50 text-purple-700 border-purple-200", dot: "bg-purple-400", icon: PieChart },
+  "소수":     { badge: "bg-teal-50 text-teal-700 border-teal-200",   dot: "bg-teal-400",   icon: Hash },
+  "도형":     { badge: "bg-orange-50 text-orange-700 border-orange-200", dot: "bg-orange-400", icon: Shapes },
+  "측정":     { badge: "bg-amber-50 text-amber-700 border-amber-200", dot: "bg-amber-400",  icon: Ruler },
+  "확률·자료": { badge: "bg-rose-50 text-rose-700 border-rose-200",  dot: "bg-rose-400",   icon: BarChart3 },
+  "대수·패턴": { badge: "bg-indigo-50 text-indigo-700 border-indigo-200", dot: "bg-indigo-400", icon: Repeat },
 };
 
 const CATEGORY_ORDER: TopicCategory[] = [
@@ -175,8 +176,9 @@ function CategorizedTopics({
           <div key={category}>
             {style && (
               <span
-                className={`mb-2 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${style.badge}`}
+                className={`mb-2 inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${style.badge}`}
               >
+                <style.icon className="h-3 w-3" />
                 {category}
               </span>
             )}

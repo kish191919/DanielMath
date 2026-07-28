@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle, ExternalLink } from "lucide-react";
+import { ArrowLeft, ArrowUp, CheckCircle, ExternalLink } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
 import { grades, gradeBySlug, type GradeData, type TrackData } from "@/lib/curriculum-data";
@@ -177,6 +177,12 @@ function TrackHeader({
           </span>
         )}
         <span className="text-xs text-navy-600">{gradeEq}</span>
+        {isAdvanced && (
+          <span className="inline-flex items-center gap-0.5 rounded-full border border-gold-400 bg-white px-1.5 py-0.5 text-[10px] font-bold text-gold-700">
+            <ArrowUp className="h-3 w-3" />
+            {isKo ? "한 학년 위" : "+1 grade"}
+          </span>
+        )}
       </div>
       <ul className="mt-3 grid gap-1.5 sm:grid-cols-2">
         {hl.map((h) => (

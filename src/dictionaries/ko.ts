@@ -263,7 +263,7 @@ const ko = {
           badge: "일정",
           title: "시험 & 대회 일정",
           titleEn: "Test & Competition Calendar",
-          desc: "AAP 스크리닝(CogAT/NNAT), SOL 시험, MOEMS 등 주요 시험과 대회 일정을 확인하세요.",
+          desc: "AAP 스크리닝(NGAT), SOL 시험, MOEMS 등 주요 시험과 대회 일정을 확인하세요.",
           cta: "일정 보기",
         },
       ],
@@ -276,7 +276,7 @@ const ko = {
           { title: "중학교 수학에 큰 영향을 줍니다", body: "6학년에 심화반(7학년 수준)을 이수하면 중학교에서 Algebra I를 8학년이 아닌 더 일찍 시작할 수 있습니다. 이는 고등학교 AP Calculus 이수에까지 이어집니다." },
           { title: "AAP 배치는 매년 갱신됩니다", body: "AAP는 한 번 들어가면 끝이 아닙니다. 매 학년 말에 재평가가 있으며, 학업 유지가 필요합니다. Daniel Math Academy는 AAP 진입과 유지를 모두 지원합니다." },
         ],
-        note: "이 페이지의 커리큘럼 내용은 FCPS Year at a Glance와 Virginia Mathematics SOL을 바탕으로 작성되었습니다. 가장 최신 정보는 FCPS 공식 웹사이트에서 확인하시기 바랍니다.",
+        note: "이 페이지의 커리큘럼 내용은 FCPS Year at a Glance와 Virginia Mathematics SOL을 바탕으로 작성되었습니다. 가장 최신 정보는 ",
         noteLink: "FCPS 공식 웹사이트",
       },
       faq: {

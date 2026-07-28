@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, CalendarDays, Info } from "lucide-react";
+import { ArrowLeft, CalendarDays, Info, FileEdit, Brain, FolderOpen, Mail, GraduationCap } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
 import { testEvents } from "@/lib/curriculum-data";
@@ -26,12 +26,12 @@ const badgeMap = {
 };
 
 const aapTimeline = [
-  { step: "01", when: "Oct", whenKo: "10월 초", title: "Referral Window Opens", titleKo: "AAP 의뢰 접수 시작", desc: "Parents, teachers, or students may submit an AAP screening referral. Contact your school's AAP coordinator.", descKo: "학부모, 교사, 학생 본인이 AAP 스크리닝 의뢰서를 제출할 수 있습니다. 각 학교 AAP 담당자에게 문의하세요.", color: "navy" as const },
-  { step: "02", when: "Dec", whenKo: "12월 초", title: "Referral Window Closes", titleKo: "AAP 의뢰 접수 마감", desc: "After the deadline it is difficult to participate in that year's screening. Submit on time.", descKo: "마감일 이후에는 당해 연도 스크리닝에 참여하기 어렵습니다. 늦지 않게 제출하세요.", color: "navy" as const },
-  { step: "03", when: "Jan–Feb", whenKo: "1~2월", title: "Ability Testing (CogAT + NNAT)", titleKo: "능력 검사 시행", desc: "The school administers CogAT (verbal, quantitative, nonverbal reasoning) and NNAT (nonverbal) tests.", descKo: "학교에서 CogAT(언어·수리·비언어 추론)와 NNAT(비언어적 추론) 검사가 진행됩니다.", color: "gold" as const },
-  { step: "04", when: "Feb–Mar", whenKo: "2~3월", title: "Portfolio Review", titleKo: "포트폴리오 & 추가 자료 제출", desc: "Report cards, work samples, and teacher evaluations are submitted to the selection committee.", descKo: "성적표, 작품 샘플, 교사 평가서 등 학생의 학업 역량을 보여주는 자료가 평가위원회에 제출됩니다.", color: "gold" as const },
-  { step: "05", when: "Apr", whenKo: "4월", title: "Placement Notification", titleKo: "배치 결과 통보", desc: "FCPS mails placement letters to families. Full-Time AAP starts at a designated center school the following year.", descKo: "FCPS가 가정에 배치 결과 서한을 발송합니다. Full-Time AAP는 다음 학년부터 지정 센터 학교에서 시작됩니다.", color: "green" as const },
-  { step: "06", when: "Sep (next yr)", whenKo: "다음 학년 9월", title: "AAP Program Begins", titleKo: "AAP 프로그램 시작", desc: "Full-Time AAP students transfer to their assigned center school. Part-Time (Level III) students remain at their home school.", descKo: "Full-Time AAP 학생은 배정된 AAP 센터 학교로 이동합니다. Part-Time(Level III)은 현재 학교에서 수업을 받습니다.", color: "green" as const },
+  { step: "01", icon: FileEdit, when: "Oct", whenKo: "10월 초", title: "Referral Window Opens", titleKo: "AAP 의뢰 접수 시작", desc: "Parents, teachers, or students may submit an AAP screening referral. Contact your school's AAP coordinator.", descKo: "학부모, 교사, 학생 본인이 AAP 스크리닝 의뢰서를 제출할 수 있습니다. 각 학교 AAP 담당자에게 문의하세요.", color: "navy" as const },
+  { step: "02", icon: FileEdit, when: "Dec", whenKo: "12월 초", title: "Referral Window Closes", titleKo: "AAP 의뢰 접수 마감", desc: "After the deadline it is difficult to participate in that year's screening. Submit on time.", descKo: "마감일 이후에는 당해 연도 스크리닝에 참여하기 어렵습니다. 늦지 않게 제출하세요.", color: "navy" as const },
+  { step: "03", icon: Brain, when: "Jan–Feb", whenKo: "1~2월", title: "Ability Testing (NGAT)", titleKo: "능력 검사 시행", desc: "The school administers the NGAT (Naglieri General Ability Test), FCPS's unified nationally normed reasoning test that replaced the separate CogAT/NNAT tests.", descKo: "학교에서 NGAT(Naglieri General Ability Test) 검사가 진행됩니다. 기존에 따로 실시하던 CogAT·NNAT 검사를 하나로 통합한 FCPS의 표준화 능력 검사입니다.", color: "gold" as const },
+  { step: "04", icon: FolderOpen, when: "Feb–Mar", whenKo: "2~3월", title: "Portfolio Review", titleKo: "포트폴리오 & 추가 자료 제출", desc: "Report cards, work samples, and teacher evaluations are submitted to the selection committee.", descKo: "성적표, 작품 샘플, 교사 평가서 등 학생의 학업 역량을 보여주는 자료가 평가위원회에 제출됩니다.", color: "gold" as const },
+  { step: "05", icon: Mail, when: "Apr", whenKo: "4월", title: "Placement Notification", titleKo: "배치 결과 통보", desc: "FCPS mails placement letters to families. Full-Time AAP starts at a designated center school the following year.", descKo: "FCPS가 가정에 배치 결과 서한을 발송합니다. Full-Time AAP는 다음 학년부터 지정 센터 학교에서 시작됩니다.", color: "green" as const },
+  { step: "06", icon: GraduationCap, when: "Sep (next yr)", whenKo: "다음 학년 9월", title: "AAP Program Begins", titleKo: "AAP 프로그램 시작", desc: "Full-Time AAP students transfer to their assigned center school. Part-Time (Level III) students remain at their home school.", descKo: "Full-Time AAP 학생은 배정된 AAP 센터 학교로 이동합니다. Part-Time(Level III)은 현재 학교에서 수업을 받습니다.", color: "green" as const },
 ];
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -39,8 +39,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!hasLocale(locale)) return {};
   const alt = pageAlternates(locale, "/resources/testing");
   return locale === "ko"
-    ? { title: "시험 & 대회 일정", description: "Fairfax County AAP 스크리닝 (CogAT/NNAT), Virginia SOL 시험, MOEMS 등 수학 관련 시험과 대회 일정을 한국어로 안내합니다.", alternates: alt }
-    : { title: "Test & Competition Calendar", description: "AAP screening (CogAT/NNAT), Virginia SOL tests, MOEMS, and more — all test and competition calendars for Fairfax County students.", alternates: alt };
+    ? { title: "시험 & 대회 일정", description: "Fairfax County AAP 스크리닝 (NGAT), Virginia SOL 시험, MOEMS 등 수학 관련 시험과 대회 일정을 한국어로 안내합니다.", alternates: alt }
+    : { title: "Test & Competition Calendar", description: "AAP screening (NGAT), Virginia SOL tests, MOEMS, and more — all test and competition calendars for Fairfax County students.", alternates: alt };
 }
 
 export default async function TestingPage({ params }: Props) {
@@ -102,7 +102,10 @@ export default async function TestingPage({ params }: Props) {
                       step.color === "green" ? "bg-emerald-600" : step.color === "gold" ? "bg-gold-500" : "bg-navy-900",
                     )}
                   >
-                    {step.step}
+                    <step.icon className="h-5 w-5 sm:h-7 sm:w-7" />
+                    <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-white text-[10px] font-bold text-navy-900 shadow-sm">
+                      {step.step.replace(/^0/, "")}
+                    </span>
                   </div>
                   <div className={cn("flex-1 rounded-2xl border p-5 shadow-sm", colorMap[step.color])}>
                     <div className="flex flex-wrap items-center gap-2">
@@ -181,8 +184,8 @@ export default async function TestingPage({ params }: Props) {
             </h2>
             <p className={`mx-auto mt-3 max-w-lg text-sm leading-7 text-navy-700${isKo ? " font-ko" : ""}`}>
               {isKo
-                ? "AAP 스크리닝(CogAT/NNAT), SOL 시험, AMC 8 — 모든 시험 목표에 맞춰 커리큘럼을 개인별로 설계합니다."
-                : "AAP screening (CogAT/NNAT), SOL tests, AMC 8 — we build a curriculum tailored to each student's test goals."}
+                ? "AAP 스크리닝(NGAT), SOL 시험, AMC 8 — 모든 시험 목표에 맞춰 커리큘럼을 개인별로 설계합니다."
+                : "AAP screening (NGAT), SOL tests, AMC 8 — we build a curriculum tailored to each student's test goals."}
             </p>
             <Link
               href={lp("/inquire")}

@@ -8,6 +8,7 @@ import { Section, SectionHeader } from "@/components/site/section";
 import { grades } from "@/lib/curriculum-data";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
 import { pageAlternates } from "@/lib/seo";
+import { GradePathway } from "@/components/site/grade-pathway";
 
 const gradeConfig: Record<number, {
   accent: string; border: string; hoverBorder: string;
@@ -59,7 +60,7 @@ export default async function CurriculumOverviewPage({ params }: Props) {
           points: ["한 학년 높은 Virginia SOL 내용을 배움", "예: 3학년 심화반 → 4학년 SOL 내용", "AAP 스크리닝 통과 학생 대상", "더 깊은 개념 이해와 추론 중심"],
         },
       ],
-      note: "K~2학년은 담임 선생님이 수업 중 학생 수준을 관찰하여 트랙을 배치합니다. 3학년부터는 AAP 공식 스크리닝(CogAT/NNAT) 결과로 Full-Time AAP 배치가 결정됩니다.",
+      note: "K~2학년은 담임 선생님이 수업 중 학생 수준을 관찰하여 트랙을 배치합니다. 3학년부터는 AAP 공식 스크리닝(NGAT) 결과로 Full-Time AAP 배치가 결정됩니다.",
     },
     grades: {
       eyebrow: "학년 선택",
@@ -80,6 +81,7 @@ export default async function CurriculumOverviewPage({ params }: Props) {
         { grade: "5학년", standard: "5학년 수준 (SOL 5)", advanced: "6학년 수준 (SOL 6)" },
         { grade: "6학년", standard: "6학년 수준 (SOL 6)", advanced: "7학년 / Pre-Algebra" },
       ],
+      finalLabel: "7학년 Algebra I 조기 시작",
       note: "심화반 6학년이 Pre-Algebra까지 마치면 중학교 1학년(7학년)에서 Algebra I를 바로 시작할 수 있습니다.",
     },
   } : {
@@ -99,10 +101,10 @@ export default async function CurriculumOverviewPage({ params }: Props) {
         },
         {
           label: "Advanced Math (AAP)", sublabel: "One grade level above", color: "gold" as const,
-          points: ["Covers content one grade above Virginia SOL", "E.g., 3rd-grade AAP → 4th-grade SOL content", "Requires AAP screening (CogAT/NNAT) for Full-Time", "Deeper conceptual understanding and reasoning"],
+          points: ["Covers content one grade above Virginia SOL", "E.g., 3rd-grade AAP → 4th-grade SOL content", "Requires AAP screening (NGAT) for Full-Time", "Deeper conceptual understanding and reasoning"],
         },
       ],
-      note: "For K–2, the homeroom teacher observes and assigns tracks during instruction. Starting in Grade 3, Full-Time AAP placement is determined by the official AAP screening (CogAT/NNAT) results.",
+      note: "For K–2, the homeroom teacher observes and assigns tracks during instruction. Starting in Grade 3, Full-Time AAP placement is determined by the official AAP screening (NGAT) results.",
     },
     grades: {
       eyebrow: "Select a Grade",
@@ -123,6 +125,7 @@ export default async function CurriculumOverviewPage({ params }: Props) {
         { grade: "Grade 5", standard: "Grade 5 level (SOL 5)", advanced: "Grade 6 level (SOL 6)" },
         { grade: "Grade 6", standard: "Grade 6 level (SOL 6)", advanced: "Grade 7 / Pre-Algebra" },
       ],
+      finalLabel: "Grade 7: Early Algebra I",
       note: "Advanced 6th graders who complete Pre-Algebra can start Algebra I in 7th grade — paving the path to AP Calculus AB/BC in high school.",
     },
   };
@@ -240,28 +243,7 @@ export default async function CurriculumOverviewPage({ params }: Props) {
             title={t.progression.title}
             titleKo={t.progression.titleKo}
           />
-          <div className="mx-auto mt-10 max-w-2xl overflow-x-auto rounded-2xl border border-navy-100 bg-white shadow-sm touch-pan-x">
-            <table className="w-full text-sm">
-              <thead className="border-b border-navy-100">
-                <tr>
-                  {t.progression.ths.map((th, i) => (
-                    <th key={i} className={`px-5 py-3.5 text-left font-semibold${i === 2 ? " bg-amber-50 text-gold-600" : " text-navy-900"}${isKo ? " font-ko" : ""}`}>
-                      {th}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-navy-50">
-                {t.progression.rows.map((r) => (
-                  <tr key={r.grade} className="hover:bg-navy-50/40">
-                    <td className={`px-5 py-3 font-bold text-navy-900${isKo ? " font-ko" : ""}`}>{r.grade}</td>
-                    <td className={`px-5 py-3 text-navy-700${isKo ? " font-ko" : ""}`}>{r.standard}</td>
-                    <td className={`px-5 py-3 font-medium text-gold-600${isKo ? " font-ko" : ""}`}>{r.advanced}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <GradePathway rows={t.progression.rows} isKo={isKo} finalLabel={t.progression.finalLabel} />
           <p className={`mx-auto mt-4 max-w-2xl text-center text-xs text-navy-500${isKo ? " font-ko" : ""}`}>
             {t.progression.note}
           </p>

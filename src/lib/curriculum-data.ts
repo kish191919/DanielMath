@@ -1960,16 +1960,16 @@ export const testEvents: TestEvent[] = [
     color: "navy",
   },
   {
-    name: "AAP Ability Testing (CogAT / NNAT)",
-    nameKo: "AAP 역량 검사 (CogAT / NNAT)",
+    name: "AAP Ability Testing (NGAT)",
+    nameKo: "AAP 역량 검사 (NGAT)",
     when: "Jan – Feb (annually)",
     whenKo: "매년 1월 ~ 2월",
     grades: "Referred students (K–5)",
     gradesKo: "의뢰된 학생 (유치원~5학년)",
     description:
-      "FCPS administers two nationally normed tests: CogAT (Cognitive Abilities Test) measures reasoning in verbal, quantitative, and nonverbal areas. NNAT (Naglieri Nonverbal Ability Test) measures nonverbal reasoning. Scores plus portfolio evidence determine AAP placement.",
+      "FCPS administers the NGAT (Naglieri General Ability Test), a single nationally normed reasoning test that replaced the previously separate CogAT and NNAT tests. Scores plus portfolio evidence determine AAP placement.",
     descriptionKo:
-      "FCPS에서 두 가지 표준화 검사를 실시합니다. CogAT(인지 능력 검사)는 언어·수리·비언어 추론 능력을, NNAT(비언어 능력 검사)는 비언어적 사고력을 측정합니다. 검사 점수와 포트폴리오 자료를 종합하여 AAP 배치가 결정됩니다.",
+      "FCPS에서 NGAT(Naglieri General Ability Test) 검사를 실시합니다. 이전에 따로 시행하던 CogAT와 NNAT 검사를 하나로 통합한 표준화 능력 검사입니다. 검사 점수와 포트폴리오 자료를 종합하여 AAP 배치가 결정됩니다.",
     color: "gold",
   },
   {

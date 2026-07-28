@@ -265,7 +265,7 @@ const en: Dictionary = {
           badge: "Calendar",
           title: "Test & Competition Calendar",
           titleEn: "Test & Competition Calendar",
-          desc: "AAP screening (CogAT/NNAT), SOL tests, MOEMS, and more — all in one calendar.",
+          desc: "AAP screening (NGAT), SOL tests, MOEMS, and more — all in one calendar.",
           cta: "View Calendar",
         },
       ],
