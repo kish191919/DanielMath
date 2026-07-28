@@ -23,14 +23,14 @@ export function DashboardNav({ role, unreadCount = 0 }: { role: Role; unreadCoun
   return (
     <nav className="border-b border-navy-100 bg-navy-50/50 print:hidden">
       <Container>
-        <ul className="flex gap-1 overflow-x-auto py-2">
+        <ul className="grid grid-cols-3 gap-1 py-2 sm:flex">
           {links.map((link) => (
-            <li key={link.href}>
+            <li key={link.href} className="min-w-0">
               <Link
                 href={link.href}
-                className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-navy-700 hover:bg-white hover:text-navy-900"
+                className="flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-medium text-navy-700 hover:bg-white hover:text-navy-900 sm:inline-flex sm:px-3"
               >
-                <span className="font-ko" lang="ko">
+                <span className="truncate font-ko" lang="ko">
                   {link.label}
                 </span>
                 {link.href === messagesHref && unreadCount > 0 && (
