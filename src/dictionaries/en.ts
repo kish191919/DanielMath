@@ -133,47 +133,51 @@ const en: Dictionary = {
   programs: {
     meta: {
       title: "Program",
-      description: "Ungraded small group classes for grades 3–6. Regardless of grade, each student works through worksheets matched to their ability level within the same proven curriculum in dedicated 70-minute sessions.",
+      description: "Ungraded small group classes for grades 3–6. Each student works through textbooks and worksheets matched to their own ability level, not their grade.",
     },
     header: {
       eyebrow: "Program",
       title: "Ungraded. Small groups. Proven materials.",
       titleKo: "",
-      desc: "Small classes of up to 4, not grouped by grade or ability — every student works through the same proven curriculum, with worksheets and pacing matched to their own level.",
+      desc: "Small classes of up to 4, not grouped by grade or ability — each student uses textbooks and worksheets matched to their own level.",
     },
     pillars: [
       {
-        title: "Worksheets Every Session",
+        title: "Personalized by Level",
         titleKo: "",
-        desc: "Curriculum-aligned worksheets are provided every session so students can practice what they've just learned and reinforce key concepts.",
+        desc: "Textbooks and worksheets are matched to each student's own level, not their grade.",
       },
       {
-        title: "Proven Textbooks, Integrated",
+        title: "Three-Step Curriculum",
         titleKo: "",
-        desc: "We use Singapore Math for deep conceptual understanding, Beast Academy (by Art of Problem Solving) for discussion-centered gifted enrichment, and IXL Math to build fundamental concept mastery — all blended with CogAT/NNAT prep in one structured sequence.",
+        desc: "Students build concepts with IXL Math, deepen understanding with Singapore Math, and tackle varied problem types with Beast Academy (AoPS).",
       },
       {
-        title: "Homework Every Session",
+        title: "Ongoing Homework",
         titleKo: "",
-        desc: "Students receive homework after every session to keep practicing the concepts covered in class — bridging the gap between weekly meetings.",
+        desc: "Homework is assigned every session, though it may not always match that day's lesson concept.",
       },
       {
-        title: "Monthly Parent Report",
+        title: "Daily AI Report",
         titleKo: "",
-        desc: "Once a month, parents receive a written update covering lesson content, curriculum progress, and overall academic development — including strengths and areas to focus on.",
+        desc: "Every day, AI analyzes the problems your student solved and sends parents a report on strengths and areas to improve.",
       },
     ],
     coverage: {
       eyebrow: "Curriculum",
-      title: "Three trusted textbooks. One integrated curriculum.",
+      title: "Three trusted textbooks. One learning path.",
       titleKo: "",
-      desc: "Singapore Math, Beast Academy, and IXL Math form the core — blended with CogAT/NNAT prep at ratios matched to each student's grade and goals.",
+      desc: "Students build concepts with IXL Math, deepen understanding with Singapore Math, and tackle varied problem types with Beast Academy (AoPS).",
       chips: [
-        { label: "Singapore Math", sublabel: "Gifted textbook" },
-        { label: "Beast Academy", sublabel: "AoPS discussion math" },
-        { label: "IXL Math", sublabel: "Adaptive concept drill" },
-        { label: "CogAT / NNAT", sublabel: "AAP placement prep" },
+        { label: "IXL Math", sublabel: "Build concepts" },
+        { label: "Singapore Math", sublabel: "Deepen understanding" },
+        { label: "Beast Academy", sublabel: "Varied problem types" },
       ],
+      optional: {
+        label: "CogAT / NNAT",
+        sublabel: "Optional add-on",
+        desc: "Not covered during regular class time — provided separately only to students who need it.",
+      },
     },
     ops: {
       eyebrow: "Schedule",

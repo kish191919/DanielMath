@@ -1,6 +1,7 @@
 export const siteConfig = {
   name: "Daniel Math Academy",
   nameKo: "다니엘 수학 아카데미",
+  legalName: "CloudMasterIT LLC",
   url: "https://danielmath.com",
   description:
     "4명 소수 정예, AAP·CogAT/NNAT 통합 커리큘럼으로 3-6학년 영재 수학을 키우는 한인 수학 아카데미.",

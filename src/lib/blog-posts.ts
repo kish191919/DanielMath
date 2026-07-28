@@ -443,6 +443,91 @@ export const blogPosts: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "summer-math-slide",
+    publishedAt: "2026-07-28",
+    readingMins: 6,
+    category: "방학학습",
+    categoryEn: "Summer Break",
+    titleKo: "여름방학 수학 학습공백, 개학 전에 막는 방법",
+    titleEn: "Preventing the Summer Math Slide Before School Starts",
+    descKo: "여름방학 동안 수학 실력이 퇴보하는 'Summer Slide' 현상의 원인과 연구 근거, 그리고 개학 전 남은 몇 주 동안 학부모가 실천할 수 있는 구체적인 대비법을 정리했습니다.",
+    descEn: "Why math skills fade faster than reading over summer break, what the research says, and practical steps parents can take in the final weeks before school starts.",
+    bodyKo: [
+      {
+        heading: "여름 학습공백(Summer Slide)이란?",
+        paragraphs: [
+          "Duke University의 심리학자 Harris Cooper가 1996년 발표한 메타분석 연구는 여름방학 동안 학생들이 평균적으로 약 한 달 분량의 학습 내용을 잊어버린다는 사실을 보여주었습니다. 이후 여러 후속 연구에서도 비슷한 패턴이 반복적으로 확인되었는데, 특히 수학 연산 능력의 퇴보 폭이 읽기 능력보다 크게 나타났습니다.",
+          "한 해의 손실은 크지 않아 보일 수 있지만, K-6 동안 매년 여름마다 조금씩 누적되면 학년이 올라갈수록 격차가 벌어집니다. 특히 전년도에 심화 내용을 다뤘던 학생이라면, 그 내용을 유지하지 못한 채 새 학년을 맞이하게 될 위험이 더 큽니다.",
+        ],
+      },
+      {
+        heading: "왜 수학이 유독 취약할까요?",
+        paragraphs: [
+          "읽기는 방학 중에도 비교적 자연스럽게 이어지는 경우가 많습니다. 도서관에 가거나, 재미로 책을 읽거나, 여행 중 표지판과 메뉴판을 읽는 등 일상 속에서 저절로 노출됩니다. 반면 수학은 아이가 스스로 나눗셈이나 분수 문제를 찾아서 풀어보는 경우가 드뭅니다.",
+          "특히 연산이나 계산 절차처럼 '몸에 익혀야 하는' 스킬은 사용하지 않으면 상대적으로 빨리 무뎌집니다. 개념을 이해하는 것과 그 개념을 빠르고 정확하게 적용하는 것은 다른 문제이며, 후자는 꾸준한 연습이 없으면 특히 퇴보하기 쉽습니다.",
+        ],
+      },
+      {
+        heading: "개학 직후 교실에서는 무슨 일이 벌어질까요?",
+        paragraphs: [
+          "새 학년이 시작되면 교사들은 보통 몇 주간 전년도 핵심 내용을 복습하는 데 시간을 씁니다. 학급 전체가 이 복습 기간을 거치기 때문에, 여름 동안 감을 유지한 학생과 그렇지 못한 학생 사이의 체감 격차가 이 시기에 가장 크게 드러납니다.",
+          "AAP나 심화반처럼 진도가 빠른 반일수록 복습에 할애하는 시간이 상대적으로 짧고, 곧바로 새 단원으로 넘어가는 경향이 있습니다. 학습공백이 있는 상태로 새 학년 첫 단원을 맞이하면, 개념이 아직 정리되지 않은 채로 더 어려운 내용을 쌓아 올리게 되는 셈입니다.",
+        ],
+      },
+      {
+        heading: "남은 여름 동안 할 수 있는 구체적인 방법",
+        paragraphs: [
+          "가장 효과적인 방법은 거창한 계획이 아니라 하루 15분 정도의 짧은 복습을 매일 반복하는 것입니다. 전년도 워크북의 마지막 한두 단원을 다시 펼쳐 보거나, 틀렸던 문제만 골라 다시 풀어보는 것만으로도 충분한 효과가 있습니다.",
+          "마트에서 장을 보며 총 금액을 어림해보거나, 요리를 하며 계량 단위를 바꿔보는 등 일상 속에서 자연스럽게 수를 다루는 기회를 만들어 주는 것도 좋습니다. 여유가 있다면 새 학년 첫 단원 내용을 아주 가볍게 미리 살펴보는 것도 도움이 되지만, 이는 선행 학습이 아니라 '낯설지 않게 만드는' 예습 수준으로 접근하는 것이 중요합니다.",
+        ],
+      },
+      {
+        heading: "언제부터, 어떻게 시작해야 할까요?",
+        paragraphs: [
+          "개학까지 2~4주 정도 남은 지금이 학습 리듬을 되찾기에 가장 적절한 시점입니다. 개학 직전 며칠 동안 몰아서 복습하는 것보다, 지금부터 매일 조금씩 규칙적으로 연습하는 것이 실질적인 효과를 냅니다.",
+          "중요한 것은 분량이 아니라 꾸준함입니다. 두꺼운 복습 워크북 한 권을 새로 사는 것보다, 이미 풀었던 문제집을 다시 펼쳐 짧고 일정한 리듬을 만드는 것이 개학 후 첫 몇 주를 훨씬 수월하게 만들어 줍니다.",
+        ],
+      },
+    ],
+    bodyEn: [
+      {
+        heading: "What Is the Summer Slide?",
+        paragraphs: [
+          "A 1996 meta-analysis by Duke University psychologist Harris Cooper found that students lose, on average, about one month's worth of learning over summer break. Follow-up studies since then have consistently confirmed the pattern, with math computation skills fading noticeably more than reading skills.",
+          "A single summer's loss may seem small, but it compounds year after year across K-6, widening the gap as students move up in grade level. Students who covered advanced content the previous year are especially at risk of losing ground they haven't had a chance to solidify.",
+        ],
+      },
+      {
+        heading: "Why Is Math Especially Vulnerable?",
+        paragraphs: [
+          "Reading tends to continue somewhat naturally over the summer — through library visits, casual reading for fun, or simply encountering text while traveling. Math rarely gets this kind of incidental exposure; children don't typically seek out a division or fraction problem on their own.",
+          "Procedural skills in particular — the kind that need to become second nature, like computation — fade relatively quickly without use. Understanding a concept and being able to apply it quickly and accurately are two different things, and the latter is especially prone to decline without regular practice.",
+        ],
+      },
+      {
+        heading: "What Happens in the Classroom Right After School Starts",
+        paragraphs: [
+          "When a new school year begins, teachers typically spend the first few weeks reviewing key content from the previous year. Because the whole class goes through this review period together, the gap between students who stayed sharp over the summer and those who didn't becomes most visible during this stretch.",
+          "Faster-paced classes, such as AAP or advanced sections, tend to spend relatively less time on review before moving into new material. Starting a new grade's first unit with an existing learning gap means building harder content on top of concepts that haven't been fully reinforced yet.",
+        ],
+      },
+      {
+        heading: "What You Can Do With the Rest of the Summer",
+        paragraphs: [
+          "The most effective approach isn't an elaborate plan — it's 15 minutes of review, done consistently, every day. Revisiting the last unit or two of last year's workbook, or simply re-solving problems your child got wrong, is often enough to make a real difference.",
+          "Everyday moments also offer natural opportunities: estimating a total while grocery shopping, or converting measurements while cooking. If there's time, a light preview of the new grade's first unit can help too — but this should feel like familiarization, not acceleration.",
+        ],
+      },
+      {
+        heading: "When and How to Start",
+        paragraphs: [
+          "With roughly 2 to 4 weeks left before school starts, now is the right time to rebuild a learning rhythm. Consistent daily practice starting now produces far better results than cramming in the final days before school begins.",
+          "What matters is consistency, not volume. Reopening a workbook your child has already used and building a short, steady rhythm will make the first few weeks of the new school year noticeably easier than buying a brand-new, thick review book.",
+        ],
+      },
+    ],
+  },
 ];
 
 export function getBlogPost(slug: string): BlogPost | undefined {

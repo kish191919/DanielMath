@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { Brain, FileText, LineChart, Sparkles, Clock, Users, CalendarDays } from "lucide-react";
+import { Brain, FileText, LineChart, Layers, Clock, Users, CalendarDays, ArrowRight } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,7 @@ export default async function ProgramsPage({ params }: Props) {
   const p = d.programs;
   const lp = (path: string) => localePath(locale as Locale, path);
   const isKo = locale === "ko";
-  const icons = [FileText, Brain, Sparkles, LineChart];
+  const icons = [Layers, Brain, FileText, LineChart];
   const opsIcons = [CalendarDays, Clock, Users];
 
   return (
@@ -86,35 +86,70 @@ export default async function ProgramsPage({ params }: Props) {
             description={p.coverage.desc}
             isKo={isKo}
           />
-          <div className="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-4">
-            {p.coverage.chips.map((c) => {
-              const img = TEXTBOOK_IMAGES[c.label];
-              return (
-                <div key={c.label} className="flex flex-col items-center gap-3">
-                  <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl shadow-md bg-white">
-                    {img && (
-                      <Image
-                        src={img.src}
-                        alt={c.label}
-                        fill
-                        unoptimized={img.unoptimized}
-                        className="object-cover"
-                        sizes="(min-width: 640px) 25vw, 50vw"
-                      />
+          <div className="mt-10 overflow-x-auto pb-2">
+            <div className="mx-auto flex min-w-max items-center justify-center gap-3 px-1 sm:gap-4">
+              {p.coverage.chips.map((c, i) => {
+                const img = TEXTBOOK_IMAGES[c.label];
+                return (
+                  <div key={c.label} className="flex items-center gap-3 sm:gap-4">
+                    <div className="flex w-32 flex-col items-center gap-3 sm:w-40">
+                      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-white shadow-md">
+                        {img && (
+                          <Image
+                            src={img.src}
+                            alt={c.label}
+                            fill
+                            unoptimized={img.unoptimized}
+                            className="object-cover"
+                            sizes="(min-width: 640px) 20vw, 33vw"
+                          />
+                        )}
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm font-semibold text-navy-900">{c.label}</p>
+                        {c.sublabel && (
+                          <p className={`text-xs text-navy-600${isKo ? " font-ko" : ""}`}>
+                            {c.sublabel}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    {i < p.coverage.chips.length - 1 && (
+                      <ArrowRight className="h-5 w-5 shrink-0 text-navy-300" />
                     )}
                   </div>
-                  <div className="text-center">
-                    <p className="text-sm font-semibold text-navy-900">{c.label}</p>
-                    {c.sublabel && (
-                      <p className={`text-xs text-navy-600${isKo ? " font-ko" : ""}`}>
-                        {c.sublabel}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
+
+          {p.coverage.optional && (
+            <div className="mx-auto mt-8 flex max-w-md items-center gap-4 rounded-xl border border-dashed border-navy-200 bg-white/60 p-4">
+              <div className="relative aspect-[3/4] w-14 shrink-0 overflow-hidden rounded-lg bg-white shadow-sm">
+                {TEXTBOOK_IMAGES[p.coverage.optional.label] && (
+                  <Image
+                    src={TEXTBOOK_IMAGES[p.coverage.optional.label].src}
+                    alt={p.coverage.optional.label}
+                    fill
+                    unoptimized={TEXTBOOK_IMAGES[p.coverage.optional.label].unoptimized}
+                    className="object-cover"
+                    sizes="56px"
+                  />
+                )}
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-semibold text-navy-900">{p.coverage.optional.label}</p>
+                  <span className={`rounded-full bg-navy-50 px-2 py-0.5 text-[11px] font-semibold text-navy-500${isKo ? " font-ko" : ""}`}>
+                    {p.coverage.optional.sublabel}
+                  </span>
+                </div>
+                <p className={`mt-1 text-xs leading-5 text-navy-600${isKo ? " font-ko" : ""}`}>
+                  {p.coverage.optional.desc}
+                </p>
+              </div>
+            </div>
+          )}
         </Container>
       </Section>
 
