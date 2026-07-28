@@ -55,3 +55,14 @@ body {
   word-break: keep-all;
 }
 
+/* Prevent iOS Safari from auto-zooming the page when a form field
+   smaller than 16px gains focus. Scoped to mobile widths so desktop
+   sizing (text-sm/text-xs, etc.) is unaffected. */
+@media (max-width: 640px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
