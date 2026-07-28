@@ -243,8 +243,10 @@ function FinalCTA({ d, lp, isKo }: { d: Awaited<ReturnType<typeof getDictionary>
           {isKo ? (
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-ko" lang="ko">
               지금 바로{" "}
-              <span className="border-b-2 border-gold-500 pb-0.5">{c.highlightKo}</span>
-              하세요.
+              <span className="whitespace-nowrap">
+                <span className="border-b-2 border-gold-500 pb-0.5">{c.highlightKo}</span>
+                하세요.
+              </span>
             </h2>
           ) : (
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">

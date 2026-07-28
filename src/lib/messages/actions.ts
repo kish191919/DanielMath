@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { requireSession } from "@/lib/dal";
 import { createServerSupabase } from "@/lib/supabase/server";
 import type { Message, MessageThread } from "@/lib/supabase/types";
@@ -61,8 +62,9 @@ export async function sendMessageAction(
     .eq("id", threadId);
 
   // Best-effort email notification — see notifyNewMessage for why this
-  // never throws.
-  await notifyNewMessage({ thread, isPrincipalSender: isPrincipal });
+  // never throws. Deferred via after() so a slow email API can't hold up
+  // the "전송" button response.
+  after(() => notifyNewMessage({ thread, isPrincipalSender: isPrincipal }));
 
   revalidatePath(isPrincipal ? "/dashboard/principal/messages" : "/dashboard/parent/messages");
   return {};

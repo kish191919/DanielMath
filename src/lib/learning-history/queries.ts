@@ -492,28 +492,46 @@ async function assertParentOwnsStudent(parentId: string, studentId: string): Pro
   return !!data;
 }
 
-export async function getSignedScanViewUrlForParent(
+// Batched counterpart of the old per-note getSignedScanViewUrlForParent —
+// that version did 3 sequential round trips (scan lookup, ownership check,
+// signed URL) per note, which meant N+1 fan-out across a child's session
+// notes. This does one ownership check, one bulk scan lookup, and one
+// batched Storage call for however many scans are requested.
+export async function getSignedScanViewUrlsForParent(
   parentId: string,
-  scanId: string,
-): Promise<{ url: string; scan: WorksheetScan } | null> {
-  const supabase = await createServerSupabase();
-  const { data: scan } = await supabase
-    .from("worksheet_scans")
-    .select("*")
-    .eq("id", scanId)
-    .maybeSingle<WorksheetScan>();
-  if (!scan) return null;
+  studentId: string,
+  scanIds: string[],
+): Promise<Map<string, string>> {
+  const result = new Map<string, string>();
+  if (scanIds.length === 0) return result;
 
-  const owns = await assertParentOwnsStudent(parentId, scan.student_id);
-  if (!owns) return null;
+  const owns = await assertParentOwnsStudent(parentId, studentId);
+  if (!owns) return result;
+
+  const supabase = await createServerSupabase();
+  const { data: scans } = await supabase
+    .from("worksheet_scans")
+    .select("id, storage_path, student_id")
+    .in("id", scanIds)
+    .returns<Pick<WorksheetScan, "id" | "storage_path" | "student_id">[]>();
+  const ownedScans = (scans ?? []).filter((scan) => scan.student_id === studentId);
+  if (ownedScans.length === 0) return result;
 
   const admin = createAdminSupabase();
   const { data, error } = await admin.storage
     .from(BUCKET)
-    .createSignedUrl(scan.storage_path, 300);
-  if (error || !data) return null;
+    .createSignedUrls(
+      ownedScans.map((scan) => scan.storage_path),
+      300,
+    );
+  if (error || !data) return result;
 
-  return { url: data.signedUrl, scan };
+  ownedScans.forEach((scan, index) => {
+    const signedUrl = data[index]?.signedUrl;
+    if (signedUrl) result.set(scan.id, signedUrl);
+  });
+
+  return result;
 }
 
 export async function getConceptAccuracySummaryForParent(

@@ -1,13 +1,14 @@
-import { Paperclip } from "lucide-react";
+import { ChevronRight, Paperclip } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
+import { Button } from "@/components/ui/button";
 import { requireRole } from "@/lib/dal";
 import { GRADE_LABELS } from "@/lib/students/schema";
 import {
   listChildrenForParent,
   getConceptAccuracySummaryForParent,
   listSessionNotesForParent,
-  getSignedScanViewUrlForParent,
+  getSignedScanViewUrlsForParent,
 } from "@/lib/learning-history/queries";
 
 function daysAgoIso(days: number) {
@@ -26,13 +27,14 @@ export default async function ParentProgressPage() {
         getConceptAccuracySummaryForParent(session.userId, child.id, { from: daysAgoIso(30) }),
         listSessionNotesForParent(session.userId, child.id, 10),
       ]);
-      const notesWithWorksheetUrls = await Promise.all(
-        notes.map(async (note) => {
-          if (!note.scan_id) return { ...note, worksheetUrl: null };
-          const result = await getSignedScanViewUrlForParent(session.userId, note.scan_id);
-          return { ...note, worksheetUrl: result?.url ?? null };
-        }),
-      );
+      const scanIds = notes
+        .map((note) => note.scan_id)
+        .filter((scanId): scanId is string => scanId !== null);
+      const signedUrls = await getSignedScanViewUrlsForParent(session.userId, child.id, scanIds);
+      const notesWithWorksheetUrls = notes.map((note) => ({
+        ...note,
+        worksheetUrl: note.scan_id ? (signedUrls.get(note.scan_id) ?? null) : null,
+      }));
       return { child, recentSummary, notes: notesWithWorksheetUrls };
     }),
   );
@@ -126,27 +128,39 @@ export default async function ParentProgressPage() {
                     <p className="mt-2 text-sm text-navy-600">아직 남겨진 메모가 없습니다.</p>
                   ) : (
                     <div className="mt-2 space-y-2">
-                      {notes.map((note) => (
-                        <div
+                      {notes.map((note, index) => (
+                        <details
                           key={note.id}
-                          className="rounded-2xl border border-navy-100 bg-white p-4 shadow-sm"
+                          open={index === 0}
+                          className="group overflow-hidden rounded-2xl border border-navy-100 bg-white shadow-sm"
                         >
-                          <p className="text-xs text-navy-500">{note.session_date}</p>
-                          <p className="mt-1 whitespace-pre-line text-sm text-navy-800 font-ko" lang="ko">
-                            {note.note}
-                          </p>
-                          {note.worksheetUrl && (
-                            <a
-                              href={note.worksheetUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="mt-2 inline-flex items-center gap-1 text-xs text-navy-400 underline-offset-2 hover:text-navy-600 hover:underline"
+                          <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 hover:bg-navy-50/60 [&::-webkit-details-marker]:hidden">
+                            <ChevronRight className="h-4 w-4 shrink-0 text-navy-400 transition-transform group-open:rotate-90" />
+                            <span className="shrink-0 text-xs text-navy-500">{note.session_date}</span>
+                            <span
+                              className="truncate text-sm text-navy-700 font-ko group-open:hidden"
+                              lang="ko"
                             >
-                              <Paperclip className="h-3 w-3" />
-                              원본 학습지 보기
-                            </a>
-                          )}
-                        </div>
+                              {note.note}
+                            </span>
+                          </summary>
+                          <div className="px-4 pb-4 pt-1">
+                            <p className="whitespace-pre-line text-sm text-navy-800 font-ko" lang="ko">
+                              {note.note}
+                            </p>
+                            {note.worksheetUrl && (
+                              <Button
+                                href={note.worksheetUrl}
+                                external
+                                variant="secondary"
+                                className="mt-3 h-8 gap-1.5 px-3 text-xs"
+                              >
+                                <Paperclip className="h-3.5 w-3.5" />
+                                원본 학습지 보기
+                              </Button>
+                            )}
+                          </div>
+                        </details>
                       ))}
                     </div>
                   )}
