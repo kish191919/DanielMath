@@ -1,7 +1,10 @@
 import Link from "next/link";
+import { Star } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
+import { Button } from "@/components/ui/button";
 import { requireRole } from "@/lib/dal";
+import { siteConfig } from "@/lib/site-config";
 
 const cards = [
   {
@@ -55,6 +58,23 @@ export default async function ParentHome() {
               )}
             </Link>
           ))}
+        </div>
+
+        <div className="mt-6 flex flex-col items-start gap-4 rounded-2xl border border-gold-300/40 bg-gold-50/50 p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <Star className="mt-0.5 h-5 w-5 shrink-0 text-gold-500" fill="currentColor" />
+            <div>
+              <h2 className="text-sm font-semibold text-navy-900 font-ko" lang="ko">
+                다니엘 수학이 마음에 드셨나요?
+              </h2>
+              <p className="mt-1 text-sm text-navy-700 font-ko" lang="ko">
+                소중한 리뷰 한 줄이 다른 학부모님들께 큰 도움이 됩니다.
+              </p>
+            </div>
+          </div>
+          <Button href={siteConfig.googleReviewUrl} external variant="secondary" size="md" className="shrink-0 font-ko">
+            Google에 리뷰 남기기
+          </Button>
         </div>
       </Container>
     </Section>

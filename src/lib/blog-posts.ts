@@ -20,7 +20,7 @@ export type BlogPost = {
 export const blogPosts: BlogPost[] = [
   {
     slug: "fcps-aap-math-guide",
-    publishedAt: "2025-04-10",
+    publishedAt: "2026-07-27",
     readingMins: 6,
     category: "AAP",
     categoryEn: "AAP",
@@ -46,8 +46,8 @@ export const blogPosts: BlogPost[] = [
       {
         heading: "배치는 어떻게 이루어지나요?",
         paragraphs: [
-          "FCPS AAP 배치는 여러 요소를 종합적으로 평가합니다. CogAT(Cognitive Abilities Test)와 NNAT(Naglieri Nonverbal Ability Test) 점수, 학업 성적(GPA), 교사 평가서, 학부모 추천서가 모두 반영됩니다.",
-          "중요한 점은 AAP 배치가 한 번에 영구적으로 결정되지 않는다는 것입니다. FCPS는 매년 학업 수행 능력을 다시 평가하며, 심화반을 유지하려면 꾸준한 학습이 필요합니다. 지원 신청은 일반적으로 전년도 12월 초에 마감됩니다.",
+          "FCPS AAP 배치는 여러 요소를 종합적으로 평가합니다. NGAT(Naglieri General Ability Test) 점수, 학업 성적(GPA), 교사 평가서, 학부모 추천서가 모두 반영됩니다. NGAT는 2025-2026학년도부터 기존 CogAT·NNAT를 대체한 단일 능력검사입니다.",
+          "중요한 점은 AAP 배치가 한 번에 영구적으로 결정되지 않는다는 것입니다. FCPS는 매년 학업 수행 능력을 다시 평가하며, 심화반을 유지하려면 꾸준한 학습이 필요합니다. 지원 신청은 일반적으로 전년도 12월 중순에 마감됩니다.",
         ],
       },
       {
@@ -83,8 +83,8 @@ export const blogPosts: BlogPost[] = [
       {
         heading: "How Is Placement Determined?",
         paragraphs: [
-          "FCPS evaluates several factors together: CogAT (Cognitive Abilities Test) and NNAT (Naglieri Nonverbal Ability Test) scores, academic grades, teacher evaluations, and a parent recommendation. No single score determines placement.",
-          "Critically, AAP placement is not permanent. FCPS re-evaluates students annually, and maintaining the advanced track requires consistent academic performance. Application windows typically close in early December for the following school year.",
+          "FCPS evaluates several factors together: NGAT (Naglieri General Ability Test) scores, academic grades, teacher evaluations, and a parent recommendation. No single score determines placement. The NGAT replaced the former CogAT and NNAT tests starting in the 2025-2026 school year.",
+          "Critically, AAP placement is not permanent. FCPS re-evaluates students annually, and maintaining the advanced track requires consistent academic performance. Application windows typically close in mid-December for the following school year.",
         ],
       },
       {
@@ -105,85 +105,85 @@ export const blogPosts: BlogPost[] = [
   },
   {
     slug: "cogat-nnat-guide",
-    publishedAt: "2025-04-24",
+    publishedAt: "2026-07-27",
     readingMins: 7,
     category: "시험",
     categoryEn: "Testing",
-    titleKo: "CogAT·NNAT 시험 완전 가이드",
-    titleEn: "A Complete Guide to CogAT & NNAT",
-    descKo: "FCPS AAP 배치에 사용되는 CogAT와 NNAT 시험의 구조, 점수 방식, 시험 시기, 그리고 준비 방법을 학부모 눈높이에서 정리했습니다.",
-    descEn: "Everything parents need to know about the CogAT and NNAT, the two ability tests used for FCPS AAP placement, including structure, scoring, timing, and preparation strategies.",
+    titleKo: "NGAT(구 CogAT·NNAT) 시험 완전 가이드",
+    titleEn: "A Complete Guide to the NGAT (formerly CogAT & NNAT)",
+    descKo: "FCPS AAP 배치에 사용되는 NGAT 시험의 구조, 점수 방식, 시험 시기, 그리고 준비 방법을 학부모 눈높이에서 정리했습니다. 2025-2026학년도부터 기존 CogAT·NNAT를 대체했습니다.",
+    descEn: "Everything parents need to know about the NGAT, the ability test now used for FCPS AAP placement, including structure, scoring, timing, and preparation strategies. It replaced CogAT and NNAT starting in the 2025-2026 school year.",
     bodyKo: [
       {
-        heading: "CogAT란 무엇인가요?",
+        heading: "NGAT란 무엇인가요?",
         paragraphs: [
-          "CogAT(Cognitive Abilities Test)는 Riverside Insights에서 개발한 인지능력 평가 시험입니다. 학생이 배운 지식을 측정하는 성취도 시험이 아니라, 학생의 추론 능력과 문제 해결 잠재력을 측정합니다. FCPS를 포함한 많은 학군에서 영재·심화 프로그램 배치 기준으로 활용합니다.",
-          "시험은 세 영역으로 구성됩니다. 언어 추론(Verbal Battery)은 단어·문장의 관계를 파악하는 능력을, 수량 추론(Quantitative Battery)은 숫자 패턴과 수학적 사고를, 비언어 추론(Nonverbal Battery)은 도형과 공간 패턴을 이용한 논리적 사고를 측정합니다.",
+          "FCPS는 2025-2026학년도부터 AAP(심화학급) 선발을 위한 능력검사 체계를 바꿨습니다. 과거에는 2학년 전체 학생에게 CogAT(Cognitive Abilities Test)를, 1학년 전체 학생에게 NNAT(Naglieri Nonverbal Ability Test)를 각각 실시했지만, 현재는 이 두 시험을 대체하는 단일 검사인 NGAT(Naglieri General Ability Test)를 2~7학년 스크리닝에 활용합니다.",
+          "NGAT는 NNAT를 개발한 심리학자 Jack Naglieri가 만든 검사로, 학생이 배운 지식이 아니라 추론 능력과 문제 해결 잠재력을 측정한다는 철학은 이전과 동일합니다. 검사는 Verbal(언어 개념), Nonverbal(도형·공간 패턴), Quantitative(수량 추론) 세 영역으로 구성되어 있어, 기존 CogAT의 세 배터리 구조를 하나의 시험 안에 통합한 형태라고 볼 수 있습니다.",
         ],
       },
       {
-        heading: "NNAT란 무엇인가요?",
+        heading: "세 가지 영역: Verbal·Nonverbal·Quantitative",
         paragraphs: [
-          "NNAT(Naglieri Nonverbal Ability Test)는 언어나 수학 지식과 관계없이 순수한 추론 능력을 측정하는 시험입니다. 모든 문제가 도형, 패턴, 공간 관계로 이루어져 있어 영어가 모국어가 아닌 학생들에게도 공평하게 평가할 수 있도록 설계되었습니다.",
-          "FCPS는 CogAT와 NNAT를 함께 활용하여 다양한 배경의 학생들이 AAP 선발 과정에서 불리하지 않도록 합니다.",
+          "Verbal(언어) 영역은 여섯 개의 그림 중 다섯 개가 공유하는 개념을 찾아내는 방식으로 언어적 개념을 측정하며, 문장이 아닌 그림으로 제시되어 언어 배경에 관계없이 공정하게 평가할 수 있도록 설계되었습니다. Nonverbal(비언어) 영역은 도형, 색상, 순서, 방향 등 시각적 패턴 사이의 논리적 관계를 파악하는 능력을 측정합니다.",
+          "Quantitative(수량) 영역은 숫자와 기호 사이의 관계를 다루며, 단순 연산 실력이 아니라 수학적으로 사고하는 방식을 평가합니다. 세 영역 모두 학교에서 배운 교과 지식보다는 순수한 추론 능력에 초점을 맞춘다는 점은 이전 CogAT·NNAT 체계와 같습니다.",
         ],
       },
       {
         heading: "점수는 어떻게 계산되나요?",
         paragraphs: [
-          "두 시험 모두 SAS(Standard Age Score)와 백분위(Percentile Rank)로 결과가 제공됩니다. SAS는 같은 연령대 학생들과 비교한 표준화 점수이며, 평균이 100점, 표준편차가 16점입니다. 백분위 99는 동일 연령대 100명 중 상위 1등이라는 의미입니다.",
+          "NGAT 결과는 NAI(Naglieri Ability Index)라는 표준화 점수와 백분위(Percentile Rank)로 제공됩니다. NAI는 같은 연령대 학생들과 비교한 점수로, 평균이 100이며 대다수 학생은 85~115 사이에 분포합니다. 백분위 99는 동일 연령대 100명 중 상위 1등이라는 의미입니다.",
           "FCPS에서 풀타임 AAP(Level IV) 배치는 일반적으로 상위 3~5% 이내의 점수가 요구되지만, 점수만으로 결정되지 않고 교사 평가, 학업 성취도 등을 종합적으로 반영합니다.",
         ],
       },
       {
         heading: "시험은 언제, 어떻게 치르나요?",
         paragraphs: [
-          "FCPS는 AAP 선발을 위한 CogAT·NNAT 스크리닝을 주로 가을 학기(10~11월)에 실시합니다. 2학년 학생들이 3학년 풀타임 AAP 배치를 위해 처음으로 응시하는 경우가 많습니다. 학교에서 단체로 실시하며 별도 등록 없이 자동으로 포함됩니다.",
-          "스크리닝 이후 학교에서 학부모에게 결과를 통보하고, 결과에 따라 추가 평가(Portfolio Review)를 거쳐 최종 배치가 결정됩니다.",
+          "FCPS는 2학년 학생 전원을 대상으로 NGAT 스크리닝을 실시하며, 3학년 풀타임 AAP 배치를 위한 첫 관문이 됩니다. 학교에서 단체로 실시하며 별도 등록 없이 자동으로 포함됩니다. 스크리닝을 원하는 다른 학년(2~7학년) 학생은 학부모가 학교에 추천서(Referral)를 제출해야 합니다.",
+          "풀타임 AAP 추천서 접수는 매년 8월 중순부터 12월 중순까지 진행되며, 정확한 마감일은 학년도마다 조금씩 달라질 수 있으므로 재학 중인 학교의 AART(Advanced Academic Resource Teacher)나 학교 홈페이지 공지를 확인하는 것이 가장 정확합니다. 스크리닝 이후 학교에서 학부모에게 결과를 통보하고, 필요 시 추가 평가(Portfolio Review)를 거쳐 최종 배치가 결정됩니다. 참고로 FCPS는 조지메이슨대학교 CEWS 프로그램 등에서 개별적으로 응시한 CogAT·NNAT-3 점수나 WISC-V 점수도 계속 인정하고 있습니다.",
         ],
       },
       {
         heading: "어떻게 준비할 수 있나요?",
         paragraphs: [
-          "CogAT와 NNAT는 학교에서 배우는 내용보다 추론 능력을 측정하기 때문에, 단순 암기나 공식 학습만으로는 준비가 어렵습니다. 가장 효과적인 준비는 시험 문제 유형에 익숙해지는 것입니다. 공식 연습 문제집을 통해 각 섹션의 형식과 시간 배분을 미리 경험해보는 것이 도움이 됩니다.",
-          "수량 추론(Quantitative Battery) 섹션은 수학적 사고력이 반영되기 때문에, 평소에 Singapore Math나 Beast Academy처럼 개념 중심의 사고력 수학을 훈련하면 실질적인 준비가 됩니다. 단, 시험 직전에 벼락치기식으로 준비하기보다는 꾸준한 수학적 사고력 훈련이 더 효과적입니다.",
+          "NGAT는 교과 내용보다 추론 능력을 측정하기 때문에, 단순 암기나 공식 학습만으로는 준비가 어렵습니다. 가장 효과적인 준비는 세 영역(Verbal·Nonverbal·Quantitative)의 문제 유형에 익숙해지는 것입니다. 공식 연습 자료나 유사 문항을 통해 각 영역의 형식과 시간 배분을 미리 경험해보는 것이 도움이 됩니다.",
+          "Quantitative 영역은 수학적 사고력이 반영되기 때문에, 평소에 Singapore Math나 Beast Academy처럼 개념 중심의 사고력 수학을 훈련하면 실질적인 준비가 됩니다. 단, 시험 직전에 벼락치기식으로 준비하기보다는 꾸준한 추론력 훈련이 더 효과적입니다.",
         ],
       },
     ],
     bodyEn: [
       {
-        heading: "What Is the CogAT?",
+        heading: "What Is the NGAT?",
         paragraphs: [
-          "The CogAT (Cognitive Abilities Test), developed by Riverside Insights, is a reasoning ability test rather than an achievement test. It measures how students think and solve problems, not what they have memorized. FCPS and many other school districts use it as a key criterion for gifted and advanced program placement.",
-          "The test has three sections: Verbal (word and sentence relationships), Quantitative (number patterns and mathematical reasoning), and Nonverbal (figure and spatial pattern reasoning). Each section yields a separate score.",
+          "Starting with the 2025-2026 school year, FCPS changed the ability-testing system used for AAP (Advanced Academic Programs) screening. Previously, all 2nd graders took the CogAT (Cognitive Abilities Test) and all 1st graders took the NNAT (Naglieri Nonverbal Ability Test). Both have now been replaced by a single test, the NGAT (Naglieri General Ability Test), used for screening in grades 2-7.",
+          "The NGAT was developed by Jack Naglieri, the same psychologist behind the NNAT, and keeps the same underlying philosophy: it measures reasoning ability and problem-solving potential rather than learned content. The test is organized into three sections — Verbal, Nonverbal, and Quantitative — effectively consolidating what used to be three separate CogAT batteries into a single exam.",
         ],
       },
       {
-        heading: "What Is the NNAT?",
+        heading: "Three Sections: Verbal, Nonverbal, and Quantitative",
         paragraphs: [
-          "The NNAT (Naglieri Nonverbal Ability Test) measures pure reasoning ability using only geometric shapes and spatial patterns, with no language or prior math knowledge required. This design ensures the test is equitable for students from diverse linguistic backgrounds.",
-          "FCPS uses both the CogAT and NNAT together so that students who are not native English speakers are not disadvantaged in the AAP selection process.",
+          "The Verbal section presents six pictures and asks students to identify the concept shared by five of them, measuring verbal reasoning through images rather than written or spoken language — a design meant to be fair across language backgrounds. The Nonverbal section measures logical reasoning through shapes, colors, sequences, and orientation in matrix-style patterns.",
+          "The Quantitative section evaluates relationships between numbers and symbols, focusing on how a student thinks mathematically rather than computational speed. As with the previous CogAT/NNAT system, all three sections prioritize pure reasoning over classroom content.",
         ],
       },
       {
         heading: "How Are Scores Calculated?",
         paragraphs: [
-          "Both tests report results as a Standard Age Score (SAS) and a Percentile Rank. The SAS compares a student to peers of the same age, with an average of 100 and a standard deviation of 16. A 99th percentile means a student scored higher than 99 out of 100 same-age students.",
+          "NGAT results are reported as a Naglieri Ability Index (NAI) and a Percentile Rank. The NAI compares a student to same-age peers, with an average of 100; most students score between 85 and 115. A 99th percentile means a student scored higher than 99 out of 100 same-age peers.",
           "Full-time AAP (Level IV) placement in FCPS typically requires scores in roughly the top 3–5%, but scores are never the sole deciding factor. Teacher evaluations and academic performance are also weighed.",
         ],
       },
       {
         heading: "When and How Is the Test Administered?",
         paragraphs: [
-          "FCPS conducts CogAT and NNAT screening primarily in the fall (October–November). Second-grade students are most commonly the first to take it, as 3rd grade is the entry point for full-time AAP placement. Testing is done in school groups with no separate registration required.",
-          "After screening, parents receive score reports and eligible students may go through a Portfolio Review before final placement decisions are made.",
+          "FCPS screens all 2nd graders with the NGAT as the first step toward full-time AAP placement starting in 3rd grade. This screening happens automatically at school with no separate registration. Students in other eligible grades (2-7) can be screened if a parent submits a referral to the school.",
+          "Full-time AAP referrals are generally accepted from mid-August through mid-December each year, though exact deadlines shift slightly year to year — check with your school's AART (Advanced Academic Resource Teacher) or school website for the current cycle's dates. After screening, parents receive results, and eligible students may go through a Portfolio Review before final placement. Note that FCPS still accepts privately administered CogAT and NNAT-3 scores (for example, through George Mason University's CEWS program) or WISC-V scores as alternative evidence.",
         ],
       },
       {
         heading: "How Can You Prepare?",
         paragraphs: [
-          "Since both tests measure reasoning rather than curriculum knowledge, memorization and formula drills are ineffective preparation. The most practical approach is familiarizing your child with each question format through official practice materials so the structure of the test itself is not surprising on test day.",
-          "For the Quantitative section specifically, building conceptual math thinking through programs like Singapore Math or Beast Academy provides genuine preparation. Long-term, consistent development of mathematical reasoning is far more effective than last-minute test prep.",
+          "Since the NGAT measures reasoning rather than curriculum knowledge, memorization and formula drills are ineffective preparation. The most practical approach is familiarizing your child with all three question formats — Verbal, Nonverbal, and Quantitative — through official or comparable practice materials.",
+          "For the Quantitative section specifically, building conceptual math thinking through programs like Singapore Math or Beast Academy provides genuine preparation. Long-term, consistent development of reasoning ability is far more effective than last-minute test prep.",
         ],
       },
     ],

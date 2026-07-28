@@ -19,7 +19,11 @@ export function WarmthSection({ locale, d }: { locale: Locale; d: WarmthData }) 
           <div className="relative aspect-[3/2] overflow-hidden rounded-3xl shadow-xl ring-1 ring-navy-100">
             <Image
               src="/warmth/parent-student.jpg"
-              alt=""
+              alt={
+                isKo
+                  ? "다니엘 수학 아카데미 학부모와 학생 간의 신뢰"
+                  : "Building trust between parents and students at Daniel Math Academy, Fairfax VA"
+              }
               fill
               sizes="(min-width: 1024px) 50vw, 100vw"
               className="object-cover"

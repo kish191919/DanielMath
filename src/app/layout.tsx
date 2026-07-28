@@ -55,6 +55,9 @@ export const metadata: Metadata = {
     images: [`${siteConfig.url}${siteConfig.ogImage}`],
   },
   robots: { index: true, follow: true },
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION,
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

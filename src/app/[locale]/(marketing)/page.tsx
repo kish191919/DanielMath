@@ -144,7 +144,11 @@ function ProgramsPreview({ d, isKo }: { d: Awaited<ReturnType<typeof getDictiona
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-sm ring-1 ring-navy-100">
             <Image
               src="/hero/student-1.jpg"
-              alt=""
+              alt={
+                isKo
+                  ? "페어팩스 다니엘 수학 아카데미 소수정예 수업 모습"
+                  : "Small-group math class at Daniel Math Academy in Fairfax, VA"
+              }
               fill
               sizes="(min-width: 1024px) 50vw, 100vw"
               className="object-cover"
@@ -198,7 +202,11 @@ function HowItWorks({ d, isKo }: { d: Awaited<ReturnType<typeof getDictionary>>[
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-sm ring-1 ring-navy-100">
             <Image
               src="/hero/student-2.jpg"
-              alt=""
+              alt={
+                isKo
+                  ? "다니엘 수학 아카데미 학생 개별 학습 진행 상황 점검"
+                  : "Personalized progress tracking at Daniel Math Academy, Fairfax VA"
+              }
               fill
               sizes="(min-width: 1024px) 50vw, 100vw"
               className="object-cover"

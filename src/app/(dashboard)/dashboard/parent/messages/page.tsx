@@ -18,6 +18,7 @@ export default async function ParentMessagesPage() {
         currentUserId={session.userId}
         otherPartyLabel="원장님"
         isPrincipal={session.profile.role === "principal"}
+        backHref="/dashboard/parent"
       />
     </div>
   );

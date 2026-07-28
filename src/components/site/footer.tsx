@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Mail, MapPin, Clock } from "lucide-react";
+import { Mail, MapPin, Clock, Phone } from "lucide-react";
 import { Container } from "./container";
 import { siteConfig } from "@/lib/site-config";
 import { localePath, type Locale } from "@/lib/i18n";
@@ -110,6 +110,15 @@ export function SiteFooter({ locale }: { locale: Locale }) {
                 >
                   <Mail className="h-3.5 w-3.5 shrink-0" />
                   {siteConfig.contactEmail}
+                </a>
+              </li>
+              <li>
+                <a
+                  href={`tel:+1${siteConfig.telephone.replace(/\D/g, "")}`}
+                  className="flex items-center gap-1.5 hover:text-navy-900 transition-colors"
+                >
+                  <Phone className="h-3.5 w-3.5 shrink-0" />
+                  {siteConfig.telephone}
                 </a>
               </li>
               <li className={`flex items-start gap-1.5${isKo ? " font-ko" : ""}`} lang={isKo ? "ko" : undefined}>

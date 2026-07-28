@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
 import { listChildrenForParent } from "@/lib/learning-history/queries";
@@ -13,7 +14,14 @@ export default async function ParentChildrenPage() {
     <Section className="py-10 sm:py-14">
       <Container>
         <div>
-          <p className="text-sm font-semibold uppercase tracking-wider text-navy-500">
+          <Link
+            href="/dashboard/parent"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-navy-500 hover:text-navy-900"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            돌아가기
+          </Link>
+          <p className="mt-3 text-sm font-semibold uppercase tracking-wider text-navy-500">
             Children
           </p>
           <h1 className="mt-2 text-2xl font-bold text-navy-900 font-ko sm:text-3xl" lang="ko">

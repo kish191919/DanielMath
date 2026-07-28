@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { createBrowserSupabase } from "@/lib/supabase/browser";
 import type { Message } from "@/lib/supabase/types";
 import { markThreadReadAction } from "@/lib/messages/actions";
@@ -13,12 +15,14 @@ export function ThreadView({
   currentUserId,
   otherPartyLabel,
   isPrincipal,
+  backHref,
 }: {
   threadId: string;
   initialMessages: Message[];
   currentUserId: string;
   otherPartyLabel: string;
   isPrincipal: boolean;
+  backHref?: string;
 }) {
   const [messages, setMessages] = React.useState(initialMessages);
   const bottomRef = React.useRef<HTMLDivElement>(null);
@@ -60,7 +64,16 @@ export function ThreadView({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="border-b border-navy-100 px-4 py-3">
+      <div className="flex items-center gap-3 border-b border-navy-100 px-4 py-3">
+        {backHref && (
+          <Link
+            href={backHref}
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-navy-500 hover:text-navy-900"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            돌아가기
+          </Link>
+        )}
         <p className="text-sm font-semibold text-navy-900 font-ko" lang="ko">
           {otherPartyLabel}
         </p>

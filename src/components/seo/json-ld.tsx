@@ -10,10 +10,18 @@ export function LocalBusinessJsonLd() {
     url: siteConfig.url,
     description: siteConfig.descriptionEn,
     email: siteConfig.contactEmail,
-    areaServed: {
-      "@type": "AdministrativeArea",
-      name: siteConfig.region,
+    telephone: siteConfig.telephone,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: siteConfig.address.locality,
+      addressRegion: siteConfig.address.region,
+      postalCode: siteConfig.address.postalCode,
+      addressCountry: siteConfig.address.country,
     },
+    areaServed: siteConfig.serviceAreas.map((city) => ({
+      "@type": "City",
+      name: `${city}, VA`,
+    })),
     audience: {
       "@type": "EducationalAudience",
       educationalRole: "student",

@@ -1,4 +1,5 @@
-import { ChevronRight, Paperclip } from "lucide-react";
+import Link from "next/link";
+import { ArrowLeft, ChevronRight, Paperclip } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
 import { Button } from "@/components/ui/button";
@@ -43,7 +44,14 @@ export default async function ParentProgressPage() {
     <Section className="py-10 sm:py-14">
       <Container>
         <div>
-          <p className="text-sm font-semibold uppercase tracking-wider text-navy-500">
+          <Link
+            href="/dashboard/parent"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-navy-500 hover:text-navy-900"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            돌아가기
+          </Link>
+          <p className="mt-3 text-sm font-semibold uppercase tracking-wider text-navy-500">
             Progress
           </p>
           <h1 className="mt-2 text-2xl font-bold text-navy-900 font-ko sm:text-3xl" lang="ko">
@@ -65,18 +73,23 @@ export default async function ParentProgressPage() {
               // not something a parent can act on, so they're hidden here.
               const visibleSummary = recentSummary.filter((row) => row.conceptId !== null);
               return (
-                <div key={child.id} id={`child-${child.id}`}>
-                <div className="flex items-center gap-3">
+                <details key={child.id} id={`child-${child.id}`} open className="group/child">
+                <summary className="flex cursor-pointer list-none items-center gap-2 [&::-webkit-details-marker]:hidden">
+                  <ChevronRight className="h-4 w-4 shrink-0 text-navy-400 transition-transform group-open/child:rotate-90" />
                   <h2 className="text-lg font-semibold text-navy-900">{child.full_name}</h2>
                   <span className="inline-flex items-center rounded-full bg-navy-50 px-2 py-0.5 text-xs font-medium text-navy-800">
                     {GRADE_LABELS[child.grade]}
                   </span>
-                </div>
+                </summary>
 
-                <div className="mt-4">
-                  <h3 className="text-sm font-semibold text-navy-700 font-ko" lang="ko">
-                    개념별 정답률 (최근 30일)
-                  </h3>
+                <div className="mt-4 pl-6">
+                <details open className="group/table">
+                  <summary className="flex cursor-pointer list-none items-center gap-2 [&::-webkit-details-marker]:hidden">
+                    <ChevronRight className="h-4 w-4 shrink-0 text-navy-400 transition-transform group-open/table:rotate-90" />
+                    <h3 className="text-sm font-semibold text-navy-700 font-ko" lang="ko">
+                      개념별 정답률 (최근 30일)
+                    </h3>
+                  </summary>
                   {visibleSummary.length === 0 ? (
                     <p className="mt-2 text-sm text-navy-600">아직 기록된 학습이력이 없습니다.</p>
                   ) : (
@@ -118,7 +131,7 @@ export default async function ParentProgressPage() {
                       </table>
                     </div>
                   )}
-                </div>
+                </details>
 
                 <div className="mt-4">
                   <h3 className="text-sm font-semibold text-navy-700 font-ko" lang="ko">
@@ -165,7 +178,8 @@ export default async function ParentProgressPage() {
                     </div>
                   )}
                 </div>
-              </div>
+                </div>
+              </details>
               );
             })}
           </div>
