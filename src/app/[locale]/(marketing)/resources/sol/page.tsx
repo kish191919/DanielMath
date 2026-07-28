@@ -228,7 +228,7 @@ export default async function SolPage({ params }: Props) {
             title={t.connection.title}
             titleKo={t.connection.titleKo}
           />
-          <div className="mt-10 overflow-x-auto rounded-2xl border border-navy-100 bg-white shadow-sm">
+          <div className="mt-10 overflow-x-auto rounded-2xl border border-navy-100 bg-white shadow-sm touch-pan-x">
             <table className="w-full text-sm">
               <thead className="border-b border-navy-100 bg-navy-50">
                 <tr>

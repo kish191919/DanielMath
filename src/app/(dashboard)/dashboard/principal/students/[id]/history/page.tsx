@@ -220,7 +220,7 @@ export default async function StudentHistoryPage({
                     <h3 className="text-sm font-semibold text-navy-800 font-ko" lang="ko">
                       {strand}
                     </h3>
-                    <div className="mt-2 overflow-x-auto rounded-2xl border border-navy-100 bg-white shadow-sm">
+                    <div className="mt-2 overflow-x-auto rounded-2xl border border-navy-100 bg-white shadow-sm touch-pan-x">
                       <table className="w-full text-left text-sm">
                         <thead className="bg-navy-50/50 text-xs uppercase tracking-wide text-navy-500">
                           <tr>

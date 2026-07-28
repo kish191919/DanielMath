@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Noto_Sans_KR } from "next/font/google";
+import Script from "next/script";
 import { headers } from "next/headers";
 import { siteConfig } from "@/lib/site-config";
 import "./globals.css";
@@ -78,6 +79,7 @@ export default async function RootLayout({
 }>) {
   const heads = await headers();
   const locale = heads.get("x-locale") ?? "ko";
+  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
   return (
     <html
@@ -86,6 +88,22 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-white text-navy-900">
         {children}
+        {gaId && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-init" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${gaId}');
+              `}
+            </Script>
+          </>
+        )}
       </body>
     </html>
   );

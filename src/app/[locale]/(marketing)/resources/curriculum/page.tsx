@@ -240,7 +240,7 @@ export default async function CurriculumOverviewPage({ params }: Props) {
             title={t.progression.title}
             titleKo={t.progression.titleKo}
           />
-          <div className="mx-auto mt-10 max-w-2xl overflow-x-auto rounded-2xl border border-navy-100 bg-white shadow-sm">
+          <div className="mx-auto mt-10 max-w-2xl overflow-x-auto rounded-2xl border border-navy-100 bg-white shadow-sm touch-pan-x">
             <table className="w-full text-sm">
               <thead className="border-b border-navy-100">
                 <tr>

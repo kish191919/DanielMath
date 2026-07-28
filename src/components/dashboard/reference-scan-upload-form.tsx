@@ -175,7 +175,7 @@ export function ReferenceScanUploadForm({ onUploaded }: { onUploaded: (scanId: s
             <p className="font-ko text-xs text-navy-700" lang="ko">
               촬영된 페이지 {cameraPages.length}장
             </p>
-            <div className="flex gap-2 overflow-x-auto pb-1">
+            <div className="flex gap-2 overflow-x-auto pb-1 touch-pan-x">
               {cameraPages.map((page) => (
                 // eslint-disable-next-line @next/next/no-img-element -- local blob URL thumbnail, not a static asset
                 <img
