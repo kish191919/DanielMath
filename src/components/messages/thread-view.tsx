@@ -12,11 +12,13 @@ export function ThreadView({
   initialMessages,
   currentUserId,
   otherPartyLabel,
+  isPrincipal,
 }: {
   threadId: string;
   initialMessages: Message[];
   currentUserId: string;
   otherPartyLabel: string;
+  isPrincipal: boolean;
 }) {
   const [messages, setMessages] = React.useState(initialMessages);
   const bottomRef = React.useRef<HTMLDivElement>(null);
@@ -64,7 +66,12 @@ export function ThreadView({
         </p>
       </div>
       <div className="flex-1 overflow-y-auto p-4">
-        <MessageBubbleList messages={messages} currentUserId={currentUserId} />
+        <MessageBubbleList
+          messages={messages}
+          currentUserId={currentUserId}
+          threadId={threadId}
+          isPrincipal={isPrincipal}
+        />
         <div ref={bottomRef} />
       </div>
       <MessageComposer threadId={threadId} />

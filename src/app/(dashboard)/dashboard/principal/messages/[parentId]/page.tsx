@@ -28,6 +28,7 @@ export default async function PrincipalMessageThreadPage({
       initialMessages={messages}
       currentUserId={session.userId}
       otherPartyLabel={parent.full_name ?? parent.email}
+      isPrincipal={session.profile.role === "principal"}
     />
   );
 }

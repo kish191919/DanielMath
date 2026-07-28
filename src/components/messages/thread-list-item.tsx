@@ -4,12 +4,12 @@ import type { MessageThread, Profile } from "@/lib/supabase/types";
 export function ThreadListItem({
   parent,
   thread,
-  hasUnread,
+  unreadCount,
   isActive,
 }: {
   parent: Profile;
   thread: MessageThread | undefined;
-  hasUnread: boolean;
+  unreadCount: number;
   isActive: boolean;
 }) {
   return (
@@ -27,8 +27,13 @@ export function ThreadListItem({
           >
             {parent.full_name ?? parent.email}
           </p>
-          {hasUnread && (
-            <span className="h-2 w-2 shrink-0 rounded-full bg-red-500" aria-label="안 읽은 메시지" />
+          {unreadCount > 0 && (
+            <span
+              className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white"
+              aria-label={`안 읽은 메시지 ${unreadCount}개`}
+            >
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </span>
           )}
         </div>
         <p

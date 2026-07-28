@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireSession } from "@/lib/dal";
 import { createServerSupabase } from "@/lib/supabase/server";
-import type { MessageThread } from "@/lib/supabase/types";
+import type { Message, MessageThread } from "@/lib/supabase/types";
 import { notifyNewMessage } from "@/lib/notifications/message-notify";
 import { messageBodySchema } from "./schema";
 
@@ -66,6 +66,33 @@ export async function sendMessageAction(
 
   revalidatePath(isPrincipal ? "/dashboard/principal/messages" : "/dashboard/parent/messages");
   return {};
+}
+
+export async function deleteMessageAction(threadId: string, messageId: string): Promise<void> {
+  const session = await requireSession();
+  const isPrincipal = session.profile.role === "principal";
+
+  await verifyParticipant(threadId, session.userId, isPrincipal);
+
+  const supabase = await createServerSupabase();
+  const { data: message } = await supabase
+    .from("messages")
+    .select("sender_id")
+    .eq("id", messageId)
+    .maybeSingle<Pick<Message, "sender_id">>();
+
+  if (!message) throw new Error("메시지를 찾을 수 없습니다.");
+  if (!isPrincipal && message.sender_id !== session.userId) {
+    throw new Error("본인이 보낸 메시지만 삭제할 수 있습니다.");
+  }
+
+  const { error } = await supabase
+    .from("messages")
+    .update({ deleted_at: new Date().toISOString() })
+    .eq("id", messageId);
+  if (error) throw new Error(error.message);
+
+  revalidatePath(isPrincipal ? "/dashboard/principal/messages" : "/dashboard/parent/messages");
 }
 
 export async function markThreadReadAction(threadId: string): Promise<void> {

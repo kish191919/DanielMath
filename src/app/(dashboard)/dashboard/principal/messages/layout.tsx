@@ -20,9 +20,11 @@ export default async function PrincipalMessagesLayout({
   const threadsByParent: Record<string, MessageThread> = {};
   for (const thread of threads) threadsByParent[thread.parent_id] = thread;
 
-  const unreadThreadIds = unread
-    .filter((message) => message.sender_id !== session.userId)
-    .map((message) => message.thread_id);
+  const unreadCounts: Record<string, number> = {};
+  for (const message of unread) {
+    if (message.sender_id === session.userId) continue;
+    unreadCounts[message.thread_id] = (unreadCounts[message.thread_id] ?? 0) + 1;
+  }
 
   return (
     <div className="grid h-[calc(100vh-8rem)] grid-cols-1 sm:grid-cols-[280px_1fr]">
@@ -31,7 +33,7 @@ export default async function PrincipalMessagesLayout({
         <ThreadSidebar
           parents={parents}
           threadsByParent={threadsByParent}
-          unreadThreadIds={unreadThreadIds}
+          unreadCounts={unreadCounts}
         />
       </div>
       <div className="min-h-0">{children}</div>

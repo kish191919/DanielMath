@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
+import { ExternalLink } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
+import { Button } from "@/components/ui/button";
 import { ReviewTable } from "@/components/dashboard/review-table";
 import { SessionNoteForm } from "@/components/dashboard/session-note-form";
 import { requireRole } from "@/lib/dal";
@@ -60,14 +62,28 @@ export default async function WorksheetScanReviewPage({
         </div>
 
         {viewUrl && (
-          <div className="mt-6 overflow-hidden rounded-2xl border border-navy-100 bg-white shadow-sm">
-            {scan.mime_type === "application/pdf" ? (
-              <iframe src={viewUrl} className="h-[500px] w-full" title="원본 스캔" />
-            ) : (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={viewUrl} alt="원본 스캔" className="max-h-[600px] w-full object-contain" />
-            )}
-          </div>
+          <>
+            <div className="mt-6 flex items-center justify-between gap-3 rounded-2xl border border-navy-100 bg-navy-50/50 p-4">
+              <p className="text-sm text-navy-700 font-ko" lang="ko">
+                {scan.mime_type === "application/pdf"
+                  ? "여러 장을 촬영한 스캔은 새 창에서 열어야 모든 페이지를 넘겨보고 확대할 수 있어요."
+                  : "새 창에서 열면 사진을 자유롭게 확대/축소해서 볼 수 있어요."}
+              </p>
+              <Button href={viewUrl} external variant="primary" size="md" className="shrink-0">
+                <ExternalLink className="h-4 w-4" />
+                새 창에서 크게 보기
+              </Button>
+            </div>
+
+            <div className="mt-4 overflow-hidden rounded-2xl border border-navy-100 bg-white shadow-sm">
+              {scan.mime_type === "application/pdf" ? (
+                <iframe src={viewUrl} className="h-[500px] w-full" title="원본 스캔 (미리보기, 첫 페이지만 표시)" />
+              ) : (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={viewUrl} alt="원본 스캔" className="max-h-[600px] w-full object-contain" />
+              )}
+            </div>
+          </>
         )}
 
         <GradingStatusPoller isGrading={scan.status === "grading"} />
