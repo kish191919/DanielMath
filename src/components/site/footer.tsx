@@ -141,16 +141,8 @@ export function SiteFooter({ locale }: { locale: Locale }) {
 
         <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-navy-200 pt-6 text-xs text-navy-500 sm:flex-row sm:items-center">
           <p>© {new Date().getFullYear()} {siteConfig.name}. All rights reserved.</p>
-          <p className={isKo ? "font-ko" : ""} lang={isKo ? "ko" : undefined}>
-            {isKo
-              ? "13세 미만 학생의 개인정보를 직접 수집하지 않습니다 (COPPA 준수)."
-              : "We do not directly collect personal data from children under 13 (COPPA compliant)."}
-          </p>
-          <p className={isKo ? "font-ko" : ""} lang={isKo ? "ko" : undefined}>
-            {isKo
-              ? `${siteConfig.name}(${siteConfig.nameKo})는 ${siteConfig.legalName}가 운영합니다.`
-              : `${siteConfig.name} is operated by ${siteConfig.legalName}.`}
-          </p>
+          <p>We do not directly collect personal data from children under 13 (COPPA compliant).</p>
+          <p>{siteConfig.name} is operated by {siteConfig.legalName}.</p>
         </div>
       </Container>
     </footer>
