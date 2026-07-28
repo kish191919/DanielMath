@@ -11,6 +11,49 @@ import { siteConfig } from "@/lib/site-config";
 import { localePath, type Locale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
+function LocaleToggle({ isKo, altHref }: { isKo: boolean; altHref: string }) {
+  return (
+    <div className="flex items-center gap-0.5">
+      {isKo ? (
+        <span
+          aria-current="true"
+          title="한국어"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-navy-100 text-lg ring-1 ring-navy-300"
+        >
+          🇰🇷
+        </span>
+      ) : (
+        <Link
+          href={altHref}
+          aria-label="한국어로 전환"
+          title="한국어"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-full text-lg opacity-40 transition hover:bg-navy-50 hover:opacity-100"
+        >
+          🇰🇷
+        </Link>
+      )}
+      {!isKo ? (
+        <span
+          aria-current="true"
+          title="English"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-navy-100 text-lg ring-1 ring-navy-300"
+        >
+          🇺🇸
+        </span>
+      ) : (
+        <Link
+          href={altHref}
+          aria-label="Switch to English"
+          title="English"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-full text-lg opacity-40 transition hover:bg-navy-50 hover:opacity-100"
+        >
+          🇺🇸
+        </Link>
+      )}
+    </div>
+  );
+}
+
 export function SiteHeader({ locale }: { locale: Locale }) {
   const [open, setOpen] = React.useState(false);
   const pathname = usePathname();
@@ -50,44 +93,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
                 {isKo ? item.labelKo : item.label}
               </Link>
             ))}
-            <div className="flex items-center gap-0.5">
-              {isKo ? (
-                <span
-                  aria-current="true"
-                  title="한국어"
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-navy-100 text-lg ring-1 ring-navy-300"
-                >
-                  🇰🇷
-                </span>
-              ) : (
-                <Link
-                  href={altHref}
-                  aria-label="한국어로 전환"
-                  title="한국어"
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full text-lg opacity-40 transition hover:bg-navy-50 hover:opacity-100"
-                >
-                  🇰🇷
-                </Link>
-              )}
-              {!isKo ? (
-                <span
-                  aria-current="true"
-                  title="English"
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-navy-100 text-lg ring-1 ring-navy-300"
-                >
-                  🇺🇸
-                </span>
-              ) : (
-                <Link
-                  href={altHref}
-                  aria-label="Switch to English"
-                  title="English"
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full text-lg opacity-40 transition hover:bg-navy-50 hover:opacity-100"
-                >
-                  🇺🇸
-                </Link>
-              )}
-            </div>
+            <LocaleToggle isKo={isKo} altHref={altHref} />
             <div className="ml-3 flex items-center gap-2">
               <Button href="/dashboard" variant="secondary" size="md">
                 {isKo ? "대시보드" : "Dashboard"}
@@ -98,15 +104,18 @@ export function SiteHeader({ locale }: { locale: Locale }) {
             </div>
           </nav>
 
-          <button
-            type="button"
-            aria-label={open ? "Close menu" : "Open menu"}
-            aria-expanded={open}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-md text-navy-900 hover:bg-navy-50 md:hidden"
-            onClick={() => setOpen((v) => !v)}
-          >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+          <div className="flex items-center gap-1 md:hidden">
+            <LocaleToggle isKo={isKo} altHref={altHref} />
+            <button
+              type="button"
+              aria-label={open ? "Close menu" : "Open menu"}
+              aria-expanded={open}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-md text-navy-900 hover:bg-navy-50"
+              onClick={() => setOpen((v) => !v)}
+            >
+              {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
         </div>
       </Container>
 
@@ -129,46 +138,6 @@ export function SiteHeader({ locale }: { locale: Locale }) {
                 {isKo ? item.labelKo : item.label}
               </Link>
             ))}
-            <div className="flex items-center gap-1.5 px-3 py-2">
-              {isKo ? (
-                <span
-                  aria-current="true"
-                  title="한국어"
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-navy-100 text-xl ring-1 ring-navy-300"
-                >
-                  🇰🇷
-                </span>
-              ) : (
-                <Link
-                  href={altHref}
-                  onClick={() => setOpen(false)}
-                  aria-label="한국어로 전환"
-                  title="한국어"
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full text-xl opacity-40 transition hover:bg-navy-50 hover:opacity-100"
-                >
-                  🇰🇷
-                </Link>
-              )}
-              {!isKo ? (
-                <span
-                  aria-current="true"
-                  title="English"
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-navy-100 text-xl ring-1 ring-navy-300"
-                >
-                  🇺🇸
-                </span>
-              ) : (
-                <Link
-                  href={altHref}
-                  onClick={() => setOpen(false)}
-                  aria-label="Switch to English"
-                  title="English"
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full text-xl opacity-40 transition hover:bg-navy-50 hover:opacity-100"
-                >
-                  🇺🇸
-                </Link>
-              )}
-            </div>
             <div className="mt-2 flex flex-col gap-2">
               <Button href="/dashboard" variant="secondary" size="lg" className="w-full">
                 {isKo ? "대시보드" : "Dashboard"}
