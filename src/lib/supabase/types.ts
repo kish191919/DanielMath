@@ -30,6 +30,8 @@ export interface Profile {
   full_name: string | null;
   email: string;
   phone: string | null;
+  sms_consent: boolean;
+  sms_consent_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -274,6 +276,8 @@ type ProfileInsert = {
   role: Role;
   email: string;
   full_name?: string | null;
+  sms_consent?: boolean;
+  sms_consent_at?: string | null;
   created_at?: string;
   updated_at?: string;
 };

@@ -49,7 +49,7 @@ export async function signOutAction() {
 export type SignUpState = {
   error?: string;
   fieldErrors?: Partial<
-    Record<"fullName" | "email" | "phone" | "password" | "confirmPassword", string>
+    Record<"fullName" | "email" | "phone" | "smsConsent" | "password" | "confirmPassword", string>
   >;
 };
 
@@ -61,6 +61,7 @@ export async function signUpAction(
     fullName: formData.get("fullName"),
     email: formData.get("email"),
     phone: formData.get("phone"),
+    smsConsent: formData.get("smsConsent") === "on",
     password: formData.get("password"),
     confirmPassword: formData.get("confirmPassword"),
   });
@@ -73,6 +74,7 @@ export async function signUpAction(
         key === "fullName" ||
         key === "email" ||
         key === "phone" ||
+        key === "smsConsent" ||
         key === "password" ||
         key === "confirmPassword"
       ) {
@@ -116,7 +118,15 @@ export async function signUpAction(
   const { error: profileError } = await admin
     .from("profiles")
     .upsert(
-      { id: userId, role: "parent", email, full_name: fullName, phone },
+      {
+        id: userId,
+        role: "parent",
+        email,
+        full_name: fullName,
+        phone,
+        sms_consent: true,
+        sms_consent_at: new Date().toISOString(),
+      },
       { onConflict: "id" },
     );
 

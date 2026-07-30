@@ -395,7 +395,7 @@ async function notifyGuardiansOfReport(
       console.error(`[notifyGuardiansOfReport] chat message failed for guardian ${guardian.id}`, err);
     }
 
-    if (!guardian.phone) continue;
+    if (!guardian.phone || !guardian.sms_consent) continue;
     const phone = normalizeUsPhone(guardian.phone);
     if (!phone) {
       console.error(`[notifyGuardiansOfReport] invalid phone for guardian ${guardian.id}`);

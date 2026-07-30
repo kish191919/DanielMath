@@ -22,7 +22,14 @@ export function SignUpForm() {
     formState: { errors },
   } = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
-    defaultValues: { fullName: "", email: "", phone: "", password: "", confirmPassword: "" },
+    defaultValues: {
+      fullName: "",
+      email: "",
+      phone: "",
+      smsConsent: false,
+      password: "",
+      confirmPassword: "",
+    },
   });
 
   return (
@@ -72,6 +79,30 @@ export function SignUpForm() {
           placeholder="010-1234-5678"
         />
       </Field>
+
+      <div className="space-y-2">
+        <label className="flex cursor-pointer items-start gap-2 text-sm text-navy-800">
+          <input
+            type="checkbox"
+            {...register("smsConsent")}
+            className="mt-0.5 h-4 w-4 accent-navy-700"
+            aria-required
+          />
+          <span>
+            학습 리포트 및 출결 안내 문자(SMS) 수신에 동의합니다 / I agree to receive SMS
+            notifications for learning reports and attendance updates. (
+            <Link href="/privacy" target="_blank" className="underline underline-offset-2">
+              개인정보처리방침 / Privacy Policy
+            </Link>
+            )
+          </span>
+        </label>
+        {(errors.smsConsent?.message ?? state?.fieldErrors?.smsConsent) && (
+          <p className="text-xs text-red-600" role="alert">
+            {errors.smsConsent?.message ?? state?.fieldErrors?.smsConsent}
+          </p>
+        )}
+      </div>
 
       <Field
         label="비밀번호 / Password"

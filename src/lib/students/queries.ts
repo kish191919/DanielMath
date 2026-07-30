@@ -27,7 +27,7 @@ export async function getStudent(id: string): Promise<Student | null> {
 
 export type GuardianLink = {
   linkId: string;
-  guardian: Pick<Profile, "id" | "email" | "full_name" | "phone">;
+  guardian: Pick<Profile, "id" | "email" | "full_name" | "phone" | "sms_consent">;
 };
 
 export async function listGuardiansForStudent(studentId: string): Promise<GuardianLink[]> {
@@ -45,9 +45,9 @@ export async function listGuardiansForStudent(studentId: string): Promise<Guardi
   const guardianIds = linkList.map((l) => l.guardian_id);
   const { data: guardians, error: guardiansError } = await supabase
     .from("profiles")
-    .select("id, email, full_name, phone")
+    .select("id, email, full_name, phone, sms_consent")
     .in("id", guardianIds)
-    .returns<Pick<Profile, "id" | "email" | "full_name" | "phone">[]>();
+    .returns<Pick<Profile, "id" | "email" | "full_name" | "phone" | "sms_consent">[]>();
   if (guardiansError) throw new Error(guardiansError.message);
 
   const guardianById = new Map((guardians ?? []).map((g) => [g.id, g]));

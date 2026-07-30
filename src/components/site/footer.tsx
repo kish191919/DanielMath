@@ -141,6 +141,9 @@ export function SiteFooter({ locale }: { locale: Locale }) {
 
         <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-navy-200 pt-6 text-xs text-navy-500 sm:flex-row sm:items-center">
           <p>© {new Date().getFullYear()} {siteConfig.name}. All rights reserved.</p>
+          <Link href={lp("/privacy")} className="underline underline-offset-2 hover:text-navy-900">
+            {isKo ? "개인정보처리방침" : "Privacy Policy"}
+          </Link>
           <p>We do not directly collect personal data from children under 13 (COPPA compliant).</p>
           <p>{siteConfig.name} is operated by {siteConfig.legalName}.</p>
         </div>

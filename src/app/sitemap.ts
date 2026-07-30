@@ -12,6 +12,7 @@ const marketingPaths = [
   "/resources/testing",
   "/school-calendar",
   "/blog",
+  "/privacy",
   "/resources/curriculum/kindergarten",
   "/resources/curriculum/grade-1",
   "/resources/curriculum/grade-2",
