@@ -1943,6 +1943,7 @@ export type TestEvent = {
   description: string;
   descriptionKo: string;
   color: "navy" | "gold" | "green" | "purple";
+  slug?: string;
 };
 
 export const testEvents: TestEvent[] = [
@@ -2010,6 +2011,7 @@ export const testEvents: TestEvent[] = [
     descriptionKo:
       "초·중학교 수학 올림피아드(MOEMS)는 11월부터 3월까지 월 1회, 총 5회 진행됩니다. 학교별로 팀을 구성해 참가하며, 각 학생은 개인전 형식으로 문제를 풀게 됩니다. 수학 경시대회를 처음 접하는 아이들에게 훌륭한 경험이 됩니다.",
     color: "purple",
+    slug: "moems",
   },
   {
     name: "AMC 8",

@@ -7,6 +7,7 @@ const koRoutes = [
   "/resources/curriculum",
   "/resources/sol",
   "/resources/testing",
+  "/resources/testing/moems",
   "/thanks",
   "/school-calendar",
   "/blog",

@@ -144,33 +144,57 @@ export default async function TestingPage({ params }: Props) {
             title={isKo ? "시험별 일정 & 특징" : "Test Calendar & Details"}
           />
           <div className="mt-10 grid gap-5 sm:grid-cols-2">
-            {testEvents.map((ev) => (
-              <div
-                key={ev.name}
-                className={cn("rounded-2xl border p-6 shadow-sm", colorMap[ev.color])}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <CalendarDays className="h-4 w-4 text-navy-500" />
-                    <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-bold", badgeMap[ev.color])}>
-                      {isKo ? ev.whenKo : ev.when}
+            {testEvents.map((ev) => {
+              const cardContent = (
+                <>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <CalendarDays className="h-4 w-4 text-navy-500" />
+                      <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-bold", badgeMap[ev.color])}>
+                        {isKo ? ev.whenKo : ev.when}
+                      </span>
+                    </div>
+                    <span className="rounded-full border border-navy-200 bg-white px-2 py-0.5 text-xs font-semibold text-navy-600">
+                      {isKo ? ev.gradesKo : ev.grades}
                     </span>
                   </div>
-                  <span className="rounded-full border border-navy-200 bg-white px-2 py-0.5 text-xs font-semibold text-navy-600">
-                    {isKo ? ev.gradesKo : ev.grades}
-                  </span>
-                </div>
-                <h3 className="mt-3 text-base font-bold text-navy-900">{ev.name}</h3>
-                {isKo && (
-                  <p className="mt-0.5 text-sm font-semibold text-navy-700 font-ko" lang="ko">
-                    {ev.nameKo}
+                  <h3 className="mt-3 text-base font-bold text-navy-900">{ev.name}</h3>
+                  {isKo && (
+                    <p className="mt-0.5 text-sm font-semibold text-navy-700 font-ko" lang="ko">
+                      {ev.nameKo}
+                    </p>
+                  )}
+                  <p className={`mt-2 text-sm leading-6 text-navy-700${isKo ? " font-ko" : ""}`}>
+                    {isKo && ev.descriptionKo ? ev.descriptionKo : ev.description}
                   </p>
-                )}
-                <p className={`mt-2 text-sm leading-6 text-navy-700${isKo ? " font-ko" : ""}`}>
-                  {isKo && ev.descriptionKo ? ev.descriptionKo : ev.description}
-                </p>
-              </div>
-            ))}
+                  {ev.slug && (
+                    <span className={`mt-3 inline-flex items-center gap-1 text-xs font-semibold text-navy-900 underline underline-offset-2${isKo ? " font-ko" : ""}`}>
+                      {isKo ? "자세히 보기" : "Learn more"} →
+                    </span>
+                  )}
+                </>
+              );
+
+              return ev.slug ? (
+                <Link
+                  key={ev.name}
+                  href={lp(`/resources/testing/${ev.slug}`)}
+                  className={cn(
+                    "rounded-2xl border p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md",
+                    colorMap[ev.color],
+                  )}
+                >
+                  {cardContent}
+                </Link>
+              ) : (
+                <div
+                  key={ev.name}
+                  className={cn("rounded-2xl border p-6 shadow-sm", colorMap[ev.color])}
+                >
+                  {cardContent}
+                </div>
+              );
+            })}
           </div>
         </Container>
       </Section>

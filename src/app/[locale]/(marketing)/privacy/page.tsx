@@ -10,10 +10,9 @@ type Props = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   if (!hasLocale(locale)) return {};
-  const isKo = locale === "ko";
   return {
-    title: isKo ? privacyPolicy.titleKo : privacyPolicy.titleEn,
-    description: isKo ? privacyPolicy.descKo : privacyPolicy.descEn,
+    title: privacyPolicy.title,
+    description: privacyPolicy.description,
     alternates: pageAlternates(locale, "/privacy"),
   };
 }
@@ -22,40 +21,22 @@ export default async function PrivacyPage({ params }: Props) {
   const { locale } = await params;
   if (!hasLocale(locale)) notFound();
 
-  const isKo = locale === "ko";
-  const title = isKo ? privacyPolicy.titleKo : privacyPolicy.titleEn;
-  const body = isKo ? privacyPolicy.bodyKo : privacyPolicy.bodyEn;
-
   return (
     <div className="py-12 sm:py-20">
       <Container>
         <div className="mx-auto max-w-2xl">
-          <h1
-            className={`mb-2 text-3xl font-bold text-navy-900${isKo ? " font-ko" : ""}`}
-            lang={isKo ? "ko" : undefined}
-          >
-            {title}
-          </h1>
+          <h1 className="mb-2 text-3xl font-bold text-navy-900">{privacyPolicy.title}</h1>
           <p className="mb-10 text-xs text-navy-400">
-            {isKo ? "시행일" : "Effective"}: {privacyPolicy.effectiveDate}
+            Effective: {privacyPolicy.effectiveDate}
           </p>
 
           <div className="space-y-10">
-            {body.map((section, i) => (
+            {privacyPolicy.body.map((section, i) => (
               <div key={i}>
-                <h2
-                  className={`mb-3 text-xl font-bold text-navy-900${isKo ? " font-ko" : ""}`}
-                  lang={isKo ? "ko" : undefined}
-                >
-                  {section.heading}
-                </h2>
+                <h2 className="mb-3 text-xl font-bold text-navy-900">{section.heading}</h2>
                 <div className="space-y-4">
                   {section.paragraphs.map((para, j) => (
-                    <p
-                      key={j}
-                      className={`leading-relaxed text-navy-700${isKo ? " font-ko" : ""}`}
-                      lang={isKo ? "ko" : undefined}
-                    >
+                    <p key={j} className="leading-relaxed text-navy-700">
                       {para}
                     </p>
                   ))}
