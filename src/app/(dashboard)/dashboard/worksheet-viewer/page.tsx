@@ -41,7 +41,11 @@ export default async function WorksheetViewerPage({
             <WorksheetPdfViewer url={url} />
           ) : (
             // eslint-disable-next-line @next/next/no-img-element -- signed Supabase URL, not a static asset
-            <img src={url} alt="원본 학습지" className="max-h-[80vh] w-full object-contain" />
+            <img
+              src={url}
+              alt="원본 학습지"
+              className="max-h-[80vh] w-full object-contain [touch-action:pan-y_pinch-zoom]"
+            />
           )}
         </div>
       </Container>

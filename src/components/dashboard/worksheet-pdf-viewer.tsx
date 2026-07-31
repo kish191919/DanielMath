@@ -1,8 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 interface WorksheetPdfViewerProps {
   url: string;
@@ -10,18 +8,12 @@ interface WorksheetPdfViewerProps {
 
 type Status = "loading" | "ready" | "error";
 
-export function WorksheetPdfViewer({ url }: WorksheetPdfViewerProps) {
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const canvasRef = React.useRef<HTMLCanvasElement>(null);
-  // Holds the loaded pdf.js document across renders without triggering re-renders itself.
-  const pdfRef = React.useRef<import("pdfjs-dist").PDFDocumentProxy | null>(null);
-  const renderTaskRef = React.useRef<ReturnType<
-    import("pdfjs-dist").PDFPageProxy["render"]
-  > | null>(null);
+type PDFPageProxy = import("pdfjs-dist").PDFPageProxy;
 
+export function WorksheetPdfViewer({ url }: WorksheetPdfViewerProps) {
+  const pdfRef = React.useRef<import("pdfjs-dist").PDFDocumentProxy | null>(null);
   const [status, setStatus] = React.useState<Status>("loading");
-  const [numPages, setNumPages] = React.useState(0);
-  const [pageIndex, setPageIndex] = React.useState(0);
+  const [pages, setPages] = React.useState<PDFPageProxy[]>([]);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -40,8 +32,14 @@ export function WorksheetPdfViewer({ url }: WorksheetPdfViewerProps) {
           return;
         }
         pdfRef.current = doc;
-        setNumPages(doc.numPages);
         setStatus("ready");
+
+        for (let n = 1; n <= doc.numPages; n++) {
+          if (cancelled) return;
+          const page = await doc.getPage(n);
+          if (cancelled) return;
+          setPages((prev) => [...prev, page]);
+        }
       } catch {
         if (!cancelled) setStatus("error");
       }
@@ -53,44 +51,6 @@ export function WorksheetPdfViewer({ url }: WorksheetPdfViewerProps) {
       pdfRef.current = null;
     };
   }, [url]);
-
-  React.useEffect(() => {
-    if (status !== "ready") return;
-    const doc = pdfRef.current;
-    const canvas = canvasRef.current;
-    const container = containerRef.current;
-    if (!doc || !canvas || !container) return;
-
-    let cancelled = false;
-
-    (async () => {
-      const page = await doc.getPage(pageIndex + 1);
-      if (cancelled) return;
-
-      const unscaledViewport = page.getViewport({ scale: 1 });
-      const scale = container.clientWidth / unscaledViewport.width;
-      const viewport = page.getViewport({ scale });
-
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
-
-      renderTaskRef.current?.cancel();
-      const task = page.render({ canvas, canvasContext: ctx, viewport });
-      renderTaskRef.current = task;
-      try {
-        await task.promise;
-      } catch {
-        // Cancelled by a newer render task (page change) — ignore.
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-      renderTaskRef.current?.cancel();
-    };
-  }, [status, pageIndex]);
 
   if (status === "error") {
     return (
@@ -106,40 +66,58 @@ export function WorksheetPdfViewer({ url }: WorksheetPdfViewerProps) {
   }
 
   return (
-    <div>
-      <div ref={containerRef} className="flex justify-center bg-navy-50/40 p-2">
-        {status === "loading" ? (
-          <p className="py-16 text-sm text-navy-500 font-ko" lang="ko">
-            불러오는 중...
-          </p>
-        ) : (
-          <canvas ref={canvasRef} className="max-w-full" />
-        )}
-      </div>
-
-      {status === "ready" && numPages > 1 && (
-        <div className="flex items-center justify-center gap-4 border-t border-navy-100 py-2">
-          <Button
-            variant="ghost"
-            className="h-8 w-8 p-0"
-            onClick={() => setPageIndex((i) => Math.max(0, i - 1))}
-            disabled={pageIndex === 0}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="text-xs text-navy-600">
-            {pageIndex + 1} / {numPages}
-          </span>
-          <Button
-            variant="ghost"
-            className="h-8 w-8 p-0"
-            onClick={() => setPageIndex((i) => Math.min(numPages - 1, i + 1))}
-            disabled={pageIndex === numPages - 1}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
+    <div className="flex flex-col gap-2 bg-navy-50/40 p-2 [touch-action:pan-y_pinch-zoom]">
+      {status === "loading" && pages.length === 0 && (
+        <p className="py-16 text-center text-sm text-navy-500 font-ko" lang="ko">
+          불러오는 중...
+        </p>
       )}
+      {pages.map((page, i) => (
+        <PdfPage key={i} page={page} />
+      ))}
+    </div>
+  );
+}
+
+function PdfPage({ page }: { page: PDFPageProxy }) {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
+  const renderTaskRef = React.useRef<ReturnType<PDFPageProxy["render"]> | null>(null);
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
+
+    (async () => {
+      const unscaledViewport = page.getViewport({ scale: 1 });
+      const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+      const scale = (container.clientWidth / unscaledViewport.width) * dpr;
+      const viewport = page.getViewport({ scale });
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+
+      renderTaskRef.current?.cancel();
+      const task = page.render({ canvas, canvasContext: ctx, viewport });
+      renderTaskRef.current = task;
+      try {
+        await task.promise;
+      } catch {
+        // Cancelled (e.g. unmounted before finishing) — ignore.
+      }
+    })();
+
+    return () => {
+      renderTaskRef.current?.cancel();
+    };
+  }, [page]);
+
+  return (
+    <div ref={containerRef} className="overflow-hidden rounded-md bg-white">
+      <canvas ref={canvasRef} className="h-auto w-full" />
     </div>
   );
 }
