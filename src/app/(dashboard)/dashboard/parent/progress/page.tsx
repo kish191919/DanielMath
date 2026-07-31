@@ -83,7 +83,7 @@ export default async function ParentProgressPage() {
                 </summary>
 
                 <div className="mt-4 pl-6">
-                <details open className="group/table">
+                <details className="group/table">
                   <summary className="flex cursor-pointer list-none items-center gap-2 [&::-webkit-details-marker]:hidden">
                     <ChevronRight className="h-4 w-4 shrink-0 text-navy-400 transition-transform group-open/table:rotate-90" />
                     <h3 className="text-sm font-semibold text-navy-700 font-ko" lang="ko">
@@ -94,11 +94,17 @@ export default async function ParentProgressPage() {
                     <p className="mt-2 text-sm text-navy-600">아직 기록된 학습이력이 없습니다.</p>
                   ) : (
                     <>
-                    <p className="mt-2 text-xs text-navy-500 font-ko" lang="ko">
-                      이 정답률은 선생님이 업로드한 학습지를 기준으로 계산됩니다. 학생이 푼 모든 문제가 아니라
-                      선생님이 필요하다고 판단한 일부만 올라올 수 있어, 실제보다 낮게 보일 수 있어요. &quot;복습
-                      자료 위주&quot; 표시가 붙은 개념은 특히 그렇습니다.
-                    </p>
+                    <details className="group/info mt-2">
+                      <summary className="flex cursor-pointer list-none items-center gap-1 text-xs text-navy-500 font-ko [&::-webkit-details-marker]:hidden" lang="ko">
+                        <ChevronRight className="h-3 w-3 shrink-0 transition-transform group-open/info:rotate-90" />
+                        <span>정답률 계산 방식 안내</span>
+                      </summary>
+                      <p className="mt-1 text-xs text-navy-500 font-ko" lang="ko">
+                        이 정답률은 선생님이 업로드한 학습지를 기준으로 계산됩니다. 학생이 푼 모든 문제가 아니라
+                        선생님이 필요하다고 판단한 일부만 올라올 수 있어, 실제보다 낮게 보일 수 있어요. &quot;복습
+                        자료 위주&quot; 표시가 붙은 개념은 특히 그렇습니다.
+                      </p>
+                    </details>
                     <div className="mt-2 overflow-hidden rounded-2xl border border-navy-100 bg-white shadow-sm">
                       <table className="w-full text-left text-sm">
                         <thead className="bg-navy-50/50 text-xs uppercase tracking-wide text-navy-500">
