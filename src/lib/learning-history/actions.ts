@@ -323,7 +323,7 @@ export async function publishSessionNoteAction(
   if (error) return { error: error.message };
 
   try {
-    await notifyGuardiansOfReport(studentId, scanId, session.userId);
+    await notifyGuardiansOfReport(studentId, scanId, session.userId, noteId);
   } catch (err) {
     // Best-effort — the publish itself already succeeded (same pattern as
     // generateParentSummaryDraft above in confirmReviewAction).
@@ -347,6 +347,7 @@ async function notifyGuardiansOfReport(
   studentId: string,
   scanId: string,
   principalId: string,
+  noteId: string,
 ): Promise<void> {
   const guardians = await listGuardiansForStudent(studentId);
   if (guardians.length === 0) return;
@@ -406,7 +407,7 @@ async function notifyGuardiansOfReport(
       continue;
     }
 
-    const link = await generateParentMagicLink(guardian.email);
+    const link = await generateParentMagicLink(guardian.email, `/dashboard/parent/reports/${noteId}`);
     if (!link) continue;
 
     try {

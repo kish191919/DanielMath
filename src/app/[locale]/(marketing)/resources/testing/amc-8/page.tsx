@@ -171,7 +171,7 @@ const sampleTests = [
 const solutionResources = [
   {
     key: "solutions",
-    href: "https://live.poshenloh.com/past-contests/amc8",
+    href: "https://live.poshenloh.com/past-contests",
     label: "Past Exams with Video & Written Solutions (1985–present)",
     labelKo: "역대 기출문제 + 동영상·서술형 해설 (1985년~현재)",
     featured: true,

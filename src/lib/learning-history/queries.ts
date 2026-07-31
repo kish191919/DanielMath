@@ -581,3 +581,34 @@ export async function listSessionNotesForParent(
   if (!owns) return [];
   return listSessionNotes(studentId, limit);
 }
+
+// Single-report counterpart for the /dashboard/parent/reports/[noteId] deep
+// link the SMS notification points at — resolves the note plus its student
+// in one call, checking guardian ownership against the note's own
+// student_id rather than a caller-supplied studentId (there isn't one at
+// this call site).
+export async function getSessionNoteForParent(
+  parentId: string,
+  noteId: string,
+): Promise<{ note: SessionNote; student: Student } | null> {
+  const supabase = await createServerSupabase();
+  const { data: note } = await supabase
+    .from("session_notes")
+    .select("*")
+    .eq("id", noteId)
+    .eq("confirmed", true)
+    .maybeSingle<SessionNote>();
+  if (!note) return null;
+
+  const owns = await assertParentOwnsStudent(parentId, note.student_id);
+  if (!owns) return null;
+
+  const { data: student } = await supabase
+    .from("students")
+    .select("*")
+    .eq("id", note.student_id)
+    .maybeSingle<Student>();
+  if (!student) return null;
+
+  return { note, student };
+}

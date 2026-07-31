@@ -1972,6 +1972,7 @@ export const testEvents: TestEvent[] = [
     descriptionKo:
       "FCPS에서 NGAT(Naglieri General Ability Test) 검사를 실시합니다. 이전에 따로 시행하던 CogAT와 NNAT 검사를 하나로 통합한 표준화 능력 검사입니다. 검사 점수와 포트폴리오 자료를 종합하여 AAP 배치가 결정됩니다.",
     color: "gold",
+    slug: "ngat",
   },
   {
     name: "AAP Placement Notification",
@@ -1998,6 +1999,7 @@ export const testEvents: TestEvent[] = [
     descriptionKo:
       "버지니아 학습 기준(SOL) 시험은 학생들이 해당 학년 교육과정을 얼마나 충실히 익혔는지 평가합니다. 버지니아 공립학교 3~8학년은 모두 필수 응시 대상입니다. 결과는 학교 인증 평가와 학생 진급 결정에 활용됩니다.",
     color: "navy",
+    slug: "virginia-sol",
   },
   {
     name: "FCPS Math Olympiad (MOEMS)",
