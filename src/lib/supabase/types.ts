@@ -155,6 +155,7 @@ export interface WorksheetScan {
   reviewed_at: string | null;
   reviewed_by: string | null;
   session_date: string;
+  is_targeted_review: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -415,6 +416,7 @@ type WorksheetScanInsert = {
   reviewed_at?: string | null;
   reviewed_by?: string | null;
   session_date?: string;
+  is_targeted_review?: boolean;
   created_at?: string;
   updated_at?: string;
 };

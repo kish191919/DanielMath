@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { updateSmsConsentAction, type UpdateSmsConsentState } from "@/lib/profile/actions";
 
 export function SmsConsentToggle({ defaultChecked }: { defaultChecked: boolean }) {
@@ -18,7 +19,6 @@ export function SmsConsentToggle({ defaultChecked }: { defaultChecked: boolean }
           name="sms_consent"
           defaultChecked={defaultChecked}
           disabled={isPending}
-          onChange={(e) => e.currentTarget.form?.requestSubmit()}
           className="mt-0.5 h-4 w-4 accent-navy-700"
         />
         <span>
@@ -45,6 +45,9 @@ export function SmsConsentToggle({ defaultChecked }: { defaultChecked: boolean }
           {state.error}
         </p>
       )}
+      <Button type="submit" size="md" disabled={isPending}>
+        {isPending ? "저장 중..." : "확인"}
+      </Button>
     </form>
   );
 }

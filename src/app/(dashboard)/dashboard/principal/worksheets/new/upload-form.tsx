@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Camera, Trash2 } from "lucide-react";
-import { Field } from "@/components/forms/field";
+import { Field, Radio } from "@/components/forms/field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -21,6 +21,7 @@ export function UploadForm({ students }: { students: Student[] }) {
   const router = useRouter();
   const [studentId, setStudentId] = React.useState("");
   const [sessionDate, setSessionDate] = React.useState(todayInEasternTime());
+  const [isTargetedReview, setIsTargetedReview] = React.useState(false);
   const [pickedFile, setPickedFile] = React.useState<File | null>(null);
   const [cameraPages, setCameraPages] = React.useState<CapturedPage[] | null>(null);
   const [showCamera, setShowCamera] = React.useState(false);
@@ -135,6 +136,7 @@ export function UploadForm({ students }: { students: Student[] }) {
       mimeType: file.type,
       fileSizeBytes: file.size,
       sessionDate,
+      isTargetedReview,
     });
     if (confirmResult && "error" in confirmResult) {
       setError(confirmResult.error);
@@ -178,6 +180,28 @@ export function UploadForm({ students }: { students: Student[] }) {
           disabled={isBusy}
           aria-required
         />
+      </Field>
+
+      <Field label="촬영 범위 / Coverage">
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Radio
+            name="isTargetedReview"
+            checked={!isTargetedReview}
+            disabled={isBusy}
+            onChange={() => setIsTargetedReview(false)}
+            label="정기 학습 전체 (빠짐없이 촬영)"
+          />
+          <Radio
+            name="isTargetedReview"
+            checked={isTargetedReview}
+            disabled={isBusy}
+            onChange={() => setIsTargetedReview(true)}
+            label="오답/복습 위주 (일부만 촬영)"
+          />
+        </div>
+        <p className="text-xs text-navy-500 font-ko" lang="ko">
+          &quot;오답/복습 위주&quot;로 표시하면 학부모 진행 상황 페이지의 정답률에 참고 표시가 함께 나타나요.
+        </p>
       </Field>
 
       <Field label="파일 / File (사진 또는 PDF)" required>

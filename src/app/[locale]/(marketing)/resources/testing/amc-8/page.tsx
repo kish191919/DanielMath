@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Trophy, Clock, ListChecks, ShieldCheck, CheckCircle, Award, BookOpen, Info, Milestone } from "lucide-react";
+import { ArrowLeft, Trophy, Clock, ListChecks, ShieldCheck, CheckCircle, Award, BookOpen, Info, Milestone, ExternalLink } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
 import { pageAlternates } from "@/lib/seo";
+import { cn } from "@/lib/utils";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -148,6 +149,42 @@ const pathway = [
   },
 ];
 
+const sampleTests = [
+  {
+    key: "2025",
+    href: "https://live.poshenloh.com/images/past-contests/pdf/amc8-2025-exam.pdf",
+    title: "2025 AMC 8",
+    label: "Full exam PDF, 25 problems",
+    labelKo: "전체 시험지 PDF, 25문항",
+    featured: true,
+  },
+  {
+    key: "2024",
+    href: "https://live.poshenloh.com/images/past-contests/pdf/amc8-2024-exam.pdf",
+    title: "2024 AMC 8",
+    label: "Full exam PDF, 25 problems",
+    labelKo: "전체 시험지 PDF, 25문항",
+    featured: false,
+  },
+];
+
+const solutionResources = [
+  {
+    key: "solutions",
+    href: "https://live.poshenloh.com/past-contests/amc8",
+    label: "Past Exams with Video & Written Solutions (1985–present)",
+    labelKo: "역대 기출문제 + 동영상·서술형 해설 (1985년~현재)",
+    featured: true,
+  },
+  {
+    key: "aops",
+    href: "https://artofproblemsolving.com/wiki/index.php/AMC_8_Problems_and_Solutions",
+    label: "AoPS Wiki — AMC 8 Problems and Solutions Archive",
+    labelKo: "AoPS 위키 — AMC 8 기출문제 및 해설 아카이브",
+    featured: false,
+  },
+];
+
 export default async function Amc8Page({ params }: Props) {
   const { locale } = await params;
   if (!hasLocale(locale)) notFound();
@@ -249,8 +286,73 @@ export default async function Amc8Page({ params }: Props) {
         </Container>
       </Section>
 
-      {/* Schedule & registration */}
+      {/* Sample problems */}
       <Section className="bg-navy-50/50">
+        <Container>
+          <SectionHeader
+            eyebrow={isKo ? "직접 풀어보기" : "Try It Yourself"}
+            title={isKo ? "실제 AMC 8 기출문제 풀어보기" : "Try Real AMC 8 Problems"}
+            isKo={isKo}
+          />
+          <p className={`mx-auto mt-5 max-w-2xl text-center text-sm leading-7 text-navy-700${isKo ? " font-ko" : ""}`}>
+            {isKo
+              ? "MAA의 공식 허가를 받아 무료로 제공되는 실제 AMC 8 기출문제지입니다. 실전과 동일한 형식으로 미리 풀어볼 수 있습니다."
+              : "These are real past AMC 8 exams, hosted free of charge with official permission from the MAA — the same format students see on test day."}
+          </p>
+          <div className="mx-auto mt-8 grid max-w-2xl gap-4 sm:grid-cols-2">
+            {sampleTests.map((t) => (
+              <a
+                key={t.key}
+                href={t.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(
+                  "flex items-center gap-3 rounded-2xl border p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md",
+                  t.featured ? "border-purple-300 bg-purple-50" : "border-navy-100 bg-white",
+                )}
+              >
+                <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white", t.featured ? "bg-purple-600" : "bg-navy-700")}>
+                  <ExternalLink className="h-4.5 w-4.5" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-navy-900">
+                    {isKo ? "기출문제 다운로드" : "Download Exam"} — {t.title}
+                  </p>
+                  <p className={`mt-0.5 text-xs text-navy-600${isKo ? " font-ko" : ""}`}>
+                    {isKo ? t.labelKo : t.label}
+                  </p>
+                </div>
+              </a>
+            ))}
+          </div>
+          <div className="mx-auto mt-4 grid max-w-2xl gap-4 sm:grid-cols-2">
+            {solutionResources.map((s) => (
+              <a
+                key={s.key}
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(
+                  "flex items-center gap-3 rounded-2xl border p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md",
+                  s.featured ? "border-purple-300 bg-purple-50" : "border-navy-100 bg-white",
+                )}
+              >
+                <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white", s.featured ? "bg-purple-600" : "bg-navy-700")}>
+                  <BookOpen className="h-4.5 w-4.5" />
+                </div>
+                <div>
+                  <p className={`text-sm font-bold text-navy-900${isKo ? " font-ko" : ""}`}>
+                    {isKo ? s.labelKo : s.label}
+                  </p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </Container>
+      </Section>
+
+      {/* Schedule & registration */}
+      <Section>
         <Container>
           <SectionHeader
             eyebrow={isKo ? "시험 & 등록 일정" : "Schedule & Registration"}

@@ -58,7 +58,7 @@ export default async function ParentProgressPage() {
             우리 아이 진행 상황
           </h1>
           <p className="mt-2 text-sm text-navy-700 font-ko" lang="ko">
-            최근 30일간 개념별 정답률과 선생님이 남긴 학습 리포트입니다.
+            최근 30일간 업로드된 학습지를 기준으로 한 개념별 정답률과 선생님이 남긴 학습 리포트입니다.
           </p>
         </div>
 
@@ -93,6 +93,12 @@ export default async function ParentProgressPage() {
                   {visibleSummary.length === 0 ? (
                     <p className="mt-2 text-sm text-navy-600">아직 기록된 학습이력이 없습니다.</p>
                   ) : (
+                    <>
+                    <p className="mt-2 text-xs text-navy-500 font-ko" lang="ko">
+                      이 정답률은 선생님이 업로드한 학습지를 기준으로 계산됩니다. 학생이 푼 모든 문제가 아니라
+                      선생님이 필요하다고 판단한 일부만 올라올 수 있어, 실제보다 낮게 보일 수 있어요. &quot;복습
+                      자료 위주&quot; 표시가 붙은 개념은 특히 그렇습니다.
+                    </p>
                     <div className="mt-2 overflow-hidden rounded-2xl border border-navy-100 bg-white shadow-sm">
                       <table className="w-full text-left text-sm">
                         <thead className="bg-navy-50/50 text-xs uppercase tracking-wide text-navy-500">
@@ -120,6 +126,11 @@ export default async function ParentProgressPage() {
                                       표본부족
                                     </span>
                                   )}
+                                  {row.isTargetedReviewHeavy && (
+                                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                                      복습 자료 위주
+                                    </span>
+                                  )}
                                 </div>
                               </td>
                               <td className="px-4 py-2.5 text-navy-700">
@@ -130,6 +141,7 @@ export default async function ParentProgressPage() {
                         </tbody>
                       </table>
                     </div>
+                    </>
                   )}
                 </details>
 

@@ -46,6 +46,12 @@ export const uploadMetaSchema = z.object({
     .positive()
     .max(MAX_UPLOAD_BYTES, "파일 크기는 20MB를 초과할 수 없습니다."),
   session_date: z.string().min(1),
+  // True when the teacher deliberately photographed only the problems a
+  // student struggled with, rather than everything the student solved that
+  // session — see getConceptAccuracySummary's isTargetedReviewHeavy, which
+  // uses this so parent-facing accuracy stats can flag that skew instead of
+  // presenting the number as a representative sample.
+  is_targeted_review: z.boolean().default(false),
 });
 
 export const learningItemInputSchema = z.object({

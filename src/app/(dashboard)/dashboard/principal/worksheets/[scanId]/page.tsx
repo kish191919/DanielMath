@@ -133,6 +133,7 @@ export default async function WorksheetScanReviewPage({
           </p>
           <div className="mt-4">
             <ReviewTable
+              key={scan.status}
               scanId={scanId}
               studentId={scan.student_id}
               sessionDate={scan.session_date}

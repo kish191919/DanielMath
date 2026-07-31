@@ -142,6 +142,11 @@ export async function listLearningItems(
 
 export const MIN_SAMPLE_SIZE = 3;
 export const WEAK_ACCURACY_THRESHOLD = 70;
+// If at least half of a concept's items came from a scan the teacher marked
+// "targeted review" (worksheet_scans.is_targeted_review), the accuracy
+// number is likely skewed low by what got selected for upload rather than
+// by the student's actual grasp of the concept — see confirmUploadAction.
+const TARGETED_REVIEW_HEAVY_RATIO = 0.5;
 
 export type ConceptAccuracySummary = {
   conceptId: string | null;
@@ -152,7 +157,24 @@ export type ConceptAccuracySummary = {
   accuracyRate: number;
   isLowSample: boolean;
   isWeak: boolean;
+  isTargetedReviewHeavy: boolean;
 };
+
+// Items don't carry is_targeted_review themselves (it lives on the scan they
+// came from), so this does one extra lookup rather than widening
+// listLearningItems's shared shape for every caller.
+async function getTargetedReviewScanIds(scanIds: string[]): Promise<Set<string>> {
+  if (scanIds.length === 0) return new Set();
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from("worksheet_scans")
+    .select("id")
+    .in("id", scanIds)
+    .eq("is_targeted_review", true)
+    .returns<{ id: string }[]>();
+  if (error) throw new Error(error.message);
+  return new Set((data ?? []).map((row) => row.id));
+}
 
 export async function getConceptAccuracySummary(
   studentId: string,
@@ -163,13 +185,17 @@ export async function getConceptAccuracySummary(
     listConcepts(),
   ]);
   const conceptById = new Map(concepts.map((c) => [c.id, c]));
+  const targetedReviewScanIds = await getTargetedReviewScanIds([
+    ...new Set(items.map((item) => item.scan_id)),
+  ]);
 
-  const buckets = new Map<string, { total: number; correct: number }>();
+  const buckets = new Map<string, { total: number; correct: number; targetedReviewCount: number }>();
   for (const item of items) {
     const key = item.concept_id ?? "unassigned";
-    const bucket = buckets.get(key) ?? { total: 0, correct: 0 };
+    const bucket = buckets.get(key) ?? { total: 0, correct: 0, targetedReviewCount: 0 };
     bucket.total += 1;
     if (item.is_correct) bucket.correct += 1;
+    if (targetedReviewScanIds.has(item.scan_id)) bucket.targetedReviewCount += 1;
     buckets.set(key, bucket);
   }
 
@@ -187,6 +213,8 @@ export async function getConceptAccuracySummary(
       accuracyRate,
       isLowSample,
       isWeak: !isLowSample && accuracyRate < WEAK_ACCURACY_THRESHOLD,
+      isTargetedReviewHeavy:
+        bucket.total > 0 && bucket.targetedReviewCount / bucket.total >= TARGETED_REVIEW_HEAVY_RATIO,
     });
   }
 

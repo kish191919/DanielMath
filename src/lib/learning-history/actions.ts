@@ -71,6 +71,7 @@ export type ConfirmUploadInput = {
   mimeType: string;
   fileSizeBytes: number;
   sessionDate: string;
+  isTargetedReview: boolean;
 };
 
 export type ConfirmUploadResult = { error: string };
@@ -86,6 +87,7 @@ export async function confirmUploadAction(
     mime_type: input.mimeType,
     file_size_bytes: input.fileSizeBytes,
     session_date: input.sessionDate,
+    is_targeted_review: input.isTargetedReview,
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "입력값을 확인해주세요." };
@@ -101,6 +103,7 @@ export async function confirmUploadAction(
     mime_type: parsed.data.mime_type,
     file_size_bytes: parsed.data.file_size_bytes,
     session_date: parsed.data.session_date,
+    is_targeted_review: parsed.data.is_targeted_review,
     status: "grading",
   });
   if (error) return { error: error.message };
