@@ -58,6 +58,9 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
   verification: {
     google: process.env.GOOGLE_SITE_VERIFICATION,
+    other: {
+      "naver-site-verification": "dd0d328210c2ee8794183d90d550976534ffd0ae",
+    },
   },
   appleWebApp: {
     capable: true,
