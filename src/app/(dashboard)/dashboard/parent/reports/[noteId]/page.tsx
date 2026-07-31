@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
-import { WorksheetViewerModal } from "@/components/dashboard/worksheet-viewer-modal";
+import { WorksheetViewerLink } from "@/components/dashboard/worksheet-viewer-link";
 import { requireRole } from "@/lib/dal";
 import { GRADE_LABELS } from "@/lib/students/schema";
 import {
@@ -60,10 +60,10 @@ export default async function ParentReportDetailPage({
               {note.note}
             </p>
             {worksheet && (
-              <WorksheetViewerModal
+              <WorksheetViewerLink
                 url={worksheet.url}
                 mimeType={worksheet.mimeType}
-                triggerClassName="mt-4 h-8 gap-1.5 px-3 text-xs"
+                className="mt-4 h-8 gap-1.5 px-3 text-xs"
               />
             )}
           </div>
