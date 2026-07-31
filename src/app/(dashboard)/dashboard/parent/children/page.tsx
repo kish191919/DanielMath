@@ -38,7 +38,7 @@ export default async function ParentChildrenPage() {
             children.map((child) => (
               <Link
                 key={child.id}
-                href={`/dashboard/parent/progress#child-${child.id}`}
+                href={`/dashboard/parent/progress?child=${child.id}`}
                 className="rounded-2xl border border-navy-100 bg-white p-5 shadow-sm transition-colors hover:border-navy-300 hover:bg-navy-50"
               >
                 <div className="flex items-start justify-between gap-3">

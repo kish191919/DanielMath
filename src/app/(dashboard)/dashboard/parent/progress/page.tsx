@@ -3,13 +3,16 @@ import { ArrowLeft, ChevronRight, Paperclip } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
 import { Button } from "@/components/ui/button";
+import { AttendanceCalendar } from "@/components/dashboard/attendance-calendar";
 import { requireRole } from "@/lib/dal";
 import { GRADE_LABELS } from "@/lib/students/schema";
+import { todayInEasternTime } from "@/lib/dates";
 import {
   listChildrenForParent,
   getConceptAccuracySummaryForParent,
   listSessionNotesForParent,
   getSignedScanViewUrlsForParent,
+  listAttendanceForParent,
 } from "@/lib/learning-history/queries";
 
 function daysAgoIso(days: number) {
@@ -18,15 +21,30 @@ function daysAgoIso(days: number) {
   return d.toISOString().slice(0, 10);
 }
 
-export default async function ParentProgressPage() {
+export default async function ParentProgressPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ child?: string; month?: string }>;
+}) {
   const session = await requireRole("parent");
+  const { child: rawChildId, month: rawMonth } = await searchParams;
   const children = await listChildrenForParent(session.userId);
 
+  const filterChildId =
+    rawChildId && children.some((c) => c.id === rawChildId) ? rawChildId : null;
+  const visibleChildren = filterChildId
+    ? children.filter((c) => c.id === filterChildId)
+    : children;
+
+  const month =
+    rawMonth && /^\d{4}-\d{2}$/.test(rawMonth) ? rawMonth : todayInEasternTime().slice(0, 7);
+
   const childData = await Promise.all(
-    children.map(async (child) => {
-      const [recentSummary, notes] = await Promise.all([
+    visibleChildren.map(async (child) => {
+      const [recentSummary, notes, attendance] = await Promise.all([
         getConceptAccuracySummaryForParent(session.userId, child.id, { from: daysAgoIso(30) }),
         listSessionNotesForParent(session.userId, child.id, 10),
+        listAttendanceForParent(session.userId, child.id, month),
       ]);
       const scanIds = notes
         .map((note) => note.scan_id)
@@ -36,7 +54,7 @@ export default async function ParentProgressPage() {
         ...note,
         worksheetUrl: note.scan_id ? (signedUrls.get(note.scan_id) ?? null) : null,
       }));
-      return { child, recentSummary, notes: notesWithWorksheetUrls };
+      return { child, recentSummary, notes: notesWithWorksheetUrls, attendance };
     }),
   );
 
@@ -60,6 +78,14 @@ export default async function ParentProgressPage() {
           <p className="mt-2 text-sm text-navy-700 font-ko" lang="ko">
             최근 30일간 업로드된 학습지를 기준으로 한 개념별 정답률과 선생님이 남긴 학습 리포트입니다.
           </p>
+          {filterChildId && (
+            <Link
+              href={rawMonth ? `/dashboard/parent/progress?month=${month}` : "/dashboard/parent/progress"}
+              className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-navy-500 hover:text-navy-900"
+            >
+              전체 자녀 보기
+            </Link>
+          )}
         </div>
 
         {childData.length === 0 ? (
@@ -68,7 +94,7 @@ export default async function ParentProgressPage() {
           </div>
         ) : (
           <div className="mt-8 space-y-10">
-            {childData.map(({ child, recentSummary, notes }) => {
+            {childData.map(({ child, recentSummary, notes, attendance }) => {
               // Unassigned ("미분류") rows are an internal data-tagging gap,
               // not something a parent can act on, so they're hidden here.
               const visibleSummary = recentSummary.filter((row) => row.conceptId !== null);
@@ -150,6 +176,17 @@ export default async function ParentProgressPage() {
                     </>
                   )}
                 </details>
+
+                <div className="mt-4">
+                  <h3 className="text-sm font-semibold text-navy-700 font-ko" lang="ko">
+                    출석 현황
+                  </h3>
+                  <AttendanceCalendar
+                    month={month}
+                    entries={attendance}
+                    extraParams={filterChildId ? { child: filterChildId } : {}}
+                  />
+                </div>
 
                 <div className="mt-4">
                   <h3 className="text-sm font-semibold text-navy-700 font-ko" lang="ko">

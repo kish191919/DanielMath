@@ -23,6 +23,14 @@ const ISO_WEEKDAY_BY_LABEL: Record<string, number> = {
   Sun: 7,
 };
 
+export function shiftMonth(month: string, delta: number): string {
+  const [year, monthNum] = month.split("-").map(Number);
+  const total = year * 12 + (monthNum - 1) + delta;
+  const newYear = Math.floor(total / 12);
+  const newMonth = (total % 12) + 1;
+  return `${newYear}-${String(newMonth).padStart(2, "0")}`;
+}
+
 export function todayIsoWeekdayInEasternTime(): number {
   const label = new Intl.DateTimeFormat("en-US", {
     timeZone: ACADEMY_TIME_ZONE,

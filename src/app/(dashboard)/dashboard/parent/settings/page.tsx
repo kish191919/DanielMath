@@ -4,6 +4,7 @@ import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
 import { requireRole } from "@/lib/dal";
 import { SmsConsentToggle } from "./sms-consent-toggle";
+import { PhoneEditor } from "./phone-editor";
 
 export default async function ParentSettings() {
   const session = await requireRole("parent");
@@ -25,6 +26,9 @@ export default async function ParentSettings() {
           </h1>
         </div>
         <div className="mt-8 max-w-xl rounded-2xl border border-navy-100 bg-white p-6 shadow-sm">
+          <PhoneEditor defaultValue={session.profile.phone ?? ""} />
+        </div>
+        <div className="mt-4 max-w-xl rounded-2xl border border-navy-100 bg-white p-6 shadow-sm">
           <SmsConsentToggle defaultChecked={session.profile.sms_consent} />
         </div>
       </Container>

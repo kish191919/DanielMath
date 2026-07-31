@@ -9,6 +9,7 @@ import type {
   Student,
   Grade,
   Track,
+  AttendanceStatus,
 } from "@/lib/supabase/types";
 import {
   getCurrentQuarter,
@@ -17,6 +18,7 @@ import {
   type Quarter,
   type AdvancedStatus,
 } from "@/lib/curriculum-quarter";
+import { shiftMonth } from "@/lib/dates";
 
 const BUCKET = "worksheet-scans";
 
@@ -518,6 +520,38 @@ async function assertParentOwnsStudent(parentId: string, studentId: string): Pro
     .eq("guardian_id", parentId)
     .maybeSingle<{ id: string }>();
   return !!data;
+}
+
+export type AttendanceCalendarEntry = {
+  date: string; // "YYYY-MM-DD"
+  status: AttendanceStatus;
+};
+
+export async function listAttendanceForParent(
+  parentId: string,
+  studentId: string,
+  month: string, // "YYYY-MM"
+): Promise<AttendanceCalendarEntry[]> {
+  const owns = await assertParentOwnsStudent(parentId, studentId);
+  if (!owns) return [];
+
+  const monthStart = `${month}-01`;
+  const nextMonthStart = `${shiftMonth(month, 1)}-01`;
+
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from("class_session_attendance")
+    .select("status, class_sessions!inner(session_date)")
+    .eq("student_id", studentId)
+    .gte("class_sessions.session_date", monthStart)
+    .lt("class_sessions.session_date", nextMonthStart)
+    .returns<{ status: AttendanceStatus; class_sessions: { session_date: string } }[]>();
+  if (error) throw new Error(error.message);
+
+  return (data ?? []).map((row) => ({
+    date: row.class_sessions.session_date,
+    status: row.status,
+  }));
 }
 
 // Batched counterpart of the old per-note getSignedScanViewUrlForParent —
