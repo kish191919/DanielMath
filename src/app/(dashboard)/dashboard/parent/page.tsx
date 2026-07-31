@@ -19,6 +19,12 @@ const cards = [
     description: "개념별 정답률과 선생님이 남긴 학습 리포트를 확인합니다.",
     ready: true,
   },
+  {
+    href: "/dashboard/parent/settings",
+    title: "설정",
+    description: "SMS 알림 수신 동의 여부를 관리합니다.",
+    ready: true,
+  },
 ];
 
 export default async function ParentHome() {
