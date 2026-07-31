@@ -7,10 +7,13 @@ import { AttendanceCalendar } from "@/components/dashboard/attendance-calendar";
 import { requireRole } from "@/lib/dal";
 import { GRADE_LABELS } from "@/lib/students/schema";
 import { todayInEasternTime } from "@/lib/dates";
+import type { SessionNote } from "@/lib/supabase/types";
 import {
   listChildrenForParent,
   getConceptAccuracySummaryForParent,
   listSessionNotesForParent,
+  listSessionNotesForParentByDate,
+  listSessionNoteDatesForParent,
   getSignedScanViewUrlsForParent,
   listAttendanceForParent,
 } from "@/lib/learning-history/queries";
@@ -21,13 +24,22 @@ function daysAgoIso(days: number) {
   return d.toISOString().slice(0, 10);
 }
 
+function buildProgressHref(params: Record<string, string | undefined>): string {
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value) search.set(key, value);
+  }
+  const qs = search.toString();
+  return qs ? `/dashboard/parent/progress?${qs}` : "/dashboard/parent/progress";
+}
+
 export default async function ParentProgressPage({
   searchParams,
 }: {
-  searchParams: Promise<{ child?: string; month?: string }>;
+  searchParams: Promise<{ child?: string; month?: string; note?: string }>;
 }) {
   const session = await requireRole("parent");
-  const { child: rawChildId, month: rawMonth } = await searchParams;
+  const { child: rawChildId, month: rawMonth, note: rawNote } = await searchParams;
   const children = await listChildrenForParent(session.userId);
 
   const filterChildId =
@@ -38,23 +50,37 @@ export default async function ParentProgressPage({
 
   const month =
     rawMonth && /^\d{4}-\d{2}$/.test(rawMonth) ? rawMonth : todayInEasternTime().slice(0, 7);
+  const noteDate = rawNote && /^\d{4}-\d{2}-\d{2}$/.test(rawNote) ? rawNote : null;
 
   const childData = await Promise.all(
     visibleChildren.map(async (child) => {
-      const [recentSummary, notes, attendance] = await Promise.all([
+      const [recentSummary, notes, attendance, reportDates, dateNotes] = await Promise.all([
         getConceptAccuracySummaryForParent(session.userId, child.id, { from: daysAgoIso(30) }),
-        listSessionNotesForParent(session.userId, child.id, 10),
+        listSessionNotesForParent(session.userId, child.id, 3),
         listAttendanceForParent(session.userId, child.id, month),
+        listSessionNoteDatesForParent(session.userId, child.id, month),
+        noteDate
+          ? listSessionNotesForParentByDate(session.userId, child.id, noteDate)
+          : Promise.resolve([] as SessionNote[]),
       ]);
-      const scanIds = notes
+      const allNotes = [...notes, ...dateNotes];
+      const scanIds = allNotes
         .map((note) => note.scan_id)
         .filter((scanId): scanId is string => scanId !== null);
       const signedUrls = await getSignedScanViewUrlsForParent(session.userId, child.id, scanIds);
-      const notesWithWorksheetUrls = notes.map((note) => ({
-        ...note,
-        worksheetUrl: note.scan_id ? (signedUrls.get(note.scan_id) ?? null) : null,
-      }));
-      return { child, recentSummary, notes: notesWithWorksheetUrls, attendance };
+      const attachUrls = (list: SessionNote[]) =>
+        list.map((note) => ({
+          ...note,
+          worksheetUrl: note.scan_id ? (signedUrls.get(note.scan_id) ?? null) : null,
+        }));
+      return {
+        child,
+        recentSummary,
+        notes: attachUrls(notes),
+        dateNotes: attachUrls(dateNotes),
+        attendance,
+        reportDates,
+      };
     }),
   );
 
@@ -80,7 +106,10 @@ export default async function ParentProgressPage({
           </p>
           {filterChildId && (
             <Link
-              href={rawMonth ? `/dashboard/parent/progress?month=${month}` : "/dashboard/parent/progress"}
+              href={buildProgressHref({
+                month: rawMonth ? month : undefined,
+                note: noteDate ?? undefined,
+              })}
               className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-navy-500 hover:text-navy-900"
             >
               전체 자녀 보기
@@ -94,7 +123,7 @@ export default async function ParentProgressPage({
           </div>
         ) : (
           <div className="mt-8 space-y-10">
-            {childData.map(({ child, recentSummary, notes, attendance }) => {
+            {childData.map(({ child, recentSummary, notes, dateNotes, attendance, reportDates }) => {
               // Unassigned ("미분류") rows are an internal data-tagging gap,
               // not something a parent can act on, so they're hidden here.
               const visibleSummary = recentSummary.filter((row) => row.conceptId !== null);
@@ -184,22 +213,41 @@ export default async function ParentProgressPage({
                   <AttendanceCalendar
                     month={month}
                     entries={attendance}
+                    reportDates={reportDates}
+                    selectedDate={noteDate}
                     extraParams={filterChildId ? { child: filterChildId } : {}}
                   />
                 </div>
 
                 <div className="mt-4">
-                  <h3 className="text-sm font-semibold text-navy-700 font-ko" lang="ko">
-                    학습 리포트
-                  </h3>
-                  {notes.length === 0 ? (
-                    <p className="mt-2 text-sm text-navy-600">아직 남겨진 메모가 없습니다.</p>
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="text-sm font-semibold text-navy-700 font-ko" lang="ko">
+                      {noteDate ? `${noteDate} 학습 리포트` : "학습 리포트 (최근 3개)"}
+                    </h3>
+                    {noteDate && (
+                      <Link
+                        href={buildProgressHref({
+                          child: filterChildId ?? undefined,
+                          month: rawMonth ? month : undefined,
+                        })}
+                        className="text-xs font-medium text-navy-500 hover:text-navy-900"
+                      >
+                        최근 리포트 보기
+                      </Link>
+                    )}
+                  </div>
+                  {(noteDate ? dateNotes : notes).length === 0 ? (
+                    <p className="mt-2 text-sm text-navy-600">
+                      {noteDate
+                        ? "이 날짜에 작성된 학습 리포트가 없습니다."
+                        : "아직 남겨진 메모가 없습니다."}
+                    </p>
                   ) : (
                     <div className="mt-2 space-y-2">
-                      {notes.map((note, index) => (
+                      {(noteDate ? dateNotes : notes).map((note, index) => (
                         <details
                           key={note.id}
-                          open={index === 0}
+                          open={noteDate ? true : index === 0}
                           className="group overflow-hidden rounded-2xl border border-navy-100 bg-white shadow-sm"
                         >
                           <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 hover:bg-navy-50/60 [&::-webkit-details-marker]:hidden">

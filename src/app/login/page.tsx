@@ -12,9 +12,21 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function LoginPage() {
+// Only ever redirect to an in-app path — `next` comes from a query string
+// an attacker can craft, so reject anything that isn't a single leading
+// slash (rules out "//evil.com" and "https://evil.com" open redirects).
+function isSafeNext(next: string | undefined): next is string {
+  return !!next && next.startsWith("/") && !next.startsWith("//");
+}
+
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const { next } = await searchParams;
   const session = await verifySession();
-  if (session) redirect("/dashboard");
+  if (session) redirect(isSafeNext(next) ? next : "/dashboard");
 
   return (
     <>
@@ -42,7 +54,7 @@ export default async function LoginPage() {
               titleKo="로그인"
             />
             <div className="mt-10">
-              <LoginForm />
+              <LoginForm next={isSafeNext(next) ? next : undefined} />
             </div>
           </Container>
         </Section>

@@ -37,7 +37,9 @@ export async function signInAction(
     return { error: "이메일 또는 비밀번호가 올바르지 않습니다." };
   }
 
-  redirect("/dashboard");
+  const next = formData.get("next");
+  const isSafeNext = typeof next === "string" && next.startsWith("/") && !next.startsWith("//");
+  redirect(isSafeNext ? next : "/dashboard");
 }
 
 export async function signOutAction() {

@@ -30,14 +30,28 @@ function monthHref(basePath: string, params: Record<string, string>, month: stri
   return `${basePath}?${search.toString()}`;
 }
 
+function dayHref(
+  basePath: string,
+  params: Record<string, string>,
+  month: string,
+  date: string,
+): string {
+  const search = new URLSearchParams({ ...params, month, note: date });
+  return `${basePath}?${search.toString()}`;
+}
+
 export function AttendanceCalendar({
   month,
   entries,
+  reportDates = new Set(),
+  selectedDate = null,
   basePath = "/dashboard/parent/progress",
   extraParams = {},
 }: {
   month: string;
   entries: AttendanceCalendarEntry[];
+  reportDates?: Set<string>;
+  selectedDate?: string | null;
   basePath?: string;
   extraParams?: Record<string, string>;
 }) {
@@ -76,16 +90,31 @@ export function AttendanceCalendar({
         {cells.map((date, index) => {
           if (!date) return <div key={`empty-${index}`} />;
           const status = statusByDate.get(date);
+          const hasReport = reportDates.has(date);
           const dayNum = Number(date.slice(-2));
+          const cellClassName = `relative flex h-9 items-center justify-center rounded-lg border text-navy-800 ${
+            status ? STATUS_CLASSNAMES[status] : "border-transparent"
+          } ${selectedDate === date ? "ring-2 ring-navy-500" : ""}`;
+
+          if (!status && !hasReport) {
+            return (
+              <div key={date} className={cellClassName}>
+                {dayNum}
+              </div>
+            );
+          }
+
           return (
-            <div
+            <Link
               key={date}
-              className={`flex h-9 items-center justify-center rounded-lg border text-navy-800 ${
-                status ? STATUS_CLASSNAMES[status] : "border-transparent"
-              }`}
+              href={dayHref(basePath, extraParams, month, date)}
+              className={`${cellClassName} hover:brightness-95`}
             >
               {dayNum}
-            </div>
+              {hasReport && (
+                <span className="absolute bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-navy-700" />
+              )}
+            </Link>
           );
         })}
       </div>

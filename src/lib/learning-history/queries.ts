@@ -616,6 +616,50 @@ export async function listSessionNotesForParent(
   return listSessionNotes(studentId, limit);
 }
 
+export async function listSessionNotesForParentByDate(
+  parentId: string,
+  studentId: string,
+  date: string, // "YYYY-MM-DD"
+): Promise<SessionNote[]> {
+  const owns = await assertParentOwnsStudent(parentId, studentId);
+  if (!owns) return [];
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from("session_notes")
+    .select("*")
+    .eq("student_id", studentId)
+    .eq("confirmed", true)
+    .eq("session_date", date)
+    .order("created_at", { ascending: true })
+    .returns<SessionNote[]>();
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+// Calendar dot indicator — which dates in this month have a confirmed
+// report, without fetching the full note bodies.
+export async function listSessionNoteDatesForParent(
+  parentId: string,
+  studentId: string,
+  month: string, // "YYYY-MM"
+): Promise<Set<string>> {
+  const owns = await assertParentOwnsStudent(parentId, studentId);
+  if (!owns) return new Set();
+  const monthStart = `${month}-01`;
+  const nextMonthStart = `${shiftMonth(month, 1)}-01`;
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from("session_notes")
+    .select("session_date")
+    .eq("student_id", studentId)
+    .eq("confirmed", true)
+    .gte("session_date", monthStart)
+    .lt("session_date", nextMonthStart)
+    .returns<{ session_date: string }[]>();
+  if (error) throw new Error(error.message);
+  return new Set((data ?? []).map((row) => row.session_date));
+}
+
 // Single-report counterpart for the /dashboard/parent/reports/[noteId] deep
 // link the SMS notification points at — resolves the note plus its student
 // in one call, checking guardian ownership against the note's own

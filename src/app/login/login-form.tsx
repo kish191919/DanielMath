@@ -11,7 +11,7 @@ import { Field } from "@/components/forms/field";
 import { signInAction, type SignInState } from "@/lib/auth/actions";
 import { signInSchema, type SignInValues } from "@/lib/auth/schema";
 
-export function LoginForm() {
+export function LoginForm({ next }: { next?: string }) {
   const [state, formAction, isPending] = useActionState<SignInState | null, FormData>(
     signInAction,
     null,
@@ -31,6 +31,7 @@ export function LoginForm() {
       noValidate
       className="space-y-6 rounded-2xl border border-navy-100 bg-white p-6 shadow-sm sm:p-8"
     >
+      {next && <input type="hidden" name="next" value={next} />}
       <Field
         label="이메일 / Email"
         error={errors.email?.message ?? state?.fieldErrors?.email}

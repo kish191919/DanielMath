@@ -41,7 +41,15 @@ export async function GET(request: NextRequest) {
 
   const { error } = await supabase.auth.verifyOtp({ type, token_hash });
   if (error) {
-    return NextResponse.redirect(new URL("/login?error=link_expired", origin));
+    // Preserve `next` so an already-signed-in visitor (e.g. the token was
+    // single-use and already redeemed — common with SMS link-preview
+    // scanners, or the parent re-tapping an old text) still lands on the
+    // deep-linked report instead of bouncing to the dashboard home; see
+    // the already-authenticated branch in src/app/login/page.tsx.
+    const loginUrl = new URL("/login", origin);
+    loginUrl.searchParams.set("error", "link_expired");
+    loginUrl.searchParams.set("next", next);
+    return NextResponse.redirect(loginUrl);
   }
 
   return response;
