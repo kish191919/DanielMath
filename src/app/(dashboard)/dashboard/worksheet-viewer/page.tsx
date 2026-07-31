@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
 import { WorksheetViewerCloseButton } from "@/components/dashboard/worksheet-viewer-close-button";
+import { WorksheetPdfViewer } from "@/components/dashboard/worksheet-pdf-viewer";
 import { requireSession } from "@/lib/dal";
 
 // Only ever linked to with a signed URL we generated for the current
@@ -37,7 +38,7 @@ export default async function WorksheetViewerPage({
 
         <div className="mt-4 overflow-hidden rounded-2xl border border-navy-100 bg-white shadow-sm">
           {isPdf ? (
-            <iframe src={url} className="h-[80vh] w-full" title="원본 학습지" />
+            <WorksheetPdfViewer url={url} />
           ) : (
             // eslint-disable-next-line @next/next/no-img-element -- signed Supabase URL, not a static asset
             <img src={url} alt="원본 학습지" className="max-h-[80vh] w-full object-contain" />
