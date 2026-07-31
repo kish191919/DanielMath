@@ -8,7 +8,7 @@ import { verifySession } from "@/lib/dal";
 import { SignUpForm } from "./signup-form";
 
 export const metadata: Metadata = {
-  title: "회원가입",
+  title: "Sign Up",
   robots: { index: false, follow: false },
 };
 
@@ -25,9 +25,6 @@ export default async function SignUpPage() {
               <span className="text-lg font-bold tracking-tight text-navy-900">
                 {siteConfig.name}
               </span>
-              <span className="hidden text-sm text-navy-600 sm:inline font-ko" lang="ko">
-                {siteConfig.nameKo}
-              </span>
             </Link>
           </div>
         </Container>
@@ -37,9 +34,8 @@ export default async function SignUpPage() {
         <Section className="py-12 sm:py-20">
           <Container className="max-w-md">
             <SectionHeader
-              eyebrow="Sign up · 회원가입"
+              eyebrow="Sign Up"
               title="Create your account."
-              titleKo="회원가입"
             />
             <div className="mt-10">
               <SignUpForm />

@@ -2025,5 +2025,6 @@ export const testEvents: TestEvent[] = [
     descriptionKo:
       "미국수학협회(MAA)가 주관하는 25문항 40분 객관식 수학 경시대회로, 8학년 이하 학생이라면 누구나 참가할 수 있습니다. 오답 감점이 없어 부담 없이 도전할 수 있으며, 향후 AMC 10/12, MATHCOUNTS 같은 상위 대회를 준비하는 첫걸음으로 매우 좋습니다.",
     color: "purple",
+    slug: "amc-8",
   },
 ];

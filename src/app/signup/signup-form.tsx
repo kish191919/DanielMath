@@ -39,7 +39,7 @@ export function SignUpForm() {
       className="space-y-6 rounded-2xl border border-navy-100 bg-white p-6 shadow-sm sm:p-8"
     >
       <Field
-        label="이름 / Full Name"
+        label="Full Name"
         error={errors.fullName?.message ?? state?.fieldErrors?.fullName}
         required
       >
@@ -48,12 +48,12 @@ export function SignUpForm() {
           {...register("fullName")}
           aria-required
           autoComplete="name"
-          placeholder="홍길동"
+          placeholder="John Doe"
         />
       </Field>
 
       <Field
-        label="이메일 / Email"
+        label="Email"
         error={errors.email?.message ?? state?.fieldErrors?.email}
         required
       >
@@ -67,7 +67,7 @@ export function SignUpForm() {
       </Field>
 
       <Field
-        label="연락처 / Phone"
+        label="Phone"
         error={errors.phone?.message ?? state?.fieldErrors?.phone}
         required
       >
@@ -76,7 +76,7 @@ export function SignUpForm() {
           {...register("phone")}
           aria-required
           autoComplete="tel"
-          placeholder="010-1234-5678"
+          placeholder="(555) 123-4567"
         />
       </Field>
 
@@ -89,18 +89,16 @@ export function SignUpForm() {
             aria-required
           />
           <span>
-            학습 리포트, 출결, 일정변경 안내 문자(SMS) 수신에 동의합니다. 메시지 빈도는 수업
-            일정에 따라 주 최대 4회입니다. 문자/데이터 요금이 발생할 수 있습니다. 언제든지 STOP
-            회신 시 수신거부, HELP 회신 시 도움을 받을 수 있습니다. / I agree to receive SMS
-            notifications for learning reports, attendance, and schedule changes. Message
-            frequency: up to 4 messages/week depending on class schedule. Msg &amp; data rates
+            I agree to receive SMS notifications for learning reports,
+            attendance, and schedule changes. Message frequency: up to 4
+            messages/week depending on class schedule. Msg &amp; data rates
             may apply. Reply STOP to cancel, HELP for help. (
             <Link href="/privacy" target="_blank" className="underline underline-offset-2">
-              개인정보처리방침 / Privacy Policy
+              Privacy Policy
             </Link>{" "}
             ·{" "}
             <Link href="/terms" target="_blank" className="underline underline-offset-2">
-              이용약관 / SMS Terms
+              SMS Terms
             </Link>
             )
           </span>
@@ -113,7 +111,7 @@ export function SignUpForm() {
       </div>
 
       <Field
-        label="비밀번호 / Password"
+        label="Password"
         error={errors.password?.message ?? state?.fieldErrors?.password}
         required
       >
@@ -127,7 +125,7 @@ export function SignUpForm() {
       </Field>
 
       <Field
-        label="비밀번호 확인 / Confirm Password"
+        label="Confirm Password"
         error={errors.confirmPassword?.message ?? state?.fieldErrors?.confirmPassword}
         required
       >
@@ -148,12 +146,12 @@ export function SignUpForm() {
 
       <div className="border-t border-navy-100 pt-5">
         <Button size="lg" type="submit" disabled={isPending} className="w-full">
-          {isPending ? "가입 중..." : "회원가입 / Sign up"}
+          {isPending ? "Signing up..." : "Sign up"}
         </Button>
-        <p className="mt-3 text-center text-xs text-navy-600 font-ko" lang="ko">
-          이미 계정이 있으신가요?{" "}
+        <p className="mt-3 text-center text-xs text-navy-600">
+          Already have an account?{" "}
           <Link href="/login" className="text-navy-800 underline underline-offset-2">
-            로그인
+            Log in
           </Link>
         </p>
       </div>
