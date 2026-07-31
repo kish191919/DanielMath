@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Paperclip } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
-import { Button } from "@/components/ui/button";
+import { WorksheetViewerModal } from "@/components/dashboard/worksheet-viewer-modal";
 import { requireRole } from "@/lib/dal";
 import { GRADE_LABELS } from "@/lib/students/schema";
 import {
@@ -23,7 +23,7 @@ export default async function ParentReportDetailPage({
   if (!result) notFound();
   const { note, student } = result;
 
-  const worksheetUrl = note.scan_id
+  const worksheet = note.scan_id
     ? ((await getSignedScanViewUrlsForParent(session.userId, student.id, [note.scan_id])).get(
         note.scan_id,
       ) ?? null)
@@ -59,16 +59,12 @@ export default async function ParentReportDetailPage({
             <p className="mt-2 whitespace-pre-line text-sm text-navy-800 font-ko" lang="ko">
               {note.note}
             </p>
-            {worksheetUrl && (
-              <Button
-                href={worksheetUrl}
-                external
-                variant="secondary"
-                className="mt-4 h-8 gap-1.5 px-3 text-xs"
-              >
-                <Paperclip className="h-3.5 w-3.5" />
-                원본 학습지 보기
-              </Button>
+            {worksheet && (
+              <WorksheetViewerModal
+                url={worksheet.url}
+                mimeType={worksheet.mimeType}
+                triggerClassName="mt-4 h-8 gap-1.5 px-3 text-xs"
+              />
             )}
           </div>
         </div>

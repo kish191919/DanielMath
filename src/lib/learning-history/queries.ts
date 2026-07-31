@@ -563,8 +563,8 @@ export async function getSignedScanViewUrlsForParent(
   parentId: string,
   studentId: string,
   scanIds: string[],
-): Promise<Map<string, string>> {
-  const result = new Map<string, string>();
+): Promise<Map<string, { url: string; mimeType: string | null }>> {
+  const result = new Map<string, { url: string; mimeType: string | null }>();
   if (scanIds.length === 0) return result;
 
   const owns = await assertParentOwnsStudent(parentId, studentId);
@@ -573,9 +573,9 @@ export async function getSignedScanViewUrlsForParent(
   const supabase = await createServerSupabase();
   const { data: scans } = await supabase
     .from("worksheet_scans")
-    .select("id, storage_path, student_id")
+    .select("id, storage_path, student_id, mime_type")
     .in("id", scanIds)
-    .returns<Pick<WorksheetScan, "id" | "storage_path" | "student_id">[]>();
+    .returns<Pick<WorksheetScan, "id" | "storage_path" | "student_id" | "mime_type">[]>();
   const ownedScans = (scans ?? []).filter((scan) => scan.student_id === studentId);
   if (ownedScans.length === 0) return result;
 
@@ -590,7 +590,7 @@ export async function getSignedScanViewUrlsForParent(
 
   ownedScans.forEach((scan, index) => {
     const signedUrl = data[index]?.signedUrl;
-    if (signedUrl) result.set(scan.id, signedUrl);
+    if (signedUrl) result.set(scan.id, { url: signedUrl, mimeType: scan.mime_type });
   });
 
   return result;

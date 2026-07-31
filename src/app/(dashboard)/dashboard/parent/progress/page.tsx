@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { ArrowLeft, ChevronRight, Paperclip } from "lucide-react";
+import { ArrowLeft, ChevronRight } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
-import { Button } from "@/components/ui/button";
 import { AttendanceCalendar } from "@/components/dashboard/attendance-calendar";
+import { WorksheetViewerModal } from "@/components/dashboard/worksheet-viewer-modal";
 import { requireRole } from "@/lib/dal";
 import { GRADE_LABELS } from "@/lib/students/schema";
 import { todayInEasternTime } from "@/lib/dates";
@@ -69,10 +69,14 @@ export default async function ParentProgressPage({
         .filter((scanId): scanId is string => scanId !== null);
       const signedUrls = await getSignedScanViewUrlsForParent(session.userId, child.id, scanIds);
       const attachUrls = (list: SessionNote[]) =>
-        list.map((note) => ({
-          ...note,
-          worksheetUrl: note.scan_id ? (signedUrls.get(note.scan_id) ?? null) : null,
-        }));
+        list.map((note) => {
+          const worksheet = note.scan_id ? (signedUrls.get(note.scan_id) ?? null) : null;
+          return {
+            ...note,
+            worksheetUrl: worksheet?.url ?? null,
+            worksheetMimeType: worksheet?.mimeType ?? null,
+          };
+        });
       return {
         child,
         recentSummary,
@@ -265,15 +269,11 @@ export default async function ParentProgressPage({
                               {note.note}
                             </p>
                             {note.worksheetUrl && (
-                              <Button
-                                href={note.worksheetUrl}
-                                external
-                                variant="secondary"
-                                className="mt-3 h-8 gap-1.5 px-3 text-xs"
-                              >
-                                <Paperclip className="h-3.5 w-3.5" />
-                                원본 학습지 보기
-                              </Button>
+                              <WorksheetViewerModal
+                                url={note.worksheetUrl}
+                                mimeType={note.worksheetMimeType}
+                                triggerClassName="mt-3 h-8 gap-1.5 px-3 text-xs"
+                              />
                             )}
                           </div>
                         </details>
