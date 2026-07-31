@@ -367,6 +367,7 @@ async function notifyGuardiansOfReport(
   const correct = items?.filter((i) => i.is_correct).length ?? 0;
   const accuracyRate = total > 0 ? Math.round((correct / total) * 100) : null;
   const rateText = accuracyRate !== null ? `정답률 ${accuracyRate}%. ` : "";
+  const rateTextEn = accuracyRate !== null ? `Accuracy ${accuracyRate}%. ` : "";
 
   // Chat gets a short arrival notice rather than the full report text — the
   // full report already lives on the "진행 상황" page (session_notes), and
@@ -408,7 +409,7 @@ async function notifyGuardiansOfReport(
     try {
       await sendSms({
         to: phone,
-        body: `[다니엘 수학] ${studentName} 학생의 학습 리포트가 도착했습니다. ${rateText}전체 내용 확인 및 답장: ${link}`,
+        body: `Daniel Math Academy: ${studentName}'s learning report has arrived. ${rateTextEn}View the full report and reply: ${link}`,
       });
     } catch (err) {
       console.error(`[notifyGuardiansOfReport] SMS failed for guardian ${guardian.id}`, err);

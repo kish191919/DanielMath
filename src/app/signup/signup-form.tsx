@@ -89,8 +89,12 @@ export function SignUpForm() {
             aria-required
           />
           <span>
-            학습 리포트 및 출결 안내 문자(SMS) 수신에 동의합니다 / I agree to receive SMS
-            notifications for learning reports and attendance updates. (
+            학습 리포트, 출결, 일정변경 안내 문자(SMS) 수신에 동의합니다. 메시지 빈도는 수업
+            일정에 따라 주 최대 4회입니다. 문자/데이터 요금이 발생할 수 있습니다. 언제든지 STOP
+            회신 시 수신거부, HELP 회신 시 도움을 받을 수 있습니다. / I agree to receive SMS
+            notifications for learning reports, attendance, and schedule changes. Message
+            frequency: up to 4 messages/week depending on class schedule. Msg &amp; data rates
+            may apply. Reply STOP to cancel, HELP for help. (
             <Link href="/privacy" target="_blank" className="underline underline-offset-2">
               개인정보처리방침 / Privacy Policy
             </Link>{" "}
