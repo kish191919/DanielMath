@@ -73,3 +73,54 @@ export const privacyPolicy = {
     },
   ] as LegalSection[],
 };
+
+export const smsTerms = {
+  title: "SMS Terms & Conditions",
+  description:
+    "Terms governing SMS text message notifications sent by Daniel Math Academy (operated by CloudMasterIT LLC) to enrolled students' guardians.",
+  effectiveDate: "2026-07-30",
+
+  body: [
+    {
+      heading: "1. Program Description",
+      paragraphs: [
+        `The Daniel Math Academy SMS Notification Program sends account-related text messages to the guardians of enrolled students, operated by ${siteConfig.legalName}. Messages include: learning report availability alerts (with a link to view the full report and reply), attendance notifications, and class schedule changes.`,
+        "This program does not send marketing or promotional messages.",
+      ],
+    },
+    {
+      heading: "2. Opt-In",
+      paragraphs: [
+        `Guardians opt in by creating an account at ${siteConfig.url}/signup and checking a dedicated SMS consent checkbox. No message is sent to any guardian who has not checked this box. SMS consent is not a condition of enrollment.`,
+      ],
+    },
+    {
+      heading: "3. Message Frequency",
+      paragraphs: [
+        "Message frequency varies based on your student's class schedule and activity. Guardians of students enrolled in classes meeting up to four days per week (Monday, Tuesday, Thursday, Friday) may receive up to 4 messages per week.",
+      ],
+    },
+    {
+      heading: "4. Message and Data Rates",
+      paragraphs: ["Message and data rates may apply, depending on your mobile carrier plan."],
+    },
+    {
+      heading: "5. Opt-Out and Help",
+      paragraphs: [
+        "You may opt out at any time by replying STOP to any message; opt-outs take effect immediately. Reply HELP for assistance, or contact us directly.",
+      ],
+    },
+    {
+      heading: "6. No Sharing of Mobile Information",
+      paragraphs: [
+        "We do not sell, rent, or share mobile phone numbers or SMS opt-in information with third parties for marketing purposes. See our Privacy Policy for details.",
+      ],
+    },
+    {
+      heading: "7. Contact",
+      paragraphs: [
+        `Questions about this program can be directed to ${siteConfig.contactEmail} or ${siteConfig.telephone}.`,
+      ],
+    },
+  ] as LegalSection[],
+};

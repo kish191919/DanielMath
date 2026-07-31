@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Trophy, CalendarClock, ListChecks, Users, CheckCircle, Award, BookOpen, ExternalLink } from "lucide-react";
+import { ArrowLeft, Trophy, CalendarClock, ListChecks, Users, CheckCircle, Award, BookOpen, ExternalLink, Info } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
@@ -57,6 +57,37 @@ const formatStats = [
     descKo: "학교별로 최대 35명까지 팀을 구성해 참가할 수 있습니다.",
   },
 ];
+
+const scheduleRows = [
+  {
+    contest: 1,
+    window: "November 9 – 30, 2026",
+    windowKo: "2026년 11월 9일 – 11월 30일",
+  },
+  {
+    contest: 2,
+    window: "December 7 – 28, 2026",
+    windowKo: "2026년 12월 7일 – 12월 28일",
+  },
+  {
+    contest: 3,
+    window: "January 4 – 25, 2027",
+    windowKo: "2027년 1월 4일 – 1월 25일",
+  },
+  {
+    contest: 4,
+    window: "February 1 – 22, 2027",
+    windowKo: "2027년 2월 1일 – 2월 22일",
+  },
+  {
+    contest: 5,
+    window: "March 1 – 29, 2027",
+    windowKo: "2027년 3월 1일 – 3월 29일",
+  },
+];
+
+const scheduleDeadline = "March 31, 2027, 11:59 PM (PT)";
+const scheduleDeadlineKo = "2027년 3월 31일 오후 11:59 (태평양시간)";
 
 const rules = [
   {
@@ -115,6 +146,23 @@ const sampleTests = [
     title: "Division M",
     label: "Grades 6–8 (Middle School)",
     labelKo: "중학교 6~8학년",
+    featured: false,
+  },
+];
+
+const problemOfWeek = [
+  {
+    key: "problems",
+    href: "https://docs.google.com/presentation/d/1p0kQwpmD_Yufspv4i7G8vN6a5sttJ7yusauezqqx-Lo/edit",
+    label: "Problem of the Week",
+    labelKo: "Problem of the Week — 문제 모음",
+    featured: true,
+  },
+  {
+    key: "solutions",
+    href: "https://docs.google.com/presentation/d/10FsgiVBRhpxe2u7WAPSPYsxHeTraqKIDl9M43BH7sdQ/edit",
+    label: "Problem of the Week — Solutions",
+    labelKo: "Problem of the Week — 정답 및 풀이",
     featured: false,
   },
 ];
@@ -205,6 +253,77 @@ export default async function MoemsPage({ params }: Props) {
                 </p>
               </div>
             ))}
+          </div>
+        </Container>
+      </Section>
+
+      {/* Contest schedule */}
+      <Section>
+        <Container>
+          <SectionHeader
+            eyebrow={isKo ? "대회 일정" : "Contest Schedule"}
+            title={isKo ? "2026–2027 시즌 일정" : "2026–2027 Season Schedule"}
+            isKo={isKo}
+          />
+          <div className="mx-auto mt-8 max-w-3xl overflow-x-auto rounded-2xl border border-navy-100 bg-white shadow-sm touch-pan-x">
+            <table className="w-full text-sm">
+              <thead className="border-b border-navy-100 bg-navy-50">
+                <tr>
+                  <th className={`px-5 py-3.5 text-left font-semibold text-navy-900${isKo ? " font-ko" : ""}`}>
+                    {isKo ? "회차" : "Contest"}
+                  </th>
+                  <th className={`px-5 py-3.5 text-left font-semibold text-navy-900${isKo ? " font-ko" : ""}`}>
+                    {isKo ? "응시 기간" : "Administration Window"}
+                  </th>
+                  <th className={`px-5 py-3.5 text-left font-semibold text-navy-900${isKo ? " font-ko" : ""}`}>
+                    {isKo ? "성적 입력 마감" : "Score Entry Deadline"}
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-navy-50">
+                {scheduleRows.map((r) => (
+                  <tr key={r.contest} className="hover:bg-navy-50/40">
+                    <td className="px-5 py-4 font-bold text-navy-900">{r.contest}</td>
+                    <td className="px-5 py-4 text-navy-700">{isKo ? r.windowKo : r.window}</td>
+                    <td className={`px-5 py-4 text-navy-700${isKo ? " font-ko" : ""}`}>
+                      {isKo ? scheduleDeadlineKo : scheduleDeadline}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mx-auto mt-6 flex max-w-3xl items-start gap-3 rounded-xl border border-navy-200 bg-white px-5 py-4 text-sm text-navy-700">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-navy-400" />
+            <p className={`leading-6${isKo ? " font-ko" : ""}`}>
+              {isKo ? (
+                <>
+                  정확한 일정 및 최신 정보는{" "}
+                  <a
+                    href="https://www.moems.org/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold underline underline-offset-2"
+                  >
+                    MOEMS 공식 홈페이지
+                  </a>
+                  에서 확인하세요.
+                </>
+              ) : (
+                <>
+                  For exact dates and the latest updates, check the{" "}
+                  <a
+                    href="https://www.moems.org/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold underline underline-offset-2"
+                  >
+                    official MOEMS website
+                  </a>
+                  .
+                </>
+              )}
+            </p>
           </div>
         </Container>
       </Section>
@@ -300,6 +419,45 @@ export default async function MoemsPage({ params }: Props) {
                   </p>
                   <p className={`mt-0.5 text-xs text-navy-600${isKo ? " font-ko" : ""}`}>
                     {isKo ? t.labelKo : t.label}
+                  </p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </Container>
+      </Section>
+
+      {/* Problem of the Week */}
+      <Section>
+        <Container>
+          <SectionHeader
+            eyebrow={isKo ? "매주 만나는 연습문제" : "Weekly Practice"}
+            title={isKo ? "Problem of the Week로 실력 다지기" : "Build Skills with the Problem of the Week"}
+            isKo={isKo}
+          />
+          <p className={`mx-auto mt-5 max-w-2xl text-center text-sm leading-7 text-navy-700${isKo ? " font-ko" : ""}`}>
+            {isKo
+              ? "매주 새로운 문제로 MOEMS 대회 유형에 익숙해질 수 있는 좋은 연습 자료입니다."
+              : "A great way to stay sharp for MOEMS with a fresh problem — and full solutions — every week."}
+          </p>
+          <div className="mx-auto mt-8 grid max-w-2xl gap-4 sm:grid-cols-2">
+            {problemOfWeek.map((p) => (
+              <a
+                key={p.key}
+                href={p.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(
+                  "flex items-center gap-3 rounded-2xl border p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md",
+                  p.featured ? "border-purple-300 bg-purple-50" : "border-navy-100 bg-white",
+                )}
+              >
+                <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white", p.featured ? "bg-purple-600" : "bg-navy-700")}>
+                  <ExternalLink className="h-4.5 w-4.5" />
+                </div>
+                <div>
+                  <p className={`text-sm font-bold text-navy-900${isKo ? " font-ko" : ""}`}>
+                    {isKo ? p.labelKo : p.label}
                   </p>
                 </div>
               </a>

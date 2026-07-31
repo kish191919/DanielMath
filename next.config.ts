@@ -12,6 +12,7 @@ const koRoutes = [
   "/school-calendar",
   "/blog",
   "/privacy",
+  "/terms",
 ];
 
 const nextConfig: NextConfig = {

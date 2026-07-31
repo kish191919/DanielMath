@@ -144,6 +144,9 @@ export function SiteFooter({ locale }: { locale: Locale }) {
           <Link href={lp("/privacy")} className="underline underline-offset-2 hover:text-navy-900">
             Privacy Policy
           </Link>
+          <Link href={lp("/terms")} className="underline underline-offset-2 hover:text-navy-900">
+            SMS Terms
+          </Link>
           <p>We do not directly collect personal data from children under 13 (COPPA compliant).</p>
           <p>{siteConfig.name} is operated by {siteConfig.legalName}.</p>
         </div>

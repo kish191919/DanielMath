@@ -93,6 +93,10 @@ export function SignUpForm() {
             notifications for learning reports and attendance updates. (
             <Link href="/privacy" target="_blank" className="underline underline-offset-2">
               개인정보처리방침 / Privacy Policy
+            </Link>{" "}
+            ·{" "}
+            <Link href="/terms" target="_blank" className="underline underline-offset-2">
+              이용약관 / SMS Terms
             </Link>
             )
           </span>
