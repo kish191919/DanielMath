@@ -180,6 +180,8 @@ export interface LearningItem {
   updated_at: string;
 }
 
+export type SessionNoteLanguage = "ko" | "en";
+
 export interface SessionNote {
   id: string;
   student_id: string;
@@ -189,6 +191,7 @@ export interface SessionNote {
   source: "ai" | "teacher";
   edited_by_teacher: boolean;
   confirmed: boolean;
+  language: SessionNoteLanguage;
   created_by: string;
   created_at: string;
   updated_at: string;
@@ -454,6 +457,7 @@ type SessionNoteInsert = {
   source?: "ai" | "teacher";
   edited_by_teacher?: boolean;
   confirmed?: boolean;
+  language?: SessionNoteLanguage;
   created_by: string;
   created_at?: string;
   updated_at?: string;

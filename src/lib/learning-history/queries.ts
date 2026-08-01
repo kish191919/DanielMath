@@ -6,6 +6,7 @@ import type {
   WorksheetScan,
   LearningItem,
   SessionNote,
+  SessionNoteLanguage,
   Student,
   Grade,
   Track,
@@ -356,6 +357,22 @@ export async function getSessionNoteForScan(scanId: string): Promise<SessionNote
     .maybeSingle<SessionNote>();
   if (error) throw new Error(error.message);
   return data ?? null;
+}
+
+// Defaults the review page's language toggle to whichever language was used
+// the last time a report was actually published to this student's parent
+// (confirmed = true), so the teacher isn't asked to pick every time.
+export async function getLastSentNoteLanguage(studentId: string): Promise<SessionNoteLanguage> {
+  const supabase = await createServerSupabase();
+  const { data } = await supabase
+    .from("session_notes")
+    .select("language")
+    .eq("student_id", studentId)
+    .eq("confirmed", true)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle<{ language: SessionNoteLanguage }>();
+  return data?.language ?? "ko";
 }
 
 export type StudentProgressOverview = {

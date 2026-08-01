@@ -23,6 +23,19 @@ export const ERROR_TYPE_LABELS: Record<(typeof ERROR_TYPES)[number], string> = {
   time_pressure: "시간 부족",
 };
 
+// English labels — used only when building the AI prompt for an
+// English-language parent report (see generate-parent-summary.ts); the
+// teacher-facing review UI keeps using ERROR_TYPE_LABELS regardless.
+export const ERROR_TYPE_LABELS_EN: Record<(typeof ERROR_TYPES)[number], string> = {
+  calculation_mistake: "calculation mistake",
+  place_value_error: "place value error",
+  fraction_concept: "fraction concept",
+  word_problem_interpretation: "word problem interpretation",
+  unit_conversion: "unit conversion",
+  pattern_recognition: "pattern recognition",
+  time_pressure: "time pressure",
+};
+
 export const SCAN_STATUS_LABELS: Record<
   "uploaded" | "grading" | "pending_review" | "reviewed" | "grading_failed",
   string
@@ -73,6 +86,9 @@ export const reviewSubmissionSchema = z.object({
   student_id: z.string().uuid(),
   session_date: z.string().min(1),
   items: z.array(learningItemInputSchema).min(1, "최소 1개 이상의 문항이 필요합니다."),
+  // Language for the AI-generated parent report that gets drafted right
+  // after this review is confirmed — see generate-parent-summary.ts.
+  language: z.enum(["ko", "en"]).default("ko"),
 });
 
 export const noteTextSchema = z.string().min(1, "내용을 입력해주세요.").max(2000);

@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ERROR_TYPES, ERROR_TYPE_LABELS } from "@/lib/learning-history/schema";
 import { confirmReviewAction } from "@/lib/learning-history/actions";
 import type { LearningItemInputValues } from "@/lib/learning-history/schema";
-import type { Concept, ErrorType, LearningItem } from "@/lib/supabase/types";
+import type { Concept, ErrorType, LearningItem, SessionNoteLanguage } from "@/lib/supabase/types";
 
 type Row = LearningItemInputValues & { clientKey: string };
 
@@ -48,6 +48,7 @@ export function ReviewTable({
   initialItems,
   concepts,
   readOnly,
+  initialLanguage,
 }: {
   scanId: string;
   studentId: string;
@@ -55,10 +56,12 @@ export function ReviewTable({
   initialItems: LearningItem[];
   concepts: Concept[];
   readOnly: boolean;
+  initialLanguage: SessionNoteLanguage;
 }) {
   const [rows, setRows] = React.useState<Row[]>(() => initialItems.map(toRow));
   const [isSaving, setIsSaving] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [language, setLanguage] = React.useState<SessionNoteLanguage>(initialLanguage);
 
   function updateRow(clientKey: string, patch: Partial<Row>) {
     setRows((prev) =>
@@ -94,7 +97,7 @@ export function ReviewTable({
       void clientKey;
       return rest;
     });
-    const result = await confirmReviewAction(scanId, studentId, sessionDate, payload);
+    const result = await confirmReviewAction(scanId, studentId, sessionDate, payload, language);
     if ("error" in result) {
       setError(result.error);
       setIsSaving(false);
@@ -223,6 +226,27 @@ export function ReviewTable({
               {error}
             </p>
           )}
+
+          <div className="flex items-center justify-between gap-3 rounded-2xl border border-navy-100 bg-white p-4 shadow-sm sm:p-5">
+            <span className="text-sm font-medium text-navy-800">학부모 메시지 언어</span>
+            <div className="flex gap-2">
+              {(["ko", "en"] as const).map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => setLanguage(option)}
+                  className={
+                    "rounded-full px-3 py-1.5 text-sm font-medium transition-colors " +
+                    (language === option
+                      ? "bg-navy-700 text-white"
+                      : "bg-navy-50 text-navy-700 hover:bg-navy-100")
+                  }
+                >
+                  {option === "ko" ? "한국어" : "English"}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <div className="flex justify-end">
             <Button type="button" size="lg" onClick={handleConfirm} disabled={isSaving}>

@@ -10,6 +10,7 @@ import {
   getScanWithItems,
   getSignedScanViewUrl,
   getSessionNoteForScan,
+  getLastSentNoteLanguage,
   listConcepts,
 } from "@/lib/learning-history/queries";
 import { retryGradingAction } from "@/lib/learning-history/actions";
@@ -34,11 +35,12 @@ export default async function WorksheetScanReviewPage({
   if (!result) notFound();
   const { scan, items } = result;
 
-  const [student, viewUrl, concepts, existingNote] = await Promise.all([
+  const [student, viewUrl, concepts, existingNote, lastNoteLanguage] = await Promise.all([
     getStudent(scan.student_id),
     getSignedScanViewUrl(scanId),
     listConcepts(),
     getSessionNoteForScan(scanId),
+    getLastSentNoteLanguage(scan.student_id),
   ]);
   if (!student) notFound();
 
@@ -140,6 +142,7 @@ export default async function WorksheetScanReviewPage({
               initialItems={items}
               concepts={concepts}
               readOnly={readOnly}
+              initialLanguage={lastNoteLanguage}
             />
           </div>
         </div>

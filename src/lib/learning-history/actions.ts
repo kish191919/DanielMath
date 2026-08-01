@@ -14,6 +14,7 @@ import { generateParentMagicLink } from "@/lib/auth/magic-link";
 import { sendSms, normalizeUsPhone } from "@/lib/notifications/sms";
 import { EXT_BY_MIME } from "@/lib/storage/mime";
 import { mintSignedUploadUrl } from "@/lib/storage/signed-upload";
+import type { SessionNoteLanguage } from "@/lib/supabase/types";
 import {
   uploadMetaSchema,
   reviewSubmissionSchema,
@@ -152,6 +153,7 @@ export async function confirmReviewAction(
   studentId: string,
   sessionDate: string,
   items: LearningItemInputValues[],
+  language: SessionNoteLanguage,
 ): Promise<ReviewResult> {
   const session = await requireRole("principal");
 
@@ -160,6 +162,7 @@ export async function confirmReviewAction(
     student_id: studentId,
     session_date: sessionDate,
     items,
+    language,
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "입력값을 확인해주세요." };
@@ -207,6 +210,7 @@ export async function confirmReviewAction(
       parsed.data.student_id,
       parsed.data.session_date,
       session.userId,
+      parsed.data.language,
     );
   } catch (err) {
     // Best-effort: the review itself already succeeded, and the principal
