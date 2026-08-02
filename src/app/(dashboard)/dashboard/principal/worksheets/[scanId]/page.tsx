@@ -17,6 +17,7 @@ import { retryGradingAction } from "@/lib/learning-history/actions";
 import { getStudent } from "@/lib/students/queries";
 import { SCAN_STATUS_LABELS } from "@/lib/learning-history/schema";
 import { GradingStatusPoller } from "@/components/dashboard/grading-status-poller";
+import { isGradingStuck } from "@/lib/scan-status";
 
 // retryGradingAction kicks off the same potentially slow Claude Vision call
 // via after(), which shares this route's duration budget even though it now
@@ -45,6 +46,7 @@ export default async function WorksheetScanReviewPage({
   if (!student) notFound();
 
   const readOnly = scan.status === "reviewed";
+  const stuck = isGradingStuck(scan.status, scan.updated_at);
 
   return (
     <Section className="py-10 sm:py-14">
@@ -90,7 +92,7 @@ export default async function WorksheetScanReviewPage({
 
         <GradingStatusPoller isGrading={scan.status === "grading"} />
 
-        {scan.status === "grading" && (
+        {scan.status === "grading" && !stuck && (
           <div className="mt-6 flex items-center gap-3 rounded-2xl border border-navy-100 bg-navy-50/50 p-5">
             <span
               className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-navy-300 border-t-navy-700"
@@ -103,12 +105,15 @@ export default async function WorksheetScanReviewPage({
         )}
 
         {(scan.status === "grading_failed" ||
+          stuck ||
           (scan.status === "pending_review" && items.length === 0)) && (
           <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-5">
             <p className="text-sm font-medium text-red-800">
               {scan.status === "grading_failed"
                 ? "채점에 실패했습니다."
-                : "AI가 문항을 인식하지 못했습니다. 응답이 중간에 잘렸을 수 있습니다."}
+                : stuck
+                  ? "채점이 예상보다 오래 걸리고 있어요. 다시 시도해보시겠어요?"
+                  : "AI가 문항을 인식하지 못했습니다. 응답이 중간에 잘렸을 수 있습니다."}
             </p>
             {scan.grading_error && (
               <p className="mt-1 text-xs text-red-700">{scan.grading_error}</p>

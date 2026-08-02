@@ -14,6 +14,12 @@ import {
 } from "@/components/dashboard/practice-sheet-generator-workspace";
 import { GRADE_LABELS } from "@/lib/students/schema";
 
+// confirmReferenceUploadAction / retryReferenceExtractionAction kick off a
+// Claude Vision call via after(), which shares this route's duration budget
+// (same reasoning as worksheets/[scanId]/page.tsx) — without this, extraction
+// is exposed to the platform's much shorter default instead of a 180s budget.
+export const maxDuration = 180;
+
 export default async function NewPracticeSheetPage({
   searchParams,
 }: {

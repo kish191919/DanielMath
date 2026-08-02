@@ -17,6 +17,7 @@ import {
   retryReferenceExtractionAction,
 } from "@/lib/problem-bank/actions";
 import type { Concept, LearningItem, ReferenceProblem, ReferenceProblemScan } from "@/lib/supabase/types";
+import { isGradingStuck } from "@/lib/scan-status";
 
 export type ItemGroup = {
   key: string;
@@ -352,6 +353,7 @@ export function PracticeSheetGeneratorWorkspace({
                   const isJustUploaded = group.scan.id === justUploadedScanId;
                   const isFastPathReady =
                     isJustUploaded && group.scan.status !== "grading" && filteredItems.length > 0;
+                  const stuck = isGradingStuck(group.scan.status, group.scan.updated_at);
                   const groupKey = `ref:${group.scan.id}`;
                   const expanded = isGroupExpanded(groupKey, index === 0);
                   const allSelected = isGroupFullySelected(filteredItems, selectedReferences);
@@ -402,7 +404,7 @@ export function PracticeSheetGeneratorWorkspace({
                               이 스캔으로 바로 생성
                             </button>
                           )}
-                          {group.scan.status === "grading_failed" && (
+                          {(group.scan.status === "grading_failed" || stuck) && (
                             <form action={retryReferenceExtractionAction.bind(null, group.scan.id)}>
                               <button
                                 type="submit"
@@ -424,7 +426,7 @@ export function PracticeSheetGeneratorWorkspace({
 
                       {expanded && (
                         <div className="border-t border-navy-100 p-4">
-                          {group.scan.status === "grading" ? (
+                          {group.scan.status === "grading" && !stuck ? (
                             <div className="flex items-center gap-3 rounded-2xl border border-navy-100 bg-navy-50/50 p-4">
                               <span
                                 className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-navy-300 border-t-navy-700"
@@ -434,9 +436,13 @@ export function PracticeSheetGeneratorWorkspace({
                                 AI가 문제를 추출하고 있습니다. 완료되면 자동으로 나타납니다.
                               </p>
                             </div>
-                          ) : group.scan.status === "grading_failed" ? (
+                          ) : group.scan.status === "grading_failed" || stuck ? (
                             <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
-                              <p className="text-sm text-red-800">문제 추출에 실패했습니다.</p>
+                              <p className="text-sm text-red-800">
+                                {stuck
+                                  ? "추출이 예상보다 오래 걸리고 있어요. 다시 시도해보시겠어요?"
+                                  : "문제 추출에 실패했습니다."}
+                              </p>
                               {group.scan.grading_error && (
                                 <p className="mt-1 text-xs text-red-700">{group.scan.grading_error}</p>
                               )}

@@ -131,7 +131,7 @@ export async function retryGradingAction(scanId: string) {
   await supabase.from("learning_items").delete().eq("scan_id", scanId).eq("confirmed", false);
   await supabase
     .from("worksheet_scans")
-    .update({ status: "grading", grading_error: null })
+    .update({ status: "grading", grading_error: null, updated_at: new Date().toISOString() })
     .eq("id", scanId);
 
   after(async () => {

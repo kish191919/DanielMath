@@ -107,7 +107,7 @@ export async function retryReferenceExtractionAction(scanId: string) {
   await supabase.from("reference_problems").delete().eq("scan_id", scanId);
   await supabase
     .from("reference_problem_scans")
-    .update({ status: "grading", grading_error: null })
+    .update({ status: "grading", grading_error: null, updated_at: new Date().toISOString() })
     .eq("id", scanId);
 
   after(async () => {

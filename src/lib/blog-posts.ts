@@ -19,6 +19,105 @@ export type BlogPost = {
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: "fcps-report-card-guide",
+    publishedAt: "2026-08-01",
+    readingMins: 6,
+    category: "성적표",
+    categoryEn: "Report Cards",
+    titleKo: "FCPS 초등학교 성적표 제대로 읽는 법",
+    titleEn: "How to Read Your Child's FCPS Elementary Report Card",
+    descKo: "버지니아 초등학교 성적표는 A·B·C가 아니라 1~4점 기준중심평가를 사용합니다. FCPS 성적표의 채점 방식, SOL 시험과의 차이, 그리고 학부모가 눈여겨봐야 할 부분을 정리했습니다.",
+    descEn: "Virginia elementary report cards don't use A-B-C grades — FCPS scores students on a 1-4 standards-based scale. Here's how the scoring works, how it differs from the state SOL test, and what parents should actually look for.",
+    bodyKo: [
+      {
+        heading: "성적표는 카운티마다 다릅니다",
+        paragraphs: [
+          "버지니아주는 학년별로 무엇을 배워야 하는지 정하는 SOL(Standards of Learning)이라는 공통 기준을 두고 있지만, 성적표를 어떻게 채점하고 표시할지는 각 카운티 교육청이 결정합니다. 따라서 다른 주나 다른 카운티에서 전학 온 가정이라면 FCPS 성적표가 낯설게 느껴질 수 있습니다.",
+          "FCPS 초등학교(K-6)는 A·B·C 등급이 아니라 기준중심평가(Standards-Based Grading)라는 방식을 사용하며, 각 학습 영역을 1부터 4까지의 숫자로 표시합니다. 이 숫자 체계를 제대로 이해하는 것이 성적표를 읽는 첫걸음입니다.",
+        ],
+      },
+      {
+        heading: "1~4점은 A·B·C와 다릅니다",
+        paragraphs: [
+          "4점은 배운 내용을 거의 항상 정확하고 독립적으로 수행한다는 뜻이고, 3점은 대부분 이해하며 약간의 도움만 필요하다는 뜻입니다. 2점은 부분적으로 이해하며 어느 정도 도움이 필요하다는 의미이고, 1점은 이해가 부족해 상당한 도움이 필요하다는 뜻입니다. 아직 배우지 않은 내용은 NT(Not Taught)로 표시됩니다.",
+          "학부모가 가장 많이 착각하는 부분은 이 숫자를 \"4=A, 3=B\" 식으로 바꿔 읽는 것입니다. 3점은 나쁜 성적이 아니라 대부분의 학생이 받는, 학년 수준을 잘 따라가고 있다는 점수입니다. 4점은 매우 안정적이고 독립적인 수행을 의미할 뿐, 모든 항목에서 4점을 받아야 한다는 뜻은 아닙니다.",
+        ],
+      },
+      {
+        heading: "과목 하나에 점수 하나가 아닙니다",
+        paragraphs: [
+          "FCPS 성적표는 수학을 하나의 점수로 요약하지 않고, 수 개념·계산 능력·문장제 문제 해결·수학적 설명과 추론처럼 여러 세부 학습기준으로 나누어 각각 점수를 매깁니다. 언어 과목도 읽기 이해력, 어휘, 쓰기 등으로 나뉘어 표시됩니다.",
+          "이 방식 덕분에 학부모는 아이가 어느 영역은 잘하고 어느 영역에서 도움이 필요한지 구체적으로 파악할 수 있습니다. 전체 평균이 아니라 각 줄의 점수를 개별적으로 살펴보는 것이 성적표를 제대로 읽는 방법입니다.",
+        ],
+      },
+      {
+        heading: "숙제 점수를 그냥 평균 내지 않습니다",
+        paragraphs: [
+          "FCPS 성적표는 숙제·퀴즈·단원평가 점수를 모두 더해 평균 내는 방식이 아닙니다. 교사는 교실 활동과 관찰, 과제와 프로젝트, 퀴즈와 단원평가, 구두 설명 능력 등 여러 자료를 종합해 판단하며, 특히 최근에 보여준 학습 수준을 더 비중 있게 반영하는 경우가 많습니다.",
+          "즉 학기 초에 어려워했던 개념도 학기 말에 충분히 이해했다면 그 향상이 최종 성적에 반영될 수 있습니다. 학년 말 성적 역시 네 분기 점수의 단순 평균이 아니라, 학년이 끝나는 시점의 이해 수준을 중심으로 결정됩니다.",
+        ],
+      },
+      {
+        heading: "학업 점수와 학습 태도는 따로 봅니다",
+        paragraphs: [
+          "FCPS 성적표는 학업 성취도 옆에 지시를 잘 따르는지, 과제를 제때 완료하는지, 시간을 잘 관리하는지, 수업에 적극적으로 참여하는지 같은 학습 습관도 별도 항목으로 평가합니다. 두 영역은 독립적으로 채점되므로, 학업이 3점이라도 학습 태도는 개선이 필요하다고 표시될 수 있고 그 반대도 가능합니다.",
+          "성적표를 볼 때는 학업 점수만 보지 말고 학습 태도 항목도 함께 확인하는 것이 좋습니다. 같은 학습 태도 항목이 여러 분기 연속으로 낮게 나온다면, 학업 점수와는 별개로 담임교사와 상담해볼 필요가 있습니다.",
+        ],
+      },
+      {
+        heading: "SOL 시험과는 어떻게 다르고, 무엇을 확인해야 할까요?",
+        paragraphs: [
+          "성적표의 1~4점과 별개로, FCPS는 대부분 3~8학년 학생을 대상으로 매년 봄 SOL(Standards of Learning) 시험을 치릅니다. 읽기와 수학은 3학년부터, 과학은 5학년부터 응시하며, 그 학년에서 배운 주 전체 공통 기준을 얼마나 이해했는지 확인하는 주정부 공식 평가입니다. 400점 이상이면 Pass, 500점 이상이면 Pass/Advanced로 표시되며, 채점 기준과 시행 주체 모두 분기 성적표와 다릅니다.",
+          "전체 점수가 몇 개인지보다 중요한 것은 어떤 세부 학습기준에서 2점이나 1점이 나왔는지, 그리고 지난 분기보다 나아지고 있는지입니다. 같은 영역에서 2점이 두 분기 이상 이어지거나 1점이 나온다면 담임교사에게 구체적으로 어떤 기술을 보완해야 하는지, 집에서 어떻게 도와줄 수 있는지 물어보세요. 성적표와 SOL 점수는 모두 ParentVUE에서 분기마다 확인할 수 있습니다. AAP 학생도 동일한 1~4점 기준중심평가 체계를 사용하지만, 실제로 배우는 학습 내용과 기대 수준은 트랙에 따라 다르다는 점을 함께 기억해 두면 성적표를 더 정확하게 해석할 수 있습니다.",
+        ],
+      },
+    ],
+    bodyEn: [
+      {
+        heading: "Report Cards Differ by County",
+        paragraphs: [
+          "Virginia sets a statewide standard for what students should learn at each grade level — the SOL (Standards of Learning) — but leaves it to each county school district to decide how report cards are scored and formatted. Families moving in from another state or county often find FCPS's report card format unfamiliar at first.",
+          "FCPS elementary schools (K-6) don't use A-B-C letter grades. They use Standards-Based Grading, scoring each learning area on a 1-to-4 scale. Understanding this numeric system is the first step to reading the report card correctly.",
+        ],
+      },
+      {
+        heading: "1-4 Is Not the Same as A-B-C",
+        paragraphs: [
+          "A 4 means the student performs the skill accurately and independently almost every time. A 3 means the student understands and performs the skill most of the time, needing only minor support. A 2 means partial understanding with some support needed, and a 1 means the student needs substantial support. Content not yet covered that quarter is marked NT (Not Taught).",
+          "The most common mistake parents make is mentally converting these numbers into letter grades — treating 4 as an A and 3 as a B. A 3 is not a bad score; it's what most students earn, and it means the child is solidly on pace for the grade level. A 4 signals very consistent, independent performance — it doesn't mean every score should be a 4.",
+        ],
+      },
+      {
+        heading: "One Subject, Several Scores",
+        paragraphs: [
+          "FCPS doesn't collapse math into a single score. It's broken into specific standards — number sense, computation, word-problem solving, mathematical reasoning and explanation — each scored separately. Language arts is broken down the same way, into reading comprehension, vocabulary, and writing.",
+          "This lets parents see exactly where a child is strong and where they need support, rather than reading one average number. The right way to read the report card is line by line, not as a single overall score.",
+        ],
+      },
+      {
+        heading: "Scores Aren't a Simple Average of Homework",
+        paragraphs: [
+          "FCPS report card scores aren't calculated by averaging every homework assignment, quiz, and unit test together. Teachers weigh a combination of classroom work and observation, assignments and projects, quizzes and unit tests, and a student's ability to explain their reasoning aloud — and more recent evidence of learning is often weighted more heavily.",
+          "That means a concept a child struggled with early in the quarter can still be reflected as strong if they've clearly mastered it by the end. The year-end grade, similarly, isn't a plain average of all four quarters — it reflects the student's level of understanding as of the end of the year.",
+        ],
+      },
+      {
+        heading: "Academic Scores and Work Habits Are Reported Separately",
+        paragraphs: [
+          "Alongside academic scores, FCPS report cards separately evaluate work habits — following directions, completing assignments on time, managing time well, and participating actively in class. These are scored independently, so a student can earn a 3 academically while work habits show room for improvement, or the reverse.",
+          "When reviewing a report card, check the work habits section as well as academic scores. If the same work-habit item stays low across multiple quarters, it's worth raising with the teacher separately from academic performance.",
+        ],
+      },
+      {
+        heading: "How Does This Differ From the SOL Test, and What Should Parents Actually Check?",
+        paragraphs: [
+          "Separate from the 1-4 quarterly scores, FCPS students in most grades 3-8 take the SOL (Standards of Learning) test each spring — reading and math starting in 3rd grade, science starting in 5th. This is the official state assessment of how well a student has mastered that grade's statewide standards. A score of 400 or above is a Pass, and 500 or above is Pass/Advanced; both the scoring method and the administering body differ from the quarterly report card.",
+          "What matters more than the total number of scores is which specific standards show a 2 or a 1, and whether those areas are improving quarter over quarter. If the same area shows a 2 for two or more quarters in a row, or a 1 appears, ask the teacher specifically which skills need work and how you can help at home. Both report card scores and SOL results are available each quarter through ParentVUE. AAP students use the same 1-4 standards-based system, but the actual content taught and expectations differ by track — worth keeping in mind when interpreting the report card.",
+        ],
+      },
+    ],
+  },
+  {
     slug: "fcps-aap-math-guide",
     publishedAt: "2026-07-27",
     readingMins: 6,
