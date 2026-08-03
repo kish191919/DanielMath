@@ -3,12 +3,14 @@ import { Section } from "@/components/site/section";
 import { UploadForm } from "./upload-form";
 import { requireRole } from "@/lib/dal";
 import { listStudents } from "@/lib/students/queries";
+import { GRADING_ROUTE_MAX_DURATION_S } from "@/lib/ai/grading-config";
 
-// Grading a multi-page scan can take a while (Claude Vision + adaptive
-// thinking). It now runs via after() rather than blocking the response, but
-// after() callbacks still share this route's duration budget, so this stays
-// well above the platform's default timeout.
-export const maxDuration = 180;
+// confirmUploadAction only triggers /api/grading/run (fast fire-and-wait-
+// for-ack) rather than running gradeWorksheetScan inline, so this page's own
+// budget just needs to cover the upload confirmation + trigger round-trip.
+// Kept in sync with the grading route's budget for simplicity — see
+// src/lib/ai/grading-config.ts.
+export const maxDuration = GRADING_ROUTE_MAX_DURATION_S;
 
 export default async function NewWorksheetScanPage() {
   await requireRole("principal");

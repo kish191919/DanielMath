@@ -1,0 +1,6 @@
+{
+  "crons": [
+    { "path": "/api/cron/reconcile-grading", "schedule": "*/5 * * * *" },
+    { "path": "/api/cron/reconcile-reference-extraction", "schedule": "*/5 * * * *" }
+  ]
+}

@@ -4,8 +4,12 @@
 // this is used) elapses. If a row is still "grading" well past that, the
 // background job is guaranteed dead rather than merely slow, so it's safe
 // to offer a retry even though no explicit grading_failed was ever recorded.
-export const GRADING_STUCK_THRESHOLD_MS = 210_000; // 3.5 min
+export const GRADING_STUCK_THRESHOLD_MS = 210_000; // 3.5 min — default, used by reference-problem extraction
 
-export function isGradingStuck(status: string, updatedAt: string): boolean {
-  return status === "grading" && Date.now() - new Date(updatedAt).getTime() > GRADING_STUCK_THRESHOLD_MS;
+export function isGradingStuck(
+  status: string,
+  updatedAt: string,
+  thresholdMs: number = GRADING_STUCK_THRESHOLD_MS,
+): boolean {
+  return status === "grading" && Date.now() - new Date(updatedAt).getTime() > thresholdMs;
 }

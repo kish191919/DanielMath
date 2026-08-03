@@ -18,6 +18,7 @@ import {
 } from "@/lib/problem-bank/actions";
 import type { Concept, LearningItem, ReferenceProblem, ReferenceProblemScan } from "@/lib/supabase/types";
 import { isGradingStuck } from "@/lib/scan-status";
+import { REFERENCE_EXTRACTION_STUCK_THRESHOLD_MS } from "@/lib/ai/grading-config";
 
 export type ItemGroup = {
   key: string;
@@ -353,7 +354,11 @@ export function PracticeSheetGeneratorWorkspace({
                   const isJustUploaded = group.scan.id === justUploadedScanId;
                   const isFastPathReady =
                     isJustUploaded && group.scan.status !== "grading" && filteredItems.length > 0;
-                  const stuck = isGradingStuck(group.scan.status, group.scan.updated_at);
+                  const stuck = isGradingStuck(
+                    group.scan.status,
+                    group.scan.updated_at,
+                    REFERENCE_EXTRACTION_STUCK_THRESHOLD_MS,
+                  );
                   const groupKey = `ref:${group.scan.id}`;
                   const expanded = isGroupExpanded(groupKey, index === 0);
                   const allSelected = isGroupFullySelected(filteredItems, selectedReferences);

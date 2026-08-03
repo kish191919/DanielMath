@@ -2,10 +2,28 @@ import "server-only";
 import { GRADING_MODEL, GRADING_EFFORT } from "./claude";
 import { ReferenceExtractionSchema, type ReferenceExtractedItem } from "./reference-extraction-schema";
 import { extractStructuredItems } from "./document-extraction";
+import { DEGRADED_GRADING_EFFORT, DEGRADED_PAGES_PER_CHUNK } from "./grading-config";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import type { Concept, ReferenceProblemScan } from "@/lib/supabase/types";
 
 const BUCKET = "problem-bank";
+
+// Runs inside after() — after the response/redirect (or the 202 ack from
+// /api/reference-extraction/run) has already been sent — so it uses the
+// admin client (not createServerSupabase()) since it doesn't depend on
+// request cookies still being valid in that deferred context. Authorization
+// already happened synchronously (requireRole() or the CRON_SECRET check)
+// before this ever runs. Mirrors markGradingFailed in grade-worksheet.ts.
+export async function markExtractionFailed(scanId: string, err: unknown) {
+  const admin = createAdminSupabase();
+  await admin
+    .from("reference_problem_scans")
+    .update({
+      status: "grading_failed",
+      grading_error: err instanceof Error ? err.message : "문제 추출 중 오류가 발생했습니다.",
+    })
+    .eq("id", scanId);
+}
 
 const REFERENCE_EXTRACTION_INSTRUCTIONS = `당신은 미국 북버지니아(NoVa) K-6 AAP 준비 수학 공부방의 문제 보관함 등록 보조입니다.
 선생님이 나중에 재사용하려고 찍어둔 "좋은 문제" 사진/PDF(여러 페이지일 수 있음)가 첨부되어 있습니다. 이 파일은 학생 답안이 아니라 문제 원본이며, 채점하는 것이 아니라 문제를 그대로 옮겨 적는 것이 목적입니다. 다음 지침에 따르세요.
@@ -24,7 +42,7 @@ function buildConceptListText(concepts: Concept[]): string {
     .join("\n");
 }
 
-export async function extractReferenceProblems(scanId: string): Promise<void> {
+export async function extractReferenceProblems(scanId: string, attempt = 0): Promise<void> {
   const admin = createAdminSupabase();
 
   const { data: scan, error: scanError } = await admin
@@ -46,6 +64,9 @@ export async function extractReferenceProblems(scanId: string): Promise<void> {
   const conceptList = concepts ?? [];
   const conceptByCode = new Map(conceptList.map((c) => [c.code, c]));
 
+  // 재시도(사람이 누른 "다시 추출하기"든 reconcile cron의 자동 재시도든)는
+  // 원래 설정으로 다시 타임아웃날 가능성이 높으므로, 완주 확률을 높이기
+  // 위해 effort를 낮추고 청크를 더 잘게 쪼갠다 (grade-worksheet.ts와 동일).
   const allItems: ReferenceExtractedItem[] = await extractStructuredItems({
     bucket: BUCKET,
     storagePath: scan.storage_path,
@@ -53,9 +74,10 @@ export async function extractReferenceProblems(scanId: string): Promise<void> {
     systemText: `${REFERENCE_EXTRACTION_INSTRUCTIONS}\n\n사용 가능한 개념 코드 목록:\n${buildConceptListText(conceptList)}`,
     itemsSchema: ReferenceExtractionSchema,
     model: GRADING_MODEL,
-    effort: GRADING_EFFORT,
+    effort: attempt >= 1 ? DEGRADED_GRADING_EFFORT : GRADING_EFFORT,
+    pagesPerChunk: attempt >= 1 ? DEGRADED_PAGES_PER_CHUNK : undefined,
     label: "문제 추출",
-    logId: `extractReferenceProblems scan ${scanId}`,
+    logId: `extractReferenceProblems scan ${scanId} attempt ${attempt}`,
   });
 
   if (allItems.length > 0) {

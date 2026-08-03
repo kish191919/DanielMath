@@ -18,11 +18,14 @@ import { getStudent } from "@/lib/students/queries";
 import { SCAN_STATUS_LABELS } from "@/lib/learning-history/schema";
 import { GradingStatusPoller } from "@/components/dashboard/grading-status-poller";
 import { isGradingStuck } from "@/lib/scan-status";
+import { GRADING_ROUTE_MAX_DURATION_S, WORKSHEET_GRADING_STUCK_THRESHOLD_MS } from "@/lib/ai/grading-config";
 
-// retryGradingAction kicks off the same potentially slow Claude Vision call
-// via after(), which shares this route's duration budget even though it now
-// runs after the response is sent rather than blocking it.
-export const maxDuration = 180;
+// This page itself no longer runs grading inline — retryGradingAction just
+// triggers /api/grading/run (its own maxDuration budget, see
+// src/lib/ai/grading-config.ts) and returns fast. This value only needs to
+// cover the redirect + trigger round-trip, but is kept in sync with the
+// grading route's budget for simplicity.
+export const maxDuration = GRADING_ROUTE_MAX_DURATION_S;
 
 export default async function WorksheetScanReviewPage({
   params,
@@ -46,7 +49,7 @@ export default async function WorksheetScanReviewPage({
   if (!student) notFound();
 
   const readOnly = scan.status === "reviewed";
-  const stuck = isGradingStuck(scan.status, scan.updated_at);
+  const stuck = isGradingStuck(scan.status, scan.updated_at, WORKSHEET_GRADING_STUCK_THRESHOLD_MS);
 
   return (
     <Section className="py-10 sm:py-14">

@@ -13,12 +13,14 @@ import {
   type ReferenceScanGroup,
 } from "@/components/dashboard/practice-sheet-generator-workspace";
 import { GRADE_LABELS } from "@/lib/students/schema";
+import { GRADING_ROUTE_MAX_DURATION_S } from "@/lib/ai/grading-config";
 
-// confirmReferenceUploadAction / retryReferenceExtractionAction kick off a
-// Claude Vision call via after(), which shares this route's duration budget
-// (same reasoning as worksheets/[scanId]/page.tsx) — without this, extraction
-// is exposed to the platform's much shorter default instead of a 180s budget.
-export const maxDuration = 180;
+// confirmReferenceUploadAction/retryReferenceExtractionAction only trigger
+// /api/reference-extraction/run (fast fire-and-wait-for-ack) rather than
+// running extractReferenceProblems inline, so this page's own budget just
+// needs to cover that round-trip. Kept in sync with the extraction route's
+// budget for simplicity — see src/lib/ai/grading-config.ts.
+export const maxDuration = GRADING_ROUTE_MAX_DURATION_S;
 
 export default async function NewPracticeSheetPage({
   searchParams,

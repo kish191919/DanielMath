@@ -6,7 +6,7 @@ import { after } from "next/server";
 import { requireRole } from "@/lib/dal";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { createAdminSupabase } from "@/lib/supabase/admin";
-import { gradeWorksheetScan } from "@/lib/ai/grade-worksheet";
+import { triggerGradingJob } from "@/lib/ai/trigger-grading";
 import { generateParentSummaryDraft } from "@/lib/ai/generate-parent-summary";
 import { listGuardiansForStudent } from "@/lib/students/queries";
 import { getOrCreateThreadForParent } from "@/lib/messages/queries";
@@ -24,22 +24,6 @@ import {
 } from "./schema";
 
 const BUCKET = "worksheet-scans";
-
-async function markGradingFailed(scanId: string, err: unknown) {
-  // Runs inside after() below, after the response/redirect has already been
-  // sent — uses the admin client (not createServerSupabase()) so it doesn't
-  // depend on request cookies still being valid in that deferred context.
-  // Authorization already happened synchronously via requireRole() before
-  // after() was registered.
-  const admin = createAdminSupabase();
-  await admin
-    .from("worksheet_scans")
-    .update({
-      status: "grading_failed",
-      grading_error: err instanceof Error ? err.message : "채점 중 오류가 발생했습니다.",
-    })
-    .eq("id", scanId);
-}
 
 export type UploadUrlResult =
   | { error: string }
@@ -109,15 +93,14 @@ export async function confirmUploadAction(
   });
   if (error) return { error: error.message };
 
-  // Grading (Claude Vision, tens of seconds) runs after this response is
-  // sent instead of blocking it, so the principal lands on the "grading"
-  // page immediately; GradingStatusPoller there picks up completion.
+  // Grading runs via a dedicated Route Handler (POST /api/grading/run)
+  // instead of inline here, so it gets its own maxDuration budget rather
+  // than sharing this request's — see src/lib/ai/grading-config.ts. The
+  // trigger fetch itself is fast (just waits for a 202 ack), so this stays
+  // well within this action's own budget even though it runs after the
+  // redirect below via after().
   after(async () => {
-    try {
-      await gradeWorksheetScan(input.scanId);
-    } catch (err) {
-      await markGradingFailed(input.scanId, err);
-    }
+    await triggerGradingJob(input.scanId, 0);
   });
 
   revalidatePath("/dashboard/principal/worksheets");
@@ -129,18 +112,36 @@ export async function retryGradingAction(scanId: string) {
 
   const supabase = await createServerSupabase();
   await supabase.from("learning_items").delete().eq("scan_id", scanId).eq("confirmed", false);
-  await supabase
-    .from("worksheet_scans")
-    .update({ status: "grading", grading_error: null, updated_at: new Date().toISOString() })
-    .eq("id", scanId);
 
-  after(async () => {
-    try {
-      await gradeWorksheetScan(scanId);
-    } catch (err) {
-      await markGradingFailed(scanId, err);
-    }
-  });
+  // Optimistic-concurrency claim: only proceed if updated_at is still what
+  // we just read. This prevents a race with the reconcile cron (which uses
+  // the same pattern) double-triggering grading for the same scan and
+  // duplicating learning_items — see src/app/api/cron/reconcile-grading.
+  const { data: current } = await supabase
+    .from("worksheet_scans")
+    .select("updated_at, grading_attempts")
+    .eq("id", scanId)
+    .single();
+
+  const nextAttempt = (current?.grading_attempts ?? 0) + 1;
+  const { data: claimed } = await supabase
+    .from("worksheet_scans")
+    .update({
+      status: "grading",
+      grading_error: null,
+      updated_at: new Date().toISOString(),
+      grading_attempts: nextAttempt,
+    })
+    .eq("id", scanId)
+    .eq("updated_at", current?.updated_at ?? "")
+    .select("id")
+    .maybeSingle();
+
+  if (claimed) {
+    after(async () => {
+      await triggerGradingJob(scanId, nextAttempt);
+    });
+  }
 
   revalidatePath(`/dashboard/principal/worksheets/${scanId}`);
   revalidatePath("/dashboard/principal");

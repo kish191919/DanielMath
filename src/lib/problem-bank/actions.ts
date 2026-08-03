@@ -5,28 +5,13 @@ import { after } from "next/server";
 import { requireRole } from "@/lib/dal";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { createAdminSupabase } from "@/lib/supabase/admin";
-import { extractReferenceProblems } from "@/lib/ai/extract-reference-problems";
+import { triggerReferenceExtractionJob } from "@/lib/ai/trigger-reference-extraction";
 import { EXT_BY_MIME } from "@/lib/storage/mime";
 import { mintSignedUploadUrl } from "@/lib/storage/signed-upload";
 import { referenceUploadMetaSchema } from "./schema";
 
 const BUCKET = "problem-bank";
 const PRACTICE_SHEETS_NEW_PATH = "/dashboard/principal/practice-sheets/new";
-
-async function markExtractionFailed(scanId: string, err: unknown) {
-  // Runs inside after(), after the response/redirect has already been sent —
-  // uses the admin client so it doesn't depend on request cookies still
-  // being valid in that deferred context (same pattern as markGradingFailed
-  // in learning-history/actions.ts).
-  const admin = createAdminSupabase();
-  await admin
-    .from("reference_problem_scans")
-    .update({
-      status: "grading_failed",
-      grading_error: err instanceof Error ? err.message : "문제 추출 중 오류가 발생했습니다.",
-    })
-    .eq("id", scanId);
-}
 
 export type UploadUrlResult =
   | { error: string }
@@ -83,15 +68,14 @@ export async function confirmReferenceUploadAction(
   });
   if (error) return { error: error.message };
 
-  // Extraction (Claude Vision, tens of seconds) runs after this response is
-  // sent instead of blocking it — mirrors confirmUploadAction in
-  // learning-history/actions.ts.
+  // Extraction runs via a dedicated Route Handler (POST
+  // /api/reference-extraction/run) instead of inline here, so it gets its
+  // own maxDuration budget rather than sharing this request's — see
+  // src/lib/ai/grading-config.ts. The trigger fetch itself is fast (just
+  // waits for a 202 ack), so this stays well within this action's own
+  // budget even though it runs via after().
   after(async () => {
-    try {
-      await extractReferenceProblems(input.scanId);
-    } catch (err) {
-      await markExtractionFailed(input.scanId, err);
-    }
+    await triggerReferenceExtractionJob(input.scanId, 0);
   });
 
   // No redirect — this is called from an embedded widget on
@@ -105,18 +89,37 @@ export async function retryReferenceExtractionAction(scanId: string) {
 
   const supabase = await createServerSupabase();
   await supabase.from("reference_problems").delete().eq("scan_id", scanId);
-  await supabase
-    .from("reference_problem_scans")
-    .update({ status: "grading", grading_error: null, updated_at: new Date().toISOString() })
-    .eq("id", scanId);
 
-  after(async () => {
-    try {
-      await extractReferenceProblems(scanId);
-    } catch (err) {
-      await markExtractionFailed(scanId, err);
-    }
-  });
+  // Optimistic-concurrency claim: only proceed if updated_at is still what
+  // we just read. This prevents a race with the reconcile cron (which uses
+  // the same pattern) double-triggering extraction for the same scan and
+  // duplicating reference_problems — see
+  // src/app/api/cron/reconcile-reference-extraction.
+  const { data: current } = await supabase
+    .from("reference_problem_scans")
+    .select("updated_at, grading_attempts")
+    .eq("id", scanId)
+    .single();
+
+  const nextAttempt = (current?.grading_attempts ?? 0) + 1;
+  const { data: claimed } = await supabase
+    .from("reference_problem_scans")
+    .update({
+      status: "grading",
+      grading_error: null,
+      updated_at: new Date().toISOString(),
+      grading_attempts: nextAttempt,
+    })
+    .eq("id", scanId)
+    .eq("updated_at", current?.updated_at ?? "")
+    .select("id")
+    .maybeSingle();
+
+  if (claimed) {
+    after(async () => {
+      await triggerReferenceExtractionJob(scanId, nextAttempt);
+    });
+  }
 
   revalidatePath(PRACTICE_SHEETS_NEW_PATH);
 }

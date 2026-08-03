@@ -79,6 +79,46 @@ export async function compressImageFileToJpeg(
   }
 }
 
+// Directly picked PDFs (vs. camera-captured pages, which are already
+// compressed before assembly) were previously uploaded untouched — a
+// multi-page scanning-app PDF could be several MB and, since Claude Vision
+// gets the raw file bytes, made grading slower and more timeout-prone.
+// Mirrors compressFrameToJpeg's approach: render each page to a canvas
+// (reusing the same pdfjs-dist pattern as worksheet-pdf-viewer.tsx), JPEG-
+// compress it, and reassemble.
+export async function compressPdfFile(
+  file: File,
+  maxDimension = MAX_DIMENSION_PX,
+  quality = JPEG_QUALITY,
+): Promise<Blob> {
+  const pdfjs = await import("pdfjs-dist");
+  pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+    "pdfjs-dist/build/pdf.worker.min.mjs",
+    import.meta.url,
+  ).toString();
+
+  const doc = await pdfjs.getDocument({ data: await file.arrayBuffer() }).promise;
+  try {
+    const pages: Blob[] = [];
+    for (let n = 1; n <= doc.numPages; n++) {
+      const page = await doc.getPage(n);
+      // Rendered at 2x before compressFrameToJpeg downscales to
+      // maxDimension, so small-but-legible source pages don't lose quality.
+      const viewport = page.getViewport({ scale: 2 });
+      const canvas = document.createElement("canvas");
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("캔버스를 생성할 수 없습니다.");
+      await page.render({ canvas, canvasContext: ctx, viewport }).promise;
+      pages.push(await compressFrameToJpeg(canvas, maxDimension, quality));
+    }
+    return assembleScanPdf(pages);
+  } finally {
+    doc.destroy();
+  }
+}
+
 export async function assembleScanPdf(pages: Blob[]): Promise<Blob> {
   const pdfDoc = await PDFDocument.create();
   for (const pageBlob of pages) {

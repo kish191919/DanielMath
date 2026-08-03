@@ -11,7 +11,12 @@ import { GRADE_LABELS } from "@/lib/students/schema";
 import { createUploadUrlAction, confirmUploadAction } from "@/lib/learning-history/actions";
 import { createBrowserSupabase } from "@/lib/supabase/browser";
 import { todayInEasternTime } from "@/lib/dates";
-import { assembleScanPdf, compressImageFileToJpeg, type CapturedPage } from "@/lib/images/build-scan-pdf";
+import {
+  assembleScanPdf,
+  compressImageFileToJpeg,
+  compressPdfFile,
+  type CapturedPage,
+} from "@/lib/images/build-scan-pdf";
 import { CameraCapture } from "./camera-capture";
 import type { Student } from "@/lib/supabase/types";
 
@@ -70,12 +75,16 @@ export function UploadForm({ students }: { students: Student[] }) {
   async function resolveUploadFile(): Promise<File | null> {
     if (pickedFile) {
       // Camera-captured pages are already resized/compressed by
-      // assembleScanPdf below; directly picked image files aren't, so a
-      // multi-MB phone photo would otherwise upload (and get graded) at full
-      // size. PDFs are left untouched — recompressing them is out of scope.
+      // assembleScanPdf below; directly picked files aren't, so a multi-MB
+      // phone photo or scanning-app PDF would otherwise upload (and get
+      // graded) at full size.
       if (pickedFile.type === "image/jpeg" || pickedFile.type === "image/png") {
         const compressed = await compressImageFileToJpeg(pickedFile);
         return new File([compressed], pickedFile.name, { type: "image/jpeg" });
+      }
+      if (pickedFile.type === "application/pdf") {
+        const compressed = await compressPdfFile(pickedFile);
+        return new File([compressed], pickedFile.name, { type: "application/pdf" });
       }
       return pickedFile;
     }
@@ -95,19 +104,24 @@ export function UploadForm({ students }: { students: Student[] }) {
       return;
     }
 
+    // Set before resolveUploadFile() (not after) — compressing a multi-page
+    // PDF client-side can take a few seconds, and the form should be busy
+    // for that whole window to prevent a double submit.
+    setStatus("uploading");
+
     let file: File | null;
     try {
       file = await resolveUploadFile();
     } catch (err) {
       setError(err instanceof Error ? err.message : "파일을 준비하지 못했습니다.");
+      setStatus("idle");
       return;
     }
     if (!file) {
       setError("파일을 선택하거나 카메라로 촬영해주세요.");
+      setStatus("idle");
       return;
     }
-
-    setStatus("uploading");
 
     const urlResult = await createUploadUrlAction(studentId, file.type);
     if ("error" in urlResult) {

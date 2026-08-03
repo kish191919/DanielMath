@@ -44,7 +44,7 @@ function buildFileContentBlock(mimeType: DocumentMimeType, base64: string) {
   };
 }
 
-async function buildPdfChunks(buffer: Buffer): Promise<PdfChunk[]> {
+async function buildPdfChunks(buffer: Buffer, pagesPerChunk: number): Promise<PdfChunk[]> {
   const srcDoc = await PDFDocument.load(buffer);
   const totalPages = srcDoc.getPageCount();
 
@@ -53,8 +53,8 @@ async function buildPdfChunks(buffer: Buffer): Promise<PdfChunk[]> {
   }
 
   const chunks: PdfChunk[] = [];
-  for (let start = 0; start < totalPages; start += PAGES_PER_CHUNK) {
-    const end = Math.min(start + PAGES_PER_CHUNK, totalPages);
+  for (let start = 0; start < totalPages; start += pagesPerChunk) {
+    const end = Math.min(start + pagesPerChunk, totalPages);
     const chunkDoc = await PDFDocument.create();
     const pageIndices = Array.from({ length: end - start }, (_, i) => start + i);
     const copiedPages = await chunkDoc.copyPages(srcDoc, pageIndices);
@@ -99,6 +99,9 @@ export interface ExtractStructuredItemsOptions<T> {
   label: string;
   // 로그에 남길 식별자 (예: scanId) — 실패 원인 추적용.
   logId: string;
+  // PDF 청킹 시 청크당 페이지 수. 기본 PAGES_PER_CHUNK(4) — 재시도 시 더 작은
+  // 값을 넘겨 청크당 처리 시간을 줄이는 용도로 쓰인다 (grade-worksheet.ts 참고).
+  pagesPerChunk?: number;
 }
 
 // 파일을 다운로드해 (PDF면 필요시 청킹한 뒤) Claude 구조화 출력으로 보내고,
@@ -107,13 +110,23 @@ export interface ExtractStructuredItemsOptions<T> {
 export async function extractStructuredItems<T>(
   options: ExtractStructuredItemsOptions<T>,
 ): Promise<T[]> {
-  const { bucket, storagePath, mimeType, systemText, itemsSchema, model, effort, label, logId } =
-    options;
+  const {
+    bucket,
+    storagePath,
+    mimeType,
+    systemText,
+    itemsSchema,
+    model,
+    effort,
+    label,
+    logId,
+    pagesPerChunk = PAGES_PER_CHUNK,
+  } = options;
 
   const buffer = await downloadBuffer(bucket, storagePath);
   const chunks: PdfChunk[] =
     mimeType === "application/pdf"
-      ? await buildPdfChunks(buffer)
+      ? await buildPdfChunks(buffer, pagesPerChunk)
       : [{ base64: buffer.toString("base64"), startPage: 1, endPage: 1, totalPages: 1 }];
 
   const client = getClaudeClient();

@@ -151,6 +151,7 @@ export interface WorksheetScan {
   file_size_bytes: number | null;
   status: ScanStatus;
   grading_error: string | null;
+  grading_attempts: number;
   graded_at: string | null;
   reviewed_at: string | null;
   reviewed_by: string | null;
@@ -252,6 +253,7 @@ export interface ReferenceProblemScan {
   file_size_bytes: number | null;
   status: ScanStatus;
   grading_error: string | null;
+  grading_attempts: number;
   graded_at: string | null;
   reviewed_at: string | null;
   reviewed_by: string | null;
@@ -415,6 +417,7 @@ type WorksheetScanInsert = {
   file_size_bytes?: number | null;
   status?: ScanStatus;
   grading_error?: string | null;
+  grading_attempts?: number;
   graded_at?: string | null;
   reviewed_at?: string | null;
   reviewed_by?: string | null;
@@ -505,6 +508,7 @@ type ReferenceProblemScanInsert = {
   file_size_bytes?: number | null;
   status?: ScanStatus;
   grading_error?: string | null;
+  grading_attempts?: number;
   graded_at?: string | null;
   reviewed_at?: string | null;
   reviewed_by?: string | null;
