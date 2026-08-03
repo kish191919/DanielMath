@@ -18,14 +18,16 @@ import { getStudent } from "@/lib/students/queries";
 import { SCAN_STATUS_LABELS } from "@/lib/learning-history/schema";
 import { GradingStatusPoller } from "@/components/dashboard/grading-status-poller";
 import { isGradingStuck } from "@/lib/scan-status";
-import { GRADING_ROUTE_MAX_DURATION_S, WORKSHEET_GRADING_STUCK_THRESHOLD_MS } from "@/lib/ai/grading-config";
+import { WORKSHEET_GRADING_STUCK_THRESHOLD_MS } from "@/lib/ai/grading-config";
 
 // This page itself no longer runs grading inline — retryGradingAction just
 // triggers /api/grading/run (its own maxDuration budget, see
 // src/lib/ai/grading-config.ts) and returns fast. This value only needs to
-// cover the redirect + trigger round-trip, but is kept in sync with the
-// grading route's budget for simplicity.
-export const maxDuration = GRADING_ROUTE_MAX_DURATION_S;
+// cover the redirect + trigger round-trip. Must be a literal here (not an
+// imported constant) — Next.js reads route segment config via static
+// analysis, not module evaluation. Keep this in sync with
+// GRADING_ROUTE_MAX_DURATION_S in src/lib/ai/grading-config.ts.
+export const maxDuration = 300;
 
 export default async function WorksheetScanReviewPage({
   params,

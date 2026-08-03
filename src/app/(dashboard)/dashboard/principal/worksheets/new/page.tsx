@@ -3,14 +3,14 @@ import { Section } from "@/components/site/section";
 import { UploadForm } from "./upload-form";
 import { requireRole } from "@/lib/dal";
 import { listStudents } from "@/lib/students/queries";
-import { GRADING_ROUTE_MAX_DURATION_S } from "@/lib/ai/grading-config";
 
 // confirmUploadAction only triggers /api/grading/run (fast fire-and-wait-
 // for-ack) rather than running gradeWorksheetScan inline, so this page's own
 // budget just needs to cover the upload confirmation + trigger round-trip.
-// Kept in sync with the grading route's budget for simplicity — see
-// src/lib/ai/grading-config.ts.
-export const maxDuration = GRADING_ROUTE_MAX_DURATION_S;
+// Must be a literal here (not an imported constant) — Next.js reads route
+// segment config via static analysis, not module evaluation. Keep this in
+// sync with GRADING_ROUTE_MAX_DURATION_S in src/lib/ai/grading-config.ts.
+export const maxDuration = 300;
 
 export default async function NewWorksheetScanPage() {
   await requireRole("principal");

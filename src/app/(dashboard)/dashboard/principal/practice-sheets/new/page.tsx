@@ -13,14 +13,15 @@ import {
   type ReferenceScanGroup,
 } from "@/components/dashboard/practice-sheet-generator-workspace";
 import { GRADE_LABELS } from "@/lib/students/schema";
-import { GRADING_ROUTE_MAX_DURATION_S } from "@/lib/ai/grading-config";
 
 // confirmReferenceUploadAction/retryReferenceExtractionAction only trigger
 // /api/reference-extraction/run (fast fire-and-wait-for-ack) rather than
 // running extractReferenceProblems inline, so this page's own budget just
-// needs to cover that round-trip. Kept in sync with the extraction route's
-// budget for simplicity — see src/lib/ai/grading-config.ts.
-export const maxDuration = GRADING_ROUTE_MAX_DURATION_S;
+// needs to cover that round-trip. Must be a literal here (not an imported
+// constant) — Next.js reads route segment config via static analysis, not
+// module evaluation. Keep this in sync with GRADING_ROUTE_MAX_DURATION_S in
+// src/lib/ai/grading-config.ts.
+export const maxDuration = 300;
 
 export default async function NewPracticeSheetPage({
   searchParams,

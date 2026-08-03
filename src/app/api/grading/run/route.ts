@@ -2,11 +2,14 @@ import "server-only";
 import { NextRequest, NextResponse } from "next/server";
 import { after } from "next/server";
 import { gradeWorksheetScan, markGradingFailed } from "@/lib/ai/grade-worksheet";
-import { GRADING_ROUTE_MAX_DURATION_S } from "@/lib/ai/grading-config";
 
 // Its own duration budget, independent of the page request that triggered
-// it via triggerGradingJob() — see src/lib/ai/grading-config.ts.
-export const maxDuration = GRADING_ROUTE_MAX_DURATION_S;
+// it via triggerGradingJob() — see src/lib/ai/grading-config.ts. Must be a
+// literal here (not an imported constant) — Next.js reads route segment
+// config via static analysis, not module evaluation, so an imported
+// identifier fails the build with "Invalid segment configuration export".
+// Keep this in sync with GRADING_ROUTE_MAX_DURATION_S in grading-config.ts.
+export const maxDuration = 300;
 
 // proxy.ts doesn't guard /api/* routes (it's a dashboard-page-only auth
 // gate), so this route authenticates itself via a shared secret instead of
