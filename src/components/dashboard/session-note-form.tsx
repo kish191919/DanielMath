@@ -5,10 +5,9 @@ import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  addSessionNoteAction,
-  publishSessionNoteAction,
+  saveSessionNoteAction,
+  sendSessionNoteAction,
   type SessionNoteFormState,
-  type PublishSessionNoteState,
 } from "@/lib/learning-history/actions";
 import type { SessionNote, SessionNoteLanguage } from "@/lib/supabase/types";
 
@@ -25,75 +24,63 @@ export function SessionNoteForm({
   existingNote?: SessionNote | null;
   initialLanguage?: SessionNoteLanguage;
 }) {
-  if (existingNote) {
-    return (
-      <PublishNoteForm studentId={studentId} scanId={scanId ?? ""} existingNote={existingNote} />
-    );
-  }
-  return (
-    <CreateNoteForm
-      studentId={studentId}
-      scanId={scanId}
-      sessionDate={sessionDate}
-      initialLanguage={initialLanguage}
-    />
-  );
-}
+  const noteId = existingNote?.id ?? null;
+  const saveAction = saveSessionNoteAction.bind(null, noteId, studentId, scanId ?? "", sessionDate);
+  const sendAction = sendSessionNoteAction.bind(null, noteId, studentId, scanId ?? "", sessionDate);
 
-function CreateNoteForm({
-  studentId,
-  scanId,
-  sessionDate,
-  initialLanguage,
-}: {
-  studentId: string;
-  scanId?: string;
-  sessionDate: string;
-  initialLanguage: SessionNoteLanguage;
-}) {
-  const action = addSessionNoteAction.bind(null, studentId);
-  const [state, formAction, isPending] = useActionState<SessionNoteFormState | null, FormData>(
-    action,
+  const [saveState, saveFormAction, isSaving] = useActionState<SessionNoteFormState | null, FormData>(
+    saveAction,
     null,
   );
-  const [language, setLanguage] = React.useState<SessionNoteLanguage>(initialLanguage);
-  const formRef = React.useRef<HTMLFormElement>(null);
+  const [sendState, sendFormAction, isSending] = useActionState<SessionNoteFormState | null, FormData>(
+    sendAction,
+    null,
+  );
+  const [language, setLanguage] = React.useState<SessionNoteLanguage>(
+    existingNote?.language ?? initialLanguage,
+  );
 
-  React.useEffect(() => {
-    if (state?.success) formRef.current?.reset();
-  }, [state]);
+  const isBusy = isSaving || isSending;
+  const state = sendState?.success || sendState?.error ? sendState : saveState;
+  const isSent = existingNote?.confirmed ?? false;
 
   return (
-    <form
-      ref={formRef}
-      action={formAction}
-      className="space-y-3 rounded-2xl border border-navy-100 bg-white p-4 shadow-sm sm:p-5"
-    >
-      <input type="hidden" name="scan_id" value={scanId ?? ""} />
-      <input type="hidden" name="session_date" value={sessionDate} />
+    <form className="space-y-3 rounded-2xl border border-navy-100 bg-white p-4 shadow-sm sm:p-5">
       <input type="hidden" name="language" value={language} />
       <div className="flex items-center justify-between gap-3">
         <label className="block text-sm font-medium text-navy-800">오늘의 학습 리포트</label>
-        <div className="flex gap-2">
-          {(["ko", "en"] as const).map((option) => (
-            <button
-              key={option}
-              type="button"
-              onClick={() => setLanguage(option)}
-              className={
-                "rounded-full px-2.5 py-1 text-xs font-medium transition-colors " +
-                (language === option
-                  ? "bg-navy-700 text-white"
-                  : "bg-navy-50 text-navy-700 hover:bg-navy-100")
-              }
+        <div className="flex items-center gap-2">
+          {existingNote && (
+            <span
+              className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                isSent ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800"
+              }`}
             >
-              {option === "ko" ? "한국어" : "English"}
-            </button>
-          ))}
+              {isSent ? "학부모에게 전달됨" : "저장됨 — 아직 전달 전"}
+            </span>
+          )}
+          <div className="flex gap-2">
+            {(["ko", "en"] as const).map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => setLanguage(option)}
+                className={
+                  "rounded-full px-2.5 py-1 text-xs font-medium transition-colors " +
+                  (language === option
+                    ? "bg-navy-700 text-white"
+                    : "bg-navy-50 text-navy-700 hover:bg-navy-100")
+                }
+              >
+                {option === "ko" ? "한국어" : "English"}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
       <Textarea
         name="note"
+        defaultValue={existingNote?.note}
         placeholder={`예:
 학습 결과
 오늘 20문제 중 18개를 정확히 풀었습니다 (정답률 90%).
@@ -107,75 +94,33 @@ function CreateNoteForm({
 숙제
 4학년 IXL C단원 풀어오기`}
         maxLength={2000}
+        className="min-h-48"
       />
       <p className="text-xs text-navy-500 font-ko" lang="ko">
-        저장하면 학부모 채팅방과 SMS로 즉시 전달됩니다.
+        저장은 학부모에게 보이지 않아요 — 나중에 다시 접속해서 이어 쓸 수 있습니다. 다 작성하면 &quot;학부모에게
+        전달&quot;을 눌러야 채팅과 SMS로 실제 발송됩니다.
       </p>
       {state?.fieldErrors?.note && (
         <p className="text-xs text-red-600" role="alert">
           {state.fieldErrors.note}
         </p>
       )}
-      {state?.success && <p className="text-xs text-green-700">저장 및 전달되었습니다.</p>}
-      <div className="flex justify-end">
-        <Button size="md" type="submit" disabled={isPending}>
-          {isPending ? "전달 중..." : "저장 후 학부모에게 전달"}
-        </Button>
-      </div>
-    </form>
-  );
-}
-
-function PublishNoteForm({
-  studentId,
-  scanId,
-  existingNote,
-}: {
-  studentId: string;
-  scanId: string;
-  existingNote: SessionNote;
-}) {
-  const action = publishSessionNoteAction.bind(
-    null,
-    existingNote.id,
-    studentId,
-    scanId,
-    existingNote.note,
-  );
-  const [state, formAction, isPending] = useActionState<PublishSessionNoteState | null, FormData>(
-    action,
-    null,
-  );
-  const isDraft = !existingNote.confirmed;
-
-  return (
-    <form
-      action={formAction}
-      className="space-y-3 rounded-2xl border border-navy-100 bg-white p-4 shadow-sm sm:p-5"
-    >
-      <div className="flex items-center justify-between gap-3">
-        <label className="block text-sm font-medium text-navy-800">오늘의 학습 리포트</label>
-        {isDraft && existingNote.source === "ai" && (
-          <span className="shrink-0 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
-            AI 초안 — 검토 후 전달해주세요
-          </span>
-        )}
-      </div>
-      <Textarea
-        name="note"
-        defaultValue={existingNote.note}
-        maxLength={2000}
-        className="min-h-48"
-      />
-      {state?.fieldErrors?.note && (
-        <p className="text-xs text-red-600" role="alert">
-          {state.fieldErrors.note}
-        </p>
+      {saveState?.success && !sendState?.success && (
+        <p className="text-xs text-green-700">저장되었습니다.</p>
       )}
-      {state?.success && <p className="text-xs text-green-700">저장되었습니다.</p>}
-      <div className="flex justify-end">
-        <Button size="md" type="submit" disabled={isPending}>
-          {isPending ? "저장 중..." : isDraft ? "학부모에게 전달" : "메모 수정"}
+      {sendState?.success && <p className="text-xs text-green-700">학부모에게 전달되었습니다.</p>}
+      <div className="flex justify-end gap-2">
+        <Button
+          size="md"
+          variant="secondary"
+          type="submit"
+          formAction={saveFormAction}
+          disabled={isBusy}
+        >
+          {isSaving ? "저장 중..." : "저장"}
+        </Button>
+        <Button size="md" type="submit" formAction={sendFormAction} disabled={isBusy}>
+          {isSending ? "전달 중..." : "학부모에게 전달"}
         </Button>
       </div>
     </form>

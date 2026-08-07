@@ -13,11 +13,11 @@ import { generateParentMagicLink } from "@/lib/auth/magic-link";
 import { sendSms, normalizeUsPhone } from "@/lib/notifications/sms";
 import { EXT_BY_MIME } from "@/lib/storage/mime";
 import { mintSignedUploadUrl } from "@/lib/storage/signed-upload";
+import type { SessionNoteLanguage } from "@/lib/supabase/types";
 import {
   uploadMetaSchema,
   reviewSubmissionSchema,
   sessionNoteSchema,
-  noteTextSchema,
   type LearningItemInputValues,
 } from "./schema";
 
@@ -230,20 +230,95 @@ export type SessionNoteFormState = {
   success?: boolean;
 };
 
-export async function addSessionNoteAction(
+// Shared insert-or-update for both saveSessionNoteAction and
+// sendSessionNoteAction below. confirmOnInsert always applies (a brand new
+// note has no prior confirmed state to preserve); confirmOnUpdate is only
+// applied when given — omitting it on an update leaves the row's existing
+// confirmed value untouched, which is what lets "저장" fix a typo on an
+// already-sent report without silently re-hiding or re-sending it.
+async function upsertSessionNote(params: {
+  noteId: string | null;
+  studentId: string;
+  scanId: string;
+  sessionDate: string;
+  note: string;
+  language: SessionNoteLanguage;
+  createdBy: string;
+  confirmOnInsert: boolean;
+  confirmOnUpdate?: boolean;
+}): Promise<{ id: string } | { error: string }> {
+  const supabase = await createServerSupabase();
+
+  if (params.noteId) {
+    const updatePayload: {
+      note: string;
+      language: SessionNoteLanguage;
+      edited_by_teacher: boolean;
+      confirmed?: boolean;
+    } = {
+      note: params.note,
+      language: params.language,
+      edited_by_teacher: true,
+    };
+    if (params.confirmOnUpdate !== undefined) updatePayload.confirmed = params.confirmOnUpdate;
+
+    const { error } = await supabase
+      .from("session_notes")
+      .update(updatePayload)
+      .eq("id", params.noteId);
+    if (error) return { error: error.message };
+    return { id: params.noteId };
+  }
+
+  const { data, error } = await supabase
+    .from("session_notes")
+    .insert({
+      student_id: params.studentId,
+      scan_id: params.scanId || null,
+      session_date: params.sessionDate || new Date().toISOString().slice(0, 10),
+      note: params.note,
+      source: "teacher",
+      confirmed: params.confirmOnInsert,
+      language: params.language,
+      created_by: params.createdBy,
+    })
+    .select("id")
+    .single();
+  if (error) return { error: error.message };
+  return { id: data.id };
+}
+
+function parseSessionNoteForm(
   studentId: string,
+  scanId: string,
+  sessionDate: string,
+  formData: FormData,
+) {
+  return sessionNoteSchema.safeParse({
+    student_id: studentId,
+    scan_id: scanId || "",
+    session_date: sessionDate || "",
+    note: formData.get("note"),
+    language: formData.get("language") || "ko",
+  });
+}
+
+// Saves the report text without notifying anyone — lets a teacher write a
+// report across multiple sittings (including from a different computer)
+// before it ever reaches the parent. noteId is null on the very first save
+// (inserts a confirmed:false draft) and the existing note's id on every
+// save after that (updates in place, leaving confirmed as-is).
+export async function saveSessionNoteAction(
+  noteId: string | null,
+  studentId: string,
+  scanId: string,
+  sessionDate: string,
   _prev: SessionNoteFormState | null,
   formData: FormData,
 ): Promise<SessionNoteFormState> {
   const session = await requireRole("principal");
 
-  const parsed = sessionNoteSchema.safeParse({
-    student_id: studentId,
-    scan_id: formData.get("scan_id") ?? "",
-    session_date: formData.get("session_date") ?? "",
-    note: formData.get("note"),
-    language: formData.get("language") || "ko",
-  });
+  const parsed = parseSessionNoteForm(studentId, scanId, sessionDate, formData);
   if (!parsed.success) {
     const fieldErrors: SessionNoteFormState["fieldErrors"] = {};
     for (const issue of parsed.error.issues) {
@@ -252,35 +327,71 @@ export async function addSessionNoteAction(
     return { error: "입력값을 확인해주세요.", fieldErrors };
   }
 
-  const supabase = await createServerSupabase();
-  const { data: inserted, error } = await supabase
-    .from("session_notes")
-    .insert({
-      student_id: parsed.data.student_id,
-      scan_id: parsed.data.scan_id || null,
-      session_date: parsed.data.session_date || new Date().toISOString().slice(0, 10),
-      note: parsed.data.note,
-      source: "teacher",
-      confirmed: true,
-      language: parsed.data.language,
-      created_by: session.userId,
-    })
-    .select("id")
-    .single();
-  if (error) return { error: error.message };
+  const result = await upsertSessionNote({
+    noteId,
+    studentId: parsed.data.student_id,
+    scanId: parsed.data.scan_id ?? "",
+    sessionDate: parsed.data.session_date ?? "",
+    note: parsed.data.note,
+    language: parsed.data.language,
+    createdBy: session.userId,
+    confirmOnInsert: false,
+  });
+  if ("error" in result) return { error: result.error };
 
-  // Teacher-written notes are published the moment they're saved (there's
-  // no separate AI-draft review step anymore), so this notifies guardians
-  // immediately — same as publishSessionNoteAction below.
+  if (parsed.data.scan_id) {
+    revalidatePath(`/dashboard/principal/worksheets/${parsed.data.scan_id}`);
+  }
+  revalidatePath(`/dashboard/principal/students/${studentId}/history`);
+  revalidatePath("/dashboard/parent/progress");
+  return { success: true };
+}
+
+// Saves (same as above) and marks the report confirmed, notifying every
+// guardian immediately (chat thread message + SMS magic link for those who
+// consented) — works even if the teacher never clicked "저장" first, since
+// it persists whatever's currently in the textarea before sending.
+export async function sendSessionNoteAction(
+  noteId: string | null,
+  studentId: string,
+  scanId: string,
+  sessionDate: string,
+  _prev: SessionNoteFormState | null,
+  formData: FormData,
+): Promise<SessionNoteFormState> {
+  const session = await requireRole("principal");
+
+  const parsed = parseSessionNoteForm(studentId, scanId, sessionDate, formData);
+  if (!parsed.success) {
+    const fieldErrors: SessionNoteFormState["fieldErrors"] = {};
+    for (const issue of parsed.error.issues) {
+      if (issue.path[0] === "note") fieldErrors.note = issue.message;
+    }
+    return { error: "입력값을 확인해주세요.", fieldErrors };
+  }
+
+  const result = await upsertSessionNote({
+    noteId,
+    studentId: parsed.data.student_id,
+    scanId: parsed.data.scan_id ?? "",
+    sessionDate: parsed.data.session_date ?? "",
+    note: parsed.data.note,
+    language: parsed.data.language,
+    createdBy: session.userId,
+    confirmOnInsert: true,
+    confirmOnUpdate: true,
+  });
+  if ("error" in result) return { error: result.error };
+
   try {
     await notifyGuardiansOfReport(
       studentId,
-      parsed.data.scan_id || "",
+      parsed.data.scan_id ?? "",
       session.userId,
-      inserted.id,
+      result.id,
     );
   } catch (err) {
-    console.error(`[addSessionNoteAction] guardian notify failed for ${inserted.id}`, err);
+    console.error(`[sendSessionNoteAction] guardian notify failed for ${result.id}`, err);
   }
 
   if (parsed.data.scan_id) {
@@ -311,55 +422,6 @@ export async function deleteWorksheetScanAction(scanId: string, studentId: strin
   revalidatePath("/dashboard/principal/worksheets");
   revalidatePath(`/dashboard/principal/students/${studentId}/history`);
   revalidatePath("/dashboard/parent/progress");
-}
-
-export type PublishSessionNoteState = {
-  error?: string;
-  fieldErrors?: Partial<Record<"note", string>>;
-  success?: boolean;
-};
-
-export async function publishSessionNoteAction(
-  noteId: string,
-  studentId: string,
-  scanId: string,
-  originalNote: string,
-  _prev: PublishSessionNoteState | null,
-  formData: FormData,
-): Promise<PublishSessionNoteState> {
-  const session = await requireRole("principal");
-
-  const parsed = noteTextSchema.safeParse(formData.get("note"));
-  if (!parsed.success) {
-    return {
-      error: "입력값을 확인해주세요.",
-      fieldErrors: { note: parsed.error.issues[0]?.message ?? "내용을 입력해주세요." },
-    };
-  }
-
-  const supabase = await createServerSupabase();
-  const { error } = await supabase
-    .from("session_notes")
-    .update({
-      note: parsed.data,
-      confirmed: true,
-      edited_by_teacher: parsed.data !== originalNote,
-    })
-    .eq("id", noteId);
-  if (error) return { error: error.message };
-
-  try {
-    await notifyGuardiansOfReport(studentId, scanId, session.userId, noteId);
-  } catch (err) {
-    // Best-effort — the publish itself already succeeded (same pattern as
-    // addSessionNoteAction above).
-    console.error(`[publishSessionNoteAction] guardian notify failed for ${noteId}`, err);
-  }
-
-  revalidatePath(`/dashboard/principal/worksheets/${scanId}`);
-  revalidatePath(`/dashboard/principal/students/${studentId}/history`);
-  revalidatePath("/dashboard/parent/progress");
-  return { success: true };
 }
 
 // Posts the published report into each guardian's own chat thread (one
