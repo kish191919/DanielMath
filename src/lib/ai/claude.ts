@@ -25,6 +25,14 @@ export const TRANSLATION_MODEL = process.env.ANTHROPIC_TRANSLATION_MODEL || "cla
 export const TRANSLATION_EFFORT = (process.env.ANTHROPIC_TRANSLATION_EFFORT ||
   "low") as "low" | "medium" | "high" | "xhigh" | "max";
 
+// Rewriting a teacher's Korean shorthand into a warm, natural, parent-facing
+// English report is closer to localization than literal translation, so
+// effort defaults a notch above TRANSLATION_EFFORT.
+export const PARENT_REPORT_MODEL = process.env.ANTHROPIC_PARENT_REPORT_MODEL || "claude-sonnet-5";
+
+export const PARENT_REPORT_EFFORT = (process.env.ANTHROPIC_PARENT_REPORT_EFFORT ||
+  "medium") as "low" | "medium" | "high" | "xhigh" | "max";
+
 export function getClaudeClient() {
   return new Anthropic();
 }

@@ -1,12 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { useActionState } from "react";
+import { useActionState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
   saveSessionNoteAction,
   sendSessionNoteAction,
+  generateParentReportDraftAction,
   type SessionNoteFormState,
 } from "@/lib/learning-history/actions";
 import type { SessionNote, SessionNoteLanguage } from "@/lib/supabase/types";
@@ -39,10 +40,42 @@ export function SessionNoteForm({
   const [language, setLanguage] = React.useState<SessionNoteLanguage>(
     existingNote?.language ?? initialLanguage,
   );
+  const [note, setNote] = React.useState(existingNote?.note ?? "");
+  // Snapshot taken right before an AI draft overwrites the textarea, so a
+  // teacher who doesn't like the draft can get their own wording back
+  // instead of retyping it. Cleared on any manual edit or once superseded by
+  // a newer draft.
+  const [preDraftNote, setPreDraftNote] = React.useState<{
+    note: string;
+    language: SessionNoteLanguage;
+  } | null>(null);
+  const [draftError, setDraftError] = React.useState<string | null>(null);
+  const [isDrafting, startDraftTransition] = useTransition();
 
   const isBusy = isSaving || isSending;
   const state = sendState?.success || sendState?.error ? sendState : saveState;
   const isSent = existingNote?.confirmed ?? false;
+
+  function handleGenerateDraft() {
+    setDraftError(null);
+    startDraftTransition(async () => {
+      const result = await generateParentReportDraftAction(note);
+      if ("error" in result) {
+        setDraftError(result.error);
+        return;
+      }
+      setPreDraftNote({ note, language });
+      setNote(result.draft);
+      setLanguage("en");
+    });
+  }
+
+  function handleRevertDraft() {
+    if (!preDraftNote) return;
+    setNote(preDraftNote.note);
+    setLanguage(preDraftNote.language);
+    setPreDraftNote(null);
+  }
 
   return (
     <form className="space-y-3 rounded-2xl border border-navy-100 bg-white p-4 shadow-sm sm:p-5">
@@ -80,7 +113,11 @@ export function SessionNoteForm({
       </div>
       <Textarea
         name="note"
-        defaultValue={existingNote?.note}
+        value={note}
+        onChange={(e) => {
+          setNote(e.target.value);
+          setPreDraftNote(null);
+        }}
         placeholder={`예:
 학습 결과
 오늘 20문제 중 18개를 정확히 풀었습니다 (정답률 90%).
@@ -100,6 +137,31 @@ export function SessionNoteForm({
         저장은 학부모에게 보이지 않아요 — 나중에 다시 접속해서 이어 쓸 수 있습니다. 다 작성하면 &quot;학부모에게
         전달&quot;을 눌러야 채팅과 SMS로 실제 발송됩니다.
       </p>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button
+          size="md"
+          variant="secondary"
+          type="button"
+          onClick={handleGenerateDraft}
+          disabled={isBusy || isDrafting || !note.trim()}
+        >
+          {isDrafting ? "영어 초안 작성 중..." : "AI로 학부모 안내문 영어 초안 작성"}
+        </Button>
+        {preDraftNote && (
+          <button
+            type="button"
+            onClick={handleRevertDraft}
+            className="text-xs text-navy-500 underline underline-offset-2 hover:text-navy-700"
+          >
+            번역 전 내용으로 되돌리기
+          </button>
+        )}
+      </div>
+      {draftError && (
+        <p className="text-xs text-red-600" role="alert">
+          {draftError}
+        </p>
+      )}
       {state?.fieldErrors?.note && (
         <p className="text-xs text-red-600" role="alert">
           {state.fieldErrors.note}

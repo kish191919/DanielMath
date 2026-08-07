@@ -70,7 +70,7 @@ export default async function ParentReportDetailPage({
         </div>
 
         <Link
-          href="/dashboard/parent/progress"
+          href={`/dashboard/parent/progress?child=${student.id}`}
           className="mt-6 inline-block text-sm font-medium text-navy-500 hover:text-navy-900"
         >
           전체 진행 상황 보기 →

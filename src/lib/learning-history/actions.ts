@@ -7,6 +7,7 @@ import { requireRole } from "@/lib/dal";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { triggerGradingJob } from "@/lib/ai/trigger-grading";
+import { generateParentReportDraft } from "@/lib/ai/generate-parent-report-draft";
 import { listGuardiansForStudent } from "@/lib/students/queries";
 import { getOrCreateThreadForParent } from "@/lib/messages/queries";
 import { generateParentMagicLink } from "@/lib/auth/magic-link";
@@ -18,6 +19,7 @@ import {
   uploadMetaSchema,
   reviewSubmissionSchema,
   sessionNoteSchema,
+  noteTextSchema,
   type LearningItemInputValues,
 } from "./schema";
 
@@ -229,6 +231,33 @@ export type SessionNoteFormState = {
   fieldErrors?: Partial<Record<"note", string>>;
   success?: boolean;
 };
+
+export type GenerateParentDraftResult = { draft: string } | { error: string };
+
+// Generates an English draft of a teacher's Korean note for review — does not
+// touch the database. Callers must still go through saveSessionNoteAction /
+// sendSessionNoteAction to persist or notify; this is draft generation only.
+export async function generateParentReportDraftAction(
+  note: string,
+): Promise<GenerateParentDraftResult> {
+  await requireRole("principal");
+
+  const parsed = noteTextSchema.safeParse(note);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "내용을 입력해주세요." };
+  }
+
+  try {
+    const draft = await generateParentReportDraft(parsed.data);
+    if (draft.length > 2000) {
+      return { error: "생성된 초안이 너무 깁니다. 원본 내용을 줄여서 다시 시도해주세요." };
+    }
+    return { draft };
+  } catch (err) {
+    console.error("[generateParentReportDraftAction] failed", err);
+    return { error: "AI 초안 생성에 실패했습니다. 잠시 후 다시 시도해주세요." };
+  }
+}
 
 // Shared insert-or-update for both saveSessionNoteAction and
 // sendSessionNoteAction below. confirmOnInsert always applies (a brand new
