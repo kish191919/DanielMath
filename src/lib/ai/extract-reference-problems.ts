@@ -1,9 +1,8 @@
 import "server-only";
-import { GRADING_MODEL, GRADING_EFFORT } from "./claude";
+import { GRADING_MODEL, REFERENCE_EXTRACTION_EFFORT } from "./claude";
 import { ReferenceExtractionSchema, type ReferenceExtractedItem } from "./reference-extraction-schema";
 import { extractStructuredItems } from "./document-extraction";
 import { translateReferenceProblems } from "./translate-reference-problems";
-import { DEGRADED_GRADING_EFFORT, DEGRADED_PAGES_PER_CHUNK } from "./grading-config";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import type { Concept, ReferenceProblemScan } from "@/lib/supabase/types";
 
@@ -66,9 +65,12 @@ export async function extractReferenceProblems(scanId: string, attempt = 0): Pro
   const conceptList = concepts ?? [];
   const conceptByCode = new Map(conceptList.map((c) => [c.code, c]));
 
-  // 재시도(사람이 누른 "다시 추출하기"든 reconcile cron의 자동 재시도든)는
-  // 원래 설정으로 다시 타임아웃날 가능성이 높으므로, 완주 확률을 높이기
-  // 위해 effort를 낮추고 청크를 더 잘게 쪼갠다 (grade-worksheet.ts와 동일).
+  // 여러 장의 사진이 assembleScanPdf()로 한 PDF에 합쳐져 들어오므로,
+  // chunkThresholdPages/pagesPerChunk를 1로 고정해 페이지(=사진 한 장)마다
+  // 별도 청크로 나눠 Promise.all로 동시에 처리한다 (document-extraction.ts
+  // 참고) — 사진이 몇 장이든 대기 시간이 "가장 느린 페이지 1장" 수준으로
+  // 유지된다. 채점(grade-worksheet.ts)과 달리 여러 페이지의 문맥을 함께 볼
+  // 필요가 없는 단순 전사 작업이라 페이지 단위 분할이 정확도를 해치지 않는다.
   const allItems: ReferenceExtractedItem[] = await extractStructuredItems({
     bucket: BUCKET,
     storagePath: scan.storage_path,
@@ -76,8 +78,9 @@ export async function extractReferenceProblems(scanId: string, attempt = 0): Pro
     systemText: `${REFERENCE_EXTRACTION_INSTRUCTIONS}\n\n사용 가능한 개념 코드 목록:\n${buildConceptListText(conceptList)}`,
     itemsSchema: ReferenceExtractionSchema,
     model: GRADING_MODEL,
-    effort: attempt >= 1 ? DEGRADED_GRADING_EFFORT : GRADING_EFFORT,
-    pagesPerChunk: attempt >= 1 ? DEGRADED_PAGES_PER_CHUNK : undefined,
+    effort: REFERENCE_EXTRACTION_EFFORT,
+    pagesPerChunk: 1,
+    chunkThresholdPages: 1,
     label: "문제 추출",
     logId: `extractReferenceProblems scan ${scanId} attempt ${attempt}`,
   });

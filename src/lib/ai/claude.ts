@@ -11,6 +11,17 @@ export const GRADING_MODEL = process.env.ANTHROPIC_GRADING_MODEL || "claude-sonn
 export const GRADING_EFFORT = (process.env.ANTHROPIC_GRADING_EFFORT ||
   "high") as "low" | "medium" | "high" | "xhigh" | "max";
 
+// Reference-problem extraction is verbatim transcription (not scoring a
+// student's answer), and now always runs one Claude call per page (see
+// extractReferenceProblems), so it doesn't need GRADING_EFFORT's "high"
+// thinking budget the way whole-document worksheet grading does — "medium"
+// finishes far faster per page with no meaningful accuracy loss for
+// transcription. Kept as its own knob (not reusing GRADING_EFFORT) so tuning
+// worksheet-grading accuracy never accidentally slows reference extraction
+// back down, and vice versa.
+export const REFERENCE_EXTRACTION_EFFORT = (process.env.ANTHROPIC_REFERENCE_EXTRACTION_EFFORT ||
+  "medium") as "low" | "medium" | "high" | "xhigh" | "max";
+
 // Similar-problem generation is text-only synthesis (no vision, no image
 // tokens), so effort defaults lower than GRADING_EFFORT.
 export const PRACTICE_GEN_MODEL = process.env.ANTHROPIC_PRACTICE_GEN_MODEL || "claude-sonnet-5";

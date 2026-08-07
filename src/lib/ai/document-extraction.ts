@@ -44,11 +44,15 @@ function buildFileContentBlock(mimeType: DocumentMimeType, base64: string) {
   };
 }
 
-async function buildPdfChunks(buffer: Buffer, pagesPerChunk: number): Promise<PdfChunk[]> {
+async function buildPdfChunks(
+  buffer: Buffer,
+  pagesPerChunk: number,
+  chunkThresholdPages: number,
+): Promise<PdfChunk[]> {
   const srcDoc = await PDFDocument.load(buffer);
   const totalPages = srcDoc.getPageCount();
 
-  if (totalPages <= CHUNK_THRESHOLD_PAGES) {
+  if (totalPages <= chunkThresholdPages) {
     return [{ base64: buffer.toString("base64"), startPage: 1, endPage: totalPages, totalPages }];
   }
 
@@ -102,6 +106,10 @@ export interface ExtractStructuredItemsOptions<T> {
   // PDF 청킹 시 청크당 페이지 수. 기본 PAGES_PER_CHUNK(4) — 재시도 시 더 작은
   // 값을 넘겨 청크당 처리 시간을 줄이는 용도로 쓰인다 (grade-worksheet.ts 참고).
   pagesPerChunk?: number;
+  // 이 페이지 수 이하면 청킹 없이 한 번의 호출로 처리한다. 기본
+  // CHUNK_THRESHOLD_PAGES(6) — extractReferenceProblems처럼 사진 몇 장짜리
+  // 업로드도 페이지별로 병렬 처리하고 싶을 때 더 낮은 값(예: 1)을 넘긴다.
+  chunkThresholdPages?: number;
 }
 
 // 파일을 다운로드해 (PDF면 필요시 청킹한 뒤) Claude 구조화 출력으로 보내고,
@@ -121,12 +129,13 @@ export async function extractStructuredItems<T>(
     label,
     logId,
     pagesPerChunk = PAGES_PER_CHUNK,
+    chunkThresholdPages = CHUNK_THRESHOLD_PAGES,
   } = options;
 
   const buffer = await downloadBuffer(bucket, storagePath);
   const chunks: PdfChunk[] =
     mimeType === "application/pdf"
-      ? await buildPdfChunks(buffer, pagesPerChunk)
+      ? await buildPdfChunks(buffer, pagesPerChunk, chunkThresholdPages)
       : [{ base64: buffer.toString("base64"), startPage: 1, endPage: 1, totalPages: 1 }];
 
   const client = getClaudeClient();
