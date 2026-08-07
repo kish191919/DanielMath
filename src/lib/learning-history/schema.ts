@@ -23,19 +23,6 @@ export const ERROR_TYPE_LABELS: Record<(typeof ERROR_TYPES)[number], string> = {
   time_pressure: "시간 부족",
 };
 
-// English labels — used only when building the AI prompt for an
-// English-language parent report (see generate-parent-summary.ts); the
-// teacher-facing review UI keeps using ERROR_TYPE_LABELS regardless.
-export const ERROR_TYPE_LABELS_EN: Record<(typeof ERROR_TYPES)[number], string> = {
-  calculation_mistake: "calculation mistake",
-  place_value_error: "place value error",
-  fraction_concept: "fraction concept",
-  word_problem_interpretation: "word problem interpretation",
-  unit_conversion: "unit conversion",
-  pattern_recognition: "pattern recognition",
-  time_pressure: "time pressure",
-};
-
 export const SCAN_STATUS_LABELS: Record<
   "uploaded" | "grading" | "pending_review" | "reviewed" | "grading_failed",
   string
@@ -59,12 +46,13 @@ export const uploadMetaSchema = z.object({
     .positive()
     .max(MAX_UPLOAD_BYTES, "파일 크기는 20MB를 초과할 수 없습니다."),
   session_date: z.string().min(1),
-  // True when the teacher deliberately photographed only the problems a
-  // student struggled with, rather than everything the student solved that
-  // session — see getConceptAccuracySummary's isTargetedReviewHeavy, which
-  // uses this so parent-facing accuracy stats can flag that skew instead of
-  // presenting the number as a representative sample.
-  is_targeted_review: z.boolean().default(false),
+  // Set only for a correction upload (a re-photograph of problems the
+  // teacher already marked wrong in red pen) — see confirmUploadAction,
+  // which derives is_targeted_review from this rather than trusting a
+  // client-supplied flag. getConceptAccuracySummary's isTargetedReviewHeavy
+  // then uses that flag so parent-facing accuracy stats can flag the skew
+  // instead of presenting the number as a representative sample.
+  source_scan_id: z.string().uuid().optional(),
 });
 
 export const learningItemInputSchema = z.object({
@@ -86,9 +74,6 @@ export const reviewSubmissionSchema = z.object({
   student_id: z.string().uuid(),
   session_date: z.string().min(1),
   items: z.array(learningItemInputSchema).min(1, "최소 1개 이상의 문항이 필요합니다."),
-  // Language for the AI-generated parent report that gets drafted right
-  // after this review is confirmed — see generate-parent-summary.ts.
-  language: z.enum(["ko", "en"]).default("ko"),
 });
 
 export const noteTextSchema = z.string().min(1, "내용을 입력해주세요.").max(2000);
@@ -98,4 +83,8 @@ export const sessionNoteSchema = z.object({
   scan_id: z.string().uuid().optional().or(z.literal("")),
   session_date: z.string().optional().or(z.literal("")),
   note: noteTextSchema,
+  // Language the teacher is writing this report in — persisted so
+  // getLastSentNoteLanguage can default the next report's toggle to
+  // whichever language was actually sent last.
+  language: z.enum(["ko", "en"]).default("ko"),
 });

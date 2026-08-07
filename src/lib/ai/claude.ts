@@ -11,18 +11,8 @@ export const GRADING_MODEL = process.env.ANTHROPIC_GRADING_MODEL || "claude-sonn
 export const GRADING_EFFORT = (process.env.ANTHROPIC_GRADING_EFFORT ||
   "high") as "low" | "medium" | "high" | "xhigh" | "max";
 
-// Parent summary generation is plain-text synthesis over already-graded
-// items (no vision, no thinking) — a fraction of the grading call's cost,
-// so effort defaults low rather than reusing GRADING_EFFORT.
-export const PARENT_SUMMARY_MODEL =
-  process.env.ANTHROPIC_PARENT_SUMMARY_MODEL || "claude-sonnet-5";
-
-export const PARENT_SUMMARY_EFFORT = (process.env.ANTHROPIC_PARENT_SUMMARY_EFFORT ||
-  "low") as "low" | "medium" | "high" | "xhigh" | "max";
-
 // Similar-problem generation is text-only synthesis (no vision, no image
-// tokens) but numeric correctness matters more than parent-summary prose, so
-// effort defaults higher than PARENT_SUMMARY_EFFORT.
+// tokens), so effort defaults lower than GRADING_EFFORT.
 export const PRACTICE_GEN_MODEL = process.env.ANTHROPIC_PRACTICE_GEN_MODEL || "claude-sonnet-5";
 
 export const PRACTICE_GEN_EFFORT = (process.env.ANTHROPIC_PRACTICE_GEN_EFFORT ||

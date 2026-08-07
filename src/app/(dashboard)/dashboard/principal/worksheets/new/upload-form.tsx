@@ -3,162 +3,40 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Camera, Trash2 } from "lucide-react";
-import { Field, Radio } from "@/components/forms/field";
+import { Field } from "@/components/forms/field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { GRADE_LABELS } from "@/lib/students/schema";
-import { createUploadUrlAction, confirmUploadAction } from "@/lib/learning-history/actions";
-import { createBrowserSupabase } from "@/lib/supabase/browser";
 import { todayInEasternTime } from "@/lib/dates";
-import {
-  assembleScanPdf,
-  compressImageFileToJpeg,
-  compressPdfFile,
-  type CapturedPage,
-} from "@/lib/images/build-scan-pdf";
-import { CameraCapture } from "./camera-capture";
+import { CameraCapture } from "@/components/dashboard/camera-capture";
+import { useWorksheetUpload } from "@/components/dashboard/use-worksheet-upload";
 import type { Student } from "@/lib/supabase/types";
-
-const BUCKET = "worksheet-scans";
 
 export function UploadForm({ students }: { students: Student[] }) {
   const router = useRouter();
   const [studentId, setStudentId] = React.useState("");
   const [sessionDate, setSessionDate] = React.useState(todayInEasternTime());
-  const [isTargetedReview, setIsTargetedReview] = React.useState(false);
-  const [pickedFile, setPickedFile] = React.useState<File | null>(null);
-  const [cameraPages, setCameraPages] = React.useState<CapturedPage[] | null>(null);
-  const [showCamera, setShowCamera] = React.useState(false);
-  const [cameraSupported, setCameraSupported] = React.useState(false);
-  const [status, setStatus] = React.useState<"idle" | "uploading" | "grading">("idle");
-  const [error, setError] = React.useState<string | null>(null);
-
-  React.useEffect(() => {
-    // getUserMedia support can only be feature-detected client-side (SSR has
-    // no `navigator`), so this one-time capability check must run in an
-    // effect rather than during render.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setCameraSupported(typeof navigator !== "undefined" && !!navigator.mediaDevices?.getUserMedia);
-  }, []);
-
-  React.useEffect(() => {
-    return () => {
-      cameraPages?.forEach((p) => URL.revokeObjectURL(p.previewUrl));
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- cleanup only runs on unmount, not on every cameraPages change
-  }, []);
-
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const next = e.target.files?.[0] ?? null;
-    if (next) clearCameraPages();
-    setPickedFile(next);
-  }
-
-  function clearCameraPages() {
-    cameraPages?.forEach((p) => URL.revokeObjectURL(p.previewUrl));
-    setCameraPages(null);
-  }
-
-  function handleCameraComplete(pages: CapturedPage[]) {
-    // Free URLs for any previously-captured pages the user deleted during a
-    // "다시 촬영" (retake) session; pages still present keep their URL.
-    const nextIds = new Set(pages.map((p) => p.id));
-    cameraPages?.forEach((p) => {
-      if (!nextIds.has(p.id)) URL.revokeObjectURL(p.previewUrl);
-    });
-    setPickedFile(null);
-    setCameraPages(pages);
-    setShowCamera(false);
-  }
-
-  async function resolveUploadFile(): Promise<File | null> {
-    if (pickedFile) {
-      // Camera-captured pages are already resized/compressed by
-      // assembleScanPdf below; directly picked files aren't, so a multi-MB
-      // phone photo or scanning-app PDF would otherwise upload (and get
-      // graded) at full size.
-      if (pickedFile.type === "image/jpeg" || pickedFile.type === "image/png") {
-        const compressed = await compressImageFileToJpeg(pickedFile);
-        return new File([compressed], pickedFile.name, { type: "image/jpeg" });
-      }
-      if (pickedFile.type === "application/pdf") {
-        const compressed = await compressPdfFile(pickedFile);
-        return new File([compressed], pickedFile.name, { type: "application/pdf" });
-      }
-      return pickedFile;
-    }
-    if (cameraPages && cameraPages.length > 0) {
-      const pdfBlob = await assembleScanPdf(cameraPages.map((p) => p.blob));
-      return new File([pdfBlob], "scan.pdf", { type: "application/pdf" });
-    }
-    return null;
-  }
+  const {
+    cameraPages,
+    showCamera,
+    setShowCamera,
+    cameraSupported,
+    status,
+    error,
+    handleFileChange,
+    clearCameraPages,
+    handleCameraComplete,
+    submit,
+  } = useWorksheetUpload();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
-
-    if (!studentId) {
-      setError("학생을 선택해주세요.");
-      return;
+    const result = await submit(studentId, { sessionDate });
+    if (!result || !("error" in result)) {
+      // On success confirmUploadAction redirects — nothing further to do.
+      router.refresh();
     }
-
-    // Set before resolveUploadFile() (not after) — compressing a multi-page
-    // PDF client-side can take a few seconds, and the form should be busy
-    // for that whole window to prevent a double submit.
-    setStatus("uploading");
-
-    let file: File | null;
-    try {
-      file = await resolveUploadFile();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "파일을 준비하지 못했습니다.");
-      setStatus("idle");
-      return;
-    }
-    if (!file) {
-      setError("파일을 선택하거나 카메라로 촬영해주세요.");
-      setStatus("idle");
-      return;
-    }
-
-    const urlResult = await createUploadUrlAction(studentId, file.type);
-    if ("error" in urlResult) {
-      setError(urlResult.error);
-      setStatus("idle");
-      return;
-    }
-
-    const browser = createBrowserSupabase();
-    const { error: uploadError } = await browser.storage
-      .from(BUCKET)
-      .uploadToSignedUrl(urlResult.path, urlResult.token, file);
-    if (uploadError) {
-      setError(uploadError.message);
-      setStatus("idle");
-      return;
-    }
-
-    setStatus("grading");
-
-    const confirmResult = await confirmUploadAction({
-      scanId: urlResult.scanId,
-      path: urlResult.path,
-      studentId,
-      originalFilename: file.name,
-      mimeType: file.type,
-      fileSizeBytes: file.size,
-      sessionDate,
-      isTargetedReview,
-    });
-    if (confirmResult && "error" in confirmResult) {
-      setError(confirmResult.error);
-      setStatus("idle");
-      return;
-    }
-    // On success confirmUploadAction redirects — nothing further to do here.
-    router.refresh();
   }
 
   const isBusy = status !== "idle";
@@ -196,31 +74,10 @@ export function UploadForm({ students }: { students: Student[] }) {
         />
       </Field>
 
-      <Field label="촬영 범위 / Coverage">
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <Radio
-            name="isTargetedReview"
-            checked={!isTargetedReview}
-            disabled={isBusy}
-            onChange={() => setIsTargetedReview(false)}
-            label="정기 학습 전체 (빠짐없이 촬영)"
-          />
-          <Radio
-            name="isTargetedReview"
-            checked={isTargetedReview}
-            disabled={isBusy}
-            onChange={() => setIsTargetedReview(true)}
-            label="오답/복습 위주 (일부만 촬영)"
-          />
-        </div>
-        <p className="text-xs text-navy-500 font-ko" lang="ko">
-          &quot;오답/복습 위주&quot;로 표시하면 학부모 진행 상황 페이지의 정답률에 참고 표시가 함께 나타나요.
-        </p>
-      </Field>
-
       <Field label="파일 / File (사진 또는 PDF)" required>
         <p className="text-xs text-navy-500 font-ko" lang="ko">
-          카메라로 여러 장 촬영하거나, 이미 스캔된 파일을 선택하세요.
+          그날 학생이 푼 학습지 전체를 빠짐없이 촬영하거나, 이미 스캔된 파일을 선택하세요. 이 업로드는 AI 채점 없이
+          그대로 저장됩니다 — 채점 후 오답이 있으면 업로드 완료 화면에서 오답만 다시 촬영해 AI 분석을 받을 수 있어요.
         </p>
 
         {cameraSupported && (
@@ -296,8 +153,8 @@ export function UploadForm({ students }: { students: Student[] }) {
       <div className="flex items-center justify-end gap-3 border-t border-navy-100 pt-5">
         <Button size="md" type="submit" disabled={isBusy}>
           {status === "uploading" && "업로드 중..."}
-          {status === "grading" && "AI 채점 중..."}
-          {status === "idle" && "업로드 및 채점 시작"}
+          {status === "saving" && "저장 중..."}
+          {status === "idle" && "업로드"}
         </Button>
       </div>
     </form>

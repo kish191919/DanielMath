@@ -7,14 +7,12 @@ import { requireRole } from "@/lib/dal";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { triggerGradingJob } from "@/lib/ai/trigger-grading";
-import { generateParentSummaryDraft } from "@/lib/ai/generate-parent-summary";
 import { listGuardiansForStudent } from "@/lib/students/queries";
 import { getOrCreateThreadForParent } from "@/lib/messages/queries";
 import { generateParentMagicLink } from "@/lib/auth/magic-link";
 import { sendSms, normalizeUsPhone } from "@/lib/notifications/sms";
 import { EXT_BY_MIME } from "@/lib/storage/mime";
 import { mintSignedUploadUrl } from "@/lib/storage/signed-upload";
-import type { SessionNoteLanguage } from "@/lib/supabase/types";
 import {
   uploadMetaSchema,
   reviewSubmissionSchema,
@@ -56,7 +54,12 @@ export type ConfirmUploadInput = {
   mimeType: string;
   fileSizeBytes: number;
   sessionDate: string;
-  isTargetedReview: boolean;
+  // Set only when this upload is a re-photograph of problems the teacher
+  // already graded and marked wrong in red pen — see
+  // correction-upload-form.tsx. Its presence is what decides whether AI
+  // grading runs at all (see below); a plain full-session upload never
+  // triggers AI.
+  sourceScanId?: string;
 };
 
 export type ConfirmUploadResult = { error: string };
@@ -72,11 +75,13 @@ export async function confirmUploadAction(
     mime_type: input.mimeType,
     file_size_bytes: input.fileSizeBytes,
     session_date: input.sessionDate,
-    is_targeted_review: input.isTargetedReview,
+    source_scan_id: input.sourceScanId || undefined,
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "입력값을 확인해주세요." };
   }
+
+  const isCorrectionUpload = !!parsed.data.source_scan_id;
 
   const supabase = await createServerSupabase();
   const { error } = await supabase.from("worksheet_scans").insert({
@@ -88,22 +93,31 @@ export async function confirmUploadAction(
     mime_type: parsed.data.mime_type,
     file_size_bytes: parsed.data.file_size_bytes,
     session_date: parsed.data.session_date,
-    is_targeted_review: parsed.data.is_targeted_review,
-    status: "grading",
+    // Derived server-side, not chosen by the teacher: true exactly when
+    // this is a correction upload, which by definition only ever captures
+    // the subset of problems marked wrong — see 0028_worksheet_scan_targeted_review.sql.
+    is_targeted_review: isCorrectionUpload,
+    source_scan_id: parsed.data.source_scan_id ?? null,
+    // Plain full-session uploads are never AI-graded, so they stay at
+    // "uploaded" permanently instead of entering the grading pipeline.
+    status: isCorrectionUpload ? "grading" : "uploaded",
   });
   if (error) return { error: error.message };
 
-  // Grading runs via a dedicated Route Handler (POST /api/grading/run)
-  // instead of inline here, so it gets its own maxDuration budget rather
-  // than sharing this request's — see src/lib/ai/grading-config.ts. The
-  // trigger fetch itself is fast (just waits for a 202 ack), so this stays
-  // well within this action's own budget even though it runs after the
-  // redirect below via after().
-  after(async () => {
-    await triggerGradingJob(input.scanId, 0);
-  });
+  if (isCorrectionUpload) {
+    // Grading runs via a dedicated Route Handler (POST /api/grading/run)
+    // instead of inline here, so it gets its own maxDuration budget rather
+    // than sharing this request's — see src/lib/ai/grading-config.ts. The
+    // trigger fetch itself is fast (just waits for a 202 ack), so this stays
+    // well within this action's own budget even though it runs after the
+    // redirect below via after().
+    after(async () => {
+      await triggerGradingJob(input.scanId, 0);
+    });
+  }
 
   revalidatePath("/dashboard/principal/worksheets");
+  if (input.sourceScanId) revalidatePath(`/dashboard/principal/worksheets/${input.sourceScanId}`);
   redirect(`/dashboard/principal/worksheets/${input.scanId}`);
 }
 
@@ -154,7 +168,6 @@ export async function confirmReviewAction(
   studentId: string,
   sessionDate: string,
   items: LearningItemInputValues[],
-  language: SessionNoteLanguage,
 ): Promise<ReviewResult> {
   const session = await requireRole("principal");
 
@@ -163,7 +176,6 @@ export async function confirmReviewAction(
     student_id: studentId,
     session_date: sessionDate,
     items,
-    language,
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "입력값을 확인해주세요." };
@@ -205,20 +217,6 @@ export async function confirmReviewAction(
     .eq("id", parsed.data.scan_id);
   if (updateError) return { error: updateError.message };
 
-  try {
-    await generateParentSummaryDraft(
-      parsed.data.scan_id,
-      parsed.data.student_id,
-      parsed.data.session_date,
-      session.userId,
-      parsed.data.language,
-    );
-  } catch (err) {
-    // Best-effort: the review itself already succeeded, and the principal
-    // can always write a manual note as a fallback (see SessionNoteForm).
-    console.error(`[confirmReviewAction] parent summary draft failed for scan ${parsed.data.scan_id}`, err);
-  }
-
   revalidatePath("/dashboard/principal/worksheets");
   revalidatePath(`/dashboard/principal/students/${parsed.data.student_id}/history`);
   revalidatePath("/dashboard/principal/students");
@@ -244,6 +242,7 @@ export async function addSessionNoteAction(
     scan_id: formData.get("scan_id") ?? "",
     session_date: formData.get("session_date") ?? "",
     note: formData.get("note"),
+    language: formData.get("language") || "ko",
   });
   if (!parsed.success) {
     const fieldErrors: SessionNoteFormState["fieldErrors"] = {};
@@ -254,17 +253,39 @@ export async function addSessionNoteAction(
   }
 
   const supabase = await createServerSupabase();
-  const { error } = await supabase.from("session_notes").insert({
-    student_id: parsed.data.student_id,
-    scan_id: parsed.data.scan_id || null,
-    session_date: parsed.data.session_date || new Date().toISOString().slice(0, 10),
-    note: parsed.data.note,
-    source: "teacher",
-    confirmed: true,
-    created_by: session.userId,
-  });
+  const { data: inserted, error } = await supabase
+    .from("session_notes")
+    .insert({
+      student_id: parsed.data.student_id,
+      scan_id: parsed.data.scan_id || null,
+      session_date: parsed.data.session_date || new Date().toISOString().slice(0, 10),
+      note: parsed.data.note,
+      source: "teacher",
+      confirmed: true,
+      language: parsed.data.language,
+      created_by: session.userId,
+    })
+    .select("id")
+    .single();
   if (error) return { error: error.message };
 
+  // Teacher-written notes are published the moment they're saved (there's
+  // no separate AI-draft review step anymore), so this notifies guardians
+  // immediately — same as publishSessionNoteAction below.
+  try {
+    await notifyGuardiansOfReport(
+      studentId,
+      parsed.data.scan_id || "",
+      session.userId,
+      inserted.id,
+    );
+  } catch (err) {
+    console.error(`[addSessionNoteAction] guardian notify failed for ${inserted.id}`, err);
+  }
+
+  if (parsed.data.scan_id) {
+    revalidatePath(`/dashboard/principal/worksheets/${parsed.data.scan_id}`);
+  }
   revalidatePath(`/dashboard/principal/students/${studentId}/history`);
   revalidatePath("/dashboard/parent/progress");
   return { success: true };
@@ -331,7 +352,7 @@ export async function publishSessionNoteAction(
     await notifyGuardiansOfReport(studentId, scanId, session.userId, noteId);
   } catch (err) {
     // Best-effort — the publish itself already succeeded (same pattern as
-    // generateParentSummaryDraft above in confirmReviewAction).
+    // addSessionNoteAction above).
     console.error(`[publishSessionNoteAction] guardian notify failed for ${noteId}`, err);
   }
 

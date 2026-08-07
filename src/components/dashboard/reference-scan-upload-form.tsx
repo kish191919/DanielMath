@@ -12,7 +12,7 @@ import {
   compressImageFileToJpeg,
   type CapturedPage,
 } from "@/lib/images/build-scan-pdf";
-import { CameraCapture } from "@/app/(dashboard)/dashboard/principal/worksheets/new/camera-capture";
+import { CameraCapture } from "@/components/dashboard/camera-capture";
 
 const BUCKET = "problem-bank";
 

@@ -10,41 +10,53 @@ import {
   type SessionNoteFormState,
   type PublishSessionNoteState,
 } from "@/lib/learning-history/actions";
-import type { SessionNote } from "@/lib/supabase/types";
+import type { SessionNote, SessionNoteLanguage } from "@/lib/supabase/types";
 
 export function SessionNoteForm({
   studentId,
   scanId,
   sessionDate,
   existingNote,
+  initialLanguage = "ko",
 }: {
   studentId: string;
   scanId?: string;
   sessionDate: string;
   existingNote?: SessionNote | null;
+  initialLanguage?: SessionNoteLanguage;
 }) {
   if (existingNote) {
     return (
       <PublishNoteForm studentId={studentId} scanId={scanId ?? ""} existingNote={existingNote} />
     );
   }
-  return <CreateNoteForm studentId={studentId} scanId={scanId} sessionDate={sessionDate} />;
+  return (
+    <CreateNoteForm
+      studentId={studentId}
+      scanId={scanId}
+      sessionDate={sessionDate}
+      initialLanguage={initialLanguage}
+    />
+  );
 }
 
 function CreateNoteForm({
   studentId,
   scanId,
   sessionDate,
+  initialLanguage,
 }: {
   studentId: string;
   scanId?: string;
   sessionDate: string;
+  initialLanguage: SessionNoteLanguage;
 }) {
   const action = addSessionNoteAction.bind(null, studentId);
   const [state, formAction, isPending] = useActionState<SessionNoteFormState | null, FormData>(
     action,
     null,
   );
+  const [language, setLanguage] = React.useState<SessionNoteLanguage>(initialLanguage);
   const formRef = React.useRef<HTMLFormElement>(null);
 
   React.useEffect(() => {
@@ -59,7 +71,27 @@ function CreateNoteForm({
     >
       <input type="hidden" name="scan_id" value={scanId ?? ""} />
       <input type="hidden" name="session_date" value={sessionDate} />
-      <label className="block text-sm font-medium text-navy-800">오늘의 학습 리포트</label>
+      <input type="hidden" name="language" value={language} />
+      <div className="flex items-center justify-between gap-3">
+        <label className="block text-sm font-medium text-navy-800">오늘의 학습 리포트</label>
+        <div className="flex gap-2">
+          {(["ko", "en"] as const).map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => setLanguage(option)}
+              className={
+                "rounded-full px-2.5 py-1 text-xs font-medium transition-colors " +
+                (language === option
+                  ? "bg-navy-700 text-white"
+                  : "bg-navy-50 text-navy-700 hover:bg-navy-100")
+              }
+            >
+              {option === "ko" ? "한국어" : "English"}
+            </button>
+          ))}
+        </div>
+      </div>
       <Textarea
         name="note"
         placeholder={`예:
@@ -76,15 +108,18 @@ function CreateNoteForm({
 4학년 IXL C단원 풀어오기`}
         maxLength={2000}
       />
+      <p className="text-xs text-navy-500 font-ko" lang="ko">
+        저장하면 학부모 채팅방과 SMS로 즉시 전달됩니다.
+      </p>
       {state?.fieldErrors?.note && (
         <p className="text-xs text-red-600" role="alert">
           {state.fieldErrors.note}
         </p>
       )}
-      {state?.success && <p className="text-xs text-green-700">저장되었습니다.</p>}
+      {state?.success && <p className="text-xs text-green-700">저장 및 전달되었습니다.</p>}
       <div className="flex justify-end">
         <Button size="md" type="submit" disabled={isPending}>
-          {isPending ? "저장 중..." : "메모 저장"}
+          {isPending ? "전달 중..." : "저장 후 학부모에게 전달"}
         </Button>
       </div>
     </form>

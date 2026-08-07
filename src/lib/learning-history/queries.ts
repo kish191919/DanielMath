@@ -96,6 +96,39 @@ export async function getScanWithItems(
   return { scan, items: items ?? [] };
 }
 
+// Correction uploads (re-photographs of problems the teacher marked wrong
+// in red pen) linked back to the raw scan they correct — see
+// confirmUploadAction's sourceScanId. A raw scan's review page uses this to
+// list them and to aggregate their confirmed learning_items for the
+// concept/error-type analysis panel.
+export async function listCorrectionScansForScan(sourceScanId: string): Promise<WorksheetScan[]> {
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from("worksheet_scans")
+    .select("*")
+    .eq("source_scan_id", sourceScanId)
+    .order("created_at", { ascending: true })
+    .returns<WorksheetScan[]>();
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+// Confirmed items across one or more correction scans, for the
+// concept/error-type analysis panel on a raw scan's review page (which may
+// have several correction uploads over the course of a session).
+export async function getConfirmedItemsForScans(scanIds: string[]): Promise<LearningItem[]> {
+  if (scanIds.length === 0) return [];
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from("learning_items")
+    .select("*")
+    .in("scan_id", scanIds)
+    .eq("confirmed", true)
+    .returns<LearningItem[]>();
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
 export async function getSignedScanViewUrl(scanId: string): Promise<string | null> {
   const supabase = await createServerSupabase();
   const { data: scan } = await supabase

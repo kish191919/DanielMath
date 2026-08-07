@@ -157,6 +157,7 @@ export interface WorksheetScan {
   reviewed_by: string | null;
   session_date: string;
   is_targeted_review: boolean;
+  source_scan_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -423,6 +424,7 @@ type WorksheetScanInsert = {
   reviewed_by?: string | null;
   session_date?: string;
   is_targeted_review?: boolean;
+  source_scan_id?: string | null;
   created_at?: string;
   updated_at?: string;
 };
@@ -695,6 +697,13 @@ export type Database = {
             columns: ["student_id"];
             isOneToOne: false;
             referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "worksheet_scans_source_scan_id_fkey";
+            columns: ["source_scan_id"];
+            isOneToOne: false;
+            referencedRelation: "worksheet_scans";
             referencedColumns: ["id"];
           },
         ];

@@ -26,16 +26,16 @@ export async function markGradingFailed(scanId: string, err: unknown) {
 }
 
 const GRADING_INSTRUCTIONS = `당신은 미국 북버지니아(NoVa) K-6 AAP 준비 수학 공부방의 채점 보조입니다.
-학생 한 명이 푼 프린트물 스캔/사진(여러 페이지일 수 있음)이 첨부되어 있습니다. 다음 지침에 따라 채점하세요.
+첨부된 스캔/사진(여러 페이지일 수 있음)은 선생님이 이미 직접 채점을 마치고 **빨간 색연필로 틀린 문제에 X 표시나 빗금을 그어둔** 학습지의 재촬영본입니다. 이 업로드의 목적은 오답만 뽑아내는 것이므로, 다음 지침에 따라 처리하세요.
 
-1. 모든 페이지에 있는 모든 문제를 빠짐없이 개별 항목으로 추출하세요. 3a, 3b처럼 하위 문항이 있으면 각각을 별도 항목으로 다루세요.
+1. **빨간색으로 X 표시나 빗금이 그어진 문제만** 개별 항목으로 추출하세요. 표시가 없는 문제(맞았거나 아직 채점되지 않은 문제)는 무시하고 절대 포함하지 마세요. 3a, 3b처럼 하위 문항 중 일부만 표시되어 있으면 표시된 하위 문항만 추출하세요.
 2. 학생이 쓴 답을 있는 그대로 옮겨 적으세요(transcribed_answer). 답이 비어있거나 판독이 불가능하면 null로 두세요.
-3. 문제와 학생 답을 근거로 정답 여부(is_correct)를 직접 판단하세요.
+3. is_correct는 항상 false로 설정하세요 — 추출 대상 자체가 선생님이 이미 오답으로 표시한 문제이므로 정답 여부를 다시 판단할 필요가 없습니다.
 4. concept_code는 아래 제공된 개념 코드 목록 중 이 문제에 가장 가까운 것 하나를 선택하세요. 적절한 항목이 없으면 null로 두세요. 목록에 없는 코드를 만들어내지 마세요.
-5. 오답인 경우에만 error_type을 아래 7개 중 하나로 선택하세요: calculation_mistake(계산 실수), place_value_error(자릿수 오류), fraction_concept(분수 개념), word_problem_interpretation(단어 문제 해석), unit_conversion(단위 변환), pattern_recognition(패턴 인식), time_pressure(시간 부족). 정답인 경우 error_type은 null입니다.
+5. error_type을 아래 7개 중 하나로 선택하세요: calculation_mistake(계산 실수), place_value_error(자릿수 오류), fraction_concept(분수 개념), word_problem_interpretation(단어 문제 해석), unit_conversion(단위 변환), pattern_recognition(패턴 인식), time_pressure(시간 부족).
 6. 이미지를 자르거나 좌표를 반환하지 마세요 — 문제 텍스트만 그대로 옮겨 적으면 됩니다.
-7. 확신이 서지 않는 부분(글씨 판독 어려움 등)은 confidence_note에 짧게 남기세요. 없으면 null.
-8. items를 절대 빈 배열로 반환하지 마세요. 페이지에 손글씨 말풍선, 캐릭터 낙서, 동그라미 표시 등이 섞여 있어 복잡해 보여도 그 안에 실제 문제와 학생 답이 있습니다. 문항을 찾기 어렵다고 느껴지면 페이지를 처음부터 다시 살펴보고 최소 1개 이상을 반드시 추출하세요.`;
+7. 확신이 서지 않는 부분(글씨 판독 어려움, 표시가 빨간색인지 애매함 등)은 confidence_note에 짧게 남기세요. 없으면 null.
+8. items를 절대 빈 배열로 반환하지 마세요. 이 업로드는 오답 표시가 있다는 전제로 이루어지므로, 빨간 표시를 찾기 어렵다고 느껴지면 페이지를 처음부터 다시 살펴보고 최소 1개 이상을 반드시 추출하세요.`;
 
 function buildConceptListText(concepts: Concept[]): string {
   return concepts

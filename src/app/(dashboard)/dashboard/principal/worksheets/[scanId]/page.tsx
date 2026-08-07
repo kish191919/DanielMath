@@ -1,10 +1,14 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, ArrowLeft } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
 import { Button } from "@/components/ui/button";
 import { ReviewTable } from "@/components/dashboard/review-table";
 import { SessionNoteForm } from "@/components/dashboard/session-note-form";
+import { ScanStatusBadge } from "@/components/dashboard/scan-status-badge";
+import { ConceptErrorAnalysis } from "@/components/dashboard/concept-error-analysis";
+import { CorrectionUploadForm } from "@/components/dashboard/correction-upload-form";
 import { requireRole } from "@/lib/dal";
 import {
   getScanWithItems,
@@ -12,6 +16,8 @@ import {
   getSessionNoteForScan,
   getLastSentNoteLanguage,
   listConcepts,
+  listCorrectionScansForScan,
+  getConfirmedItemsForScans,
 } from "@/lib/learning-history/queries";
 import { retryGradingAction } from "@/lib/learning-history/actions";
 import { getStudent } from "@/lib/students/queries";
@@ -41,14 +47,139 @@ export default async function WorksheetScanReviewPage({
   if (!result) notFound();
   const { scan, items } = result;
 
-  const [student, viewUrl, concepts, existingNote, lastNoteLanguage] = await Promise.all([
+  const [student, viewUrl, concepts] = await Promise.all([
     getStudent(scan.student_id),
     getSignedScanViewUrl(scanId),
     listConcepts(),
-    getSessionNoteForScan(scanId),
-    getLastSentNoteLanguage(scan.student_id),
   ]);
   if (!student) notFound();
+
+  // A raw (never AI-graded) full-session upload never leaves "uploaded" —
+  // confirmUploadAction only kicks off grading for correction uploads, and
+  // every scan created before this change already advanced past "uploaded"
+  // the moment it was uploaded, so this also keeps old scans on the
+  // original AI-review screen below with no behavior change for them.
+  const isRawScan = scan.status === "uploaded";
+
+  const viewer = viewUrl && (
+    <>
+      <div className="mt-6 flex items-center justify-between gap-3 rounded-2xl border border-navy-100 bg-navy-50/50 p-4">
+        <p className="text-sm text-navy-700 font-ko" lang="ko">
+          {scan.mime_type === "application/pdf"
+            ? "여러 장을 촬영한 스캔은 새 창에서 열어야 모든 페이지를 넘겨보고 확대할 수 있어요."
+            : "새 창에서 열면 사진을 자유롭게 확대/축소해서 볼 수 있어요."}
+        </p>
+        <Button href={viewUrl} external variant="primary" size="md" className="shrink-0">
+          <ExternalLink className="h-4 w-4" />
+          새 창에서 크게 보기
+        </Button>
+      </div>
+
+      <div className="mt-4 overflow-hidden rounded-2xl border border-navy-100 bg-white shadow-sm">
+        {scan.mime_type === "application/pdf" ? (
+          <iframe src={viewUrl} className="h-[500px] w-full" title="원본 스캔 (미리보기, 첫 페이지만 표시)" />
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={viewUrl} alt="원본 스캔" className="max-h-[600px] w-full object-contain" />
+        )}
+      </div>
+    </>
+  );
+
+  const header = (
+    <div className="flex items-end justify-between gap-3">
+      <div>
+        <p className="text-sm font-semibold uppercase tracking-wider text-navy-500">
+          Worksheet Review
+        </p>
+        <h1 className="mt-2 text-2xl font-bold text-navy-900 font-ko sm:text-3xl" lang="ko">
+          {student.full_name} — {scan.session_date}
+        </h1>
+      </div>
+      <span className="inline-flex shrink-0 items-center rounded-full bg-navy-50 px-2.5 py-0.5 text-xs font-medium text-navy-800">
+        {SCAN_STATUS_LABELS[scan.status]}
+      </span>
+    </div>
+  );
+
+  if (isRawScan) {
+    const [correctionScans, existingNote, lastNoteLanguage] = await Promise.all([
+      listCorrectionScansForScan(scanId),
+      getSessionNoteForScan(scanId),
+      getLastSentNoteLanguage(scan.student_id),
+    ]);
+    const reviewedCorrectionScans = correctionScans.filter((s) => s.status === "reviewed");
+    const confirmedItems = await getConfirmedItemsForScans(
+      reviewedCorrectionScans.map((s) => s.id),
+    );
+
+    return (
+      <Section className="py-10 sm:py-14">
+        <Container className="max-w-3xl">
+          {header}
+          {viewer}
+
+          <div className="mt-8 space-y-4">
+            <div>
+              <h2 className="text-lg font-semibold text-navy-900 font-ko" lang="ko">
+                오답 학습지 촬영
+              </h2>
+              <p className="mt-1 text-sm text-navy-600 font-ko" lang="ko">
+                채점 후 빨간 펜으로 표시한 오답 부분을 다시 촬영하면 AI가 표시된 문제만 추출해서 검토·분석해드려요.
+              </p>
+            </div>
+
+            {correctionScans.length > 0 && (
+              <div className="space-y-2">
+                {correctionScans.map((cs) => (
+                  <Link
+                    key={cs.id}
+                    href={`/dashboard/principal/worksheets/${cs.id}`}
+                    className="flex items-center justify-between gap-3 rounded-2xl border border-navy-100 bg-white p-4 shadow-sm transition-colors hover:border-navy-300 hover:bg-navy-50"
+                  >
+                    <span className="text-sm text-navy-800 font-ko" lang="ko">
+                      오답 재촬영본 — {new Date(cs.created_at).toLocaleString("ko-KR")}
+                    </span>
+                    <ScanStatusBadge status={cs.status} />
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            <CorrectionUploadForm
+              studentId={scan.student_id}
+              sessionDate={scan.session_date}
+              sourceScanId={scanId}
+            />
+          </div>
+
+          {confirmedItems.length > 0 && (
+            <div className="mt-8">
+              <ConceptErrorAnalysis items={confirmedItems} concepts={concepts} />
+            </div>
+          )}
+
+          <div className="mt-8">
+            <SessionNoteForm
+              studentId={scan.student_id}
+              scanId={scanId}
+              sessionDate={scan.session_date}
+              existingNote={existingNote}
+              initialLanguage={lastNoteLanguage}
+            />
+          </div>
+        </Container>
+      </Section>
+    );
+  }
+
+  // Correction scan (source_scan_id set) or a legacy scan graded before this
+  // change (source_scan_id null but already past "uploaded") — same AI
+  // review flow as before.
+  const [existingNote, lastNoteLanguage] = await Promise.all([
+    scan.source_scan_id ? Promise.resolve(null) : getSessionNoteForScan(scanId),
+    getLastSentNoteLanguage(scan.student_id),
+  ]);
 
   const readOnly = scan.status === "reviewed";
   const stuck = isGradingStuck(scan.status, scan.updated_at, WORKSHEET_GRADING_STUCK_THRESHOLD_MS);
@@ -56,44 +187,18 @@ export default async function WorksheetScanReviewPage({
   return (
     <Section className="py-10 sm:py-14">
       <Container className="max-w-3xl">
-        <div className="flex items-end justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-wider text-navy-500">
-              Worksheet Review
-            </p>
-            <h1 className="mt-2 text-2xl font-bold text-navy-900 font-ko sm:text-3xl" lang="ko">
-              {student.full_name} — {scan.session_date}
-            </h1>
-          </div>
-          <span className="inline-flex shrink-0 items-center rounded-full bg-navy-50 px-2.5 py-0.5 text-xs font-medium text-navy-800">
-            {SCAN_STATUS_LABELS[scan.status]}
-          </span>
-        </div>
-
-        {viewUrl && (
-          <>
-            <div className="mt-6 flex items-center justify-between gap-3 rounded-2xl border border-navy-100 bg-navy-50/50 p-4">
-              <p className="text-sm text-navy-700 font-ko" lang="ko">
-                {scan.mime_type === "application/pdf"
-                  ? "여러 장을 촬영한 스캔은 새 창에서 열어야 모든 페이지를 넘겨보고 확대할 수 있어요."
-                  : "새 창에서 열면 사진을 자유롭게 확대/축소해서 볼 수 있어요."}
-              </p>
-              <Button href={viewUrl} external variant="primary" size="md" className="shrink-0">
-                <ExternalLink className="h-4 w-4" />
-                새 창에서 크게 보기
-              </Button>
-            </div>
-
-            <div className="mt-4 overflow-hidden rounded-2xl border border-navy-100 bg-white shadow-sm">
-              {scan.mime_type === "application/pdf" ? (
-                <iframe src={viewUrl} className="h-[500px] w-full" title="원본 스캔 (미리보기, 첫 페이지만 표시)" />
-              ) : (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={viewUrl} alt="원본 스캔" className="max-h-[600px] w-full object-contain" />
-              )}
-            </div>
-          </>
+        {scan.source_scan_id && (
+          <Link
+            href={`/dashboard/principal/worksheets/${scan.source_scan_id}`}
+            className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-navy-500 hover:text-navy-900"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            원본 학습지로 돌아가기
+          </Link>
         )}
+
+        {header}
+        {viewer}
 
         <GradingStatusPoller isGrading={scan.status === "grading"} />
 
@@ -152,19 +257,27 @@ export default async function WorksheetScanReviewPage({
               initialItems={items}
               concepts={concepts}
               readOnly={readOnly}
-              initialLanguage={lastNoteLanguage}
             />
           </div>
         </div>
 
-        <div className="mt-8">
-          <SessionNoteForm
-            studentId={scan.student_id}
-            scanId={scanId}
-            sessionDate={scan.session_date}
-            existingNote={existingNote}
-          />
-        </div>
+        {readOnly && items.length > 0 && (
+          <div className="mt-8">
+            <ConceptErrorAnalysis items={items.filter((i) => i.confirmed)} concepts={concepts} />
+          </div>
+        )}
+
+        {!scan.source_scan_id && (
+          <div className="mt-8">
+            <SessionNoteForm
+              studentId={scan.student_id}
+              scanId={scanId}
+              sessionDate={scan.session_date}
+              existingNote={existingNote}
+              initialLanguage={lastNoteLanguage}
+            />
+          </div>
+        )}
       </Container>
     </Section>
   );
