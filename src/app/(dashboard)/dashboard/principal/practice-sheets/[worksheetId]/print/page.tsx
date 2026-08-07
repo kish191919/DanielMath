@@ -169,7 +169,7 @@ export default async function PracticeSheetPrintPage({
                         <div className="flex-1">
                           <p className="text-sm font-medium text-navy-900">{problem.problem_text}</p>
                           {problem.options && (
-                            <div className="mt-2 flex flex-wrap gap-2">
+                            <div className="mt-4 flex flex-wrap gap-2">
                               {problem.options.map((opt) => (
                                 <div
                                   key={opt.label}
