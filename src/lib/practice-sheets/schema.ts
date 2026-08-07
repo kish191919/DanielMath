@@ -3,7 +3,7 @@ import { z } from "zod";
 export const generateSelectionSchema = z
   .array(
     z.object({
-      sourceType: z.enum(["wrong_answer", "reference"]),
+      sourceType: z.enum(["wrong_answer", "reference", "reference_verbatim"]),
       itemId: z.string().uuid(),
       count: z.number().int().min(1).max(5),
     }),
@@ -19,7 +19,7 @@ export const practiceProblemInputSchema = z.object({
   source_item_id: z.string().uuid().nullable().optional(),
   source_reference_id: z.string().uuid().nullable().optional(),
   concept_id: z.string().uuid().nullable().optional(),
-  source: z.enum(["ai", "teacher"]),
+  source: z.enum(["ai", "teacher", "reference_verbatim"]),
   edited_by_teacher: z.boolean(),
 });
 

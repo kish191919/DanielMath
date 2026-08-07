@@ -238,7 +238,7 @@ export interface GeneratedProblem {
   problem_text: string;
   answer_text: string;
   sort_order: number;
-  source: "ai" | "teacher";
+  source: "ai" | "teacher" | "reference_verbatim";
   edited_by_teacher: boolean;
   ai_suggested: unknown;
   created_at: string;
@@ -268,6 +268,11 @@ export interface ReferenceProblem {
   problem_number: string | null;
   transcribed_problem: string;
   transcribed_answer: string | null;
+  translated_problem: string | null;
+  translated_answer: string | null;
+  has_diagram: boolean;
+  crop_storage_path: string | null;
+  translation_error: string | null;
   concept_id: string | null;
   ai_confidence_note: string | null;
   ai_suggested: unknown;
@@ -492,7 +497,7 @@ type GeneratedProblemInsert = {
   problem_text: string;
   answer_text: string;
   sort_order?: number;
-  source?: "ai" | "teacher";
+  source?: "ai" | "teacher" | "reference_verbatim";
   edited_by_teacher?: boolean;
   ai_suggested?: unknown;
   created_at?: string;
@@ -526,6 +531,11 @@ type ReferenceProblemInsert = {
   problem_number?: string | null;
   transcribed_problem: string;
   transcribed_answer?: string | null;
+  translated_problem?: string | null;
+  translated_answer?: string | null;
+  has_diagram?: boolean;
+  crop_storage_path?: string | null;
+  translation_error?: string | null;
   concept_id?: string | null;
   ai_confidence_note?: string | null;
   ai_suggested?: unknown;

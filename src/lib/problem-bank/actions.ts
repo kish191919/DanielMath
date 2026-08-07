@@ -6,9 +6,12 @@ import { requireRole } from "@/lib/dal";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { triggerReferenceExtractionJob } from "@/lib/ai/trigger-reference-extraction";
+import { translateReferenceProblems } from "@/lib/ai/translate-reference-problems";
 import { EXT_BY_MIME } from "@/lib/storage/mime";
 import { mintSignedUploadUrl } from "@/lib/storage/signed-upload";
 import { referenceUploadMetaSchema } from "./schema";
+import { getReferenceProblemCropSource } from "./queries";
+import type { ReferenceProblem } from "@/lib/supabase/types";
 
 const BUCKET = "problem-bank";
 const PRACTICE_SHEETS_NEW_PATH = "/dashboard/principal/practice-sheets/new";
@@ -150,6 +153,106 @@ export async function deleteReferenceProblemAction(id: string) {
   const supabase = await createServerSupabase();
   const { error } = await supabase.from("reference_problems").delete().eq("id", id);
   if (error) throw new Error(error.message);
+
+  revalidatePath(PRACTICE_SHEETS_NEW_PATH);
+}
+
+// Manual retry for the automatic translation step in extractReferenceProblems
+// (see extract-reference-problems.ts) — surfaced in the workspace whenever a
+// row has translation_error set, or for problems extracted before this
+// column existed (translated_problem null, translation_error also null).
+export async function retranslateReferenceProblemAction(id: string) {
+  await requireRole("principal");
+
+  const supabase = await createServerSupabase();
+  const { data: problem, error: fetchError } = await supabase
+    .from("reference_problems")
+    .select("id, transcribed_problem, transcribed_answer")
+    .eq("id", id)
+    .maybeSingle<Pick<ReferenceProblem, "id" | "transcribed_problem" | "transcribed_answer">>();
+  if (fetchError) throw new Error(fetchError.message);
+  if (!problem) return;
+
+  try {
+    const translated = await translateReferenceProblems([problem]);
+    const t = translated.get(problem.id);
+    await supabase
+      .from("reference_problems")
+      .update(
+        t
+          ? { translated_problem: t.translated_problem, translated_answer: t.translated_answer, translation_error: null }
+          : { translation_error: "번역 응답에서 이 문제를 찾지 못했습니다." },
+      )
+      .eq("id", id);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "번역 중 오류가 발생했습니다.";
+    await supabase.from("reference_problems").update({ translation_error: message }).eq("id", id);
+  }
+
+  revalidatePath(PRACTICE_SHEETS_NEW_PATH);
+}
+
+// --- Diagram crop (reference-problem-crop-dialog.tsx) ---
+
+export type CropSourceResult = { error: string } | { signedUrl: string; mimeType: string };
+
+export async function getReferenceScanCropSourceAction(
+  referenceProblemId: string,
+): Promise<CropSourceResult> {
+  await requireRole("principal");
+  const source = await getReferenceProblemCropSource(referenceProblemId);
+  if (!source) return { error: "원본 스캔을 찾을 수 없습니다." };
+  return source;
+}
+
+export type CropUploadUrlResult = { error: string } | { path: string; signedUrl: string; token: string };
+
+export async function createReferenceCropUploadUrlAction(
+  referenceProblemId: string,
+): Promise<CropUploadUrlResult> {
+  await requireRole("principal");
+
+  // Fixed, deterministic path (unlike scan uploads, which mint a fresh
+  // scanId) so re-cropping the same problem overwrites its old crop instead
+  // of accumulating orphaned files — hence upsert: true here.
+  const path = `crops/${referenceProblemId}.jpg`;
+  return mintSignedUploadUrl(BUCKET, path, { upsert: true });
+}
+
+export async function confirmReferenceCropAction(referenceProblemId: string, storagePath: string) {
+  await requireRole("principal");
+
+  const supabase = await createServerSupabase();
+  const { error } = await supabase
+    .from("reference_problems")
+    .update({ crop_storage_path: storagePath })
+    .eq("id", referenceProblemId);
+  if (error) throw new Error(error.message);
+
+  revalidatePath(PRACTICE_SHEETS_NEW_PATH);
+}
+
+export async function deleteReferenceCropAction(referenceProblemId: string) {
+  await requireRole("principal");
+
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from("reference_problems")
+    .select("crop_storage_path")
+    .eq("id", referenceProblemId)
+    .maybeSingle<Pick<ReferenceProblem, "crop_storage_path">>();
+  if (error) throw new Error(error.message);
+
+  if (data?.crop_storage_path) {
+    const admin = createAdminSupabase();
+    await admin.storage.from(BUCKET).remove([data.crop_storage_path]);
+  }
+
+  const { error: updateError } = await supabase
+    .from("reference_problems")
+    .update({ crop_storage_path: null })
+    .eq("id", referenceProblemId);
+  if (updateError) throw new Error(updateError.message);
 
   revalidatePath(PRACTICE_SHEETS_NEW_PATH);
 }

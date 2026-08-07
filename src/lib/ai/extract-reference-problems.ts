@@ -2,6 +2,7 @@ import "server-only";
 import { GRADING_MODEL, GRADING_EFFORT } from "./claude";
 import { ReferenceExtractionSchema, type ReferenceExtractedItem } from "./reference-extraction-schema";
 import { extractStructuredItems } from "./document-extraction";
+import { translateReferenceProblems } from "./translate-reference-problems";
 import { DEGRADED_GRADING_EFFORT, DEGRADED_PAGES_PER_CHUNK } from "./grading-config";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import type { Concept, ReferenceProblemScan } from "@/lib/supabase/types";
@@ -34,7 +35,8 @@ const REFERENCE_EXTRACTION_INSTRUCTIONS = `당신은 미국 북버지니아(NoVa
 4. concept_code는 아래 제공된 개념 코드 목록 중 이 문제에 가장 가까운 것 하나를 선택하세요. 적절한 항목이 없으면 null로 두세요. 목록에 없는 코드를 만들어내지 마세요.
 5. 이미지를 자르거나 좌표를 반환하지 마세요.
 6. 확신이 서지 않는 부분(글씨 판독 어려움 등)은 confidence_note에 짧게 남기세요. 없으면 null.
-7. items를 절대 빈 배열로 반환하지 마세요. 페이지가 복잡해 보여도 그 안에 실제 문제가 있습니다. 문항을 찾기 어렵다고 느껴지면 페이지를 처음부터 다시 살펴보고 최소 1개 이상을 반드시 추출하세요.`;
+7. items를 절대 빈 배열로 반환하지 마세요. 페이지가 복잡해 보여도 그 안에 실제 문제가 있습니다. 문항을 찾기 어렵다고 느껴지면 페이지를 처음부터 다시 살펴보고 최소 1개 이상을 반드시 추출하세요.
+8. 이 문제를 정확히 풀려면 도형/그래프/표/그림이 반드시 필요한지 has_diagram에 true/false로 표시하세요. 5번 지침은 그대로입니다 — 좌표는 반환하지 마세요, true/false 판단만 하면 됩니다.`;
 
 function buildConceptListText(concepts: Concept[]): string {
   return concepts
@@ -88,6 +90,7 @@ export async function extractReferenceProblems(scanId: string, attempt = 0): Pro
         problem_number: item.problem_number,
         transcribed_problem: item.transcribed_problem,
         transcribed_answer: item.transcribed_answer,
+        has_diagram: item.has_diagram,
         concept_id: concept?.id ?? null,
         ai_confidence_note: item.confidence_note,
         ai_suggested: item,
@@ -99,8 +102,45 @@ export async function extractReferenceProblems(scanId: string, attempt = 0): Pro
       };
     });
 
-    const { error: insertError } = await admin.from("reference_problems").insert(rows);
+    const { data: inserted, error: insertError } = await admin
+      .from("reference_problems")
+      .insert(rows)
+      .select("id, transcribed_problem, transcribed_answer");
     if (insertError) throw new Error(insertError.message);
+
+    // Best-effort: translation runs in the same background job (still well
+    // within the 300s budget for a text-only call) so a scan never sits
+    // "extracted but untranslated" waiting on a teacher to notice and
+    // trigger it manually. A translation failure must never fail extraction
+    // itself — it's recorded per-row via translation_error and retried from
+    // the workspace (retranslateReferenceProblemAction).
+    if (inserted && inserted.length > 0) {
+      try {
+        const translated = await translateReferenceProblems(inserted);
+        await Promise.all(
+          inserted.map((row) => {
+            const t = translated.get(row.id);
+            return admin
+              .from("reference_problems")
+              .update(
+                t
+                  ? { translated_problem: t.translated_problem, translated_answer: t.translated_answer, translation_error: null }
+                  : { translation_error: "번역 응답에서 이 문제를 찾지 못했습니다." },
+              )
+              .eq("id", row.id);
+          }),
+        );
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "번역 중 오류가 발생했습니다.";
+        await admin
+          .from("reference_problems")
+          .update({ translation_error: message })
+          .in(
+            "id",
+            inserted.map((row) => row.id),
+          );
+      }
+    }
   }
 
   const { error: updateError } = await admin

@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/button";
 import { requireRole } from "@/lib/dal";
 import { listStudents, getStudent } from "@/lib/students/queries";
 import { listLearningItems, listConcepts, listScansForStudent } from "@/lib/learning-history/queries";
-import { listReferenceProblems, listReferenceScans } from "@/lib/problem-bank/queries";
+import {
+  listReferenceProblems,
+  listReferenceScans,
+  getSignedReferenceProblemCropUrls,
+} from "@/lib/problem-bank/queries";
 import {
   PracticeSheetGeneratorWorkspace,
   type ItemGroup,
@@ -84,6 +88,19 @@ export default async function NewPracticeSheetPage({
     ]);
   if (!student) notFound();
 
+  // Batched once here (rather than per-card) so the reference-problem list
+  // can show crop thumbnails without a signed-URL round trip per card — see
+  // getSignedReferenceProblemCropUrls.
+  const cropPaths = referenceProblems
+    .map((p) => p.crop_storage_path)
+    .filter((path): path is string => !!path);
+  const cropUrlByPath = await getSignedReferenceProblemCropUrls(cropPaths);
+  const cropThumbnailsByProblemId: Record<string, string> = {};
+  for (const problem of referenceProblems) {
+    const url = problem.crop_storage_path ? cropUrlByPath.get(problem.crop_storage_path) : undefined;
+    if (url) cropThumbnailsByProblemId[problem.id] = url;
+  }
+
   const scansById = new Map(scans.map((s) => [s.id, s]));
   const sessionGroups = new Map<string, typeof wrongAnswerItems>();
   for (const item of wrongAnswerItems) {
@@ -139,6 +156,7 @@ export default async function NewPracticeSheetPage({
             wrongAnswerGroups={wrongAnswerGroups}
             referenceGroups={referenceGroups}
             concepts={concepts}
+            cropThumbnailsByProblemId={cropThumbnailsByProblemId}
           />
         </div>
       </Container>

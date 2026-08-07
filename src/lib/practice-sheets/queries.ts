@@ -1,13 +1,16 @@
 import "server-only";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { createAdminSupabase } from "@/lib/supabase/admin";
-import type { GeneratedProblem, GeneratedWorksheet } from "@/lib/supabase/types";
+import type { GeneratedProblem, GeneratedWorksheet, ReferenceProblem } from "@/lib/supabase/types";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const PROBLEM_BANK_BUCKET = "problem-bank";
+
+export type GeneratedProblemWithCrop = GeneratedProblem & { crop_image_url: string | null };
 
 export async function getPracticeSheetWithProblems(
   worksheetId: string,
-): Promise<{ worksheet: GeneratedWorksheet; problems: GeneratedProblem[] } | null> {
+): Promise<{ worksheet: GeneratedWorksheet; problems: GeneratedProblemWithCrop[] } | null> {
   const supabase = await createServerSupabase();
   const { data: worksheet } = await supabase
     .from("generated_worksheets")
@@ -24,7 +27,52 @@ export async function getPracticeSheetWithProblems(
     .returns<GeneratedProblem[]>();
   if (error) throw new Error(error.message);
 
-  return { worksheet, problems: problems ?? [] };
+  const withCrops = await attachCropImageUrls(problems ?? []);
+  return { worksheet, problems: withCrops };
+}
+
+// Only "reference_verbatim" rows (translated original text, unmodified) may
+// ever be paired with the original figure — an "ai" row (generate-similar-
+// problems.ts) has changed numbers/scenario, so its original diagram would
+// no longer match and must never be attached here.
+async function attachCropImageUrls(problems: GeneratedProblem[]): Promise<GeneratedProblemWithCrop[]> {
+  const verbatimReferenceIds = problems
+    .filter((p) => p.source === "reference_verbatim" && p.source_reference_id)
+    .map((p) => p.source_reference_id as string);
+  if (verbatimReferenceIds.length === 0) {
+    return problems.map((p) => ({ ...p, crop_image_url: null }));
+  }
+
+  const admin = createAdminSupabase();
+  const { data: referenceRows } = await admin
+    .from("reference_problems")
+    .select("id, crop_storage_path")
+    .in("id", verbatimReferenceIds)
+    .returns<Pick<ReferenceProblem, "id" | "crop_storage_path">[]>();
+
+  const cropPathByReferenceId = new Map(
+    (referenceRows ?? [])
+      .filter((r) => r.crop_storage_path)
+      .map((r) => [r.id, r.crop_storage_path as string]),
+  );
+  const paths = [...cropPathByReferenceId.values()];
+
+  let urlByPath = new Map<string, string>();
+  if (paths.length > 0) {
+    const { data: signed } = await admin.storage.from(PROBLEM_BANK_BUCKET).createSignedUrls(paths, 300);
+    if (signed) {
+      urlByPath = new Map(paths.map((path, index) => [path, signed[index]?.signedUrl ?? ""]));
+    }
+  }
+
+  return problems.map((p) => {
+    if (p.source !== "reference_verbatim" || !p.source_reference_id) {
+      return { ...p, crop_image_url: null };
+    }
+    const path = cropPathByReferenceId.get(p.source_reference_id);
+    const url = path ? urlByPath.get(path) : undefined;
+    return { ...p, crop_image_url: url || null };
+  });
 }
 
 // Public "check my answers" lookup for the QR code printed on a practice

@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { ConfirmSubmitButton } from "@/components/dashboard/confirm-submit-button";
 import { GradingStatusPoller } from "@/components/dashboard/grading-status-poller";
 import { ReferenceScanUploadForm } from "@/components/dashboard/reference-scan-upload-form";
+import { ReferenceProblemCropDialog } from "@/components/dashboard/reference-problem-crop-dialog";
 import { ERROR_TYPE_LABELS } from "@/lib/learning-history/schema";
 import { deleteLearningItemAction } from "@/lib/learning-history/actions";
 import { generatePracticeSheetAction } from "@/lib/practice-sheets/actions";
@@ -15,6 +16,8 @@ import {
   deleteReferenceProblemAction,
   deleteReferenceScanAction,
   retryReferenceExtractionAction,
+  retranslateReferenceProblemAction,
+  deleteReferenceCropAction,
 } from "@/lib/problem-bank/actions";
 import type { Concept, LearningItem, ReferenceProblem, ReferenceProblemScan } from "@/lib/supabase/types";
 import { isGradingStuck } from "@/lib/scan-status";
@@ -63,25 +66,45 @@ function toggleGroupSelection(
 // the reference section) since it's the entry point most sessions start
 // from, and the two lists live behind a tab switch with collapsible groups
 // so a long problem-bank history doesn't turn this into one giant scroll.
+// "similar" (AI-rewritten, default — matches prior behavior) vs "verbatim"
+// (translated original text + crop image, printed as-is). Absent from the
+// map is treated as "similar", so existing selections behave unchanged.
+type ReferenceMode = "similar" | "verbatim";
+
 export function PracticeSheetGeneratorWorkspace({
   studentId,
   wrongAnswerGroups,
   referenceGroups,
   concepts,
+  cropThumbnailsByProblemId,
 }: {
   studentId: string;
   wrongAnswerGroups: ItemGroup[];
   referenceGroups: ReferenceScanGroup[];
   concepts: Concept[];
+  cropThumbnailsByProblemId: Record<string, string>;
 }) {
   const [selectedWrongAnswers, setSelectedWrongAnswers] = React.useState<Record<string, boolean>>(
     {},
   );
   const [selectedReferences, setSelectedReferences] = React.useState<Record<string, boolean>>({});
+  const [referenceMode, setReferenceMode] = React.useState<Record<string, ReferenceMode>>({});
+  const [cropDialogProblemId, setCropDialogProblemId] = React.useState<string | null>(null);
   const [conceptFilter, setConceptFilter] = React.useState("");
   const [countPerItem, setCountPerItem] = React.useState(3);
   const [error, setError] = React.useState<string | null>(null);
   const [isPending, startTransition] = React.useTransition();
+
+  function modeOf(id: string): ReferenceMode {
+    return referenceMode[id] ?? "similar";
+  }
+  function setModeForIds(ids: string[], mode: ReferenceMode) {
+    setReferenceMode((prev) => {
+      const next = { ...prev };
+      for (const id of ids) next[id] = mode;
+      return next;
+    });
+  }
 
   const hasNoWrongAnswers = wrongAnswerGroups.every((g) => g.items.length === 0);
   const [activeTab, setActiveTab] = React.useState<"wrong" | "reference">(() =>
@@ -141,6 +164,16 @@ export function PracticeSheetGeneratorWorkspace({
     setSelectedReferences((prev) => ({ ...prev, [id]: !prev[id] }));
   }
 
+  // Verbatim reprints copy translated_problem/translated_answer as-is (see
+  // generatePracticeSheetAction) — there's no "similar variant" concept for
+  // them, so count is always 1 regardless of the shared 문항당 개수 selector,
+  // which only applies to AI-rewritten (similar) items.
+  function referenceSelection(itemId: string) {
+    return modeOf(itemId) === "verbatim"
+      ? { sourceType: "reference_verbatim" as const, itemId, count: 1 }
+      : { sourceType: "reference" as const, itemId, count: countPerItem };
+  }
+
   function handleGenerate() {
     setError(null);
     const selections = [
@@ -149,11 +182,7 @@ export function PracticeSheetGeneratorWorkspace({
         itemId,
         count: countPerItem,
       })),
-      ...selectedReferenceIds.map((itemId) => ({
-        sourceType: "reference" as const,
-        itemId,
-        count: countPerItem,
-      })),
+      ...selectedReferenceIds.map(referenceSelection),
     ];
     startTransition(async () => {
       const result = await generatePracticeSheetAction(studentId, selections);
@@ -168,11 +197,7 @@ export function PracticeSheetGeneratorWorkspace({
   // 문항으로 생성" button below, which respects the full current selection.
   function handleGenerateFromScan(itemIds: string[]) {
     setError(null);
-    const selections = itemIds.map((itemId) => ({
-      sourceType: "reference" as const,
-      itemId,
-      count: countPerItem,
-    }));
+    const selections = itemIds.map(referenceSelection);
     startTransition(async () => {
       const result = await generatePracticeSheetAction(studentId, selections);
       if (result && "error" in result) {
@@ -391,13 +416,35 @@ export function PracticeSheetGeneratorWorkspace({
                         </button>
                         <div className="flex flex-wrap items-center gap-2">
                           {canSelectAll && (
-                            <button
-                              type="button"
-                              onClick={() => toggleGroupSelection(filteredItems, setSelectedReferences)}
-                              className="text-xs font-medium text-navy-600 hover:underline"
-                            >
-                              {allSelected ? "전체 해제" : "전체 선택"}
-                            </button>
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => toggleGroupSelection(filteredItems, setSelectedReferences)}
+                                className="text-xs font-medium text-navy-600 hover:underline"
+                              >
+                                {allSelected ? "전체 해제" : "전체 선택"}
+                              </button>
+                              <span className="text-xs text-navy-300">|</span>
+                              <span className="text-xs text-navy-500">그룹 전체 방식:</span>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setModeForIds(filteredItems.map((i) => i.id), "verbatim")
+                                }
+                                className="text-xs font-medium text-navy-600 hover:underline"
+                              >
+                                원본
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setModeForIds(filteredItems.map((i) => i.id), "similar")
+                                }
+                                className="text-xs font-medium text-navy-600 hover:underline"
+                              >
+                                유사문제
+                              </button>
+                            </>
                           )}
                           {isFastPathReady && (
                             <button
@@ -464,6 +511,12 @@ export function PracticeSheetGeneratorWorkspace({
                                 const concept = problem.concept_id
                                   ? conceptById.get(problem.concept_id)
                                   : undefined;
+                                const mode = modeOf(problem.id);
+                                const cropUrl = cropThumbnailsByProblemId[problem.id];
+                                const needsTranslationRetry =
+                                  !problem.translated_problem && !!problem.translation_error;
+                                const translationPending =
+                                  !problem.translated_problem && !problem.translation_error;
                                 return (
                                   <div
                                     key={problem.id}
@@ -477,9 +530,23 @@ export function PracticeSheetGeneratorWorkspace({
                                         onChange={() => toggleReference(problem.id)}
                                       />
                                       <div className="flex-1">
-                                        <p className="text-xs font-semibold uppercase tracking-wide text-navy-500">
-                                          {concept ? `${concept.strand} · ${concept.label_ko}` : "미분류"}
-                                        </p>
+                                        <div className="flex flex-wrap items-center gap-1.5">
+                                          <p className="text-xs font-semibold uppercase tracking-wide text-navy-500">
+                                            {concept ? `${concept.strand} · ${concept.label_ko}` : "미분류"}
+                                          </p>
+                                          {problem.has_diagram && (
+                                            <span
+                                              className={cn(
+                                                "rounded-full px-2 py-0.5 text-[10px] font-medium",
+                                                cropUrl
+                                                  ? "bg-teal-100 text-teal-700"
+                                                  : "bg-amber-100 text-amber-700",
+                                              )}
+                                            >
+                                              {cropUrl ? "도형 포함 · 크롭 완료" : "도형 포함 · 크롭 필요"}
+                                            </span>
+                                          )}
+                                        </div>
                                         <p className="mt-1 text-sm text-navy-900">
                                           {problem.problem_number && (
                                             <span className="mr-2 font-medium">
@@ -488,6 +555,86 @@ export function PracticeSheetGeneratorWorkspace({
                                           )}
                                           {problem.transcribed_problem}
                                         </p>
+                                        {mode === "verbatim" && (
+                                          <p className="mt-1 text-xs text-navy-500">
+                                            {problem.translated_problem ??
+                                              (translationPending ? "번역 대기 중..." : "번역 실패")}
+                                          </p>
+                                        )}
+
+                                        <div className="mt-2 flex flex-wrap items-center gap-2">
+                                          <div className="inline-flex rounded-full border border-navy-200 p-0.5 text-xs">
+                                            <button
+                                              type="button"
+                                              onClick={() => setModeForIds([problem.id], "similar")}
+                                              className={cn(
+                                                "rounded-full px-2 py-0.5 font-medium",
+                                                mode === "similar"
+                                                  ? "bg-navy-900 text-white"
+                                                  : "text-navy-600",
+                                              )}
+                                            >
+                                              유사문제
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={() => setModeForIds([problem.id], "verbatim")}
+                                              className={cn(
+                                                "rounded-full px-2 py-0.5 font-medium",
+                                                mode === "verbatim"
+                                                  ? "bg-navy-900 text-white"
+                                                  : "text-navy-600",
+                                              )}
+                                            >
+                                              원본 그대로
+                                            </button>
+                                          </div>
+
+                                          {needsTranslationRetry && (
+                                            <form
+                                              action={retranslateReferenceProblemAction.bind(null, problem.id)}
+                                            >
+                                              <button
+                                                type="submit"
+                                                className="rounded-md border border-red-200 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
+                                              >
+                                                번역 다시 시도
+                                              </button>
+                                            </form>
+                                          )}
+
+                                          {problem.has_diagram && (
+                                            <>
+                                              {cropUrl && (
+                                                // eslint-disable-next-line @next/next/no-img-element -- signed Supabase Storage URL, not a static asset
+                                                <img
+                                                  src={cropUrl}
+                                                  alt=""
+                                                  className="h-10 w-10 rounded-md border border-navy-200 object-cover"
+                                                />
+                                              )}
+                                              <button
+                                                type="button"
+                                                onClick={() => setCropDialogProblemId(problem.id)}
+                                                className="rounded-md border border-navy-200 px-2 py-1 text-xs font-medium text-navy-600 hover:bg-navy-50"
+                                              >
+                                                {cropUrl ? "크롭 수정" : "크롭 추가"}
+                                              </button>
+                                              {cropUrl && (
+                                                <form
+                                                  action={deleteReferenceCropAction.bind(null, problem.id)}
+                                                >
+                                                  <button
+                                                    type="submit"
+                                                    className="rounded-md border border-red-200 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
+                                                  >
+                                                    크롭 삭제
+                                                  </button>
+                                                </form>
+                                              )}
+                                            </>
+                                          )}
+                                        </div>
                                       </div>
                                     </label>
                                     <form action={deleteReferenceProblemAction.bind(null, problem.id)}>
@@ -531,6 +678,7 @@ export function PracticeSheetGeneratorWorkspace({
                 ))}
               </Select>
               개 생성
+              <span className="text-xs text-navy-400">(유사문제 항목에만 적용)</span>
             </label>
           </div>
           <div className="flex items-center gap-3">
@@ -540,11 +688,19 @@ export function PracticeSheetGeneratorWorkspace({
               onClick={handleGenerate}
               disabled={totalSelected === 0 || isPending}
             >
-              {isPending ? "생성 중..." : "유사문제 생성"}
+              {isPending ? "생성 중..." : "선택한 문항으로 생성"}
             </Button>
           </div>
         </div>
       </div>
+
+      {cropDialogProblemId && (
+        <ReferenceProblemCropDialog
+          referenceProblemId={cropDialogProblemId}
+          onClose={() => setCropDialogProblemId(null)}
+          onSaved={() => setCropDialogProblemId(null)}
+        />
+      )}
     </div>
   );
 }

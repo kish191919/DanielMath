@@ -10,6 +10,10 @@ export const ReferenceExtractedItemSchema = z.object({
   // 사후 매칭된다 (개념은 교사가 편집 가능하므로 스키마 레벨 enum이 아님).
   concept_code: z.string().nullable(),
   confidence_note: z.string().nullable(),
+  // 이 문제를 정확히 풀려면 도형/그래프/표/그림이 반드시 필요한지 여부.
+  // 좌표나 크롭된 이미지 자체는 여전히 반환하지 않는다(아래 지침 5) — 교사가
+  // reference-problem-crop-dialog.tsx에서 직접 잘라 붙인다.
+  has_diagram: z.boolean(),
 });
 
 export const ReferenceExtractionSchema = z.object({

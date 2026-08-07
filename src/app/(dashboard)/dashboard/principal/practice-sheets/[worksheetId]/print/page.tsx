@@ -157,11 +157,21 @@ export default async function PracticeSheetPrintPage({
                     key={problem.id}
                     className="mb-6 break-inside-avoid rounded-xl border border-navy-200 p-4 [page-break-inside:avoid]"
                   >
-                    <div className="flex items-start gap-2.5">
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-navy-900 text-xs font-bold text-white">
-                        {column.startIndex + localIndex + 1}
-                      </span>
-                      <p className="text-sm font-medium text-navy-900">{problem.problem_text}</p>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+                      <div className="flex flex-1 items-start gap-2.5">
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-navy-900 text-xs font-bold text-white">
+                          {column.startIndex + localIndex + 1}
+                        </span>
+                        <p className="text-sm font-medium text-navy-900">{problem.problem_text}</p>
+                      </div>
+                      {problem.crop_image_url && (
+                        // eslint-disable-next-line @next/next/no-img-element -- signed Supabase Storage URL, not a static asset
+                        <img
+                          src={problem.crop_image_url}
+                          alt=""
+                          className="max-w-[40%] shrink-0 rounded-md border border-navy-200 object-contain print:max-w-[35%]"
+                        />
+                      )}
                     </div>
                     <div className="mt-8 border-b border-navy-300">&nbsp;</div>
                   </li>

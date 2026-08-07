@@ -18,6 +18,13 @@ export const PRACTICE_GEN_MODEL = process.env.ANTHROPIC_PRACTICE_GEN_MODEL || "c
 export const PRACTICE_GEN_EFFORT = (process.env.ANTHROPIC_PRACTICE_GEN_EFFORT ||
   "medium") as "low" | "medium" | "high" | "xhigh" | "max";
 
+// Translation is a direct text-only rendering (no invention, no vision), so
+// it defaults lower effort than even PRACTICE_GEN_EFFORT.
+export const TRANSLATION_MODEL = process.env.ANTHROPIC_TRANSLATION_MODEL || "claude-sonnet-5";
+
+export const TRANSLATION_EFFORT = (process.env.ANTHROPIC_TRANSLATION_EFFORT ||
+  "low") as "low" | "medium" | "high" | "xhigh" | "max";
+
 export function getClaudeClient() {
   return new Anthropic();
 }

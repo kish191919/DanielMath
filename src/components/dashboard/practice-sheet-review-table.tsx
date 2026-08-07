@@ -6,11 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { confirmPracticeSheetAction } from "@/lib/practice-sheets/actions";
 import type { PracticeProblemInputValues } from "@/lib/practice-sheets/schema";
-import type { GeneratedProblem } from "@/lib/supabase/types";
+import type { GeneratedProblemWithCrop } from "@/lib/practice-sheets/queries";
 
-type Row = PracticeProblemInputValues & { clientKey: string };
+type Row = PracticeProblemInputValues & { clientKey: string; crop_image_url?: string | null };
 
-function toRow(problem: GeneratedProblem): Row {
+function toRow(problem: GeneratedProblemWithCrop): Row {
   return {
     clientKey: problem.id,
     id: problem.id,
@@ -21,6 +21,7 @@ function toRow(problem: GeneratedProblem): Row {
     concept_id: problem.concept_id,
     source: problem.source,
     edited_by_teacher: problem.edited_by_teacher,
+    crop_image_url: problem.crop_image_url,
   };
 }
 
@@ -43,7 +44,7 @@ export function PracticeSheetReviewTable({
   readOnly,
 }: {
   worksheetId: string;
-  initialProblems: GeneratedProblem[];
+  initialProblems: GeneratedProblemWithCrop[];
   initialTitle: string | null;
   readOnly: boolean;
 }) {
@@ -82,8 +83,9 @@ export function PracticeSheetReviewTable({
     }
     setIsSaving(true);
     const payload = rows.map((row): PracticeProblemInputValues => {
-      const { clientKey, ...rest } = row;
+      const { clientKey, crop_image_url, ...rest } = row;
       void clientKey;
+      void crop_image_url;
       return rest;
     });
     const result = await confirmPracticeSheetAction(worksheetId, payload, title.trim());
@@ -151,9 +153,28 @@ export function PracticeSheetReviewTable({
             />
           </div>
 
+          {row.crop_image_url && (
+            <div className="mt-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-navy-500">
+                원본 도형 (재크롭은 문제 생성 화면에서)
+              </p>
+              {/* eslint-disable-next-line @next/next/no-img-element -- signed Supabase Storage URL, not a static asset */}
+              <img
+                src={row.crop_image_url}
+                alt=""
+                className="mt-1 max-h-40 rounded-md border border-navy-200 object-contain"
+              />
+            </div>
+          )}
+
           {row.source === "ai" && (
             <p className="mt-2 text-xs text-navy-500">
               AI 생성{row.edited_by_teacher ? " (수정됨)" : ""}
+            </p>
+          )}
+          {row.source === "reference_verbatim" && (
+            <p className="mt-2 text-xs text-navy-500">
+              원본 그대로{row.edited_by_teacher ? " (수정됨)" : ""}
             </p>
           )}
         </div>
