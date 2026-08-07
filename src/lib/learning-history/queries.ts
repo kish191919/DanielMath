@@ -589,19 +589,36 @@ export async function listAttendanceForParent(
   const nextMonthStart = `${shiftMonth(month, 1)}-01`;
 
   const supabase = await createServerSupabase();
-  const { data, error } = await supabase
-    .from("class_session_attendance")
-    .select("status, class_sessions!inner(session_date)")
-    .eq("student_id", studentId)
-    .gte("class_sessions.session_date", monthStart)
-    .lt("class_sessions.session_date", nextMonthStart)
-    .returns<{ status: AttendanceStatus; class_sessions: { session_date: string } }[]>();
-  if (error) throw new Error(error.message);
+  const [attendanceResult, scanResult] = await Promise.all([
+    supabase
+      .from("class_session_attendance")
+      .select("status, class_sessions!inner(session_date)")
+      .eq("student_id", studentId)
+      .gte("class_sessions.session_date", monthStart)
+      .lt("class_sessions.session_date", nextMonthStart)
+      .returns<{ status: AttendanceStatus; class_sessions: { session_date: string } }[]>(),
+    supabase
+      .from("worksheet_scans")
+      .select("session_date")
+      .eq("student_id", studentId)
+      .neq("status", "grading_failed")
+      .gte("session_date", monthStart)
+      .lt("session_date", nextMonthStart)
+      .returns<{ session_date: string }[]>(),
+  ]);
+  if (attendanceResult.error) throw new Error(attendanceResult.error.message);
+  if (scanResult.error) throw new Error(scanResult.error.message);
 
-  return (data ?? []).map((row) => ({
-    date: row.class_sessions.session_date,
-    status: row.status,
-  }));
+  const statusByDate = new Map<string, AttendanceStatus>(
+    (attendanceResult.data ?? []).map((row) => [row.class_sessions.session_date, row.status]),
+  );
+  // A worksheet upload is direct evidence the student attended, so it wins
+  // over any attendance record already logged for the same date.
+  for (const row of scanResult.data ?? []) {
+    statusByDate.set(row.session_date, "present");
+  }
+
+  return [...statusByDate.entries()].map(([date, status]) => ({ date, status }));
 }
 
 // Batched counterpart of the old per-note getSignedScanViewUrlForParent —

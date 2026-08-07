@@ -101,7 +101,7 @@ export interface ClassEnrollment {
   created_at: string;
 }
 
-export type AttendanceStatus = "present" | "absent" | "late";
+export type AttendanceStatus = "present" | "absent";
 export type HomeworkStatus = "done" | "partial" | "not_done" | "na";
 
 export interface ClassSession {

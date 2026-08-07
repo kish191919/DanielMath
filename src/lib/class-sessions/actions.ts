@@ -76,8 +76,7 @@ export async function createClassSessionAction(
   if (rosterData.roster.length > 0) {
     const attendanceRows = rosterData.roster.map(({ student }) => {
       const submittedStatus = formData.get(`status_${student.id}`);
-      const status: AttendanceStatus =
-        submittedStatus === "absent" || submittedStatus === "late" ? submittedStatus : "present";
+      const status: AttendanceStatus = submittedStatus === "absent" ? "absent" : "present";
 
       const submittedHomework = formData.get(`homework_${student.id}`);
       const homework_status: HomeworkStatus = HOMEWORK_STATUSES.includes(

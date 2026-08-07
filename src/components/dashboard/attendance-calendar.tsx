@@ -8,7 +8,6 @@ import type { AttendanceCalendarEntry } from "@/lib/learning-history/queries";
 const STATUS_CLASSNAMES: Record<AttendanceStatus, string> = {
   present: "border-green-300 bg-green-100 text-green-800",
   absent: "border-red-300 bg-red-100 text-red-800",
-  late: "border-amber-300 bg-amber-100 text-amber-800",
 };
 
 const WEEKDAY_LABELS_KO = ["일", "월", "화", "수", "목", "금", "토"];

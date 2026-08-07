@@ -57,7 +57,6 @@ export function ClassSessionLogList({
                   <p className="text-xs text-navy-500">
                     {summary.present}/{summary.total}명 출석
                     {summary.absentNames.length > 0 && ` · 결석: ${summary.absentNames.join(", ")}`}
-                    {summary.lateNames.length > 0 && ` · 지각: ${summary.lateNames.join(", ")}`}
                   </p>
                 )}
                 {summary && summary.total - summary.homeworkNa > 0 && (

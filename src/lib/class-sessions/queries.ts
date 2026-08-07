@@ -33,9 +33,7 @@ export type AttendanceSummary = {
   total: number;
   present: number;
   absent: number;
-  late: number;
   absentNames: string[];
-  lateNames: string[];
   homeworkDone: number;
   homeworkPartial: number;
   homeworkNotDone: number;
@@ -77,9 +75,7 @@ export async function listAttendanceSummaries(
       total: 0,
       present: 0,
       absent: 0,
-      late: 0,
       absentNames: [],
-      lateNames: [],
       homeworkDone: 0,
       homeworkPartial: 0,
       homeworkNotDone: 0,
@@ -92,10 +88,6 @@ export async function listAttendanceSummaries(
     if (row.status === "absent") {
       summary.absent += 1;
       summary.absentNames.push(studentName);
-    }
-    if (row.status === "late") {
-      summary.late += 1;
-      summary.lateNames.push(studentName);
     }
     if (row.homework_status === "done") summary.homeworkDone += 1;
     if (row.homework_status === "partial") summary.homeworkPartial += 1;

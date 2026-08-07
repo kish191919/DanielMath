@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { ZoomableMedia } from "@/components/dashboard/zoomable-media";
 
 interface WorksheetPdfViewerProps {
   url: string;
@@ -66,7 +67,7 @@ export function WorksheetPdfViewer({ url }: WorksheetPdfViewerProps) {
   }
 
   return (
-    <div className="flex flex-col gap-2 bg-navy-50/40 p-2 [touch-action:pan-y_pinch-zoom]">
+    <div className="flex flex-col gap-2 bg-navy-50/40 p-2 touch-pan-y">
       {status === "loading" && pages.length === 0 && (
         <p className="py-16 text-center text-sm text-navy-500 font-ko" lang="ko">
           불러오는 중...
@@ -116,8 +117,12 @@ function PdfPage({ page }: { page: PDFPageProxy }) {
   }, [page]);
 
   return (
-    <div ref={containerRef} className="overflow-hidden rounded-md bg-white">
+    <ZoomableMedia
+      ref={containerRef}
+      label="학습지 페이지"
+      className="overflow-hidden rounded-md bg-white"
+    >
       <canvas ref={canvasRef} className="h-auto w-full" />
-    </div>
+    </ZoomableMedia>
   );
 }

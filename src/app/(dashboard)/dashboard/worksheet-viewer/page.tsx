@@ -3,6 +3,7 @@ import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
 import { WorksheetViewerCloseButton } from "@/components/dashboard/worksheet-viewer-close-button";
 import { WorksheetPdfViewer } from "@/components/dashboard/worksheet-pdf-viewer";
+import { ZoomableMedia } from "@/components/dashboard/zoomable-media";
 import { requireSession } from "@/lib/dal";
 
 // Only ever linked to with a signed URL we generated for the current
@@ -40,12 +41,14 @@ export default async function WorksheetViewerPage({
           {isPdf ? (
             <WorksheetPdfViewer url={url} />
           ) : (
-            // eslint-disable-next-line @next/next/no-img-element -- signed Supabase URL, not a static asset
-            <img
-              src={url}
-              alt="원본 학습지"
-              className="max-h-[80vh] w-full object-contain [touch-action:pan-y_pinch-zoom]"
-            />
+            <ZoomableMedia label="원본 학습지 이미지" className="max-h-[80vh]">
+              {/* eslint-disable-next-line @next/next/no-img-element -- signed Supabase URL, not a static asset */}
+              <img
+                src={url}
+                alt="원본 학습지"
+                className="max-h-[80vh] w-full object-contain"
+              />
+            </ZoomableMedia>
           )}
         </div>
       </Container>
