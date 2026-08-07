@@ -86,11 +86,15 @@ export async function compressImageFileToJpeg(
 // Mirrors compressFrameToJpeg's approach: render each page to a canvas
 // (reusing the same pdfjs-dist pattern as worksheet-pdf-viewer.tsx), JPEG-
 // compress it, and reassemble.
-export async function compressPdfFile(
+// Extracted from compressPdfFile so multi-file selection can pull the JPEG
+// pages of a directly-picked PDF into a larger merged page list (see
+// use-worksheet-upload.ts's resolveUploadFile) without assembling an
+// intermediate single-file PDF first.
+export async function pdfFileToJpegBlobs(
   file: File,
   maxDimension = MAX_DIMENSION_PX,
   quality = JPEG_QUALITY,
-): Promise<Blob> {
+): Promise<Blob[]> {
   const pdfjs = await import("pdfjs-dist");
   pdfjs.GlobalWorkerOptions.workerSrc = new URL(
     "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -113,10 +117,18 @@ export async function compressPdfFile(
       await page.render({ canvas, canvasContext: ctx, viewport }).promise;
       pages.push(await compressFrameToJpeg(canvas, maxDimension, quality));
     }
-    return assembleScanPdf(pages);
+    return pages;
   } finally {
     doc.destroy();
   }
+}
+
+export async function compressPdfFile(
+  file: File,
+  maxDimension = MAX_DIMENSION_PX,
+  quality = JPEG_QUALITY,
+): Promise<Blob> {
+  return assembleScanPdf(await pdfFileToJpegBlobs(file, maxDimension, quality));
 }
 
 export async function assembleScanPdf(pages: Blob[]): Promise<Blob> {

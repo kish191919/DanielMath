@@ -96,6 +96,7 @@ export function UploadForm({ students }: { students: Student[] }) {
         <input
           type="file"
           accept="image/jpeg,image/png,application/pdf"
+          multiple
           disabled={isBusy}
           onChange={handleFileChange}
           className="block w-full text-sm text-navy-700 file:mr-4 file:rounded-md file:border-0 file:bg-navy-900 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-navy-800"

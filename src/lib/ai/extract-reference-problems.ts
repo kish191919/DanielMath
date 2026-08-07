@@ -85,6 +85,11 @@ export async function extractReferenceProblems(scanId: string, attempt = 0): Pro
     pagesPerChunk: 1,
     chunkThresholdPages: 1,
     chunkConcurrency: "full",
+    // extended thinking은 effort를 낮춰도 꺼지지 않는다 — 이 작업은 페이지에
+    // 적힌 문제를 그대로 옮겨 적고 개념 코드 하나를 고르는 단순 전사이지,
+    // 깊은 추론이 필요한 문제 풀이가 아니므로 thinking 자체를 꺼서 그 단계를
+    // 통째로 건너뛴다. 이게 지연시간에 effort보다 훨씬 큰 영향을 준다.
+    thinking: "disabled",
     label: "문제 추출",
     logId: `extractReferenceProblems scan ${scanId} attempt ${attempt}`,
   });

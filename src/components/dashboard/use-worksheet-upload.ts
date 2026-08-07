@@ -7,6 +7,7 @@ import {
   assembleScanPdf,
   compressImageFileToJpeg,
   compressPdfFile,
+  pdfFileToJpegBlobs,
   type CapturedPage,
 } from "@/lib/images/build-scan-pdf";
 
@@ -19,7 +20,7 @@ export type UploadStatus = "idle" | "uploading" | "saving";
 // review page — the two differ only in which fields they collect and what
 // they pass through to confirmUploadAction.
 export function useWorksheetUpload() {
-  const [pickedFile, setPickedFile] = React.useState<File | null>(null);
+  const [pickedFiles, setPickedFiles] = React.useState<File[] | null>(null);
   const [cameraPages, setCameraPages] = React.useState<CapturedPage[] | null>(null);
   const [showCamera, setShowCamera] = React.useState(false);
   const [cameraSupported, setCameraSupported] = React.useState(false);
@@ -42,9 +43,9 @@ export function useWorksheetUpload() {
   }, []);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const next = e.target.files?.[0] ?? null;
+    const next = e.target.files && e.target.files.length > 0 ? Array.from(e.target.files) : null;
     if (next) clearCameraPages();
-    setPickedFile(next);
+    setPickedFiles(next);
   }
 
   function clearCameraPages() {
@@ -59,12 +60,28 @@ export function useWorksheetUpload() {
     cameraPages?.forEach((p) => {
       if (!nextIds.has(p.id)) URL.revokeObjectURL(p.previewUrl);
     });
-    setPickedFile(null);
+    setPickedFiles(null);
     setCameraPages(pages);
     setShowCamera(false);
   }
 
   async function resolveUploadFile(): Promise<File | null> {
+    if (pickedFiles && pickedFiles.length > 1) {
+      // Multiple directly-picked files are merged into one PDF in selection
+      // order, same output shape as a multi-page camera capture — see
+      // pdfFileToJpegBlobs/assembleScanPdf in build-scan-pdf.ts.
+      const pages: Blob[] = [];
+      for (const f of pickedFiles) {
+        if (f.type === "application/pdf") {
+          pages.push(...(await pdfFileToJpegBlobs(f)));
+        } else {
+          pages.push(await compressImageFileToJpeg(f));
+        }
+      }
+      const pdfBlob = await assembleScanPdf(pages);
+      return new File([pdfBlob], "scan.pdf", { type: "application/pdf" });
+    }
+    const pickedFile = pickedFiles?.[0] ?? null;
     if (pickedFile) {
       // Camera-captured pages are already resized/compressed by
       // assembleScanPdf below; directly picked files aren't, so a multi-MB
@@ -152,7 +169,7 @@ export function useWorksheetUpload() {
   }
 
   return {
-    pickedFile,
+    pickedFiles,
     cameraPages,
     showCamera,
     setShowCamera,

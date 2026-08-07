@@ -31,9 +31,14 @@ export async function translateReferenceProblems(
   const itemsText = items.map(buildItemText).join("\n\n");
 
   const client = getClaudeClient();
+  // Claude Sonnet 5 runs adaptive thinking by default when `thinking` is
+  // omitted (it isn't optional-off like older models) — this is literal
+  // translation with nothing to reason about, so disable it explicitly to
+  // skip that extra pass rather than paying its latency for no benefit.
   const response = await client.messages.parse({
     model: TRANSLATION_MODEL,
     max_tokens: 8192,
+    thinking: { type: "disabled" },
     output_config: {
       format: zodOutputFormat(ReferenceTranslationSchema),
       effort: TRANSLATION_EFFORT,

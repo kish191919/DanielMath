@@ -118,6 +118,12 @@ export interface ExtractStructuredItemsOptions<T> {
   // 처음부터 동시에 실행한다 (캐시 적중은 못 받지만 전체 지연시간이
   // max(모든 청크)로 줄어든다).
   chunkConcurrency?: "staged" | "full";
+  // "adaptive"(기본) — extended thinking을 켜서 모델이 스스로 얼마나
+  // 생각할지 정하게 한다. effort를 낮춰도 thinking 자체는 켜져 있으므로
+  // (Claude Sonnet 5는 adaptive가 유일한 on-mode) 여전히 추론 단계를 거친다.
+  // 채점처럼 정확한 판단이 필요한 작업엔 유지하되, 단순 전사 작업은
+  // "disabled"로 꺼서 추론 단계를 아예 건너뛰면 지연시간이 크게 줄어든다.
+  thinking?: "adaptive" | "disabled";
 }
 
 // 파일을 다운로드해 (PDF면 필요시 청킹한 뒤) Claude 구조화 출력으로 보내고,
@@ -139,6 +145,7 @@ export async function extractStructuredItems<T>(
     pagesPerChunk = PAGES_PER_CHUNK,
     chunkThresholdPages = CHUNK_THRESHOLD_PAGES,
     chunkConcurrency = "staged",
+    thinking = "adaptive",
   } = options;
 
   const buffer = await downloadBuffer(bucket, storagePath);
@@ -164,7 +171,7 @@ export async function extractStructuredItems<T>(
     const stream = client.messages.stream({
       model,
       max_tokens: MAX_TOKENS_PER_CALL,
-      thinking: { type: "adaptive" },
+      thinking: { type: thinking },
       system: systemBlocks,
       output_config: { format: zodOutputFormat(itemsSchema), effort },
       messages: [{ role: "user", content }],

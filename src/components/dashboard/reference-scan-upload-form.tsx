@@ -10,6 +10,7 @@ import { createBrowserSupabase } from "@/lib/supabase/browser";
 import {
   assembleScanPdf,
   compressImageFileToJpeg,
+  pdfFileToJpegBlobs,
   type CapturedPage,
 } from "@/lib/images/build-scan-pdf";
 import { CameraCapture } from "@/components/dashboard/camera-capture";
@@ -24,7 +25,7 @@ const BUCKET = "problem-bank";
 // 생성" fast path in the workspace component).
 export function ReferenceScanUploadForm({ onUploaded }: { onUploaded: (scanId: string) => void }) {
   const router = useRouter();
-  const [pickedFile, setPickedFile] = React.useState<File | null>(null);
+  const [pickedFiles, setPickedFiles] = React.useState<File[] | null>(null);
   const [cameraPages, setCameraPages] = React.useState<CapturedPage[] | null>(null);
   const [showCamera, setShowCamera] = React.useState(false);
   const [cameraSupported, setCameraSupported] = React.useState(false);
@@ -44,9 +45,9 @@ export function ReferenceScanUploadForm({ onUploaded }: { onUploaded: (scanId: s
   }, []);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const next = e.target.files?.[0] ?? null;
+    const next = e.target.files && e.target.files.length > 0 ? Array.from(e.target.files) : null;
     if (next) clearCameraPages();
-    setPickedFile(next);
+    setPickedFiles(next);
   }
 
   function clearCameraPages() {
@@ -59,12 +60,27 @@ export function ReferenceScanUploadForm({ onUploaded }: { onUploaded: (scanId: s
     cameraPages?.forEach((p) => {
       if (!nextIds.has(p.id)) URL.revokeObjectURL(p.previewUrl);
     });
-    setPickedFile(null);
+    setPickedFiles(null);
     setCameraPages(pages);
     setShowCamera(false);
   }
 
   async function resolveUploadFile(): Promise<File | null> {
+    if (pickedFiles && pickedFiles.length > 1) {
+      // Multiple directly-picked files are merged into one PDF in selection
+      // order, same output shape as a multi-page camera capture.
+      const pages: Blob[] = [];
+      for (const f of pickedFiles) {
+        if (f.type === "application/pdf") {
+          pages.push(...(await pdfFileToJpegBlobs(f)));
+        } else {
+          pages.push(await compressImageFileToJpeg(f));
+        }
+      }
+      const pdfBlob = await assembleScanPdf(pages);
+      return new File([pdfBlob], "problem.pdf", { type: "application/pdf" });
+    }
+    const pickedFile = pickedFiles?.[0] ?? null;
     if (pickedFile) {
       if (pickedFile.type === "image/jpeg" || pickedFile.type === "image/png") {
         const compressed = await compressImageFileToJpeg(pickedFile);
@@ -129,7 +145,7 @@ export function ReferenceScanUploadForm({ onUploaded }: { onUploaded: (scanId: s
       return;
     }
 
-    setPickedFile(null);
+    setPickedFiles(null);
     clearCameraPages();
     setStatus("idle");
     onUploaded(urlResult.scanId);
@@ -165,6 +181,7 @@ export function ReferenceScanUploadForm({ onUploaded }: { onUploaded: (scanId: s
         <input
           type="file"
           accept="image/jpeg,image/png,application/pdf"
+          multiple
           disabled={isBusy}
           onChange={handleFileChange}
           className="block w-full text-sm text-navy-700 file:mr-4 file:rounded-md file:border-0 file:bg-navy-900 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-navy-800"
