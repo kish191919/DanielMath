@@ -146,6 +146,23 @@ export async function getSignedScanViewUrl(scanId: string): Promise<string | nul
   return data.signedUrl;
 }
 
+// Separate from getSignedScanViewUrl because the viewer needs an
+// inline-displayable URL, while this forces Content-Disposition:
+// attachment so the browser downloads the file instead of navigating to
+// it (required for the cross-origin Supabase Storage URL to download at
+// all — the HTML `download` attribute alone doesn't work cross-origin).
+export async function getSignedScanDownloadUrl(
+  storagePath: string,
+  filename: string,
+): Promise<string | null> {
+  const admin = createAdminSupabase();
+  const { data, error } = await admin.storage
+    .from(BUCKET)
+    .createSignedUrl(storagePath, 300, { download: filename });
+  if (error || !data) return null;
+  return data.signedUrl;
+}
+
 type LearningItemFilters = {
   from?: string;
   to?: string;

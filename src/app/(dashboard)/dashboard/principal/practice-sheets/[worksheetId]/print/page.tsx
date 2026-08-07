@@ -65,8 +65,8 @@ export default async function PracticeSheetPrintPage({
     redirect(`/dashboard/principal/practice-sheets/${worksheetId}`);
   }
 
-  const student = await getStudent(worksheet.student_id);
-  if (!student) notFound();
+  const student = worksheet.student_id ? await getStudent(worksheet.student_id) : null;
+  if (worksheet.student_id && !student) notFound();
 
   const problemColumns = chunkArray(problems, problemCols);
   const answerColumns = chunkArray(problems, answerCols);
@@ -114,7 +114,11 @@ export default async function PracticeSheetPrintPage({
                 <dt className="font-ko font-medium" lang="ko">
                   이름
                 </dt>
-                <dd>{student.full_name}</dd>
+                {student ? (
+                  <dd>{student.full_name}</dd>
+                ) : (
+                  <dd className="min-w-32 border-b border-navy-400">&nbsp;</dd>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 <dt className="font-ko font-medium" lang="ko">
@@ -189,9 +193,11 @@ export default async function PracticeSheetPrintPage({
           <h2 className="mt-1 text-lg font-bold text-navy-900 font-ko" lang="ko">
             {title} — 답안지
           </h2>
-          <p className="mt-1 text-sm text-navy-600 font-ko" lang="ko">
-            {student.full_name}
-          </p>
+          {student && (
+            <p className="mt-1 text-sm text-navy-600 font-ko" lang="ko">
+              {student.full_name}
+            </p>
+          )}
         </header>
         <div className={answerGridClass}>
           {answerColumns

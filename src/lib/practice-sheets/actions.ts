@@ -17,7 +17,7 @@ import type { LearningItem, ReferenceProblem } from "@/lib/supabase/types";
 export type GenerateResult = { error: string };
 
 export async function generatePracticeSheetAction(
-  studentId: string,
+  studentId: string | null,
   selections: GenerateSelection,
 ): Promise<GenerateResult | void> {
   const session = await requireRole("principal");
@@ -32,6 +32,16 @@ export async function generatePracticeSheetAction(
   const verbatimIds = parsed.data
     .filter((s) => s.sourceType === "reference_verbatim")
     .map((s) => s.itemId);
+
+  // Common (no-student) worksheets are built entirely from the scanned
+  // reference pool — wrong-answer items are always student-scoped, so there
+  // is nothing valid to pull from without a studentId. The generator UI never
+  // offers this combination, so this only guards against a stale/tampered
+  // client request.
+  if (!studentId && wrongAnswerIds.length > 0) {
+    return { error: "학생을 선택하지 않은 경우 오답 문항은 사용할 수 없습니다." };
+  }
+
   const supabase = await createServerSupabase();
 
   // Never trust problem content from the client — re-fetch every source item
@@ -46,7 +56,8 @@ export async function generatePracticeSheetAction(
           .from("learning_items")
           .select("*")
           .in("id", wrongAnswerIds)
-          .eq("student_id", studentId)
+          // Guarded above: wrongAnswerIds is only non-empty when studentId is set.
+          .eq("student_id", studentId as string)
           .eq("is_correct", false)
           .eq("confirmed", true)
           .returns<LearningItem[]>()

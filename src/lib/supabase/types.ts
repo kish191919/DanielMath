@@ -201,7 +201,7 @@ export interface SessionNote {
 
 export interface GeneratedWorksheet {
   id: string;
-  student_id: string;
+  student_id: string | null;
   created_by: string;
   status: PracticeSheetStatus;
   title: string | null;
@@ -477,7 +477,7 @@ type SessionNoteUpdate = Partial<SessionNoteInsert>;
 
 type GeneratedWorksheetInsert = {
   id?: string;
-  student_id: string;
+  student_id?: string | null;
   created_by: string;
   status?: PracticeSheetStatus;
   title?: string | null;

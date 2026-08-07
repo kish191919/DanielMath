@@ -78,12 +78,16 @@ export function PracticeSheetGeneratorWorkspace({
   concepts,
   cropThumbnailsByProblemId,
 }: {
-  studentId: string;
+  // null = "공통 학습지": no student picked, wrong-answer items aren't
+  // offered (they're always student-scoped), and every generated sheet
+  // prints the same problems for every student.
+  studentId: string | null;
   wrongAnswerGroups: ItemGroup[];
   referenceGroups: ReferenceScanGroup[];
   concepts: Concept[];
   cropThumbnailsByProblemId: Record<string, string>;
 }) {
+  const isCommon = studentId === null;
   const [selectedWrongAnswers, setSelectedWrongAnswers] = React.useState<Record<string, boolean>>(
     {},
   );
@@ -108,7 +112,7 @@ export function PracticeSheetGeneratorWorkspace({
 
   const hasNoWrongAnswers = wrongAnswerGroups.every((g) => g.items.length === 0);
   const [activeTab, setActiveTab] = React.useState<"wrong" | "reference">(() =>
-    hasNoWrongAnswers ? "reference" : "wrong",
+    isCommon || hasNoWrongAnswers ? "reference" : "wrong",
   );
 
   // Per-group expand/collapse state. Absent = default (first group in each
@@ -225,6 +229,7 @@ export function PracticeSheetGeneratorWorkspace({
       </section>
 
       <section>
+        {!isCommon && (
         <div className="inline-flex rounded-full border border-navy-200 bg-navy-50 p-1">
           <button
             type="button"
@@ -253,8 +258,9 @@ export function PracticeSheetGeneratorWorkspace({
             {selectedReferenceIds.length > 0 && ` (${selectedReferenceIds.length})`}
           </button>
         </div>
+        )}
 
-        {activeTab === "wrong" ? (
+        {!isCommon && activeTab === "wrong" ? (
           <div className="mt-4">
             {hasNoWrongAnswers ? (
               <div className="rounded-2xl border border-navy-100 bg-white p-6 text-center text-sm text-navy-600">

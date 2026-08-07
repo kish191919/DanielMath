@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
@@ -30,14 +31,15 @@ export const maxDuration = 300;
 export default async function NewPracticeSheetPage({
   searchParams,
 }: {
-  searchParams: Promise<{ studentId?: string }>;
+  searchParams: Promise<{ studentId?: string; common?: string }>;
 }) {
   await requireRole("principal");
-  const { studentId } = await searchParams;
+  const { studentId, common } = await searchParams;
+  const isCommon = !studentId && common === "1";
 
   const students = await listStudents();
 
-  if (!studentId) {
+  if (!studentId && !isCommon) {
     return (
       <Section className="py-10 sm:py-14">
         <Container className="max-w-xl">
@@ -72,6 +74,20 @@ export default async function NewPracticeSheetPage({
             </div>
             <Button type="submit">다음</Button>
           </form>
+
+          <div className="mt-8 border-t border-navy-100 pt-6">
+            <p className="text-sm text-navy-700 font-ko" lang="ko">
+              모든 학생에게 같은 문제를 그대로 나눠줄 학습지를 만드시나요? 학생을
+              선택하지 않고 스캔한 문제로 바로 만들 수 있습니다.
+            </p>
+            <Link
+              href="/dashboard/principal/practice-sheets/new?common=1"
+              className="mt-3 inline-flex items-center rounded-lg border border-navy-200 px-4 py-2 text-sm font-medium text-navy-800 hover:bg-navy-50 font-ko"
+              lang="ko"
+            >
+              학생 선택 없이 공통 학습지 만들기
+            </Link>
+          </div>
         </Container>
       </Section>
     );
@@ -79,14 +95,14 @@ export default async function NewPracticeSheetPage({
 
   const [student, wrongAnswerItems, concepts, referenceProblems, referenceScans, scans] =
     await Promise.all([
-      getStudent(studentId),
-      listLearningItems(studentId, { onlyIncorrect: true }),
+      studentId ? getStudent(studentId) : Promise.resolve(null),
+      studentId ? listLearningItems(studentId, { onlyIncorrect: true }) : Promise.resolve([]),
       listConcepts(),
       listReferenceProblems({}),
       listReferenceScans(),
-      listScansForStudent(studentId),
+      studentId ? listScansForStudent(studentId) : Promise.resolve([]),
     ]);
-  if (!student) notFound();
+  if (studentId && !student) notFound();
 
   // Batched once here (rather than per-card) so the reference-problem list
   // can show crop thumbnails without a signed-URL round trip per card — see
@@ -144,15 +160,17 @@ export default async function NewPracticeSheetPage({
             Practice Sheet
           </p>
           <h1 className="mt-2 text-2xl font-bold text-navy-900 font-ko sm:text-3xl" lang="ko">
-            {student.full_name} — 유사문제 생성
+            {student ? `${student.full_name} — 유사문제 생성` : "공통 학습지 만들기"}
           </h1>
           <p className="mt-2 text-sm text-navy-700 font-ko" lang="ko">
-            오답과 스캔한 문제를 함께 선택할 수 있습니다. 사진을 찍어 올리면 아래 목록에 바로 추가됩니다.
+            {student
+              ? "오답과 스캔한 문제를 함께 선택할 수 있습니다. 사진을 찍어 올리면 아래 목록에 바로 추가됩니다."
+              : "스캔한 문제 중 원하는 문제를 선택해 모든 학생에게 같은 문제를 출력합니다. 사진을 찍어 올리면 아래 목록에 바로 추가됩니다."}
           </p>
         </div>
         <div className="mt-8">
           <PracticeSheetGeneratorWorkspace
-            studentId={studentId}
+            studentId={studentId ?? null}
             wrongAnswerGroups={wrongAnswerGroups}
             referenceGroups={referenceGroups}
             concepts={concepts}

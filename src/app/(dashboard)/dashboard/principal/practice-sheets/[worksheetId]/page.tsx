@@ -21,8 +21,8 @@ export default async function PracticeSheetReviewPage({
   if (!result) notFound();
   const { worksheet, problems } = result;
 
-  const student = await getStudent(worksheet.student_id);
-  if (!student) notFound();
+  const student = worksheet.student_id ? await getStudent(worksheet.student_id) : null;
+  if (worksheet.student_id && !student) notFound();
 
   const readOnly = worksheet.status === "confirmed";
 
@@ -35,7 +35,7 @@ export default async function PracticeSheetReviewPage({
               Practice Sheet
             </p>
             <h1 className="mt-2 text-2xl font-bold text-navy-900 font-ko sm:text-3xl" lang="ko">
-              {student.full_name} — 유사문제 검토
+              {student ? `${student.full_name} — 유사문제 검토` : "공통 학습지 — 유사문제 검토"}
             </h1>
           </div>
           <span className="inline-flex shrink-0 items-center rounded-full bg-navy-50 px-2.5 py-0.5 text-xs font-medium text-navy-800">
