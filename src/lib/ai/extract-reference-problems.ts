@@ -67,10 +67,13 @@ export async function extractReferenceProblems(scanId: string, attempt = 0): Pro
 
   // 여러 장의 사진이 assembleScanPdf()로 한 PDF에 합쳐져 들어오므로,
   // chunkThresholdPages/pagesPerChunk를 1로 고정해 페이지(=사진 한 장)마다
-  // 별도 청크로 나눠 Promise.all로 동시에 처리한다 (document-extraction.ts
-  // 참고) — 사진이 몇 장이든 대기 시간이 "가장 느린 페이지 1장" 수준으로
-  // 유지된다. 채점(grade-worksheet.ts)과 달리 여러 페이지의 문맥을 함께 볼
-  // 필요가 없는 단순 전사 작업이라 페이지 단위 분할이 정확도를 해치지 않는다.
+  // 별도 청크로 나눈다. chunkConcurrency: "full"이 핵심 — 기본값 "staged"는
+  // 첫 청크를 다 기다린 뒤에야 나머지를 동시에 시작하므로, 사진이 정확히
+  // 2장(청크 2개)일 땐 사실상 순차 실행과 같아져 페이지 분할의 의미가
+  // 없어진다. "full"로 모든 페이지를 처음부터 동시에 호출해야 사진이 몇
+  // 장이든 대기 시간이 "가장 느린 페이지 1장" 수준으로 유지된다. 채점
+  // (grade-worksheet.ts)과 달리 여러 페이지의 문맥을 함께 볼 필요가 없는
+  // 단순 전사 작업이라 페이지 단위 분할이 정확도를 해치지 않는다.
   const allItems: ReferenceExtractedItem[] = await extractStructuredItems({
     bucket: BUCKET,
     storagePath: scan.storage_path,
@@ -81,6 +84,7 @@ export async function extractReferenceProblems(scanId: string, attempt = 0): Pro
     effort: REFERENCE_EXTRACTION_EFFORT,
     pagesPerChunk: 1,
     chunkThresholdPages: 1,
+    chunkConcurrency: "full",
     label: "문제 추출",
     logId: `extractReferenceProblems scan ${scanId} attempt ${attempt}`,
   });

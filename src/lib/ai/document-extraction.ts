@@ -110,6 +110,14 @@ export interface ExtractStructuredItemsOptions<T> {
   // CHUNK_THRESHOLD_PAGES(6) — extractReferenceProblems처럼 사진 몇 장짜리
   // 업로드도 페이지별로 병렬 처리하고 싶을 때 더 낮은 값(예: 1)을 넘긴다.
   chunkThresholdPages?: number;
+  // "staged"(기본) — 첫 청크를 단독으로 기다려 프롬프트 캐시를 데운 뒤
+  // 나머지를 동시에 실행. 청크가 많은 문서(채점)에서는 캐시 적중으로 비용을
+  // 아끼면서도 대기 시간은 청크1 + max(나머지)로 줄어들지만, 청크가 정확히
+  // 2개일 때는 사실상 완전 순차 실행과 같아진다 — 사진 2장짜리 업로드처럼
+  // 청크 수가 적고 지연시간이 비용보다 중요할 땐 "full"을 넘겨 모든 청크를
+  // 처음부터 동시에 실행한다 (캐시 적중은 못 받지만 전체 지연시간이
+  // max(모든 청크)로 줄어든다).
+  chunkConcurrency?: "staged" | "full";
 }
 
 // 파일을 다운로드해 (PDF면 필요시 청킹한 뒤) Claude 구조화 출력으로 보내고,
@@ -130,6 +138,7 @@ export async function extractStructuredItems<T>(
     logId,
     pagesPerChunk = PAGES_PER_CHUNK,
     chunkThresholdPages = CHUNK_THRESHOLD_PAGES,
+    chunkConcurrency = "staged",
   } = options;
 
   const buffer = await downloadBuffer(bucket, storagePath);
@@ -201,6 +210,11 @@ export async function extractStructuredItems<T>(
     }
 
     return (response.parsed_output as z.infer<typeof itemsSchema>).items;
+  }
+
+  if (chunkConcurrency === "full") {
+    const allChunkItems = await Promise.all(chunks.map(runChunk));
+    return allChunkItems.flat();
   }
 
   // 첫 청크는 단독으로 기다려 프롬프트 캐시를 먼저 데운 뒤, 나머지 청크는
