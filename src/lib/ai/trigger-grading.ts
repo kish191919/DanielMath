@@ -1,4 +1,5 @@
 import "server-only";
+import { siteConfig } from "@/lib/site-config";
 
 // Fires the actual grading work (gradeWorksheetScan) as a fresh HTTP request
 // to /api/grading/run instead of running it inline in the caller's after().
@@ -7,9 +8,20 @@ import "server-only";
 // matters. This function only waits for the 202 ack, not for grading itself
 // to finish, so it stays fast enough to run inside the caller's own after().
 export async function triggerGradingJob(scanId: string, attempt: number): Promise<void> {
-  const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : `http://localhost:${process.env.PORT ?? 3000}`;
+  // In production, self-fetching the raw *.vercel.app deployment URL
+  // (VERCEL_URL) hits Vercel Deployment Protection and gets a 401 from the
+  // platform itself, before the request ever reaches this app's route —
+  // this silently killed every grading job, since the CRON_SECRET header
+  // never mattered. The custom production domain isn't behind that wall, so
+  // use it whenever we're actually running in production; only fall back to
+  // VERCEL_URL (preview) or localhost (dev). Mirrors
+  // trigger-reference-extraction.ts.
+  const baseUrl =
+    process.env.VERCEL_ENV === "production"
+      ? siteConfig.url
+      : process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : `http://localhost:${process.env.PORT ?? 3000}`;
 
   try {
     const res = await fetch(`${baseUrl}/api/grading/run`, {
