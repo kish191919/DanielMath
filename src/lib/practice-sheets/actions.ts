@@ -13,6 +13,7 @@ import {
   type PracticeProblemInputValues,
 } from "./schema";
 import type { LearningItem, ReferenceProblem } from "@/lib/supabase/types";
+import type { ProblemOption } from "@/lib/ai/problem-option-schema";
 
 export type GenerateResult = { error: string };
 
@@ -112,23 +113,39 @@ export async function generatePracticeSheetAction(
     concept_id: string | null;
     problem_text: string;
     answer_text: string;
+    options: ProblemOption[] | null;
+    correct_option: string | null;
     sort_order: number;
     source: "ai" | "reference_verbatim";
     edited_by_teacher: false;
     ai_suggested: unknown;
+    answer_needs_review: boolean;
   }[] = [];
 
   for (const item of verbatimItems) {
+    // Falls back to the AI-solved best-effort letter, mirroring the
+    // answer_text fallback below — either way answer_needs_review flags it.
+    const correctOption = item.translated_correct_option ?? item.solved_correct_option ?? null;
     problemRows.push({
       source_item_id: null,
       source_reference_id: item.id,
       concept_id: item.concept_id,
       problem_text: item.translated_problem!,
-      answer_text: item.translated_answer ?? "(정답 미확인)",
+      // Falls back to the AI-solved best-effort answer (see
+      // solve-reference-problems.ts), then to a bare placeholder if even
+      // that hasn't succeeded yet — either way answer_needs_review flags it
+      // for the teacher, since neither came from the actual source scan.
+      answer_text: item.translated_answer ?? item.solved_answer ?? "(정답 미확인)",
+      options: item.translated_options,
+      correct_option: correctOption,
       sort_order: sortOrder++,
       source: "reference_verbatim",
       edited_by_teacher: false,
       ai_suggested: null,
+      // Also flags when this is MCQ but no confident correct_option letter
+      // could be resolved (translation nor solve produced one) — the
+      // teacher must pick the right choice manually in the review table.
+      answer_needs_review: item.translated_answer == null || (item.translated_options != null && correctOption == null),
     });
   }
 
@@ -156,10 +173,13 @@ export async function generatePracticeSheetAction(
           concept_id: source.concept_id,
           problem_text: problem.problem_text,
           answer_text: problem.answer_text,
+          options: problem.options,
+          correct_option: problem.correct_option,
           sort_order: sortOrder++,
           source: "ai",
           edited_by_teacher: false,
           ai_suggested: problem,
+          answer_needs_review: false,
         });
       }
     }
@@ -219,9 +239,12 @@ export async function confirmPracticeSheetAction(
     concept_id: problem.concept_id ?? null,
     problem_text: problem.problem_text,
     answer_text: problem.answer_text,
+    options: problem.options,
+    correct_option: problem.correct_option,
     sort_order: index,
     source: problem.source,
     edited_by_teacher: problem.edited_by_teacher,
+    answer_needs_review: problem.answer_needs_review,
   }));
   const { error: insertError } = await supabase.from("generated_problems").insert(rows);
   if (insertError) return { error: insertError.message };

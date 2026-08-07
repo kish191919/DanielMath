@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ProblemOptionsArraySchema } from "./problem-option-schema";
 
 export const TranslatedReferenceItemSchema = z.object({
   // Echoes reference_problems.id back so the caller can match by id
@@ -6,6 +7,8 @@ export const TranslatedReferenceItemSchema = z.object({
   // relying on array order surviving the round trip.
   id: z.string().uuid(),
   translated_problem: z.string(),
+  translated_options: ProblemOptionsArraySchema,
+  translated_correct_option: z.string().nullable(),
   translated_answer: z.string().nullable(),
 });
 

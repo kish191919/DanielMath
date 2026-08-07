@@ -3,8 +3,9 @@ import { GRADING_MODEL, REFERENCE_EXTRACTION_EFFORT } from "./claude";
 import { ReferenceExtractionSchema, type ReferenceExtractedItem } from "./reference-extraction-schema";
 import { extractStructuredItems } from "./document-extraction";
 import { translateReferenceProblems } from "./translate-reference-problems";
+import { solveReferenceProblems } from "./solve-reference-problems";
 import { createAdminSupabase } from "@/lib/supabase/admin";
-import type { Concept, ReferenceProblemScan } from "@/lib/supabase/types";
+import type { Concept, ReferenceProblem, ReferenceProblemScan } from "@/lib/supabase/types";
 
 const BUCKET = "problem-bank";
 
@@ -29,8 +30,10 @@ const REFERENCE_EXTRACTION_INSTRUCTIONS = `당신은 미국 북버지니아(NoVa
 선생님이 나중에 재사용하려고 찍어둔 "좋은 문제" 사진/PDF(여러 페이지일 수 있음)가 첨부되어 있습니다. 이 파일은 학생 답안이 아니라 문제 원본이며, 채점하는 것이 아니라 문제를 그대로 옮겨 적는 것이 목적입니다. 다음 지침에 따르세요.
 
 1. 모든 페이지에 있는 모든 문제를 빠짐없이 개별 항목으로 추출하세요. 3a, 3b처럼 하위 문항이 있으면 각각을 별도 항목으로 다루세요.
-2. transcribed_problem에는 문제 내용만 그대로 옮겨 적으세요.
+2. transcribed_problem에는 문제의 본문(stem)만 옮기고, 보기(선택지)는 절대 포함하지 마세요 — 보기는 options에 별도로 담습니다.
+2a. 이 문제가 객관식이면(2개 이상 6개 이하의 뚜렷한 보기가 있으면) options에 각 보기를 {label, text}로 담으세요. label은 원본에 인쇄된 그대로(A/B/C, 1)/2)/3), ①②③ 등) 옮기고 절대 새로 만들거나 A/B/C로 바꾸지 마세요. 보기가 6개를 초과하거나 명확히 구분되지 않으면(애매하면) options는 null로 두고 transcribed_problem에 원문 그대로 남기세요(기존 방식).
 3. 정답이 인쇄되어 있거나 손으로 적혀 있으면 transcribed_answer에 그대로 옮겨 적으세요. 정답이 보이지 않으면 절대 추측하지 말고 null로 두세요.
+3a. transcribed_answer가 options 중 하나의 label과 정확히 일치하는 값(예: "D" 한 글자)이면, correct_option에 그 label을 넣고 transcribed_answer는 그 보기의 실제 text 값으로 바꿔서 채우세요(label 그대로 두지 마세요). transcribed_answer가 이미 값(예: "Q")이고 어느 보기의 text와 정확히 일치하면 correct_option에 그 보기의 label을 채우세요. 어느 쪽인지 확신할 수 없으면 correct_option은 null로 두고 transcribed_answer는 원문 그대로만 옮기세요 — 추측 금지. options가 null이면 correct_option도 반드시 null입니다.
 4. concept_code는 아래 제공된 개념 코드 목록 중 이 문제에 가장 가까운 것 하나를 선택하세요. 적절한 항목이 없으면 null로 두세요. 목록에 없는 코드를 만들어내지 마세요.
 5. 이미지를 자르거나 좌표를 반환하지 마세요.
 6. 확신이 서지 않는 부분(글씨 판독 어려움 등)은 confidence_note에 짧게 남기세요. 없으면 null.
@@ -102,6 +105,8 @@ export async function extractReferenceProblems(scanId: string, attempt = 0): Pro
         problem_number: item.problem_number,
         transcribed_problem: item.transcribed_problem,
         transcribed_answer: item.transcribed_answer,
+        transcribed_options: item.options,
+        transcribed_correct_option: item.correct_option,
         has_diagram: item.has_diagram,
         concept_id: concept?.id ?? null,
         ai_confidence_note: item.confidence_note,
@@ -117,7 +122,7 @@ export async function extractReferenceProblems(scanId: string, attempt = 0): Pro
     const { data: inserted, error: insertError } = await admin
       .from("reference_problems")
       .insert(rows)
-      .select("id, transcribed_problem, transcribed_answer");
+      .select("id, transcribed_problem, transcribed_answer, transcribed_options, transcribed_correct_option");
     if (insertError) throw new Error(insertError.message);
 
     // Best-effort: translation runs in the same background job (still well
@@ -136,7 +141,13 @@ export async function extractReferenceProblems(scanId: string, attempt = 0): Pro
               .from("reference_problems")
               .update(
                 t
-                  ? { translated_problem: t.translated_problem, translated_answer: t.translated_answer, translation_error: null }
+                  ? {
+                      translated_problem: t.translated_problem,
+                      translated_answer: t.translated_answer,
+                      translated_options: t.translated_options,
+                      translated_correct_option: t.translated_correct_option,
+                      translation_error: null,
+                    }
                   : { translation_error: "번역 응답에서 이 문제를 찾지 못했습니다." },
               )
               .eq("id", row.id);
@@ -151,6 +162,60 @@ export async function extractReferenceProblems(scanId: string, attempt = 0): Pro
             "id",
             inserted.map((row) => row.id),
           );
+      }
+
+      // Best-effort, same reasoning as translation above: for rows whose
+      // source scan never printed an answer (translated_answer still null
+      // after translation), have the model actually solve the problem so
+      // "원본 그대로" mode never has to fall back to a bare "(정답 미확인)"
+      // placeholder — see solve-reference-problems.ts and
+      // generatePracticeSheetAction's verbatim branch. Re-selected from the
+      // DB (rather than reusing the `translated` map above) so this reflects
+      // reality regardless of whether translation partially failed.
+      const { data: toSolve } = await admin
+        .from("reference_problems")
+        .select("id, translated_problem, has_diagram, translated_options")
+        .in(
+          "id",
+          inserted.map((row) => row.id),
+        )
+        .is("translated_answer", null)
+        .not("translated_problem", "is", null)
+        .returns<Pick<ReferenceProblem, "id" | "translated_problem" | "has_diagram" | "translated_options">[]>();
+
+      if (toSolve && toSolve.length > 0) {
+        try {
+          const solved = await solveReferenceProblems(
+            toSolve.map((r) => ({
+              id: r.id,
+              translated_problem: r.translated_problem!,
+              has_diagram: r.has_diagram,
+              translated_options: r.translated_options,
+            })),
+          );
+          await Promise.all(
+            toSolve.map((item) => {
+              const s = solved.get(item.id);
+              return admin
+                .from("reference_problems")
+                .update(
+                  s
+                    ? { solved_answer: s.solved_answer, solved_correct_option: s.solved_correct_option, solve_error: null }
+                    : { solve_error: "풀이 응답에서 이 문제를 찾지 못했습니다." },
+                )
+                .eq("id", item.id);
+            }),
+          );
+        } catch (err) {
+          const message = err instanceof Error ? err.message : "정답 풀이 중 오류가 발생했습니다.";
+          await admin
+            .from("reference_problems")
+            .update({ solve_error: message })
+            .in(
+              "id",
+              toSolve.map((item) => item.id),
+            );
+        }
       }
     }
   }

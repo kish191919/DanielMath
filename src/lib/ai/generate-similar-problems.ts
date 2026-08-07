@@ -20,7 +20,9 @@ const WRONG_ANSWER_INSTRUCTIONS = `아래는 학생이 틀린 문제들입니다
 4. 정답이 틀리면 이 기능의 목적 자체가 무너지니, 직접 계산해서 정답을 검산한 뒤 답을 작성하세요.
 5. source_id에는 입력에 주어진 source_id 값을, source_kind에는 "wrong_answer"를 그대로 돌려주세요.
 6. 각 항목에 대해 요청된 개수만큼 정확히 생성하세요.
-7. 아래 "원래 문제"가 한국어로 되어 있더라도, 새로 생성하는 problem_text와 answer_text는 반드시 영어로만 작성하세요.`;
+7. 아래 "원래 문제"가 한국어로 되어 있더라도, 새로 생성하는 problem_text와 answer_text는 반드시 영어로만 작성하세요.
+8. "원래 문제" 텍스트 자체에 보기(A) B) C)... 또는 1) 2) 3)... 같은 선택지)가 포함되어 있으면 그 문제는 객관식입니다 — 새로 만드는 문제도 반드시 객관식으로 만드세요. 보기 개수와 라벨 체계는 원본과 동일하게 유지하되 값(오답 보기 포함)은 새 문제에 맞게 새로 지어내세요(낡은 보기를 그대로 남기지 마세요). options에 담고, problem_text에는 보기를 절대 포함하지 마세요. correct_option에는 새로 만든 정답 보기의 label을, answer_text에는 그 보기의 text와 동일한 값을 넣어 서로 일치시키세요.
+9. "원래 문제"에 보기가 없으면(서술형) 새 문제도 서술형이어야 합니다 — options와 correct_option은 반드시 null로 두세요.`;
 
 // 참고문제(문제 보관함) 기반: 핵심 개념은 유지하되 소재/시나리오를 바꾼다 —
 // 숫자만 바꾸는 오답 재생성과는 목적이 다르다 (원장님 요청사항).
@@ -32,7 +34,9 @@ const REFERENCE_INSTRUCTIONS = `아래는 선생님이 보관함에 저장해둔
 4. 원본 정답이 제공되어 있으면 그것이 맞는지 검산한 뒤 새 문제의 정답을 계산하세요. 원본 정답이 제공되지 않았으면 직접 계산해서 검산한 뒤 답을 작성하세요. 정답이 틀리면 이 기능의 목적 자체가 무너집니다.
 5. source_id에는 입력에 주어진 source_id 값을, source_kind에는 "reference"를 그대로 돌려주세요.
 6. 각 항목에 대해 요청된 개수만큼 정확히 생성하세요.
-7. 아래 "원래 문제"가 한국어로 되어 있더라도, 새로 생성하는 problem_text와 answer_text는 반드시 영어로만 작성하세요.`;
+7. 아래 "원래 문제"가 한국어로 되어 있더라도, 새로 생성하는 problem_text와 answer_text는 반드시 영어로만 작성하세요.
+8. "원래 보기"가 주어진 문제는 객관식입니다 — 새로 만드는 문제도 반드시 객관식으로 만드세요. 보기 개수와 라벨 체계는 원본과 동일하게 유지하되 값(오답 보기 포함)은 새 문제에 맞게 새로 지어내세요(낡은 보기를 그대로 남기지 마세요). options에 담고, problem_text에는 보기를 절대 포함하지 마세요. correct_option에는 새로 만든 정답 보기의 label을, answer_text에는 그 보기의 text와 동일한 값을 넣어 서로 일치시키세요.
+9. "원래 보기"가 없으면(서술형) 새 문제도 서술형이어야 합니다 — options와 correct_option은 반드시 null로 두세요.`;
 
 function conceptLineFor(conceptId: string | null, conceptById: Map<string, Concept>): string {
   const concept = conceptId ? conceptById.get(conceptId) : undefined;
@@ -60,10 +64,14 @@ function buildReferenceItemText(
   const answerLine = item.transcribed_answer
     ? `원본 정답: ${item.transcribed_answer}`
     : "원본 정답: (제공되지 않음 — 직접 계산)";
+  const optionsLine = item.transcribed_options
+    ? `원래 보기: ${item.transcribed_options.map((o) => `${o.label} ${o.text}`).join(", ")} (정답 라벨: ${item.transcribed_correct_option ?? "미상"})`
+    : "원래 보기: (없음 — 서술형)";
   return `- source_id: ${item.id}
   원래 문제: ${item.transcribed_problem}
   개념: ${conceptLineFor(item.concept_id, conceptById)}
   ${answerLine}
+  ${optionsLine}
   요청 개수: ${count}개`;
 }
 

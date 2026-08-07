@@ -166,7 +166,24 @@ export default async function PracticeSheetPrintPage({
                         <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-navy-900 text-xs font-bold text-white">
                           {column.startIndex + localIndex + 1}
                         </span>
-                        <p className="text-sm font-medium text-navy-900">{problem.problem_text}</p>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-navy-900">{problem.problem_text}</p>
+                          {problem.options && (
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              {problem.options.map((opt) => (
+                                <div
+                                  key={opt.label}
+                                  className="flex items-center gap-1.5 rounded-md border border-navy-200 bg-navy-50 px-2.5 py-1"
+                                >
+                                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-navy-900 text-[10px] font-bold text-white">
+                                    {opt.label}
+                                  </span>
+                                  <span className="text-sm text-navy-800">{opt.text}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </div>
                       {problem.crop_image_url && (
                         // eslint-disable-next-line @next/next/no-img-element -- signed Supabase Storage URL, not a static asset
@@ -206,7 +223,13 @@ export default async function PracticeSheetPrintPage({
               <ol key={column.startIndex}>
                 {column.items.map((problem, localIndex) => (
                   <li key={problem.id} className="mb-2 break-inside-avoid [page-break-inside:avoid]">
-                    {column.startIndex + localIndex + 1}. {problem.answer_text}
+                    {column.startIndex + localIndex + 1}.{" "}
+                    {problem.options && problem.correct_option && (
+                      <span className="mr-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-navy-900 text-[10px] font-bold text-white">
+                        {problem.correct_option}
+                      </span>
+                    )}
+                    {problem.answer_text}
                   </li>
                 ))}
               </ol>

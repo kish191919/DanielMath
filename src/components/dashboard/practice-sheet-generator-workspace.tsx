@@ -17,6 +17,7 @@ import {
   deleteReferenceScanAction,
   retryReferenceExtractionAction,
   retranslateReferenceProblemAction,
+  resolveReferenceAnswerAction,
   deleteReferenceCropAction,
 } from "@/lib/problem-bank/actions";
 import type { Concept, LearningItem, ReferenceProblem, ReferenceProblemScan } from "@/lib/supabase/types";
@@ -523,6 +524,17 @@ export function PracticeSheetGeneratorWorkspace({
                                   !problem.translated_problem && !!problem.translation_error;
                                 const translationPending =
                                   !problem.translated_problem && !problem.translation_error;
+                                // The source scan never printed an answer for this
+                                // problem — solving happens automatically right
+                                // after extraction (see extractReferenceProblems),
+                                // but these three states distinguish "hasn't run
+                                // yet" (offer the button) from "ran and produced a
+                                // guess" (flag for review) from "the call itself
+                                // failed" (offer a retry, same button/label).
+                                const answerMissing = mode === "verbatim" && !problem.translated_answer;
+                                const answerNotYetAttempted =
+                                  answerMissing && !problem.solved_answer && !problem.solve_error;
+                                const answerNeedsReview = answerMissing && !!problem.solved_answer;
                                 return (
                                   <div
                                     key={problem.id}
@@ -567,6 +579,15 @@ export function PracticeSheetGeneratorWorkspace({
                                               (translationPending ? "번역 대기 중..." : "번역 실패")}
                                           </p>
                                         )}
+                                        {mode === "verbatim" && answerMissing && (
+                                          <p className="mt-1 text-xs text-navy-500">
+                                            정답:{" "}
+                                            {problem.solved_answer ??
+                                              (problem.solve_error
+                                                ? "풀이 실패"
+                                                : "정답이 없어 AI가 풀이 중...")}
+                                          </p>
+                                        )}
 
                                         <div className="mt-2 flex flex-wrap items-center gap-2">
                                           <div className="inline-flex rounded-full border border-navy-200 p-0.5 text-xs">
@@ -607,6 +628,24 @@ export function PracticeSheetGeneratorWorkspace({
                                                 번역 다시 시도
                                               </button>
                                             </form>
+                                          )}
+
+                                          {mode === "verbatim" && answerNotYetAttempted && (
+                                            <form
+                                              action={resolveReferenceAnswerAction.bind(null, problem.id)}
+                                            >
+                                              <button
+                                                type="submit"
+                                                className="rounded-md border border-red-200 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
+                                              >
+                                                {problem.solve_error ? "정답 풀이 다시 시도" : "정답 풀이하기"}
+                                              </button>
+                                            </form>
+                                          )}
+                                          {mode === "verbatim" && answerNeedsReview && (
+                                            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700">
+                                              AI 추정 정답 · 확인 필요
+                                            </span>
                                           )}
 
                                           {problem.has_diagram && (

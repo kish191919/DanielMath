@@ -33,7 +33,13 @@ export default async function PublicAnswerKeyPage({
         <ol className="mt-6 space-y-2.5 text-base text-navy-800">
           {answers.map((answer) => (
             <li key={answer.sort_order}>
-              {answer.sort_order + 1}. {answer.answer_text}
+              {answer.sort_order + 1}.{" "}
+              {answer.correct_option && (
+                <span className="mr-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-navy-900 text-[10px] font-bold text-white">
+                  {answer.correct_option}
+                </span>
+              )}
+              {answer.answer_text}
             </li>
           ))}
         </ol>

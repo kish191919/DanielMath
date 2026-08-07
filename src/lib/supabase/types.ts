@@ -1,4 +1,5 @@
 import type { AdvancedStatus, Quarter } from "@/lib/curriculum-quarter";
+import type { ProblemOption } from "@/lib/ai/problem-option-schema";
 
 export type Role = "principal" | "parent";
 
@@ -237,10 +238,20 @@ export interface GeneratedProblem {
   concept_id: string | null;
   problem_text: string;
   answer_text: string;
+  // Structured multiple-choice options, if any — null for free-response
+  // problems. When non-null, problem_text holds the stem only (choices are
+  // never embedded in it). correct_option is the label of the option
+  // matching answer_text's value, or null if it couldn't be resolved.
+  options: ProblemOption[] | null;
+  correct_option: string | null;
   sort_order: number;
   source: "ai" | "teacher" | "reference_verbatim";
   edited_by_teacher: boolean;
   ai_suggested: unknown;
+  // True only for a "reference_verbatim" row whose answer_text came from
+  // solved_answer (or the "(정답 미확인)" placeholder) rather than the
+  // scan's actual translated_answer — see ReferenceProblem below.
+  answer_needs_review: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -268,8 +279,29 @@ export interface ReferenceProblem {
   problem_number: string | null;
   transcribed_problem: string;
   transcribed_answer: string | null;
+  // Structured options, mirroring transcribed_problem/translated_problem's
+  // dual-stage pattern — null for free-response problems. transcribed_*
+  // options is set at OCR time so the stem stays clean even before/without
+  // translation; translated_* is the English version carried through
+  // generation. *_correct_option is the label matching *_answer's value.
+  transcribed_options: ProblemOption[] | null;
+  transcribed_correct_option: string | null;
   translated_problem: string | null;
   translated_answer: string | null;
+  translated_options: ProblemOption[] | null;
+  translated_correct_option: string | null;
+  // AI-computed best-effort answer, only ever populated when
+  // translated_answer is null (the source scan never printed one). May be
+  // wrong — never treated as equivalent to translated_answer, which is a
+  // faithful transcription and never a guess. See solve-reference-problems.ts.
+  solved_answer: string | null;
+  // Best-effort correct_option to go with solved_answer — unlike
+  // solved_answer, may stay null even when solving succeeds, if the
+  // computed value couldn't be confidently matched to one of the options.
+  solved_correct_option: string | null;
+  // Set only when the solve call itself failed (not when it succeeded with
+  // a possibly-wrong answer) — mirrors translation_error.
+  solve_error: string | null;
   has_diagram: boolean;
   crop_storage_path: string | null;
   translation_error: string | null;
@@ -496,10 +528,13 @@ type GeneratedProblemInsert = {
   concept_id?: string | null;
   problem_text: string;
   answer_text: string;
+  options?: ProblemOption[] | null;
+  correct_option?: string | null;
   sort_order?: number;
   source?: "ai" | "teacher" | "reference_verbatim";
   edited_by_teacher?: boolean;
   ai_suggested?: unknown;
+  answer_needs_review?: boolean;
   created_at?: string;
   updated_at?: string;
 };
@@ -531,8 +566,15 @@ type ReferenceProblemInsert = {
   problem_number?: string | null;
   transcribed_problem: string;
   transcribed_answer?: string | null;
+  transcribed_options?: ProblemOption[] | null;
+  transcribed_correct_option?: string | null;
   translated_problem?: string | null;
   translated_answer?: string | null;
+  translated_options?: ProblemOption[] | null;
+  translated_correct_option?: string | null;
+  solved_answer?: string | null;
+  solved_correct_option?: string | null;
+  solve_error?: string | null;
   has_diagram?: boolean;
   crop_storage_path?: string | null;
   translation_error?: string | null;

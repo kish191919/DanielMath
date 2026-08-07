@@ -82,7 +82,10 @@ async function attachCropImageUrls(problems: GeneratedProblem[]): Promise<Genera
 // confirmed sheet matching this exact share token.
 export async function getPracticeSheetAnswersByToken(
   token: string,
-): Promise<{ title: string; answers: Pick<GeneratedProblem, "sort_order" | "answer_text">[] } | null> {
+): Promise<{
+  title: string;
+  answers: Pick<GeneratedProblem, "sort_order" | "answer_text" | "correct_option">[];
+} | null> {
   if (!UUID_RE.test(token)) return null;
 
   const supabase = createAdminSupabase();
@@ -95,10 +98,10 @@ export async function getPracticeSheetAnswersByToken(
 
   const { data: problems, error } = await supabase
     .from("generated_problems")
-    .select("sort_order, answer_text")
+    .select("sort_order, answer_text, correct_option")
     .eq("worksheet_id", worksheet.id)
     .order("sort_order", { ascending: true })
-    .returns<Pick<GeneratedProblem, "sort_order" | "answer_text">[]>();
+    .returns<Pick<GeneratedProblem, "sort_order" | "answer_text" | "correct_option">[]>();
   if (error) throw new Error(error.message);
 
   return { title: worksheet.title?.trim() || "연습문제", answers: problems ?? [] };

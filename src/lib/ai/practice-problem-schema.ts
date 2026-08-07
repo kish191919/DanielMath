@@ -1,11 +1,18 @@
 import { z } from "zod";
+import { ProblemOptionsArraySchema } from "./problem-option-schema";
 
 export const GeneratedProblemSchema = z.object({
   problem_text: z.string().describe(
-    "The newly generated problem statement. Must be written entirely in English, regardless of what language the source problem was in.",
+    "The newly generated problem statement (stem only — never include multiple-choice options here, they go in `options`). Must be written entirely in English, regardless of what language the source problem was in.",
   ),
   answer_text: z.string().describe(
-    "The final answer only, no work shown. Must be written entirely in English, regardless of what language the source problem was in.",
+    "The final answer only, no work shown. If `options` is set, this must equal that option's text. Must be written entirely in English, regardless of what language the source problem was in.",
+  ),
+  options: ProblemOptionsArraySchema.describe(
+    "Multiple-choice options if (and only if) the source problem was multiple choice — same choice count and label scheme as the source, with freshly invented values (including plausible-but-wrong distractors). Null if the source was free-response.",
+  ),
+  correct_option: z.string().nullable().describe(
+    "The label of the correct option, matching one entry in `options`. Null if `options` is null.",
   ),
 });
 

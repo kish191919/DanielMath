@@ -7,6 +7,7 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { triggerReferenceExtractionJob } from "@/lib/ai/trigger-reference-extraction";
 import { translateReferenceProblems } from "@/lib/ai/translate-reference-problems";
+import { solveReferenceProblems } from "@/lib/ai/solve-reference-problems";
 import { EXT_BY_MIME } from "@/lib/storage/mime";
 import { mintSignedUploadUrl } from "@/lib/storage/signed-upload";
 import { referenceUploadMetaSchema } from "./schema";
@@ -167,9 +168,14 @@ export async function retranslateReferenceProblemAction(id: string) {
   const supabase = await createServerSupabase();
   const { data: problem, error: fetchError } = await supabase
     .from("reference_problems")
-    .select("id, transcribed_problem, transcribed_answer")
+    .select("id, transcribed_problem, transcribed_answer, transcribed_options, transcribed_correct_option")
     .eq("id", id)
-    .maybeSingle<Pick<ReferenceProblem, "id" | "transcribed_problem" | "transcribed_answer">>();
+    .maybeSingle<
+      Pick<
+        ReferenceProblem,
+        "id" | "transcribed_problem" | "transcribed_answer" | "transcribed_options" | "transcribed_correct_option"
+      >
+    >();
   if (fetchError) throw new Error(fetchError.message);
   if (!problem) return;
 
@@ -180,13 +186,68 @@ export async function retranslateReferenceProblemAction(id: string) {
       .from("reference_problems")
       .update(
         t
-          ? { translated_problem: t.translated_problem, translated_answer: t.translated_answer, translation_error: null }
+          ? {
+              translated_problem: t.translated_problem,
+              translated_answer: t.translated_answer,
+              translated_options: t.translated_options,
+              translated_correct_option: t.translated_correct_option,
+              translation_error: null,
+            }
           : { translation_error: "번역 응답에서 이 문제를 찾지 못했습니다." },
       )
       .eq("id", id);
   } catch (err) {
     const message = err instanceof Error ? err.message : "번역 중 오류가 발생했습니다.";
     await supabase.from("reference_problems").update({ translation_error: message }).eq("id", id);
+  }
+
+  revalidatePath(PRACTICE_SHEETS_NEW_PATH);
+}
+
+// Manual retry for the automatic answer-solving step in
+// extractReferenceProblems (see extract-reference-problems.ts /
+// solve-reference-problems.ts) — surfaced in the workspace whenever a
+// verbatim-eligible row has no translated_answer and either solve_error is
+// set or solving simply hasn't run yet (e.g. rows extracted before this
+// feature existed).
+export async function resolveReferenceAnswerAction(id: string) {
+  await requireRole("principal");
+
+  const supabase = await createServerSupabase();
+  const { data: problem, error: fetchError } = await supabase
+    .from("reference_problems")
+    .select("id, translated_problem, has_diagram, translated_answer, translated_options")
+    .eq("id", id)
+    .maybeSingle<
+      Pick<
+        ReferenceProblem,
+        "id" | "translated_problem" | "has_diagram" | "translated_answer" | "translated_options"
+      >
+    >();
+  if (fetchError) throw new Error(fetchError.message);
+  if (!problem || !problem.translated_problem || problem.translated_answer) return;
+
+  try {
+    const solved = await solveReferenceProblems([
+      {
+        id: problem.id,
+        translated_problem: problem.translated_problem,
+        has_diagram: problem.has_diagram,
+        translated_options: problem.translated_options,
+      },
+    ]);
+    const s = solved.get(problem.id);
+    await supabase
+      .from("reference_problems")
+      .update(
+        s
+          ? { solved_answer: s.solved_answer, solved_correct_option: s.solved_correct_option, solve_error: null }
+          : { solve_error: "풀이 응답에서 이 문제를 찾지 못했습니다." },
+      )
+      .eq("id", id);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "정답 풀이 중 오류가 발생했습니다.";
+    await supabase.from("reference_problems").update({ solve_error: message }).eq("id", id);
   }
 
   revalidatePath(PRACTICE_SHEETS_NEW_PATH);

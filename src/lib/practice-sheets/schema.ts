@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ProblemOptionsArraySchema } from "@/lib/ai/problem-option-schema";
 
 export const generateSelectionSchema = z
   .array(
@@ -12,16 +13,34 @@ export const generateSelectionSchema = z
 
 export type GenerateSelection = z.infer<typeof generateSelectionSchema>;
 
-export const practiceProblemInputSchema = z.object({
-  id: z.string().uuid().optional(),
-  problem_text: z.string().min(1, "문제 내용을 입력해주세요"),
-  answer_text: z.string().min(1, "정답을 입력해주세요"),
-  source_item_id: z.string().uuid().nullable().optional(),
-  source_reference_id: z.string().uuid().nullable().optional(),
-  concept_id: z.string().uuid().nullable().optional(),
-  source: z.enum(["ai", "teacher", "reference_verbatim"]),
-  edited_by_teacher: z.boolean(),
-});
+export const practiceProblemInputSchema = z
+  .object({
+    id: z.string().uuid().optional(),
+    problem_text: z.string().min(1, "문제 내용을 입력해주세요"),
+    answer_text: z.string().min(1, "정답을 입력해주세요"),
+    options: ProblemOptionsArraySchema,
+    correct_option: z.string().nullable(),
+    source_item_id: z.string().uuid().nullable().optional(),
+    source_reference_id: z.string().uuid().nullable().optional(),
+    concept_id: z.string().uuid().nullable().optional(),
+    source: z.enum(["ai", "teacher", "reference_verbatim"]),
+    edited_by_teacher: z.boolean(),
+    answer_needs_review: z.boolean(),
+  })
+  .superRefine((val, ctx) => {
+    if (val.options) {
+      const labels = val.options.map((o) => o.label);
+      if (!val.correct_option || !labels.includes(val.correct_option)) {
+        ctx.addIssue({ code: "custom", path: ["correct_option"], message: "정답 보기를 선택해주세요" });
+      }
+    } else if (val.correct_option) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["correct_option"],
+        message: "보기가 없으면 정답 보기를 지정할 수 없습니다",
+      });
+    }
+  });
 
 export type PracticeProblemInputValues = z.infer<typeof practiceProblemInputSchema>;
 
