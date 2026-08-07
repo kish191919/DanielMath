@@ -212,17 +212,26 @@ export const ZoomableMedia = React.forwardRef<HTMLDivElement, ZoomableMediaProps
           !gesture.wasPinch &&
           gesture.moved < TAP_MOVE_THRESHOLD
         ) {
-          const now = Date.now();
-          const last = lastTapRef.current;
-          if (
-            last &&
-            now - last.time < DOUBLE_TAP_MS &&
-            Math.hypot(e.clientX - last.x, e.clientY - last.y) < DOUBLE_TAP_DIST
-          ) {
+          if (transformRef.current.scale <= minScale + EPS) {
+            // Not zoomed: a single tap zooms in on that exact spot immediately —
+            // waiting for a double-tap makes precisely targeting small text too hard.
             toggleZoomAt(e.clientX, e.clientY);
             lastTapRef.current = null;
           } else {
-            lastTapRef.current = { time: now, x: e.clientX, y: e.clientY };
+            // Zoomed: still require a double-tap to reset, so a small
+            // no-movement tap while fine-tuning the pan doesn't reset it.
+            const now = Date.now();
+            const last = lastTapRef.current;
+            if (
+              last &&
+              now - last.time < DOUBLE_TAP_MS &&
+              Math.hypot(e.clientX - last.x, e.clientY - last.y) < DOUBLE_TAP_DIST
+            ) {
+              toggleZoomAt(e.clientX, e.clientY);
+              lastTapRef.current = null;
+            } else {
+              lastTapRef.current = { time: now, x: e.clientX, y: e.clientY };
+            }
           }
         }
       } else if (pointersRef.current.size === 1) {
