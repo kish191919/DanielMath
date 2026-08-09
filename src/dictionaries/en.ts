@@ -313,6 +313,8 @@ const en: Dictionary = {
     readMore: "Read More",
     minRead: "min read",
     publishedAt: "Published",
+    previousPost: "Previous",
+    nextPost: "Next",
   },
   footer: {
     quickLinks: "Quick Links",

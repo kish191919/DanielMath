@@ -8,7 +8,7 @@ import { pageAlternates } from "@/lib/seo";
 import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
 import { BlogListItem } from "@/components/site/blog-card";
-import { blogPosts } from "@/lib/blog-posts";
+import { getSortedPosts } from "@/lib/blog-posts";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -53,7 +53,7 @@ export default async function BlogPage({ params }: Props) {
           />
 
           <div className="mt-10 flex flex-col divide-y divide-navy-100">
-            {blogPosts.map((post) => (
+            {getSortedPosts().map((post) => (
               <BlogListItem
                 key={post.slug}
                 post={post}

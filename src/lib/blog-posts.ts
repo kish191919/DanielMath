@@ -1319,3 +1319,22 @@ export function getBlogPost(slug: string): BlogPost | undefined {
 export function getAllSlugs(): string[] {
   return blogPosts.map((p) => p.slug);
 }
+
+export function getSortedPosts(): BlogPost[] {
+  return [...blogPosts].sort(
+    (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+  );
+}
+
+export function getAdjacentPosts(slug: string): {
+  newer: BlogPost | null;
+  older: BlogPost | null;
+} {
+  const sorted = getSortedPosts();
+  const index = sorted.findIndex((p) => p.slug === slug);
+  if (index === -1) return { newer: null, older: null };
+  return {
+    newer: index > 0 ? sorted[index - 1] : null,
+    older: index < sorted.length - 1 ? sorted[index + 1] : null,
+  };
+}

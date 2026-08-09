@@ -311,6 +311,8 @@ const ko = {
     readMore: "자세히 읽기",
     minRead: "분",
     publishedAt: "작성일",
+    previousPost: "이전 글",
+    nextPost: "다음 글",
   },
   footer: {
     quickLinks: "바로가기",
