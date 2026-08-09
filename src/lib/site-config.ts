@@ -25,7 +25,7 @@ export const siteConfig = {
     "Chantilly",
   ],
   contactEmail: "kish1919@gmail.com",
-  googleReviewUrl: "https://g.page/r/CS0dlftSUH10EBM/review",
+  googleReviewUrl: "https://search.google.com/local/writereview?placeid=ChIJnevfwD-qOQ8RLR0h-1JQfXQ",
   hours: "M · T · Th · F · 5–8 PM",
   hoursKo: "월·화·목·금 오후 5–8시",
   ogImage: "/og.png",
