@@ -65,6 +65,8 @@ export interface StudentEnrollmentPeriod {
   created_at: string;
 }
 
+export type TuitionPaymentMethod = "zelle" | "venmo" | "cash" | "stripe";
+
 export interface TuitionPayment {
   id: string;
   student_id: string;
@@ -73,6 +75,7 @@ export interface TuitionPayment {
   due_date: string;
   paid_amount: number | null;
   paid_at: string | null;
+  payment_method: TuitionPaymentMethod | null;
   note: string | null;
   created_at: string;
   updated_at: string;
@@ -393,6 +396,7 @@ type TuitionPaymentInsert = {
   due_date: string;
   paid_amount?: number | null;
   paid_at?: string | null;
+  payment_method?: TuitionPaymentMethod | null;
   note?: string | null;
   created_at?: string;
   updated_at?: string;

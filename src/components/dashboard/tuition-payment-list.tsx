@@ -4,6 +4,7 @@ import * as React from "react";
 import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { TuitionStatusBadge } from "@/components/dashboard/tuition-status-badge";
 import { ConfirmSubmitButton } from "@/components/dashboard/confirm-submit-button";
 import {
@@ -13,7 +14,11 @@ import {
   updateTuitionPaymentAction,
   type TuitionActionState,
 } from "@/lib/tuition/actions";
-import { computeTuitionStatus } from "@/lib/tuition/schema";
+import {
+  computeTuitionStatus,
+  TUITION_PAYMENT_METHODS,
+  TUITION_PAYMENT_METHOD_LABELS,
+} from "@/lib/tuition/schema";
 import { formatUsd } from "@/lib/tuition/format";
 import type { TuitionPayment } from "@/lib/supabase/types";
 
@@ -53,6 +58,7 @@ function TuitionPaymentRow({ payment, today }: { payment: TuitionPayment; today:
           {payment.paid_at && (
             <p className="mt-1 text-xs text-navy-500">
               납부 {payment.paid_at} · {formatUsd(payment.paid_amount ?? 0)}
+              {payment.payment_method && ` · ${TUITION_PAYMENT_METHOD_LABELS[payment.payment_method]}`}
             </p>
           )}
         </div>
@@ -167,6 +173,30 @@ function MarkPaidForm({
           defaultValue={today}
           className="h-9 w-40 text-sm"
         />
+      </div>
+      <div>
+        <label
+          className="mb-1 block text-xs font-medium text-navy-600"
+          htmlFor={`payment_method_${paymentId}`}
+        >
+          입금 방법
+        </label>
+        <Select
+          name="payment_method"
+          id={`payment_method_${paymentId}`}
+          defaultValue=""
+          required
+          className="h-9 w-32 text-sm"
+        >
+          <option value="" disabled>
+            선택
+          </option>
+          {TUITION_PAYMENT_METHODS.map((method) => (
+            <option key={method} value={method}>
+              {TUITION_PAYMENT_METHOD_LABELS[method]}
+            </option>
+          ))}
+        </Select>
       </div>
       <Button type="submit" size="md" disabled={isPending}>
         {isPending ? "처리 중..." : "확인"}

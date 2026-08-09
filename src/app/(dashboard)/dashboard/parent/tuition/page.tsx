@@ -2,14 +2,11 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
-import { TuitionStatusBadge } from "@/components/dashboard/tuition-status-badge";
 import { requireRole } from "@/lib/dal";
 import { GRADE_LABELS } from "@/lib/students/schema";
 import { listChildrenForParent } from "@/lib/learning-history/queries";
 import { listTuitionPaymentsForParent } from "@/lib/tuition/queries";
-import { computeTuitionStatus } from "@/lib/tuition/schema";
 import { formatUsd } from "@/lib/tuition/format";
-import { todayInEasternTime } from "@/lib/dates";
 
 export default async function ParentTuitionPage({
   searchParams,
@@ -26,12 +23,11 @@ export default async function ParentTuitionPage({
     ? children.filter((c) => c.id === filterChildId)
     : children;
 
-  const today = todayInEasternTime();
   const childData = await Promise.all(
-    visibleChildren.map(async (child) => ({
-      child,
-      payments: await listTuitionPaymentsForParent(session.userId, child.id),
-    })),
+    visibleChildren.map(async (child) => {
+      const payments = await listTuitionPaymentsForParent(session.userId, child.id);
+      return { child, payments: payments.filter((p) => p.paid_at !== null) };
+    }),
   );
 
   return (
@@ -52,7 +48,7 @@ export default async function ParentTuitionPage({
             납부 현황
           </h1>
           <p className="mt-2 text-sm text-navy-700 font-ko" lang="ko">
-            자녀의 학원비 청구와 납부 내역을 확인하세요.
+            자녀의 학원비 납부 내역을 확인하세요.
           </p>
           {filterChildId && (
             <Link
@@ -81,25 +77,17 @@ export default async function ParentTuitionPage({
 
                 <div className="mt-3 space-y-2">
                   {payments.length === 0 ? (
-                    <p className="text-sm text-navy-600">청구 내역이 없습니다.</p>
+                    <p className="text-sm text-navy-600">납부 내역이 없습니다.</p>
                   ) : (
                     payments.map((payment) => (
                       <div
                         key={payment.id}
                         className="flex items-center justify-between gap-3 rounded-2xl border border-navy-100 bg-white p-4 shadow-sm"
                       >
-                        <div>
-                          <p className="text-sm font-semibold text-navy-900">
-                            {payment.billing_month.slice(0, 7)}
-                          </p>
-                          <p className="mt-1 text-xs text-navy-600">
-                            {formatUsd(payment.amount_due)} · 기한 {payment.due_date}
-                          </p>
-                          {payment.paid_at && (
-                            <p className="mt-1 text-xs text-navy-500">납부일 {payment.paid_at}</p>
-                          )}
-                        </div>
-                        <TuitionStatusBadge status={computeTuitionStatus(payment, today)} />
+                        <p className="text-sm font-semibold text-navy-900">
+                          {formatUsd(payment.paid_amount ?? payment.amount_due)}
+                        </p>
+                        <p className="text-xs text-navy-600">{payment.paid_at}</p>
                       </div>
                     ))
                   )}

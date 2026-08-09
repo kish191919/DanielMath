@@ -119,6 +119,7 @@ export async function markTuitionPaidAction(
   const parsed = markTuitionPaidSchema.safeParse({
     paid_amount: formData.get("paid_amount"),
     paid_at: formData.get("paid_at") || todayInEasternTime(),
+    payment_method: formData.get("payment_method"),
     note: formData.get("note") ?? "",
   });
   if (!parsed.success) {
@@ -131,6 +132,7 @@ export async function markTuitionPaidAction(
     .update({
       paid_amount: parsed.data.paid_amount,
       paid_at: parsed.data.paid_at,
+      payment_method: parsed.data.payment_method,
       note: parsed.data.note && parsed.data.note.length > 0 ? parsed.data.note : null,
       updated_at: new Date().toISOString(),
     })
@@ -147,7 +149,12 @@ export async function markTuitionUnpaidAction(paymentId: string, studentId: stri
   const supabase = await createServerSupabase();
   const { error } = await supabase
     .from("tuition_payments")
-    .update({ paid_amount: null, paid_at: null, updated_at: new Date().toISOString() })
+    .update({
+      paid_amount: null,
+      paid_at: null,
+      payment_method: null,
+      updated_at: new Date().toISOString(),
+    })
     .eq("id", paymentId);
   if (error) throw new Error(error.message);
 
