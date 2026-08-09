@@ -627,6 +627,204 @@ export const blogPosts: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "back-to-school-checklist",
+    publishedAt: "2026-08-08",
+    readingMins: 6,
+    category: "새학기 준비",
+    categoryEn: "Back to School",
+    titleKo: "새 학년 개학 전, 학부모가 챙겨야 할 체크리스트",
+    titleEn: "The Back-to-School Checklist Every Parent Should Run Through",
+    descKo: "개학까지 몇 주 남지 않은 지금, 담임교사 확인부터 수학 감 되찾기, 생활 리듬 재조정까지 학부모가 놓치기 쉬운 준비 사항을 체크리스트로 정리했습니다.",
+    descEn: "With just a few weeks left before school starts, here's a practical checklist covering everything from confirming your child's teacher to resetting sleep schedules and brushing up on math.",
+    bodyKo: [
+      {
+        heading: "개학까지 남은 시간, 지금부터 무엇을 챙겨야 할까",
+        paragraphs: [
+          "여름방학이 끝을 향해 갈수록 학부모들의 마음은 바빠집니다. 학용품을 사야 하는지, 담임교사는 누구인지, 생활 리듬은 언제부터 되돌려야 하는지 한꺼번에 떠오르지만 정작 무엇부터 시작해야 할지 막막할 때가 많습니다. 각 학교의 정확한 개학일과 학사일정은 학군 및 학교마다 다르므로, FCPS 학부모라면 재학 중인 학교 홈페이지나 ParentVUE 공지사항에서 먼저 확인하는 것이 순서입니다.",
+          "개학을 2~4주 앞둔 이 시기는 서두르지 않고도 하나씩 준비할 수 있는 여유가 남아 있는 골든타임입니다. 이 글에서는 학사 정보 확인부터 수학 감 되찾기, 생활 리듬 조정, 서류 준비, 아이의 마음 챙기기까지 학부모가 순서대로 점검하면 좋은 다섯 가지 항목을 정리했습니다.",
+        ],
+      },
+      {
+        heading: "ParentVUE로 확인하는 새 학년 정보",
+        paragraphs: [
+          "새 학년이 다가오면 FCPS는 보통 개학 1~2주 전 즈음 ParentVUE를 통해 담임교사 배정 정보를 공개합니다. 정확한 공개 시점은 학교마다 다를 수 있으므로, 개학이 가까워지면 며칠에 한 번씩 ParentVUE를 확인해보는 것이 좋습니다. 담임교사를 미리 알면 아이와 함께 이름을 불러보고 마음의 준비를 시키는 데 도움이 됩니다.",
+          "ParentVUE에는 담임교사 정보 외에도 새 학년 시간표, 학용품 목록(School Supply List), 방과후 프로그램 안내 등이 함께 올라오는 경우가 많습니다. 학교마다 요구하는 학용품 목록이 다르므로, 작년에 쓰던 목록을 그대로 참고하기보다는 반드시 올해 목록을 새로 확인하는 것이 안전합니다.",
+        ],
+      },
+      {
+        heading: "수학 감 되찾기: 짧고 굵게",
+        paragraphs: [
+          "여름 동안 수학과 멀어졌다면, 개학 전 남은 몇 주를 활용해 감을 되찾아 두는 것이 좋습니다. 거창한 계획보다는 전년도 워크북의 마지막 한두 단원을 다시 펼쳐보거나, 틀렸던 문제만 골라 다시 풀어보는 정도로 충분합니다. 하루 15분씩이라도 매일 반복하면 개학 첫 주에 느끼는 부담이 눈에 띄게 줄어듭니다.",
+          "여유가 있다면 새 학년 첫 단원 내용을 아주 가볍게 미리 살펴보는 것도 도움이 됩니다. 이때 중요한 것은 선행 학습이 아니라 '낯설지 않게 만드는' 예습 수준으로 접근하는 것입니다. 여름방학 학습공백에 대해 더 자세히 알고 싶다면 저희 블로그의 '여름방학 수학 학습공백' 글을 함께 참고하세요.",
+        ],
+      },
+      {
+        heading: "생활 리듬 재조정하기",
+        paragraphs: [
+          "방학 동안 늦게 자고 늦게 일어나는 습관이 굳어졌다면, 개학 1~2주 전부터 서서히 되돌려 놓는 것이 좋습니다. 하루 만에 취침·기상 시간을 학기 중 스케줄로 바꾸려 하면 아이도 부모도 스트레스를 받기 쉽습니다. 며칠에 걸쳐 15~30분씩 앞당기는 방식이 훨씬 수월합니다.",
+          "아침 루틴도 함께 연습해두면 좋습니다. 등교 준비에 걸리는 시간, 아침 식사 시간을 미리 가늠해보고 알람 시간을 정해두면 개학 첫날 허둥대는 상황을 줄일 수 있습니다. 특히 스쿨버스를 이용하는 가정이라면 정류장까지 걸어가는 시간까지 미리 계산해두는 것이 안전합니다.",
+        ],
+      },
+      {
+        heading: "학용품·서류 체크리스트",
+        paragraphs: [
+          "학용품 외에도 개학 전 챙겨야 할 서류가 은근히 많습니다. 버지니아주는 K학년과 새로 전학 온 학생에게 예방접종 기록(Immunization Records) 제출을 요구하며, 미제출 시 등교가 제한될 수 있으므로 미리 확인해두는 것이 안전합니다. 소아과 예약이 밀릴 수 있는 시기이므로 서둘러 일정을 잡는 것이 좋습니다.",
+          "방과전후 돌봄 프로그램(Before/After School Care)을 이용할 계획이라면 신청 마감일을 놓치지 않는 것도 중요합니다. 인기 있는 프로그램은 개학 전에 정원이 마감되는 경우도 있으므로, 필요하다면 여름방학 중에 미리 신청해 두는 것이 좋습니다.",
+        ],
+      },
+      {
+        heading: "새 학년 첫 주, 아이의 마음 다독이기",
+        paragraphs: [
+          "준비물과 일정을 아무리 꼼꼼히 챙겨도, 아이 마음속에는 새 선생님과 새 친구에 대한 막연한 긴장감이 남아있을 수 있습니다. \"새 선생님은 어떤 분일까 궁금하다\", \"작년 친구랑 같은 반이 아닐 수도 있어\"처럼 있을 수 있는 상황을 미리 담담하게 이야기해두면, 아이가 실제로 그 상황을 마주했을 때 훨씬 덜 당황합니다.",
+          "첫 주에는 학업보다 적응이 우선입니다. 학교에서 돌아온 아이에게 \"오늘 뭐 배웠어?\"보다는 \"오늘 제일 재미있었던 순간이 뭐였어?\"처럼 구체적으로 물어보면 아이가 훨씬 편하게 이야기를 시작합니다. 며칠간 아이의 표정과 말수를 유심히 지켜보면서 적응 상태를 파악하는 것이, 그 어떤 준비물보다 중요한 개학 준비입니다.",
+        ],
+      },
+    ],
+    bodyEn: [
+      {
+        heading: "With a Few Weeks Left, Where Do You Even Start?",
+        paragraphs: [
+          "As summer break winds down, parents' to-do lists start piling up all at once — school supplies, teacher assignments, sleep schedules — and it's easy to feel unsure where to even start. Exact start dates and calendars vary by school and district, so FCPS parents should begin by checking their school's website or ParentVUE announcements for the specifics.",
+          "With roughly 2 to 4 weeks left before the first day, there's still enough time to work through preparations calmly rather than scrambling at the last minute. This checklist walks through five areas worth confirming in order: school-year logistics, math readiness, sleep schedule, paperwork, and your child's emotional readiness.",
+        ],
+      },
+      {
+        heading: "Checking New Year Details Through ParentVUE",
+        paragraphs: [
+          "As the new school year approaches, FCPS typically releases teacher assignments through ParentVUE about one to two weeks before the first day, though the exact timing can vary by school. Checking ParentVUE every few days as the date gets closer is a good habit. Knowing the teacher's name ahead of time also gives you a chance to talk it through with your child and ease any first-day nerves.",
+          "Beyond teacher assignments, ParentVUE often posts the new class schedule, the school supply list, and information about after-school programs. Supply lists can change from year to year, so it's worth checking this year's list directly rather than reusing last year's.",
+        ],
+      },
+      {
+        heading: "Rebuilding Math Momentum, the Short Way",
+        paragraphs: [
+          "If math practice fell off over the summer, the remaining weeks before school starts are a good window to rebuild momentum. Nothing elaborate is needed — revisiting the last unit or two of last year's workbook, or re-solving problems your child got wrong, is enough. Even 15 minutes a day, done consistently, noticeably eases the adjustment during the first week back.",
+          "If there's time, a light preview of the new grade's first unit can help too. The goal here isn't to get ahead — it's simply to make the material feel familiar rather than brand new. For more on why math skills fade over summer, see our earlier post on the summer math slide.",
+        ],
+      },
+      {
+        heading: "Resetting the Daily Rhythm",
+        paragraphs: [
+          "If bedtimes and wake-up times drifted later over the summer, start shifting them back one to two weeks before school begins. Trying to reset the schedule overnight tends to stress out both kids and parents. Moving bedtime earlier by 15 to 30 minutes every few days is a much smoother approach.",
+          "It also helps to practice the morning routine ahead of time. Estimating how long getting ready and eating breakfast actually takes, and setting the alarm accordingly, cuts down on first-day chaos. Families relying on the school bus should factor in walking time to the stop as well.",
+        ],
+      },
+      {
+        heading: "Supplies and Paperwork Checklist",
+        paragraphs: [
+          "Beyond school supplies, there's often more paperwork to handle than expected. Virginia requires immunization records for kindergarteners and any newly enrolled students, and missing this can restrict a child's ability to attend school, so it's worth confirming early. Pediatrician appointments can book up quickly this time of year, so scheduling ahead is wise.",
+          "If you're planning to use a before- or after-school care program, don't miss the registration deadline. Popular programs can fill up before the school year even starts, so it's worth applying during the summer if you know you'll need a spot.",
+        ],
+      },
+      {
+        heading: "Easing Your Child's Mind for the First Week",
+        paragraphs: [
+          "No matter how carefully you handle supplies and paperwork, your child may still be quietly nervous about a new teacher and new classmates. Talking through likely scenarios ahead of time — 'I wonder what your new teacher will be like,' 'you might not be in the same class as your friends from last year' — makes those moments far less unsettling when they actually happen.",
+          "In the first week, adjustment matters more than academics. Instead of asking 'What did you learn today?', try 'What was the most fun part of your day?' — a question that's much easier for a child to answer. Paying close attention to your child's mood and how much they're sharing over those first few days is, in the end, more important preparation than any item on a checklist.",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "tjhsst-roadmap",
+    publishedAt: "2026-08-08",
+    readingMins: 7,
+    category: "진학 로드맵",
+    categoryEn: "High School Pathway",
+    titleKo: "TJ(TJHSST) 진학, 초등 학부모가 알아야 할 로드맵",
+    titleEn: "The TJHSST Roadmap: What Elementary Parents Should Know",
+    descKo: "TJ(Thomas Jefferson High School for Science and Technology)가 정확히 어떤 학교인지, 한국의 과학고·영재고와 무엇이 다른지, 그리고 초등학교 때부터 무엇을 준비하면 좋은지 처음 듣는 학부모도 이해할 수 있도록 쉽게 정리했습니다.",
+    descEn: "A parent-friendly introduction to TJHSST — what it actually is, how it differs from Korea's science and gifted high schools, and what elementary-age preparation actually looks like.",
+    bodyKo: [
+      {
+        heading: "TJ가 무엇인가요?",
+        paragraphs: [
+          "Fairfax County(그리고 인근 몇 개 카운티)에 사는 학부모들 사이에서 \"TJ\"라는 이름을 한 번쯤 들어보셨을 겁니다. 정식 명칭은 Thomas Jefferson High School for Science and Technology로, Fairfax County Public Schools(FCPS)가 운영하는 공립 고등학교입니다. 미국의 여러 고교 평가에서 최상위권에 자주 이름을 올리는 학교이며, 수학·과학·컴퓨터공학 분야에 특화된 커리큘럼으로 잘 알려져 있습니다.",
+          "TJ는 미국식 표현으로 \"매그넷 스쿨(Magnet School)\"에 속합니다. 매그넷 스쿨이란 특정 분야(TJ의 경우 STEM: 과학·기술·공학·수학)에 집중된 커리큘럼을 제공하기 위해, 원래 정해진 학군 경계와 상관없이 여러 지역에서 학생을 모집하는 공립학교를 말합니다. 즉 우리 동네 배정 고등학교가 아니라, 관심 있는 학생이 별도로 지원해서 들어가는 '선택형 공립학교'라고 이해하면 쉽습니다.",
+        ],
+      },
+      {
+        heading: "한국의 과학고·영재고와 무엇이 다른가요?",
+        paragraphs: [
+          "한국에서 오신 학부모라면 TJ를 과학고나 영재고와 비슷하게 떠올리실 수 있습니다. STEM에 특화된 상위권 학생을 위한 학교라는 점은 비슷하지만, 운영 방식은 상당히 다릅니다. 가장 큰 차이는 TJ가 등록금 없는 완전 무료 공립학교라는 점입니다. 별도의 학비 체계가 있는 것이 아니라, 다른 공립 고등학교와 동일하게 세금으로 운영됩니다.",
+          "입학 전형 방식도 다릅니다. 과거 TJ는 별도의 입학시험을 치렀지만, 2021년부터는 시험 점수 없이 성적, 에세이, 학생이 제출하는 문제 해결 과정(Student Portrait Sheet 등)을 종합적으로 평가하는 '홀리스틱 리뷰(Holistic Review)' 방식으로 바뀌었습니다. 즉 단 하나의 시험 점수로 당락이 갈리는 구조가 아니라, 학생의 여러 면을 함께 살펴보는 방식입니다. 정확한 전형 요소와 비중은 매년 조정될 수 있으므로, 지원을 고려한다면 매년 가을 학교 공식 입학 안내(tjhsst.fcps.edu)를 확인하는 것이 가장 정확합니다.",
+        ],
+      },
+      {
+        heading: "지원은 언제, 어떻게 하나요?",
+        paragraphs: [
+          "TJ는 8학년(중학교 2학년에 해당) 학생이 9학년(고등학교 1학년) 입학을 목표로 지원합니다. Fairfax County뿐 아니라 협약을 맺은 몇 개 인근 카운티(Arlington, Fairfax City, Loudoun 등) 거주 학생도 지원할 수 있습니다. 지원은 대개 재학 중인 중학교를 통해 진행되며, 담당 카운슬러가 안내해주는 경우가 많습니다.",
+          "지원 절차와 정확한 마감일, 정원, 평가 기준의 세부 내용은 소송과 정책 변화로 인해 최근 몇 년간 계속 조정되어 왔습니다. 따라서 이 글에서 특정 연도의 마감일이나 정원 숫자를 단정적으로 안내하기보다는, 8학년 지원이라는 큰 틀만 기억해두시고 정확한 최신 정보는 반드시 tjhsst.fcps.edu의 공식 입학 안내나 재학 중학교의 카운슬러를 통해 확인하시길 권합니다.",
+        ],
+      },
+      {
+        heading: "초등학교 때부터 무엇이 쌓여야 하나요?",
+        paragraphs: [
+          "TJ 지원은 8학년에 이루어지지만, 그 밑바탕이 되는 학업 습관과 사고력은 초등학교 시기에 쌓입니다. 가장 직접적으로 연결되는 것은 FCPS의 AAP(Advanced Academic Programs) 심화 수학 트랙입니다. 초등학교에서 AAP 수학을 꾸준히 이수하면 중학교에서 더 빠른 수학 진도를 밟게 되고, 이는 8학년 시점의 수학 역량 전반에 영향을 줍니다. AAP와 수학 경로에 대한 자세한 내용은 저희 블로그의 'FCPS AAP 수학, 제대로 이해하기' 글을 참고하세요.",
+          "홀리스틱 리뷰는 에세이와 문제 해결 과정을 함께 평가하기 때문에, 수학 실력만큼이나 읽기·쓰기 습관도 중요합니다. 평소 책을 읽고 자기 생각을 글로 표현해보는 연습, 그리고 정답보다 풀이 과정을 설명해보는 습관이 장기적으로 큰 자산이 됩니다. MOEMS 같은 초등 수학 경시대회 경험도 문제 해결 과정을 글로 정리해보는 좋은 연습이 될 수 있습니다.",
+        ],
+      },
+      {
+        heading: "학부모들이 흔히 하는 오해",
+        paragraphs: [
+          "가장 흔한 오해는 '선행학습 학원을 많이 다니면 TJ에 갈 수 있다'는 생각입니다. 홀리스틱 리뷰 체제에서는 단순히 진도를 많이 나간 것보다, 개념을 얼마나 깊이 이해하고 스스로 문제를 풀어내는지, 그리고 그 과정을 얼마나 명확하게 설명할 수 있는지가 더 중요하게 평가됩니다. 진도만 빠르고 개념 이해가 얕은 경우, 오히려 에세이나 문제 해결 과정에서 어려움을 겪을 수 있습니다.",
+          "또 다른 오해는 '초등학교 때 AAP에 들어가지 못하면 TJ는 불가능하다'는 생각입니다. AAP는 분명 유리한 경로이지만, 매년 재평가되는 시스템이며 중학교 시기에도 심화 수학 트랙에 진입할 기회가 있습니다. 초등 시기에 다소 늦었다고 느끼더라도, 꾸준히 개념을 다지고 사고력을 키우는 것이 여전히 의미 있는 준비가 됩니다.",
+        ],
+      },
+      {
+        heading: "지금 초등 학부모가 실천할 수 있는 것",
+        paragraphs: [
+          "지금 자녀가 초등학생이라면, 8학년 지원까지는 아직 몇 년의 시간이 있습니다. 가장 먼저 할 수 있는 것은 현재 AAP 트랙 여부를 확인하고, 심화 수학의 개념을 탄탄히 다지도록 돕는 것입니다. 여기에 더해 꾸준한 독서와 글쓰기 습관, 그리고 MOEMS 같은 수학 경시대회 경험을 통해 사고 과정을 표현하는 연습을 함께 쌓아가는 것이 좋습니다.",
+          "마지막으로, 담임교사나 학교의 AART(Advanced Academic Resource Teacher)와 정기적으로 소통하며 자녀의 학업 상태를 파악해두는 것도 중요합니다. TJ 지원은 8학년이라는 먼 미래의 일처럼 느껴질 수 있지만, 초등학교 시기의 꾸준한 기초 다지기가 결국 그 시점의 선택지를 넓혀줍니다. 조급하게 서두르기보다, 지금 할 수 있는 것부터 차근차근 쌓아가는 것이 가장 확실한 로드맵입니다.",
+        ],
+      },
+    ],
+    bodyEn: [
+      {
+        heading: "What Exactly Is TJ?",
+        paragraphs: [
+          "If you live in Fairfax County (or one of the nearby participating counties), you've probably heard the name \"TJ\" mentioned by other parents. Its full name is Thomas Jefferson High School for Science and Technology, a public high school run by Fairfax County Public Schools (FCPS). It regularly ranks among the top public high schools in national rankings, and it's especially known for its math, science, and computer science curriculum.",
+          "TJ is what's called a \"magnet school\" in the American system. A magnet school offers a specialized curriculum — in TJ's case, STEM (science, technology, engineering, and math) — and draws students from across a wider area rather than just one neighborhood boundary. In other words, it's not the high school your address automatically assigns you to; it's a public school students apply to separately because of a specific interest.",
+        ],
+      },
+      {
+        heading: "How Is It Different From Korea's Science and Gifted High Schools?",
+        paragraphs: [
+          "Parents who grew up in Korea's education system might picture TJ as similar to a Korean science high school (과학고) or gifted academy (영재고). Both serve academically strong students with a STEM focus, but the two systems work quite differently. The biggest difference is that TJ is a fully free public school — there's no separate tuition structure. It's funded like any other public high school.",
+          "The admissions process is also different. TJ used to require a separate entrance exam, but since 2021 it has used a \"Holistic Review\" process instead — no test score, but a combined look at grades, a written essay, and a problem-solving submission (often called a Student Portrait Sheet). In other words, no single test score determines the outcome; several aspects of the student are considered together. The exact components and how they're weighted can shift from year to year, so families considering applying should check the school's official admissions page (tjhsst.fcps.edu) each fall for the current cycle's details.",
+        ],
+      },
+      {
+        heading: "When and How Do Students Apply?",
+        paragraphs: [
+          "Students apply to TJ in 8th grade for admission the following year, as 9th graders. Eligibility extends beyond Fairfax County to a handful of neighboring participating jurisdictions, such as Arlington, Fairfax City, and Loudoun. Applications are typically submitted through the student's current middle school, often with guidance from the school counselor.",
+          "The exact application process, deadlines, class size, and evaluation criteria have shifted repeatedly over the past several years amid litigation and policy changes. Rather than stating specific numbers here that could be outdated by the time you read this, the key structural fact to remember is that students apply in 8th grade — and for the current cycle's exact details, always check the official admissions page at tjhsst.fcps.edu or ask your middle school counselor.",
+        ],
+      },
+      {
+        heading: "What Needs to Be Built Starting in Elementary School?",
+        paragraphs: [
+          "Although the application happens in 8th grade, the academic habits and reasoning skills behind it are built years earlier, starting in elementary school. The most direct connection is FCPS's AAP (Advanced Academic Programs) advanced math track. Students who stay on the AAP math track through elementary school move into a faster math sequence in middle school, which shapes their overall math readiness by 8th grade. For more on this pathway, see our earlier post, \"Understanding FCPS AAP Math.\"",
+          "Because Holistic Review evaluates essays and problem-solving submissions alongside grades, reading and writing habits matter just as much as math skill. Regularly reading books, practicing writing down one's own thoughts, and explaining reasoning rather than just stating an answer are all habits that pay off years later. Experience with elementary math competitions like MOEMS can also double as good practice for articulating a problem-solving process in writing.",
+        ],
+      },
+      {
+        heading: "Common Misconceptions Parents Have",
+        paragraphs: [
+          "The most common misconception is that enrolling in enough acceleration-focused tutoring guarantees TJ admission. Under Holistic Review, what matters more than how far ahead a student has covered material is how deeply they understand the concepts, how independently they can solve problems, and how clearly they can explain their reasoning. A student who has moved fast but understands shallowly can actually struggle more with the essay and problem-solving components.",
+          "Another misconception is that missing AAP placement in elementary school closes the door on TJ entirely. AAP is certainly an advantageous path, but placement is reassessed every year, and there are still opportunities to move into an advanced math track in middle school. Even if a family feels they started a bit later, consistently building conceptual understanding and reasoning skills is still meaningful preparation.",
+        ],
+      },
+      {
+        heading: "What Elementary Parents Can Do Right Now",
+        paragraphs: [
+          "If your child is currently in elementary school, there are still several years before an 8th-grade application. The first practical step is confirming their current AAP status and helping them build a genuinely solid understanding of advanced math concepts, not just speed through material. Alongside that, consistent reading and writing habits, plus experience with elementary math competitions like MOEMS, help build the ability to articulate a reasoning process — a skill that carries directly into the Holistic Review process later.",
+          "Finally, staying in regular contact with your child's teacher or the school's AART (Advanced Academic Resource Teacher) helps you keep a clear picture of where your child stands. An 8th-grade application can feel like a distant milestone, but the consistent groundwork laid during elementary school is what keeps that option open later. Rather than rushing, building steadily on what you can do now is the most reliable roadmap there is.",
+        ],
+      },
+    ],
+  },
 ];
 
 export function getBlogPost(slug: string): BlogPost | undefined {
