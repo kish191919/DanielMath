@@ -156,9 +156,9 @@ const ko = {
         desc: "숙제는 매 수업 꾸준히 제공되며, 그날 수업에서 다룬 개념이 아닐 수도 있습니다.",
       },
       {
-        title: "Daily AI Report",
-        titleKo: "AI 기반 일일 리포트",
-        desc: "매일 학생이 푼 문제를 AI가 분석해 잘한 점과 보완할 점을 학부모님께 전달합니다.",
+        title: "Teacher-Reviewed Progress Reports",
+        titleKo: "선생님이 직접 확인하는 학습 리포트",
+        desc: "선생님이 학생이 푼 학습지를 직접 확인해 잘한 점과 보완할 점을 정리하고, 학부모님께 리포트로 전달합니다.",
       },
     ],
     coverage: {

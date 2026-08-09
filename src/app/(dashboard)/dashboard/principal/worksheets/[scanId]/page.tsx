@@ -4,6 +4,7 @@ import { ExternalLink, ArrowLeft } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
 import { Button } from "@/components/ui/button";
+import { BackLink } from "@/components/ui/back-link";
 import { ReviewTable } from "@/components/dashboard/review-table";
 import { SessionNoteForm } from "@/components/dashboard/session-note-form";
 import { ScanStatusBadge } from "@/components/dashboard/scan-status-badge";
@@ -116,6 +117,7 @@ export default async function WorksheetScanReviewPage({
     return (
       <Section className="py-10 sm:py-14">
         <Container className="max-w-3xl">
+          <BackLink label="학습지 목록으로 돌아가기" />
           {header}
           {viewer}
 
@@ -187,6 +189,7 @@ export default async function WorksheetScanReviewPage({
   return (
     <Section className="py-10 sm:py-14">
       <Container className="max-w-3xl">
+        <BackLink label="학습지 목록으로 돌아가기" />
         {scan.source_scan_id && (
           <Link
             href={`/dashboard/principal/worksheets/${scan.source_scan_id}`}
@@ -241,7 +244,7 @@ export default async function WorksheetScanReviewPage({
 
         <div className="mt-8">
           <h2 className="text-lg font-semibold text-navy-900 font-ko" lang="ko">
-            {readOnly ? "확정된 문항" : "AI 채점 결과 확인"}
+            {readOnly ? "확정된 문항" : "AI 추출 결과 확인"}
           </h2>
           <p className="mt-1 text-sm text-navy-600 font-ko" lang="ko">
             {readOnly

@@ -202,7 +202,7 @@ export function ReviewTable({
 
           {row.source === "ai" && (
             <p className="mt-2 text-xs text-navy-500">
-              AI 채점 결과{row.edited_by_teacher ? " (수정됨)" : ""}
+              AI 추출 결과{row.edited_by_teacher ? " (수정됨)" : ""}
             </p>
           )}
         </div>

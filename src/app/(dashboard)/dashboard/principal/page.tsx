@@ -3,6 +3,7 @@ import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
 import { Button } from "@/components/ui/button";
 import { ScanStatusBadge } from "@/components/dashboard/scan-status-badge";
+import { ConfirmSubmitButton } from "@/components/dashboard/confirm-submit-button";
 import { StudentQuickSearch } from "@/components/dashboard/student-quick-search";
 import { TodayClassesWidget } from "@/components/dashboard/today-classes-widget";
 import { AttendanceAlertBanner } from "@/components/dashboard/attendance-alert-banner";
@@ -10,7 +11,7 @@ import { NewInquiriesWidget } from "@/components/dashboard/new-inquiries-widget"
 import { StatTile } from "@/components/dashboard/stat-tile";
 import { requireRole } from "@/lib/dal";
 import { listPendingScans, listRecentScans } from "@/lib/learning-history/queries";
-import { retryGradingAction } from "@/lib/learning-history/actions";
+import { retryGradingAction, deleteWorksheetScanAction } from "@/lib/learning-history/actions";
 import { listStudents } from "@/lib/students/queries";
 import { listClassesWithCounts } from "@/lib/classes/queries";
 import { listSessionsByDate, listAttendanceSummaries } from "@/lib/class-sessions/queries";
@@ -66,7 +67,7 @@ export default async function PrincipalHome() {
           <StatTile label="학생" value={students.length} href="/dashboard/principal/students" />
           <StatTile label="반" value={classesWithCounts.length} href="/dashboard/principal/classes" />
           <StatTile
-            label="채점 대기"
+            label="확정 대기"
             value={pendingScans.length}
             href="/dashboard/principal/worksheets?status=pending"
           />
@@ -112,7 +113,7 @@ export default async function PrincipalHome() {
         <div className="mt-10">
           <div className="flex items-baseline justify-between gap-3">
             <h2 className="text-lg font-semibold text-navy-900 font-ko" lang="ko">
-              최근 업로드 · 검토 대기
+              최근 업로드 · 확정 대기
             </h2>
             <Link
               href="/dashboard/principal/worksheets"
@@ -133,18 +134,27 @@ export default async function PrincipalHome() {
                   key={scan.id}
                   className="overflow-hidden rounded-2xl border border-navy-100 bg-white shadow-sm"
                 >
-                  <Link
-                    href={`/dashboard/principal/worksheets/${scan.id}`}
-                    className="flex items-center justify-between gap-3 p-4 transition-colors hover:bg-navy-50"
-                  >
-                    <div>
-                      <p className="text-sm font-semibold text-navy-900">
-                        {studentNameById.get(scan.student_id) ?? "알 수 없는 학생"}
-                      </p>
-                      <p className="mt-1 text-xs text-navy-600">{scan.session_date}</p>
-                    </div>
-                    <ScanStatusBadge status={scan.status} />
-                  </Link>
+                  <div className="flex items-center p-4">
+                    <Link
+                      href={`/dashboard/principal/worksheets/${scan.id}`}
+                      className="flex flex-1 items-center justify-between gap-3 transition-colors"
+                    >
+                      <div>
+                        <p className="text-sm font-semibold text-navy-900">
+                          {studentNameById.get(scan.student_id) ?? "알 수 없는 학생"}
+                        </p>
+                        <p className="mt-1 text-xs text-navy-600">{scan.session_date}</p>
+                      </div>
+                      <ScanStatusBadge status={scan.status} />
+                    </Link>
+                    <form action={deleteWorksheetScanAction.bind(null, scan.id, scan.student_id)}>
+                      <ConfirmSubmitButton
+                        label="삭제"
+                        confirmMessage="이 학습지 스캔을 삭제하시겠습니까? 채점 결과와 업로드된 원본 파일도 함께 삭제되며 되돌릴 수 없습니다."
+                        className="ml-2 shrink-0 rounded-md border border-red-200 px-3 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
+                      />
+                    </form>
+                  </div>
                   {scan.status === "grading_failed" && (
                     <div className="border-t border-red-100 bg-red-50 p-3">
                       {scan.grading_error && (

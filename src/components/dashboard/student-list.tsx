@@ -35,12 +35,15 @@ export function StudentList({
           아직 등록된 학생이 없습니다. 위 카드를 눌러 첫 학생을 추가하세요.
         </div>
       ) : (
-        overview.map(({ student, lastSessionDate, recentAccuracyRate, recentTotal }) => (
+        overview.map(({ student, lastSessionDate }) => (
           <article
             key={student.id}
             className="flex min-h-[200px] flex-col rounded-2xl border border-navy-100 bg-white p-5 shadow-sm"
           >
-            <div className="flex items-start justify-between gap-3">
+            <Link
+              href={`/dashboard/principal/students/${student.id}/history`}
+              className="-m-2 flex items-start justify-between gap-3 rounded-lg p-2 no-underline transition-colors hover:bg-navy-50"
+            >
               <div>
                 <h3 className="text-base font-semibold text-navy-900">
                   {student.full_name}
@@ -49,7 +52,7 @@ export function StudentList({
               <span className="inline-flex shrink-0 items-center rounded-full bg-navy-50 px-2 py-0.5 text-xs font-medium text-navy-800">
                 {GRADE_LABELS[student.grade]}
               </span>
-            </div>
+            </Link>
             {(classBadgesByStudent[student.id]?.length ?? 0) > 0 && (
               <div className="mt-2 flex flex-wrap gap-1">
                 {classBadgesByStudent[student.id].map((classRow) => (
@@ -67,17 +70,7 @@ export function StudentList({
                 {student.notes}
               </p>
             )}
-            <p className="mt-3 text-xs text-navy-700 font-ko" lang="ko">
-              최근 30일 정답률:{" "}
-              {recentAccuracyRate === null ? (
-                <span className="text-navy-400">기록 없음</span>
-              ) : (
-                <span className="font-medium text-navy-900">
-                  {recentAccuracyRate}% ({recentTotal}문항)
-                </span>
-              )}
-            </p>
-            <p className="mt-1 text-xs text-navy-500">
+            <p className="mt-3 text-xs text-navy-500" lang="ko">
               마지막 수업일: {lastSessionDate ?? "-"}
             </p>
             <div className="mt-auto flex items-center justify-end gap-2 pt-4">

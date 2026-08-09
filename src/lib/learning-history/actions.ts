@@ -478,22 +478,10 @@ async function notifyGuardiansOfReport(
     .maybeSingle<{ full_name: string }>();
   const studentName = student?.full_name ?? "학생";
 
-  const { data: items } = await supabase
-    .from("learning_items")
-    .select("is_correct")
-    .eq("scan_id", scanId)
-    .eq("confirmed", true)
-    .returns<{ is_correct: boolean }[]>();
-  const total = items?.length ?? 0;
-  const correct = items?.filter((i) => i.is_correct).length ?? 0;
-  const accuracyRate = total > 0 ? Math.round((correct / total) * 100) : null;
-  const rateText = accuracyRate !== null ? `정답률 ${accuracyRate}%. ` : "";
-  const rateTextEn = accuracyRate !== null ? `Accuracy ${accuracyRate}%. ` : "";
-
   // Chat gets a short arrival notice rather than the full report text — the
   // full report already lives on the "진행 상황" page (session_notes), and
   // duplicating it into the thread just meant parents saw it twice.
-  const notificationText = `${studentName} 학생의 학습 리포트가 도착했습니다. ${rateText}'진행 상황' 메뉴에서 전체 내용을 확인해보세요.`;
+  const notificationText = `${studentName} 학생의 학습 리포트가 도착했습니다. '진행 상황' 메뉴에서 전체 내용을 확인해보세요.`;
 
   for (const { guardian } of guardians) {
     try {
@@ -530,7 +518,7 @@ async function notifyGuardiansOfReport(
     try {
       await sendSms({
         to: phone,
-        body: `Daniel Math Academy: ${studentName}'s learning report has arrived. ${rateTextEn}View the full report and reply: ${link}`,
+        body: `Daniel Math Academy: ${studentName}'s learning report has arrived. View the full report and reply: ${link}`,
       });
     } catch (err) {
       console.error(`[notifyGuardiansOfReport] SMS failed for guardian ${guardian.id}`, err);

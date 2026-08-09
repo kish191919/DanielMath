@@ -158,9 +158,9 @@ const en: Dictionary = {
         desc: "Homework is assigned every session, though it may not always match that day's lesson concept.",
       },
       {
-        title: "Daily AI Report",
+        title: "Teacher-Reviewed Progress Reports",
         titleKo: "",
-        desc: "Every day, AI analyzes the problems your student solved and sends parents a report on strengths and areas to improve.",
+        desc: "Teachers review each worksheet in person and send parents a report on strengths and areas to improve.",
       },
     ],
     coverage: {

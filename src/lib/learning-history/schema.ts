@@ -49,9 +49,9 @@ export const uploadMetaSchema = z.object({
   // Set only for a correction upload (a re-photograph of problems the
   // teacher already marked wrong in red pen) — see confirmUploadAction,
   // which derives is_targeted_review from this rather than trusting a
-  // client-supplied flag. getConceptAccuracySummary's isTargetedReviewHeavy
-  // then uses that flag so parent-facing accuracy stats can flag the skew
-  // instead of presenting the number as a representative sample.
+  // client-supplied flag. That flag is what gates whether AI grading runs
+  // at all (confirmUploadAction only triggers grading for correction
+  // uploads) — it no longer feeds any accuracy-rate display.
   source_scan_id: z.string().uuid().optional(),
 });
 

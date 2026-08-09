@@ -35,11 +35,11 @@ export default async function PrincipalWorksheetsPage({
               학습지 스캔
             </h1>
             <p className="mt-2 text-sm text-navy-700 font-ko" lang="ko">
-              학생이 푼 프린트물을 사진/PDF로 업로드하면 Claude Vision이 채점한 뒤 확인을 거쳐 학습이력에 저장됩니다.
+              학생이 푼 학습지를 업로드해 보관합니다. 오답이 있다면 빨간펜으로 표시한 부분만 다시 촬영해 올리세요 — AI가 오답을 추출하면 선생님이 확인·확정한 뒤 학습이력에 반영됩니다.
             </p>
             {isPendingFilter && (
               <p className="mt-1 text-sm font-medium text-navy-600 font-ko" lang="ko">
-                채점 대기 {scans.length}건
+                확정 대기 {scans.length}건
               </p>
             )}
           </div>
@@ -76,7 +76,7 @@ export default async function PrincipalWorksheetsPage({
           {scans.length === 0 ? (
             <div className="rounded-2xl border border-navy-100 bg-white p-8 text-center text-sm text-navy-600">
               {isPendingFilter
-                ? "채점 대기 중인 학습지가 없습니다."
+                ? "확정 대기 중인 학습지가 없습니다."
                 : "아직 업로드된 학습지가 없습니다."}
             </div>
           ) : (
