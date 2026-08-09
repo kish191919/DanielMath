@@ -423,15 +423,19 @@ export async function sendSessionNoteAction(
     console.error(`[sendSessionNoteAction] guardian notify failed for ${result.id}`, err);
   }
 
-  if (parsed.data.scan_id) {
+  if (parsed.data.scan_id && parsed.data.session_date) {
     // Only a plain upload (still "uploaded") flips here — scans in the AI
     // grading pipeline (grading/pending_review/reviewed/grading_failed) keep
-    // their own status untouched.
+    // their own status untouched. Scoped to student+session_date rather than
+    // just this scan_id, since a student can have multiple scans uploaded
+    // for the same session (e.g. a re-scan) — once the report for that
+    // session is sent, none of them should linger as "미발송".
     const supabase = await createServerSupabase();
     await supabase
       .from("worksheet_scans")
       .update({ status: "delivered_to_parent" })
-      .eq("id", parsed.data.scan_id)
+      .eq("student_id", parsed.data.student_id)
+      .eq("session_date", parsed.data.session_date)
       .eq("status", "uploaded");
     revalidatePath(`/dashboard/principal/worksheets/${parsed.data.scan_id}`);
     revalidatePath("/dashboard/principal/worksheets");
