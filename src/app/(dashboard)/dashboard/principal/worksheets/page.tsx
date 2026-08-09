@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ScanStatusBadge } from "@/components/dashboard/scan-status-badge";
 import { ConfirmSubmitButton } from "@/components/dashboard/confirm-submit-button";
 import { requireRole } from "@/lib/dal";
-import { listPendingScans, listRecentScans } from "@/lib/learning-history/queries";
+import { listPendingScans, listRecentScans, listUndeliveredScans } from "@/lib/learning-history/queries";
 import { deleteWorksheetScanAction } from "@/lib/learning-history/actions";
 import { listStudents } from "@/lib/students/queries";
 
@@ -17,8 +17,13 @@ export default async function PrincipalWorksheetsPage({
   await requireRole("principal");
   const { studentId, status } = await searchParams;
   const isPendingFilter = status === "pending";
+  const isUndeliveredFilter = status === "undelivered";
   const [scans, students] = await Promise.all([
-    isPendingFilter ? listPendingScans() : listRecentScans(50, studentId),
+    isPendingFilter
+      ? listPendingScans()
+      : isUndeliveredFilter
+        ? listUndeliveredScans()
+        : listRecentScans(50, studentId),
     listStudents(),
   ]);
   const studentNameById = new Map(students.map((s) => [s.id, s.full_name]));
@@ -40,6 +45,11 @@ export default async function PrincipalWorksheetsPage({
             {isPendingFilter && (
               <p className="mt-1 text-sm font-medium text-navy-600 font-ko" lang="ko">
                 확정 대기 {scans.length}건
+              </p>
+            )}
+            {isUndeliveredFilter && (
+              <p className="mt-1 text-sm font-medium text-navy-600 font-ko" lang="ko">
+                미발송 {scans.length}건
               </p>
             )}
           </div>
@@ -77,7 +87,9 @@ export default async function PrincipalWorksheetsPage({
             <div className="rounded-2xl border border-navy-100 bg-white p-8 text-center text-sm text-navy-600">
               {isPendingFilter
                 ? "확정 대기 중인 학습지가 없습니다."
-                : "아직 업로드된 학습지가 없습니다."}
+                : isUndeliveredFilter
+                  ? "미발송 학습지가 없습니다."
+                  : "아직 업로드된 학습지가 없습니다."}
             </div>
           ) : (
             scans.map((scan) => (

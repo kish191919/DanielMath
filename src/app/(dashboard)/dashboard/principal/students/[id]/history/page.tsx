@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { GraduationCap, CalendarClock, type LucideIcon } from "lucide-react";
+import { GraduationCap, CalendarClock } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
@@ -13,6 +13,7 @@ import {
 import { BackLink } from "@/components/ui/back-link";
 import { WrongAnswerWorkspace, type ItemGroup } from "@/components/dashboard/wrong-answer-workspace";
 import { ScanStatusBadge } from "@/components/dashboard/scan-status-badge";
+import { KpiCard } from "@/components/dashboard/kpi-card";
 import { GRADE_LABELS } from "@/lib/students/schema";
 import { todayInEasternTime } from "@/lib/dates";
 import type { LearningItem } from "@/lib/supabase/types";
@@ -228,43 +229,5 @@ export default async function StudentHistoryPage({
         </div>
       </Container>
     </Section>
-  );
-}
-
-function KpiCard({
-  icon: Icon,
-  label,
-  value,
-  sub,
-  warn,
-}: {
-  icon: LucideIcon;
-  label: string;
-  value: string;
-  sub?: string;
-  warn?: boolean;
-}) {
-  return (
-    <div className={`rounded-2xl border bg-white p-4 shadow-sm ${warn ? "border-red-200" : "border-navy-100"}`}>
-      <div className="flex items-center gap-2">
-        <span
-          className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
-            warn ? "bg-red-100 text-red-600" : "bg-navy-50 text-navy-500"
-          }`}
-        >
-          <Icon className="h-4 w-4" strokeWidth={2} />
-        </span>
-        <p className="text-xs font-medium text-navy-500 font-ko" lang="ko">
-          {label}
-        </p>
-      </div>
-      <p
-        className={`mt-2 text-lg font-bold font-ko ${warn ? "text-red-600" : "text-navy-900"}`}
-        lang="ko"
-      >
-        {value}
-      </p>
-      {sub && <p className="mt-0.5 text-xs text-navy-500">{sub}</p>}
-    </div>
   );
 }

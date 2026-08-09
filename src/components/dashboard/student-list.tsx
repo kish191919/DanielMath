@@ -3,8 +3,10 @@ import { Plus } from "lucide-react";
 import { GRADE_LABELS } from "@/lib/students/schema";
 import { deleteStudentAction } from "@/lib/students/actions";
 import { WEEKDAYS, WEEKDAY_LABELS } from "@/lib/classes/schema";
+import { EnrollmentStatusBadge } from "@/components/dashboard/enrollment-status-badge";
 import type { StudentProgressOverview } from "@/lib/learning-history/queries";
 import type { Class } from "@/lib/supabase/types";
+import type { EnrollmentStatus } from "@/lib/enrollment/schema";
 
 function scheduleLabel(days: number[], startTime: string, endTime: string) {
   const dayLabel = WEEKDAYS.filter((d) => days.includes(d))
@@ -16,9 +18,13 @@ function scheduleLabel(days: number[], startTime: string, endTime: string) {
 export function StudentList({
   overview,
   classBadgesByStudent = {},
+  enrollmentStatusByStudent = {},
+  hasUnpaidTuitionByStudent = {},
 }: {
   overview: StudentProgressOverview[];
   classBadgesByStudent?: Record<string, Class[]>;
+  enrollmentStatusByStudent?: Record<string, EnrollmentStatus>;
+  hasUnpaidTuitionByStudent?: Record<string, boolean>;
 }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -38,21 +44,31 @@ export function StudentList({
         overview.map(({ student, lastSessionDate }) => (
           <article
             key={student.id}
-            className="flex min-h-[200px] flex-col rounded-2xl border border-navy-100 bg-white p-5 shadow-sm"
+            className="relative flex min-h-[200px] flex-col rounded-2xl border border-navy-100 bg-white p-5 shadow-sm"
           >
             <Link
               href={`/dashboard/principal/students/${student.id}/history`}
-              className="-m-2 flex items-start justify-between gap-3 rounded-lg p-2 no-underline transition-colors hover:bg-navy-50"
-            >
-              <div>
-                <h3 className="text-base font-semibold text-navy-900">
-                  {student.full_name}
-                </h3>
+              aria-label={`${student.full_name} 학습이력 보기`}
+              className="absolute inset-0 z-0 rounded-2xl transition-colors hover:bg-navy-50 active:bg-navy-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-400"
+            />
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="text-base font-semibold text-navy-900">
+                {student.full_name}
+              </h3>
+              <div className="flex shrink-0 flex-wrap items-center justify-end gap-1">
+                {enrollmentStatusByStudent[student.id] && (
+                  <EnrollmentStatusBadge status={enrollmentStatusByStudent[student.id]} />
+                )}
+                <span className="inline-flex items-center rounded-full bg-navy-50 px-2 py-0.5 text-xs font-medium text-navy-800">
+                  {GRADE_LABELS[student.grade]}
+                </span>
               </div>
-              <span className="inline-flex shrink-0 items-center rounded-full bg-navy-50 px-2 py-0.5 text-xs font-medium text-navy-800">
-                {GRADE_LABELS[student.grade]}
-              </span>
-            </Link>
+            </div>
+            {hasUnpaidTuitionByStudent[student.id] && (
+              <p className="mt-1 text-xs font-medium text-red-600 font-ko" lang="ko">
+                학원비 미납
+              </p>
+            )}
             {(classBadgesByStudent[student.id]?.length ?? 0) > 0 && (
               <div className="mt-2 flex flex-wrap gap-1">
                 {classBadgesByStudent[student.id].map((classRow) => (
@@ -73,23 +89,23 @@ export function StudentList({
             <p className="mt-3 text-xs text-navy-500" lang="ko">
               마지막 수업일: {lastSessionDate ?? "-"}
             </p>
-            <div className="mt-auto flex items-center justify-end gap-2 pt-4">
+            <div className="relative z-10 mt-auto flex items-center justify-end gap-2 pt-4">
               <Link
-                href={`/dashboard/principal/students/${student.id}/history`}
-                className="rounded-md border border-navy-200 px-3 py-1 text-xs font-medium text-navy-700 hover:bg-navy-50"
+                href={`/dashboard/principal/students/${student.id}/tuition`}
+                className="rounded-md border border-navy-200 bg-white px-3 py-1 text-xs font-medium text-navy-700 hover:bg-navy-50"
               >
-                학습이력
+                정산
               </Link>
               <Link
                 href={`/dashboard/principal/students/${student.id}`}
-                className="rounded-md border border-navy-200 px-3 py-1 text-xs font-medium text-navy-700 hover:bg-navy-50"
+                className="rounded-md border border-navy-200 bg-white px-3 py-1 text-xs font-medium text-navy-700 hover:bg-navy-50"
               >
                 수정
               </Link>
               <form action={deleteStudentAction.bind(null, student.id)}>
                 <button
                   type="submit"
-                  className="rounded-md border border-red-200 px-3 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
+                  className="rounded-md border border-red-200 bg-white px-3 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
                 >
                   삭제
                 </button>

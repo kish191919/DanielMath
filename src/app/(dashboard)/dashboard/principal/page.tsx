@@ -8,14 +8,17 @@ import { StudentQuickSearch } from "@/components/dashboard/student-quick-search"
 import { TodayClassesWidget } from "@/components/dashboard/today-classes-widget";
 import { AttendanceAlertBanner } from "@/components/dashboard/attendance-alert-banner";
 import { NewInquiriesWidget } from "@/components/dashboard/new-inquiries-widget";
+import { UndeliveredScansWidget } from "@/components/dashboard/undelivered-scans-widget";
+import { OverdueTuitionWidget } from "@/components/dashboard/overdue-tuition-widget";
 import { StatTile } from "@/components/dashboard/stat-tile";
 import { requireRole } from "@/lib/dal";
-import { listPendingScans, listRecentScans } from "@/lib/learning-history/queries";
+import { listPendingScans, listRecentScans, listUndeliveredScans } from "@/lib/learning-history/queries";
 import { retryGradingAction, deleteWorksheetScanAction } from "@/lib/learning-history/actions";
 import { listStudents } from "@/lib/students/queries";
 import { listClassesWithCounts } from "@/lib/classes/queries";
 import { listSessionsByDate, listAttendanceSummaries } from "@/lib/class-sessions/queries";
 import { listInquiries } from "@/lib/inquiries/queries";
+import { listOverdueTuitionPayments, listUnpaidTuitionPayments } from "@/lib/tuition/queries";
 import { todayInEasternTime, todayIsoWeekdayInEasternTime } from "@/lib/dates";
 
 // retryGradingAction re-runs the same potentially slow Claude Vision call.
@@ -23,12 +26,24 @@ export const maxDuration = 180;
 
 export default async function PrincipalHome() {
   const session = await requireRole("principal");
-  const [pendingScans, students, classesWithCounts, inquiries] = await Promise.all([
+  const [
+    pendingScans,
+    undeliveredScans,
+    students,
+    classesWithCounts,
+    inquiries,
+    overdueTuition,
+    unpaidTuition,
+  ] = await Promise.all([
     listPendingScans(),
+    listUndeliveredScans(),
     listStudents(),
     listClassesWithCounts(),
     listInquiries(),
+    listOverdueTuitionPayments(),
+    listUnpaidTuitionPayments(),
   ]);
+  const unpaidStudentCount = new Set(unpaidTuition.map((p) => p.student_id)).size;
   const widgetScans =
     pendingScans.length > 0 ? pendingScans.slice(0, 6) : await listRecentScans(6);
   const studentNameById = new Map(students.map((s) => [s.id, s.full_name]));
@@ -67,14 +82,19 @@ export default async function PrincipalHome() {
           <StatTile label="학생" value={students.length} href="/dashboard/principal/students" />
           <StatTile label="반" value={classesWithCounts.length} href="/dashboard/principal/classes" />
           <StatTile
-            label="확정 대기"
-            value={pendingScans.length}
-            href="/dashboard/principal/worksheets?status=pending"
+            label="미발송 학부모"
+            value={undeliveredScans.length}
+            href="/dashboard/principal/worksheets?status=undelivered"
           />
           <StatTile
             label="신규 문의"
             value={allNewInquiries.length}
             href="/dashboard/principal/inquiries?status=new"
+          />
+          <StatTile
+            label="미납 학생"
+            value={unpaidStudentCount}
+            href="/dashboard/principal/tuition?status=due"
           />
         </div>
 
@@ -82,6 +102,13 @@ export default async function PrincipalHome() {
           <AttendanceAlertBanner
             absentNames={absentNames}
             homeworkNotDoneNames={homeworkNotDoneNames}
+          />
+        </div>
+
+        <div className="mt-10">
+          <OverdueTuitionWidget
+            payments={overdueTuition.slice(0, 6)}
+            studentNameById={studentNameById}
           />
         </div>
 
@@ -108,6 +135,10 @@ export default async function PrincipalHome() {
 
         <div className="mt-10">
           <NewInquiriesWidget inquiries={newInquiries} />
+        </div>
+
+        <div className="mt-10">
+          <UndeliveredScansWidget scans={undeliveredScans.slice(0, 6)} studentNameById={studentNameById} />
         </div>
 
         <div className="mt-10">

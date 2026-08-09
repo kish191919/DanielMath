@@ -20,6 +20,12 @@ const cards = [
     ready: true,
   },
   {
+    href: "/dashboard/parent/tuition",
+    title: "납부 현황",
+    description: "이번 달 학원비 납부 상태를 확인합니다.",
+    ready: true,
+  },
+  {
     href: "/dashboard/parent/settings",
     title: "설정",
     description: "SMS 알림 수신 동의 여부를 관리합니다.",

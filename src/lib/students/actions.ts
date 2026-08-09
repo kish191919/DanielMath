@@ -6,7 +6,7 @@ import { requireRole } from "@/lib/dal";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { addGuardianSchema, guardianPhoneSchema, studentSchema } from "./schema";
-import type { Profile } from "@/lib/supabase/types";
+import type { Profile, Student } from "@/lib/supabase/types";
 
 export type StudentFormState = {
   error?: string;
@@ -54,14 +54,26 @@ export async function createStudentAction(
   }
 
   const supabase = await createServerSupabase();
-  const { error } = await supabase.from("students").insert({
-    full_name: parsed.data.full_name,
-    grade: parsed.data.grade,
-    track: parsed.data.track,
-    ...normalize(parsed.data),
-  });
+  const { data: newStudent, error } = await supabase
+    .from("students")
+    .insert({
+      full_name: parsed.data.full_name,
+      grade: parsed.data.grade,
+      track: parsed.data.track,
+      ...normalize(parsed.data),
+    })
+    .select("id")
+    .single<Pick<Student, "id">>();
 
   if (error) return { error: error.message };
+
+  // Every student always has an enrollment history — open the first
+  // student_enrollment_periods row here rather than requiring a separate
+  // manual click. Best-effort like the inquiry-closing step below: the
+  // student is already saved, so a failure here shouldn't block the redirect.
+  await supabase
+    .from("student_enrollment_periods")
+    .insert({ student_id: newStudent.id });
 
   // If this registration started from an inquiry card ("학생으로 등록"
   // link), close the loop by marking that inquiry enrolled. Best-effort:

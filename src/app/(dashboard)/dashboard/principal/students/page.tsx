@@ -3,14 +3,24 @@ import { Section } from "@/components/site/section";
 import { StudentList } from "@/components/dashboard/student-list";
 import { listStudentsProgressOverview } from "@/lib/learning-history/queries";
 import { listClassBadgesForStudents } from "@/lib/classes/queries";
+import { listEnrollmentStatusForStudents } from "@/lib/enrollment/queries";
+import { listUnpaidTuitionPayments } from "@/lib/tuition/queries";
 import { requireRole } from "@/lib/dal";
 
 export default async function PrincipalStudentsPage() {
   await requireRole("principal");
   const overview = await listStudentsProgressOverview();
-  const classBadgesByStudent = await listClassBadgesForStudents(
-    overview.map(({ student }) => student.id),
-  );
+  const studentIds = overview.map(({ student }) => student.id);
+
+  const [classBadgesByStudent, enrollmentStatusByStudent, unpaidPayments] = await Promise.all([
+    listClassBadgesForStudents(studentIds),
+    listEnrollmentStatusForStudents(studentIds),
+    listUnpaidTuitionPayments(),
+  ]);
+  const hasUnpaidTuitionByStudent: Record<string, boolean> = {};
+  for (const payment of unpaidPayments) {
+    hasUnpaidTuitionByStudent[payment.student_id] = true;
+  }
 
   return (
     <Section className="py-10 sm:py-14">
@@ -28,7 +38,12 @@ export default async function PrincipalStudentsPage() {
         </div>
 
         <div className="mt-8">
-          <StudentList overview={overview} classBadgesByStudent={classBadgesByStudent} />
+          <StudentList
+            overview={overview}
+            classBadgesByStudent={classBadgesByStudent}
+            enrollmentStatusByStudent={enrollmentStatusByStudent}
+            hasUnpaidTuitionByStudent={hasUnpaidTuitionByStudent}
+          />
         </div>
       </Container>
     </Section>

@@ -424,7 +424,18 @@ export async function sendSessionNoteAction(
   }
 
   if (parsed.data.scan_id) {
+    // Only a plain upload (still "uploaded") flips here — scans in the AI
+    // grading pipeline (grading/pending_review/reviewed/grading_failed) keep
+    // their own status untouched.
+    const supabase = await createServerSupabase();
+    await supabase
+      .from("worksheet_scans")
+      .update({ status: "delivered_to_parent" })
+      .eq("id", parsed.data.scan_id)
+      .eq("status", "uploaded");
     revalidatePath(`/dashboard/principal/worksheets/${parsed.data.scan_id}`);
+    revalidatePath("/dashboard/principal/worksheets");
+    revalidatePath("/dashboard/principal");
   }
   revalidatePath(`/dashboard/principal/students/${studentId}/history`);
   revalidatePath("/dashboard/parent/progress");

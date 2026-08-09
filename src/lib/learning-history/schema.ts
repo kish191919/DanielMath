@@ -24,7 +24,7 @@ export const ERROR_TYPE_LABELS: Record<(typeof ERROR_TYPES)[number], string> = {
 };
 
 export const SCAN_STATUS_LABELS: Record<
-  "uploaded" | "grading" | "pending_review" | "reviewed" | "grading_failed",
+  "uploaded" | "grading" | "pending_review" | "reviewed" | "grading_failed" | "delivered_to_parent",
   string
 > = {
   uploaded: "업로드됨",
@@ -32,6 +32,7 @@ export const SCAN_STATUS_LABELS: Record<
   pending_review: "검토 대기",
   reviewed: "확정 완료",
   grading_failed: "채점 실패",
+  delivered_to_parent: "학부모 전달완료",
 };
 
 const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;

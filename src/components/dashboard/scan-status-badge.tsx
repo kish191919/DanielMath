@@ -7,6 +7,7 @@ const STATUS_STYLES: Record<ScanStatus, string> = {
   pending_review: "bg-gold-300/30 text-navy-800",
   reviewed: "bg-green-100 text-green-800",
   grading_failed: "bg-red-100 text-red-700",
+  delivered_to_parent: "bg-blue-100 text-blue-800",
 };
 
 export function ScanStatusBadge({ status }: { status: ScanStatus }) {

@@ -21,7 +21,8 @@ export type ScanStatus =
   | "grading"
   | "pending_review"
   | "reviewed"
-  | "grading_failed";
+  | "grading_failed"
+  | "delivered_to_parent";
 
 export type PracticeSheetStatus = "draft" | "confirmed";
 
@@ -43,6 +44,7 @@ export interface Student {
   grade: Grade;
   track: Track;
   notes: string | null;
+  monthly_tuition_amount: number;
   created_at: string;
   updated_at: string;
 }
@@ -52,6 +54,28 @@ export interface StudentGuardian {
   student_id: string;
   guardian_id: string;
   created_at: string;
+}
+
+export interface StudentEnrollmentPeriod {
+  id: string;
+  student_id: string;
+  started_at: string;
+  ended_at: string | null;
+  note: string | null;
+  created_at: string;
+}
+
+export interface TuitionPayment {
+  id: string;
+  student_id: string;
+  billing_month: string;
+  amount_due: number;
+  due_date: string;
+  paid_amount: number | null;
+  paid_at: string | null;
+  note: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export type InquiryStatus = "new" | "contacted" | "enrolled" | "closed";
@@ -334,6 +358,7 @@ type StudentInsert = {
   grade: Grade;
   track?: Track;
   notes?: string | null;
+  monthly_tuition_amount?: number;
   created_at?: string;
   updated_at?: string;
 };
@@ -348,6 +373,32 @@ type StudentGuardianInsert = {
 };
 
 type StudentGuardianUpdate = Partial<StudentGuardianInsert>;
+
+type StudentEnrollmentPeriodInsert = {
+  id?: string;
+  student_id: string;
+  started_at?: string;
+  ended_at?: string | null;
+  note?: string | null;
+  created_at?: string;
+};
+
+type StudentEnrollmentPeriodUpdate = Partial<StudentEnrollmentPeriodInsert>;
+
+type TuitionPaymentInsert = {
+  id?: string;
+  student_id: string;
+  billing_month: string;
+  amount_due: number;
+  due_date: string;
+  paid_amount?: number | null;
+  paid_at?: string | null;
+  note?: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+type TuitionPaymentUpdate = Partial<TuitionPaymentInsert>;
 
 type InquiryInsert = {
   id?: string;
@@ -647,6 +698,34 @@ export type Database = {
             columns: ["guardian_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      student_enrollment_periods: {
+        Row: StudentEnrollmentPeriod;
+        Insert: StudentEnrollmentPeriodInsert;
+        Update: StudentEnrollmentPeriodUpdate;
+        Relationships: [
+          {
+            foreignKeyName: "student_enrollment_periods_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      tuition_payments: {
+        Row: TuitionPayment;
+        Insert: TuitionPaymentInsert;
+        Update: TuitionPaymentUpdate;
+        Relationships: [
+          {
+            foreignKeyName: "tuition_payments_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
             referencedColumns: ["id"];
           },
         ];

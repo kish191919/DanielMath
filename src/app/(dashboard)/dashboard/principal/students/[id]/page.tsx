@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
@@ -30,6 +31,12 @@ export default async function EditStudentPage({
           <h1 className="mt-2 text-2xl font-bold text-navy-900 font-ko sm:text-3xl" lang="ko">
             학생 수정 — {student.full_name}
           </h1>
+          <Link
+            href={`/dashboard/principal/students/${id}/tuition`}
+            className="mt-3 inline-flex items-center text-sm font-medium text-navy-600 underline underline-offset-2 hover:text-navy-800"
+          >
+            정산/등록 상태 관리 →
+          </Link>
         </div>
         <div className="mt-8 space-y-6">
           <StudentForm mode="edit" student={student} action={action} />

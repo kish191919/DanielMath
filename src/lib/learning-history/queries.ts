@@ -65,6 +65,21 @@ export async function listPendingScans(): Promise<WorksheetScan[]> {
   return data ?? [];
 }
 
+// Scans still sitting at "uploaded" — a report about them has not yet been
+// sent to the parent (see sendSessionNoteAction, which flips a scan to
+// "delivered_to_parent" once notifyGuardiansOfReport succeeds).
+export async function listUndeliveredScans(): Promise<WorksheetScan[]> {
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from("worksheet_scans")
+    .select("*")
+    .eq("status", "uploaded")
+    .order("created_at", { ascending: false })
+    .returns<WorksheetScan[]>();
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
 export async function getScanWithItems(
   scanId: string,
 ): Promise<{ scan: WorksheetScan; items: LearningItem[] } | null> {
