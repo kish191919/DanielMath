@@ -244,10 +244,10 @@ const ko = {
   resources: {
     hub: {
       meta: {
-        title: "수학 교육과정",
-        description: "Fairfax County (FCPS) 초등 수학 커리큘럼, 학년별 일반·심화(AAP) 비교, Virginia SOL 기준, 시험 일정을 한국어로 안내합니다.",
+        title: "버지니아 수학 교육과정 | FCPS AAP 커리큘럼",
+        description: "버지니아 수학 커리큘럼 안내: Fairfax County (FCPS) 초등 수학, 학년별 일반·심화(AAP) 비교, Virginia SOL 기준, 시험 일정을 한국어로 정리했습니다.",
       },
-      badge: "",
+      badge: "버지니아 수학 자료",
       title: "수학 교육과정",
       subtitle: "FCPS Math Curriculum",
       desc: "Fairfax County 초등학교 수학에 대해 꼭 알아야 할 것들을 한국어로 정리했습니다. 학년별 커리큘럼 비교, Virginia SOL 기준, 그리고 시험 일정까지 한 곳에서 확인하세요.",

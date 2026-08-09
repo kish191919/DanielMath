@@ -8,6 +8,7 @@ import { pageAlternates } from "@/lib/seo";
 import { Container } from "@/components/site/container";
 import { getBlogPost, getAllSlugs } from "@/lib/blog-posts";
 import { BlogPostingJsonLd } from "@/components/seo/json-ld";
+import { BlogVisualBlock } from "@/components/site/blog-visuals";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
@@ -96,6 +97,11 @@ export default async function BlogPostPage({ params }: Props) {
                   <h2 className="mb-3 text-xl font-bold text-navy-900">
                     {section.heading}
                   </h2>
+                  {section.visual && section.visualPosition === "before" && (
+                    <div className="mb-5">
+                      <BlogVisualBlock visual={section.visual} isKo={isKo} />
+                    </div>
+                  )}
                   <div className="space-y-4">
                     {section.paragraphs.map((para, j) => (
                       <p
@@ -106,6 +112,11 @@ export default async function BlogPostPage({ params }: Props) {
                       </p>
                     ))}
                   </div>
+                  {section.visual && section.visualPosition !== "before" && (
+                    <div className="mt-5">
+                      <BlogVisualBlock visual={section.visual} isKo={isKo} />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

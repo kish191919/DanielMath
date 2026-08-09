@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!hasLocale(locale)) return {};
   const alt = pageAlternates(locale, "/resources/sol");
   return locale === "ko"
-    ? { title: "Virginia SOL 수학 기준", description: "버지니아 주 수학 성취 기준(SOL)을 유치원~6학년별로 한국어로 설명합니다.", alternates: alt }
+    ? { title: "버지니아 수학 기준 (Virginia SOL)", description: "버지니아 수학 성취 기준(SOL)을 유치원~6학년별로 한국어로 설명합니다.", alternates: alt }
     : { title: "Virginia SOL Math Standards", description: "Virginia Standards of Learning for math — explained grade by grade from kindergarten through 6th grade.", alternates: alt };
 }
 
@@ -37,7 +37,7 @@ export default async function SolPage({ params }: Props) {
   const t = isKo ? {
     back: "자료 센터로 돌아가기",
     title: "Virginia SOL",
-    subtitle: "수학 성취 기준 (Standards of Learning)",
+    subtitle: "버지니아 수학 성취 기준 (Standards of Learning)",
     heroDesc: "버지니아 주 모든 공립학교는 주 교육부(VDOE)가 정한 SOL(Standards of Learning)을 기준으로 수업을 운영하고 평가합니다. 각 학년이 그 학년 말까지 반드시 알아야 할 내용이 정해져 있습니다.",
     whatIs: {
       eyebrow: "SOL 기초 이해",

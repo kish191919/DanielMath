@@ -1,6 +1,65 @@
+export type ScaleItem = {
+  level: string;
+  label: string;
+  desc: string;
+  tone?: "high" | "mid" | "low" | "neutral";
+};
+export type ScaleBlock = {
+  type: "scale";
+  items: ScaleItem[];
+  note?: { tone: "myth" | "info"; text: string };
+};
+
+export type TableBlock = {
+  type: "table";
+  headers: string[];
+  rows: { label: string; values: string[] }[];
+};
+
+export type ComparisonColumn = {
+  label: string;
+  tone?: "standard" | "advanced" | "neutral";
+  points: string[];
+};
+export type ComparisonBlock = { type: "comparison"; columns: ComparisonColumn[] };
+
+export type PathwayStep = { label: string; sublabel?: string; tone?: "standard" | "advanced" };
+export type PathwayBlock = { type: "pathway"; steps: PathwayStep[]; finalLabel?: string };
+
+export type ChecklistBlock = {
+  type: "checklist";
+  title?: string;
+  items: { text: string; note?: string }[];
+};
+
+export type StatBlock = { type: "stat"; value: string; label: string; source?: string };
+
+export type CalloutBlock =
+  | {
+      type: "callout";
+      variant: "note";
+      tone: "warning" | "tip" | "info";
+      title?: string;
+      text: string;
+      linkHref?: string;
+      linkLabel?: string;
+    }
+  | { type: "callout"; variant: "mythFact"; pairs: { myth: string; fact: string }[] };
+
+export type BlogVisual =
+  | ScaleBlock
+  | TableBlock
+  | ComparisonBlock
+  | PathwayBlock
+  | ChecklistBlock
+  | StatBlock
+  | CalloutBlock;
+
 export type BlogSection = {
   heading: string;
   paragraphs: string[];
+  visual?: BlogVisual;
+  visualPosition?: "before" | "after";
 };
 
 export type BlogPost = {
@@ -42,6 +101,20 @@ export const blogPosts: BlogPost[] = [
           "4점은 배운 내용을 거의 항상 정확하고 독립적으로 수행한다는 뜻이고, 3점은 대부분 이해하며 약간의 도움만 필요하다는 뜻입니다. 2점은 부분적으로 이해하며 어느 정도 도움이 필요하다는 의미이고, 1점은 이해가 부족해 상당한 도움이 필요하다는 뜻입니다. 아직 배우지 않은 내용은 NT(Not Taught)로 표시됩니다.",
           "학부모가 가장 많이 착각하는 부분은 이 숫자를 \"4=A, 3=B\" 식으로 바꿔 읽는 것입니다. 3점은 나쁜 성적이 아니라 대부분의 학생이 받는, 학년 수준을 잘 따라가고 있다는 점수입니다. 4점은 매우 안정적이고 독립적인 수행을 의미할 뿐, 모든 항목에서 4점을 받아야 한다는 뜻은 아닙니다.",
         ],
+        visual: {
+          type: "scale",
+          items: [
+            { level: "4", label: "정확·독립 수행", desc: "거의 항상 정확하고 독립적으로 수행", tone: "high" },
+            { level: "3", label: "대부분 이해", desc: "약간의 도움만 필요 — 대다수 학생의 점수", tone: "mid" },
+            { level: "2", label: "부분 이해", desc: "어느 정도 도움이 필요", tone: "mid" },
+            { level: "1", label: "이해 부족", desc: "상당한 도움이 필요", tone: "low" },
+            { level: "NT", label: "미학습", desc: "아직 배우지 않은 내용", tone: "neutral" },
+          ],
+          note: {
+            tone: "myth",
+            text: "가장 흔한 오해: \"4=A, 3=B\"로 바꿔 읽는 것. 3점은 나쁜 성적이 아니라 대다수 학생이 받는, 학년 수준을 잘 따라가는 점수입니다.",
+          },
+        },
       },
       {
         heading: "과목 하나에 점수 하나가 아닙니다",
@@ -70,6 +143,15 @@ export const blogPosts: BlogPost[] = [
           "성적표의 1~4점과 별개로, FCPS는 대부분 3~8학년 학생을 대상으로 매년 봄 SOL(Standards of Learning) 시험을 치릅니다. 읽기와 수학은 3학년부터, 과학은 5학년부터 응시하며, 그 학년에서 배운 주 전체 공통 기준을 얼마나 이해했는지 확인하는 주정부 공식 평가입니다. 400점 이상이면 Pass, 500점 이상이면 Pass/Advanced로 표시되며, 채점 기준과 시행 주체 모두 분기 성적표와 다릅니다.",
           "전체 점수가 몇 개인지보다 중요한 것은 어떤 세부 학습기준에서 2점이나 1점이 나왔는지, 그리고 지난 분기보다 나아지고 있는지입니다. 같은 영역에서 2점이 두 분기 이상 이어지거나 1점이 나온다면 담임교사에게 구체적으로 어떤 기술을 보완해야 하는지, 집에서 어떻게 도와줄 수 있는지 물어보세요. 성적표와 SOL 점수는 모두 ParentVUE에서 분기마다 확인할 수 있습니다. AAP 학생도 동일한 1~4점 기준중심평가 체계를 사용하지만, 실제로 배우는 학습 내용과 기대 수준은 트랙에 따라 다르다는 점을 함께 기억해 두면 성적표를 더 정확하게 해석할 수 있습니다.",
         ],
+        visual: {
+          type: "table",
+          headers: ["", "성적표 (Report Card)", "SOL 시험"],
+          rows: [
+            { label: "채점 방식", values: ["1~4점 기준중심평가", "400점 이상 Pass, 500점 이상 Pass/Advanced"] },
+            { label: "시행 주체", values: ["담임교사, 분기별 평가", "버지니아주, 연 1회 봄 시행"] },
+            { label: "대상 학년", values: ["K-6 전 학년", "읽기·수학 3학년+, 과학 5학년+"] },
+          ],
+        },
       },
     ],
     bodyEn: [
@@ -86,6 +168,20 @@ export const blogPosts: BlogPost[] = [
           "A 4 means the student performs the skill accurately and independently almost every time. A 3 means the student understands and performs the skill most of the time, needing only minor support. A 2 means partial understanding with some support needed, and a 1 means the student needs substantial support. Content not yet covered that quarter is marked NT (Not Taught).",
           "The most common mistake parents make is mentally converting these numbers into letter grades — treating 4 as an A and 3 as a B. A 3 is not a bad score; it's what most students earn, and it means the child is solidly on pace for the grade level. A 4 signals very consistent, independent performance — it doesn't mean every score should be a 4.",
         ],
+        visual: {
+          type: "scale",
+          items: [
+            { level: "4", label: "Accurate & Independent", desc: "Performs the skill accurately and independently almost every time", tone: "high" },
+            { level: "3", label: "Understands Most", desc: "Needs only minor support — what most students earn", tone: "mid" },
+            { level: "2", label: "Partial Understanding", desc: "Needs some support", tone: "mid" },
+            { level: "1", label: "Needs Support", desc: "Needs substantial support", tone: "low" },
+            { level: "NT", label: "Not Taught", desc: "Content not yet covered this quarter", tone: "neutral" },
+          ],
+          note: {
+            tone: "myth",
+            text: "Common mistake: reading 4 as an A and 3 as a B. A 3 isn't a bad score — it's what most students earn, and it means solid grade-level progress.",
+          },
+        },
       },
       {
         heading: "One Subject, Several Scores",
@@ -114,6 +210,15 @@ export const blogPosts: BlogPost[] = [
           "Separate from the 1-4 quarterly scores, FCPS students in most grades 3-8 take the SOL (Standards of Learning) test each spring — reading and math starting in 3rd grade, science starting in 5th. This is the official state assessment of how well a student has mastered that grade's statewide standards. A score of 400 or above is a Pass, and 500 or above is Pass/Advanced; both the scoring method and the administering body differ from the quarterly report card.",
           "What matters more than the total number of scores is which specific standards show a 2 or a 1, and whether those areas are improving quarter over quarter. If the same area shows a 2 for two or more quarters in a row, or a 1 appears, ask the teacher specifically which skills need work and how you can help at home. Both report card scores and SOL results are available each quarter through ParentVUE. AAP students use the same 1-4 standards-based system, but the actual content taught and expectations differ by track — worth keeping in mind when interpreting the report card.",
         ],
+        visual: {
+          type: "table",
+          headers: ["", "Report Card", "SOL Test"],
+          rows: [
+            { label: "Scoring", values: ["1-4 standards-based scale", "400+ = Pass, 500+ = Pass/Advanced"] },
+            { label: "Administered by", values: ["Classroom teacher, each quarter", "State of Virginia, once each spring"] },
+            { label: "Grades covered", values: ["All of K-6", "Reading & math from 3rd+, science from 5th+"] },
+          ],
+        },
       },
     ],
   },
@@ -134,6 +239,13 @@ export const blogPosts: BlogPost[] = [
           "Fairfax County 공립학교(FCPS)는 초등학교 전 학년(K–6)에 두 가지 수학 트랙을 운영합니다. 하나는 해당 학년의 Virginia Standards of Learning(SOL)을 따르는 일반 수학(Standard), 다른 하나는 한 학년 높은 내용을 배우는 심화 수학(Advanced/AAP)입니다.",
           "예를 들어 4학년 일반반 학생이 4학년 SOL을 공부할 때, 4학년 AAP반 학생은 5학년 SOL 내용을 배웁니다. 이 한 학년의 차이는 시간이 지날수록 누적되어 중학교 이후 학습 경로에 큰 영향을 줍니다.",
         ],
+        visual: {
+          type: "comparison",
+          columns: [
+            { label: "일반(Standard)", tone: "standard", points: ["학년 수준의 Virginia SOL을 따라감", "예: 4학년 → 4학년 SOL"] },
+            { label: "AAP(심화)", tone: "advanced", points: ["한 학년 높은 내용을 학습", "예: 4학년 AAP → 5학년 SOL"] },
+          ],
+        },
       },
       {
         heading: "AAP(Advanced Academic Programs)란?",
@@ -148,6 +260,16 @@ export const blogPosts: BlogPost[] = [
           "FCPS AAP 배치는 여러 요소를 종합적으로 평가합니다. NGAT(Naglieri General Ability Test) 점수, 학업 성적(GPA), 교사 평가서, 학부모 추천서가 모두 반영됩니다. NGAT는 2025-2026학년도부터 기존 CogAT·NNAT를 대체한 단일 능력검사입니다.",
           "중요한 점은 AAP 배치가 한 번에 영구적으로 결정되지 않는다는 것입니다. FCPS는 매년 학업 수행 능력을 다시 평가하며, 심화반을 유지하려면 꾸준한 학습이 필요합니다. 지원 신청은 일반적으로 전년도 12월 중순에 마감됩니다.",
         ],
+        visual: {
+          type: "checklist",
+          title: "배치 평가 요소",
+          items: [
+            { text: "NGAT(Naglieri General Ability Test) 점수" },
+            { text: "학업 성적(GPA)" },
+            { text: "교사 평가서" },
+            { text: "학부모 추천서", note: "지원 마감: 전년도 12월 중순" },
+          ],
+        },
       },
       {
         heading: "초등 AAP 수학이 중학교 이후 경로에 미치는 영향",
@@ -155,6 +277,15 @@ export const blogPosts: BlogPost[] = [
           "초등 AAP 수학을 꾸준히 이수한 학생은 중학교에서 더 빠른 수학 경로를 밟을 수 있습니다. FCPS 기준으로, 6학년에 7학년 수준의 수학을 이수한 학생은 7학년에 Pre-Algebra, 8학년에 Algebra I를 수강하게 됩니다.",
           "이 경로를 따라가면 고등학교에서 AP Calculus AB 또는 BC를 수강할 수 있는 기반이 마련됩니다. 많은 대학에서 AP Calculus 이수 여부를 이공계 전공 지원 시 중요하게 봅니다. 초등학교의 수학 배치가 결국 대학 입시까지 영향을 미칠 수 있다는 점에서 조기에 준비하는 것이 중요합니다.",
         ],
+        visual: {
+          type: "pathway",
+          steps: [
+            { label: "6학년", sublabel: "7학년 수학 이수" },
+            { label: "7학년", sublabel: "Pre-Algebra" },
+            { label: "8학년", sublabel: "Algebra I" },
+          ],
+          finalLabel: "AP Calculus",
+        },
       },
       {
         heading: "학부모가 할 수 있는 것",
@@ -171,6 +302,13 @@ export const blogPosts: BlogPost[] = [
           "Fairfax County Public Schools (FCPS) runs two separate math tracks at every elementary grade level (K–6). The Standard track follows the grade-level Virginia Standards of Learning (SOL). The Advanced/AAP track covers content one full grade level ahead.",
           "For example, while a 4th-grade Standard student works through 4th-grade SOL, a 4th-grade AAP student is already covering 5th-grade content. This one-year gap compounds over time and significantly shapes a student's math trajectory into middle and high school.",
         ],
+        visual: {
+          type: "comparison",
+          columns: [
+            { label: "Standard", tone: "standard", points: ["Follows the grade-level Virginia SOL", "e.g. 4th grade → 4th-grade SOL"] },
+            { label: "AAP (Advanced)", tone: "advanced", points: ["Covers content one grade ahead", "e.g. 4th-grade AAP → 5th-grade SOL"] },
+          ],
+        },
       },
       {
         heading: "What Is AAP?",
@@ -185,6 +323,16 @@ export const blogPosts: BlogPost[] = [
           "FCPS evaluates several factors together: NGAT (Naglieri General Ability Test) scores, academic grades, teacher evaluations, and a parent recommendation. No single score determines placement. The NGAT replaced the former CogAT and NNAT tests starting in the 2025-2026 school year.",
           "Critically, AAP placement is not permanent. FCPS re-evaluates students annually, and maintaining the advanced track requires consistent academic performance. Application windows typically close in mid-December for the following school year.",
         ],
+        visual: {
+          type: "checklist",
+          title: "What Placement Considers",
+          items: [
+            { text: "NGAT (Naglieri General Ability Test) score" },
+            { text: "Academic grades (GPA)" },
+            { text: "Teacher evaluation" },
+            { text: "Parent recommendation", note: "Application deadline: mid-December" },
+          ],
+        },
       },
       {
         heading: "Why AAP Math Matters for the Long-Term Pathway",
@@ -192,6 +340,15 @@ export const blogPosts: BlogPost[] = [
           "Students who complete the elementary AAP math track consistently enter a faster math sequence in middle school. Under the FCPS pathway, a student who completes 7th-grade-level math in 6th grade proceeds to Pre-Algebra in 7th grade and Algebra I in 8th grade.",
           "This trajectory makes AP Calculus AB or BC achievable in high school, a credential that carries weight for STEM college admissions. Elementary math placement has compounding effects that reach well beyond elementary school.",
         ],
+        visual: {
+          type: "pathway",
+          steps: [
+            { label: "6th Grade", sublabel: "7th-grade math" },
+            { label: "7th Grade", sublabel: "Pre-Algebra" },
+            { label: "8th Grade", sublabel: "Algebra I" },
+          ],
+          finalLabel: "AP Calculus",
+        },
       },
       {
         heading: "What Parents Can Do",
@@ -219,6 +376,13 @@ export const blogPosts: BlogPost[] = [
           "FCPS는 2025-2026학년도부터 AAP(심화학급) 선발을 위한 능력검사 체계를 바꿨습니다. 과거에는 2학년 전체 학생에게 CogAT(Cognitive Abilities Test)를, 1학년 전체 학생에게 NNAT(Naglieri Nonverbal Ability Test)를 각각 실시했지만, 현재는 이 두 시험을 대체하는 단일 검사인 NGAT(Naglieri General Ability Test)를 2~7학년 스크리닝에 활용합니다.",
           "NGAT는 NNAT를 개발한 심리학자 Jack Naglieri가 만든 검사로, 학생이 배운 지식이 아니라 추론 능력과 문제 해결 잠재력을 측정한다는 철학은 이전과 동일합니다. 검사는 Verbal(언어 개념), Nonverbal(도형·공간 패턴), Quantitative(수량 추론) 세 영역으로 구성되어 있어, 기존 CogAT의 세 배터리 구조를 하나의 시험 안에 통합한 형태라고 볼 수 있습니다.",
         ],
+        visual: {
+          type: "comparison",
+          columns: [
+            { label: "이전 (CogAT·NNAT)", tone: "standard", points: ["2학년 전체 CogAT 실시", "1학년 전체 NNAT 실시", "영역별 별개 시험"] },
+            { label: "현재 (NGAT)", tone: "advanced", points: ["2~7학년 스크리닝에 단일 시험 활용", "Verbal·Nonverbal·Quantitative 통합"] },
+          ],
+        },
       },
       {
         heading: "세 가지 영역: Verbal·Nonverbal·Quantitative",
@@ -226,6 +390,15 @@ export const blogPosts: BlogPost[] = [
           "Verbal(언어) 영역은 여섯 개의 그림 중 다섯 개가 공유하는 개념을 찾아내는 방식으로 언어적 개념을 측정하며, 문장이 아닌 그림으로 제시되어 언어 배경에 관계없이 공정하게 평가할 수 있도록 설계되었습니다. Nonverbal(비언어) 영역은 도형, 색상, 순서, 방향 등 시각적 패턴 사이의 논리적 관계를 파악하는 능력을 측정합니다.",
           "Quantitative(수량) 영역은 숫자와 기호 사이의 관계를 다루며, 단순 연산 실력이 아니라 수학적으로 사고하는 방식을 평가합니다. 세 영역 모두 학교에서 배운 교과 지식보다는 순수한 추론 능력에 초점을 맞춘다는 점은 이전 CogAT·NNAT 체계와 같습니다.",
         ],
+        visual: {
+          type: "table",
+          headers: ["", "측정 대상", "형식"],
+          rows: [
+            { label: "Verbal", values: ["언어적 개념 이해", "6개 그림 중 5개의 공통 개념 찾기"] },
+            { label: "Nonverbal", values: ["도형·공간 패턴 논리", "매트릭스 패턴 추론"] },
+            { label: "Quantitative", values: ["수량·기호 관계, 수학적 사고", "숫자·기호 관계 문제"] },
+          ],
+        },
       },
       {
         heading: "점수는 어떻게 계산되나요?",
@@ -233,6 +406,13 @@ export const blogPosts: BlogPost[] = [
           "NGAT 결과는 NAI(Naglieri Ability Index)라는 표준화 점수와 백분위(Percentile Rank)로 제공됩니다. NAI는 같은 연령대 학생들과 비교한 점수로, 평균이 100이며 대다수 학생은 85~115 사이에 분포합니다. 백분위 99는 동일 연령대 100명 중 상위 1등이라는 의미입니다.",
           "FCPS에서 풀타임 AAP(Level IV) 배치는 일반적으로 상위 3~5% 이내의 점수가 요구되지만, 점수만으로 결정되지 않고 교사 평가, 학업 성취도 등을 종합적으로 반영합니다.",
         ],
+        visual: {
+          type: "stat",
+          value: "상위 3~5%",
+          label: "FCPS 풀타임 AAP(Level IV) 배치 기준",
+          source: "NAI 평균 100, 대다수 85~115 분포 (백분위 99 = 상위 1%)",
+        },
+        visualPosition: "before",
       },
       {
         heading: "시험은 언제, 어떻게 치르나요?",
@@ -256,6 +436,13 @@ export const blogPosts: BlogPost[] = [
           "Starting with the 2025-2026 school year, FCPS changed the ability-testing system used for AAP (Advanced Academic Programs) screening. Previously, all 2nd graders took the CogAT (Cognitive Abilities Test) and all 1st graders took the NNAT (Naglieri Nonverbal Ability Test). Both have now been replaced by a single test, the NGAT (Naglieri General Ability Test), used for screening in grades 2-7.",
           "The NGAT was developed by Jack Naglieri, the same psychologist behind the NNAT, and keeps the same underlying philosophy: it measures reasoning ability and problem-solving potential rather than learned content. The test is organized into three sections — Verbal, Nonverbal, and Quantitative — effectively consolidating what used to be three separate CogAT batteries into a single exam.",
         ],
+        visual: {
+          type: "comparison",
+          columns: [
+            { label: "Before (CogAT + NNAT)", tone: "standard", points: ["All 2nd graders took CogAT", "All 1st graders took NNAT", "Separate tests by grade"] },
+            { label: "Now (NGAT)", tone: "advanced", points: ["Single test used for grades 2-7 screening", "Verbal, Nonverbal & Quantitative combined"] },
+          ],
+        },
       },
       {
         heading: "Three Sections: Verbal, Nonverbal, and Quantitative",
@@ -263,6 +450,15 @@ export const blogPosts: BlogPost[] = [
           "The Verbal section presents six pictures and asks students to identify the concept shared by five of them, measuring verbal reasoning through images rather than written or spoken language — a design meant to be fair across language backgrounds. The Nonverbal section measures logical reasoning through shapes, colors, sequences, and orientation in matrix-style patterns.",
           "The Quantitative section evaluates relationships between numbers and symbols, focusing on how a student thinks mathematically rather than computational speed. As with the previous CogAT/NNAT system, all three sections prioritize pure reasoning over classroom content.",
         ],
+        visual: {
+          type: "table",
+          headers: ["", "What It Measures", "Format"],
+          rows: [
+            { label: "Verbal", values: ["Verbal reasoning concepts", "Identify the shared concept among 5 of 6 pictures"] },
+            { label: "Nonverbal", values: ["Logical reasoning in visual patterns", "Matrix-style shape/pattern problems"] },
+            { label: "Quantitative", values: ["Mathematical thinking, number relationships", "Number & symbol relationship problems"] },
+          ],
+        },
       },
       {
         heading: "How Are Scores Calculated?",
@@ -270,6 +466,13 @@ export const blogPosts: BlogPost[] = [
           "NGAT results are reported as a Naglieri Ability Index (NAI) and a Percentile Rank. The NAI compares a student to same-age peers, with an average of 100; most students score between 85 and 115. A 99th percentile means a student scored higher than 99 out of 100 same-age peers.",
           "Full-time AAP (Level IV) placement in FCPS typically requires scores in roughly the top 3–5%, but scores are never the sole deciding factor. Teacher evaluations and academic performance are also weighed.",
         ],
+        visual: {
+          type: "stat",
+          value: "Top 3-5%",
+          label: "Typical threshold for full-time AAP (Level IV) placement",
+          source: "NAI average is 100; most students score 85-115 (99th percentile = top 1%)",
+        },
+        visualPosition: "before",
       },
       {
         heading: "When and How Is the Test Administered?",
@@ -311,6 +514,14 @@ export const blogPosts: BlogPost[] = [
           "Singapore Math의 핵심 교육 방식은 CPA(Concrete-Pictorial-Abstract) 접근법입니다. 학생이 수학 개념을 처음 접할 때는 실물(구체물)로 직접 만지며 이해하고, 그 다음엔 그림이나 도식으로 표현하며, 마지막으로 추상적인 숫자와 기호로 다룹니다.",
           "예를 들어 분수를 배울 때, 먼저 피자나 블록 같은 실물을 반으로 나눠 보고, 이후 원이나 막대를 나눈 그림으로 표현하며, 마지막에 '1/2'이라는 기호를 사용합니다. 이 과정을 통해 학생들은 숫자 뒤에 있는 개념을 직관적으로 이해하게 됩니다.",
         ],
+        visual: {
+          type: "pathway",
+          steps: [
+            { label: "구체(Concrete)", sublabel: "실물 조작" },
+            { label: "그림(Pictorial)", sublabel: "도식·그림 표현" },
+            { label: "추상(Abstract)", sublabel: "숫자·기호" },
+          ],
+        },
       },
       {
         heading: "Bar Model로 워드 프로블럼 시각화하기",
@@ -325,6 +536,13 @@ export const blogPosts: BlogPost[] = [
           "전통적인 미국 수학 교육은 공식과 절차(Procedure)를 먼저 가르치고, 많은 문제를 반복해서 풀게 하는 방식입니다. 이렇게 하면 계산 속도는 빨라지지만 '왜(Why)' 그렇게 되는지 이해하지 못하는 경우가 많습니다.",
           "Singapore Math는 반대로 '왜'를 먼저 이해시킵니다. 나눗셈이 무엇인지 개념을 완전히 이해한 학생은 공식을 잊어버려도 스스로 다시 유도할 수 있습니다. CogAT·NNAT 같은 추론 능력 시험이나 AMC 같은 수학 경시대회에서 Singapore Math 학생들이 강한 이유가 이 때문입니다.",
         ],
+        visual: {
+          type: "comparison",
+          columns: [
+            { label: "전통적 미국 수학", tone: "standard", points: ["공식·절차를 먼저 학습", "반복 연산으로 계산 속도 향상", "'왜'는 이해 못하는 경우가 많음"] },
+            { label: "Singapore Math", tone: "advanced", points: ["'왜'를 먼저 완전히 이해", "개념을 잊어도 스스로 재유도 가능", "추론 시험·경시대회에 강함"] },
+          ],
+        },
       },
       {
         heading: "Beast Academy와의 관계",
@@ -348,6 +566,14 @@ export const blogPosts: BlogPost[] = [
           "Singapore Math's signature teaching method is the CPA (Concrete-Pictorial-Abstract) progression. Students first explore concepts using physical objects, then represent them as pictures or diagrams, and finally work with abstract numbers and symbols.",
           "For example, when learning fractions, students first split physical objects (blocks, pizza), then draw diagrams of divided shapes, and only then write '1/2.' This ensures the abstract symbol is always tied to a real, understood concept.",
         ],
+        visual: {
+          type: "pathway",
+          steps: [
+            { label: "Concrete", sublabel: "Physical objects" },
+            { label: "Pictorial", sublabel: "Pictures & diagrams" },
+            { label: "Abstract", sublabel: "Numbers & symbols" },
+          ],
+        },
       },
       {
         heading: "The Bar Model for Visual Problem Solving",
@@ -362,6 +588,13 @@ export const blogPosts: BlogPost[] = [
           "Traditional U.S. math instruction often prioritizes procedure first, teaching formulas and having students drill many repetitions. Students can become fast calculators without understanding why the methods work.",
           "Singapore Math inverts this. Students who deeply understand division can reconstruct the concept even if they forget a formula. This is why Singapore Math students tend to perform well on reasoning-based tests like CogAT and NNAT, and in competitions like AMC 8.",
         ],
+        visual: {
+          type: "comparison",
+          columns: [
+            { label: "Traditional U.S. Math", tone: "standard", points: ["Procedure and formulas taught first", "Fast calculation through repetition", "Often lacks understanding of 'why'"] },
+            { label: "Singapore Math", tone: "advanced", points: ["'Why' is understood first, deeply", "Concepts can be reconstructed even if forgotten", "Stronger performance on reasoning tests & competitions"] },
+          ],
+        },
       },
       {
         heading: "The Connection to Beast Academy",
@@ -403,6 +636,11 @@ export const blogPosts: BlogPost[] = [
           "AMC 8(American Mathematics Competition 8)은 미국수학협회(MAA)가 주관하는 대회로, 8학년 이하 학생 전원이 참가할 수 있습니다. 매년 1월에 시행되며, 25문항, 40분이 주어집니다. 주관식 없이 전부 5지선다 객관식입니다.",
           "난이도는 MOEMS보다 높습니다. 특히 후반부 10문제는 상당한 수학적 창의성이 요구됩니다. 고득점자는 AMC 10/12 → AIME → USAMO로 이어지는 미국 수학 올림피아드 경로에 진입할 수 있어, 수학에 열정 있는 학생에게는 장기적인 목표가 됩니다.",
         ],
+        visual: {
+          type: "pathway",
+          steps: [{ label: "AMC 8" }, { label: "AMC 10/12" }, { label: "AIME" }],
+          finalLabel: "USAMO",
+        },
       },
       {
         heading: "Math Kangaroo로 경험하는 국제 수학 대회",
@@ -410,6 +648,16 @@ export const blogPosts: BlogPost[] = [
           "Math Kangaroo는 1991년 프랑스에서 시작된 국제 수학 경시대회로, 현재 90개국 이상이 참가합니다. 매년 3월 셋째 목요일에 시행되며, K-12 전체 학년을 대상으로 학년별 난이도가 구분됩니다.",
           "각 학년에 맞는 30문항을 75분 안에 풀며, 참가 신청은 kangaroo.org에서 개인 단위로 할 수 있습니다. 참가비는 소정의 금액이 있으며, 전 세계 학생들과 비교할 수 있다는 점에서 흥미로운 경험이 됩니다.",
         ],
+        visual: {
+          type: "table",
+          headers: ["", "MOEMS", "AMC 8", "Math Kangaroo"],
+          rows: [
+            { label: "대상 학년", values: ["4-6학년(E) / 4-8학년(M)", "8학년 이하", "K-12 전 학년"] },
+            { label: "형식", values: ["5회 × 30분 × 5문제", "25문항, 40분 객관식", "30문항, 75분"] },
+            { label: "시행 시기", values: ["11월~3월(5회)", "매년 1월", "3월 셋째 목요일"] },
+            { label: "난이도", values: ["창의적이나 접근 용이", "후반부 상당한 창의성 요구", "학년별 난이도 조정"] },
+          ],
+        },
       },
       {
         heading: "언제부터 준비를 시작할까요?",
@@ -440,6 +688,11 @@ export const blogPosts: BlogPost[] = [
           "The AMC 8 (American Mathematics Competition 8), run by the Mathematical Association of America (MAA), is open to all students in 8th grade or below. Held each January, it consists of 25 multiple-choice questions in 40 minutes.",
           "Difficulty is higher than MOEMS, especially in the last 10 questions, which demand substantial mathematical creativity. High scorers can advance through the AMC 10/12 → AIME → USAMO pathway, making AMC 8 a meaningful long-term goal for mathematically passionate students.",
         ],
+        visual: {
+          type: "pathway",
+          steps: [{ label: "AMC 8" }, { label: "AMC 10/12" }, { label: "AIME" }],
+          finalLabel: "USAMO",
+        },
       },
       {
         heading: "Math Kangaroo as an International Competition Experience",
@@ -447,6 +700,16 @@ export const blogPosts: BlogPost[] = [
           "Math Kangaroo began in France in 1991 and now runs in over 90 countries. Held annually on the third Thursday of March, it covers all grades K–12 with difficulty scaled by grade level.",
           "Students solve 30 questions in 75 minutes. Individual registration is available at kangaroo.org with a small participation fee. It's a unique opportunity to compare performance against students internationally.",
         ],
+        visual: {
+          type: "table",
+          headers: ["", "MOEMS", "AMC 8", "Math Kangaroo"],
+          rows: [
+            { label: "Grades", values: ["4-6 (Div E) / 4-8 (Div M)", "8th grade or below", "K-12, all grades"] },
+            { label: "Format", values: ["5 contests × 30 min × 5 questions", "25 questions, 40 min, multiple-choice", "30 questions, 75 min"] },
+            { label: "Timing", values: ["Nov-Mar (5 contests)", "Every January", "3rd Thursday of March"] },
+            { label: "Difficulty", values: ["Creative but accessible", "Last 10 questions demand real creativity", "Difficulty scaled by grade"] },
+          ],
+        },
       },
       {
         heading: "When Should You Start Preparing?",
@@ -472,36 +735,66 @@ export const blogPosts: BlogPost[] = [
         heading: "1. 짧게, 자주 반복하는 분산 학습의 힘",
         paragraphs: [
           "인지과학 연구에서 반복적으로 확인된 '분산 학습(Spaced Practice)' 효과가 있습니다. 주말에 2시간 몰아서 공부하는 것보다 매일 15~20분씩 꾸준히 연습하는 것이 장기 기억과 실력 향상에 훨씬 효과적입니다.",
-          "실천 방법: 매일 저녁 식사 후 15분을 수학 연습 시간으로 고정하세요. IXL Math처럼 짧게 집중적으로 연습할 수 있는 도구를 활용하면 지속하기 쉽습니다.",
         ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "tip",
+          title: "실천 방법",
+          text: "매일 저녁 식사 후 15분을 수학 연습 시간으로 고정하세요. IXL Math처럼 짧게 집중적으로 연습할 수 있는 도구를 활용하면 지속하기 쉽습니다.",
+        },
       },
       {
         heading: "2. 암산 능력 키우기",
         paragraphs: [
           "암산(Mental Math) 능력은 단순히 빠른 계산이 아닙니다. 수의 구조를 유연하게 다루는 능력을 키우며, 이는 대수(Algebra)와 문제 해결 능력의 기초가 됩니다. 여러 연구에서 암산 능력이 높은 학생이 복잡한 수학 문제에서도 더 높은 성취를 보인다는 결과가 있습니다.",
-          "실천 방법: 차를 타고 이동할 때 가볍게 '235 + 78은 얼마일까?'처럼 물어보세요. 정답보다 어떻게 계산했는지 방법을 물어보는 것이 더 중요합니다.",
         ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "tip",
+          title: "실천 방법",
+          text: "차를 타고 이동할 때 가볍게 '235 + 78은 얼마일까?'처럼 물어보세요. 정답보다 어떻게 계산했는지 방법을 물어보는 것이 더 중요합니다.",
+        },
       },
       {
         heading: "3. 워드 프로블럼은 소리 내어 읽기",
         paragraphs: [
           "많은 학생들이 수학 연산은 잘 하면서도 워드 프로블럼에서 실수합니다. 이유는 대부분 수학 실력 부족이 아니라 독해 능력의 문제입니다. 문제를 소리 내어 읽으면 이해도가 높아지고, 중요한 정보와 불필요한 정보를 구분하는 능력이 자연스럽게 길러집니다.",
-          "실천 방법: 숙제를 풀 때 워드 프로블럼은 반드시 소리 내어 읽게 하고, 문제에서 구하는 것이 무엇인지 스스로 말로 설명하게 해보세요.",
         ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "tip",
+          title: "실천 방법",
+          text: "숙제를 풀 때 워드 프로블럼은 반드시 소리 내어 읽게 하고, 문제에서 구하는 것이 무엇인지 스스로 말로 설명하게 해보세요.",
+        },
       },
       {
         heading: "4. 틀린 문제를 같이 분석하기",
         paragraphs: [
           "오답이 실력 향상의 가장 좋은 재료입니다. 틀린 문제를 그냥 넘기지 말고, 왜 틀렸는지 함께 분석해보세요. 계산 실수인지, 개념 이해 부족인지, 문제를 잘못 읽은 것인지 원인을 파악하면 같은 실수가 반복되지 않습니다.",
-          "실천 방법: 시험지를 돌려받으면 틀린 문제만 다시 풀어보게 하세요. 그리고 어떤 부분에서 실수했는지 학생 스스로 말로 설명하게 하면 메타인지 능력도 함께 키워집니다.",
         ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "tip",
+          title: "실천 방법",
+          text: "시험지를 돌려받으면 틀린 문제만 다시 풀어보게 하세요. 그리고 어떤 부분에서 실수했는지 학생 스스로 말로 설명하게 하면 메타인지 능력도 함께 키워집니다.",
+        },
       },
       {
         heading: "5. 성장 마인드셋으로 키우는 수학 자신감",
         paragraphs: [
           "Stanford 대학의 심리학자 Carol Dweck 박사의 연구에 따르면, '나는 수학을 못 해'처럼 능력을 고정된 것으로 보는 학생(Fixed Mindset)보다 '아직은 어렵지만 연습하면 할 수 있어'처럼 노력으로 성장한다고 믿는 학생(Growth Mindset)이 장기적으로 더 높은 수학 성취를 보입니다.",
-          "실천 방법: 아이가 수학을 어려워할 때 '원래 이런 거야, 괜찮아'보다 '지금은 어렵지, 그런데 어떤 부분이 어려웠어?'라고 구체적으로 물어보세요. 어려움을 인정하되 포기하지 않는 태도를 함께 만들어가는 것이 중요합니다.",
         ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "tip",
+          title: "실천 방법",
+          text: "아이가 수학을 어려워할 때 '원래 이런 거야, 괜찮아'보다 '지금은 어렵지, 그런데 어떤 부분이 어려웠어?'라고 구체적으로 물어보세요. 어려움을 인정하되 포기하지 않는 태도를 함께 만들어가는 것이 중요합니다.",
+        },
       },
     ],
     bodyEn: [
@@ -509,36 +802,66 @@ export const blogPosts: BlogPost[] = [
         heading: "1. Short and Frequent: The Power of Spaced Practice",
         paragraphs: [
           "Cognitive science research consistently shows that distributed (spaced) practice outperforms massed practice for long-term retention. Practicing 15–20 minutes daily is far more effective than a single 2-hour session on the weekend.",
-          "In practice: Set a fixed 15-minute math window each evening after dinner. Tools like IXL Math are designed for exactly this kind of short, focused daily practice.",
         ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "tip",
+          title: "In Practice",
+          text: "Set a fixed 15-minute math window each evening after dinner. Tools like IXL Math are designed for exactly this kind of short, focused daily practice.",
+        },
       },
       {
         heading: "2. Build Mental Math Ability",
         paragraphs: [
           "Mental math is not just about speed. It develops flexible number sense, which is the foundation for algebra and complex problem solving. Research shows students with stronger mental math skills tend to achieve higher on multi-step math problems.",
-          "In practice: During car rides, ask casual questions like 'What's 235 plus 78?' Focus on the method they used, not just the answer. Discussing different calculation strategies is the real learning.",
         ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "tip",
+          title: "In Practice",
+          text: "During car rides, ask casual questions like 'What's 235 plus 78?' Focus on the method they used, not just the answer. Discussing different calculation strategies is the real learning.",
+        },
       },
       {
         heading: "3. Read Word Problems Aloud",
         paragraphs: [
           "Many students who handle computation well still stumble on word problems, and the cause is usually comprehension rather than math ability. Reading problems aloud increases understanding and naturally trains students to identify what's being asked versus what's extra information.",
-          "In practice: Require word problems to be read aloud during homework, and ask your child to say in their own words what the question is asking before they start solving.",
         ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "tip",
+          title: "In Practice",
+          text: "Require word problems to be read aloud during homework, and ask your child to say in their own words what the question is asking before they start solving.",
+        },
       },
       {
         heading: "4. Analyze Mistakes Together",
         paragraphs: [
           "Wrong answers are the best raw material for improvement. Rather than moving past incorrect problems, look at them together and identify the cause: a calculation slip, a concept gap, or misreading the question. Understanding why reduces repetition of the same mistakes.",
-          "In practice: When a test comes back, have your child re-solve only the wrong problems and explain out loud where they went wrong. This also builds metacognitive skills alongside math ability.",
         ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "tip",
+          title: "In Practice",
+          text: "When a test comes back, have your child re-solve only the wrong problems and explain out loud where they went wrong. This also builds metacognitive skills alongside math ability.",
+        },
       },
       {
         heading: "5. 'Not Yet' and the Growth Mindset Approach",
         paragraphs: [
           "Stanford psychologist Carol Dweck's research shows that students who believe their ability is fixed ('I'm just not a math person') consistently underperform over time compared to students who believe ability grows with effort. The language used around math mistakes matters significantly.",
-          "In practice: When your child struggles, instead of 'It's fine, this is just hard,' try 'This is tough right now. Which part felt hardest?' Acknowledging difficulty while maintaining forward momentum is the core of a growth mindset.",
         ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "tip",
+          title: "In Practice",
+          text: "When your child struggles, instead of 'It's fine, this is just hard,' try 'This is tough right now. Which part felt hardest?' Acknowledging difficulty while maintaining forward momentum is the core of a growth mindset.",
+        },
       },
     ],
   },
@@ -559,6 +882,13 @@ export const blogPosts: BlogPost[] = [
           "Duke University의 심리학자 Harris Cooper가 1996년 발표한 메타분석 연구는 여름방학 동안 학생들이 평균적으로 약 한 달 분량의 학습 내용을 잊어버린다는 사실을 보여주었습니다. 이후 여러 후속 연구에서도 비슷한 패턴이 반복적으로 확인되었는데, 특히 수학 연산 능력의 퇴보 폭이 읽기 능력보다 크게 나타났습니다.",
           "한 해의 손실은 크지 않아 보일 수 있지만, K-6 동안 매년 여름마다 조금씩 누적되면 학년이 올라갈수록 격차가 벌어집니다. 특히 전년도에 심화 내용을 다뤘던 학생이라면, 그 내용을 유지하지 못한 채 새 학년을 맞이하게 될 위험이 더 큽니다.",
         ],
+        visual: {
+          type: "stat",
+          value: "약 한 달",
+          label: "여름방학 동안 평균 학습 손실",
+          source: "Harris Cooper, Duke University, 1996 메타분석",
+        },
+        visualPosition: "before",
       },
       {
         heading: "왜 수학이 유독 취약할까요?",
@@ -566,6 +896,13 @@ export const blogPosts: BlogPost[] = [
           "읽기는 방학 중에도 비교적 자연스럽게 이어지는 경우가 많습니다. 도서관에 가거나, 재미로 책을 읽거나, 여행 중 표지판과 메뉴판을 읽는 등 일상 속에서 저절로 노출됩니다. 반면 수학은 아이가 스스로 나눗셈이나 분수 문제를 찾아서 풀어보는 경우가 드뭅니다.",
           "특히 연산이나 계산 절차처럼 '몸에 익혀야 하는' 스킬은 사용하지 않으면 상대적으로 빨리 무뎌집니다. 개념을 이해하는 것과 그 개념을 빠르고 정확하게 적용하는 것은 다른 문제이며, 후자는 꾸준한 연습이 없으면 특히 퇴보하기 쉽습니다.",
         ],
+        visual: {
+          type: "comparison",
+          columns: [
+            { label: "읽기", points: ["도서관·여행 등 일상 속에서 자연스럽게 노출", "방학 중에도 비교적 유지되는 편"] },
+            { label: "수학", points: ["아이가 스스로 찾아 풀어보는 경우가 드묾", "연산 등 절차 기술은 안 쓰면 빠르게 무뎌짐"] },
+          ],
+        },
       },
       {
         heading: "개학 직후 교실에서는 무슨 일이 벌어질까요?",
@@ -580,6 +917,17 @@ export const blogPosts: BlogPost[] = [
           "가장 효과적인 방법은 거창한 계획이 아니라 하루 15분 정도의 짧은 복습을 매일 반복하는 것입니다. 전년도 워크북의 마지막 한두 단원을 다시 펼쳐 보거나, 틀렸던 문제만 골라 다시 풀어보는 것만으로도 충분한 효과가 있습니다.",
           "마트에서 장을 보며 총 금액을 어림해보거나, 요리를 하며 계량 단위를 바꿔보는 등 일상 속에서 자연스럽게 수를 다루는 기회를 만들어 주는 것도 좋습니다. 여유가 있다면 새 학년 첫 단원 내용을 아주 가볍게 미리 살펴보는 것도 도움이 되지만, 이는 선행 학습이 아니라 '낯설지 않게 만드는' 예습 수준으로 접근하는 것이 중요합니다.",
         ],
+        visual: {
+          type: "checklist",
+          title: "개학까지 2~4주 남았다면",
+          items: [
+            { text: "전년도 워크북 마지막 1~2단원 복습" },
+            { text: "틀렸던 문제만 골라 재풀이" },
+            { text: "장보기하며 총액 어림셈" },
+            { text: "요리하며 계량 단위 변환" },
+            { text: "(여유 있다면) 새 학년 첫 단원 가볍게 예습" },
+          ],
+        },
       },
       {
         heading: "언제부터, 어떻게 시작해야 할까요?",
@@ -596,6 +944,13 @@ export const blogPosts: BlogPost[] = [
           "A 1996 meta-analysis by Duke University psychologist Harris Cooper found that students lose, on average, about one month's worth of learning over summer break. Follow-up studies since then have consistently confirmed the pattern, with math computation skills fading noticeably more than reading skills.",
           "A single summer's loss may seem small, but it compounds year after year across K-6, widening the gap as students move up in grade level. Students who covered advanced content the previous year are especially at risk of losing ground they haven't had a chance to solidify.",
         ],
+        visual: {
+          type: "stat",
+          value: "About One Month",
+          label: "Average learning loss over summer break",
+          source: "Harris Cooper, Duke University, 1996 meta-analysis",
+        },
+        visualPosition: "before",
       },
       {
         heading: "Why Is Math Especially Vulnerable?",
@@ -603,6 +958,13 @@ export const blogPosts: BlogPost[] = [
           "Reading tends to continue somewhat naturally over the summer — through library visits, casual reading for fun, or simply encountering text while traveling. Math rarely gets this kind of incidental exposure; children don't typically seek out a division or fraction problem on their own.",
           "Procedural skills in particular — the kind that need to become second nature, like computation — fade relatively quickly without use. Understanding a concept and being able to apply it quickly and accurately are two different things, and the latter is especially prone to decline without regular practice.",
         ],
+        visual: {
+          type: "comparison",
+          columns: [
+            { label: "Reading", points: ["Natural exposure through libraries, travel, daily life", "Tends to hold up fairly well over the break"] },
+            { label: "Math", points: ["Children rarely seek out problems on their own", "Procedural skills fade quickly without use"] },
+          ],
+        },
       },
       {
         heading: "What Happens in the Classroom Right After School Starts",
@@ -617,6 +979,17 @@ export const blogPosts: BlogPost[] = [
           "The most effective approach isn't an elaborate plan — it's 15 minutes of review, done consistently, every day. Revisiting the last unit or two of last year's workbook, or simply re-solving problems your child got wrong, is often enough to make a real difference.",
           "Everyday moments also offer natural opportunities: estimating a total while grocery shopping, or converting measurements while cooking. If there's time, a light preview of the new grade's first unit can help too — but this should feel like familiarization, not acceleration.",
         ],
+        visual: {
+          type: "checklist",
+          title: "With 2-4 Weeks Left Before School",
+          items: [
+            { text: "Review the last 1-2 units of last year's workbook" },
+            { text: "Re-solve problems your child got wrong" },
+            { text: "Estimate totals while grocery shopping" },
+            { text: "Convert measurements while cooking" },
+            { text: "(If time allows) Lightly preview the new grade's first unit" },
+          ],
+        },
       },
       {
         heading: "When and How to Start",
@@ -644,6 +1017,17 @@ export const blogPosts: BlogPost[] = [
           "여름방학이 끝을 향해 갈수록 학부모들의 마음은 바빠집니다. 학용품을 사야 하는지, 담임교사는 누구인지, 생활 리듬은 언제부터 되돌려야 하는지 한꺼번에 떠오르지만 정작 무엇부터 시작해야 할지 막막할 때가 많습니다. 각 학교의 정확한 개학일과 학사일정은 학군 및 학교마다 다르므로, FCPS 학부모라면 재학 중인 학교 홈페이지나 ParentVUE 공지사항에서 먼저 확인하는 것이 순서입니다.",
           "개학을 2~4주 앞둔 이 시기는 서두르지 않고도 하나씩 준비할 수 있는 여유가 남아 있는 골든타임입니다. 이 글에서는 학사 정보 확인부터 수학 감 되찾기, 생활 리듬 조정, 서류 준비, 아이의 마음 챙기기까지 학부모가 순서대로 점검하면 좋은 다섯 가지 항목을 정리했습니다.",
         ],
+        visual: {
+          type: "checklist",
+          title: "다섯 가지 준비 영역",
+          items: [
+            { text: "학사 정보 확인 (ParentVUE)" },
+            { text: "수학 감 되찾기" },
+            { text: "생활 리듬 재조정" },
+            { text: "학용품·서류 준비" },
+            { text: "아이의 마음 챙기기" },
+          ],
+        },
       },
       {
         heading: "ParentVUE로 확인하는 새 학년 정보",
@@ -658,6 +1042,14 @@ export const blogPosts: BlogPost[] = [
           "여름 동안 수학과 멀어졌다면, 개학 전 남은 몇 주를 활용해 감을 되찾아 두는 것이 좋습니다. 거창한 계획보다는 전년도 워크북의 마지막 한두 단원을 다시 펼쳐보거나, 틀렸던 문제만 골라 다시 풀어보는 정도로 충분합니다. 하루 15분씩이라도 매일 반복하면 개학 첫 주에 느끼는 부담이 눈에 띄게 줄어듭니다.",
           "여유가 있다면 새 학년 첫 단원 내용을 아주 가볍게 미리 살펴보는 것도 도움이 됩니다. 이때 중요한 것은 선행 학습이 아니라 '낯설지 않게 만드는' 예습 수준으로 접근하는 것입니다. 여름방학 학습공백에 대해 더 자세히 알고 싶다면 저희 블로그의 '여름방학 수학 학습공백' 글을 함께 참고하세요.",
         ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "info",
+          text: "여름방학 동안 수학 실력이 왜, 얼마나 퇴보하는지 더 자세히 알고 싶다면 아래 글을 참고하세요.",
+          linkHref: "/blog/summer-math-slide",
+          linkLabel: "여름방학 수학 학습공백 자세히 보기",
+        },
       },
       {
         heading: "생활 리듬 재조정하기",
@@ -672,6 +1064,13 @@ export const blogPosts: BlogPost[] = [
           "학용품 외에도 개학 전 챙겨야 할 서류가 은근히 많습니다. 버지니아주는 K학년과 새로 전학 온 학생에게 예방접종 기록(Immunization Records) 제출을 요구하며, 미제출 시 등교가 제한될 수 있으므로 미리 확인해두는 것이 안전합니다. 소아과 예약이 밀릴 수 있는 시기이므로 서둘러 일정을 잡는 것이 좋습니다.",
           "방과전후 돌봄 프로그램(Before/After School Care)을 이용할 계획이라면 신청 마감일을 놓치지 않는 것도 중요합니다. 인기 있는 프로그램은 개학 전에 정원이 마감되는 경우도 있으므로, 필요하다면 여름방학 중에 미리 신청해 두는 것이 좋습니다.",
         ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "warning",
+          title: "예방접종 기록 필수",
+          text: "버지니아주는 K학년과 새로 전학 온 학생에게 예방접종 기록 제출을 요구합니다. 미제출 시 등교가 제한될 수 있으니 미리 확인하세요.",
+        },
       },
       {
         heading: "새 학년 첫 주, 아이의 마음 다독이기",
@@ -688,6 +1087,17 @@ export const blogPosts: BlogPost[] = [
           "As summer break winds down, parents' to-do lists start piling up all at once — school supplies, teacher assignments, sleep schedules — and it's easy to feel unsure where to even start. Exact start dates and calendars vary by school and district, so FCPS parents should begin by checking their school's website or ParentVUE announcements for the specifics.",
           "With roughly 2 to 4 weeks left before the first day, there's still enough time to work through preparations calmly rather than scrambling at the last minute. This checklist walks through five areas worth confirming in order: school-year logistics, math readiness, sleep schedule, paperwork, and your child's emotional readiness.",
         ],
+        visual: {
+          type: "checklist",
+          title: "Five Areas to Cover",
+          items: [
+            { text: "School-year logistics (ParentVUE)" },
+            { text: "Math readiness" },
+            { text: "Sleep schedule" },
+            { text: "Supplies & paperwork" },
+            { text: "Emotional readiness" },
+          ],
+        },
       },
       {
         heading: "Checking New Year Details Through ParentVUE",
@@ -702,6 +1112,14 @@ export const blogPosts: BlogPost[] = [
           "If math practice fell off over the summer, the remaining weeks before school starts are a good window to rebuild momentum. Nothing elaborate is needed — revisiting the last unit or two of last year's workbook, or re-solving problems your child got wrong, is enough. Even 15 minutes a day, done consistently, noticeably eases the adjustment during the first week back.",
           "If there's time, a light preview of the new grade's first unit can help too. The goal here isn't to get ahead — it's simply to make the material feel familiar rather than brand new. For more on why math skills fade over summer, see our earlier post on the summer math slide.",
         ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "info",
+          text: "Curious why math skills fade faster than other subjects over the summer? Read our deep dive below.",
+          linkHref: "/en/blog/summer-math-slide",
+          linkLabel: "Preventing the Summer Math Slide",
+        },
       },
       {
         heading: "Resetting the Daily Rhythm",
@@ -716,6 +1134,13 @@ export const blogPosts: BlogPost[] = [
           "Beyond school supplies, there's often more paperwork to handle than expected. Virginia requires immunization records for kindergarteners and any newly enrolled students, and missing this can restrict a child's ability to attend school, so it's worth confirming early. Pediatrician appointments can book up quickly this time of year, so scheduling ahead is wise.",
           "If you're planning to use a before- or after-school care program, don't miss the registration deadline. Popular programs can fill up before the school year even starts, so it's worth applying during the summer if you know you'll need a spot.",
         ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "warning",
+          title: "Immunization Records Required",
+          text: "Virginia requires immunization records for kindergarteners and newly enrolled students. Missing this can restrict a child's ability to attend school, so confirm early.",
+        },
       },
       {
         heading: "Easing Your Child's Mind for the First Week",
@@ -750,6 +1175,13 @@ export const blogPosts: BlogPost[] = [
           "한국에서 오신 학부모라면 TJ를 과학고나 영재고와 비슷하게 떠올리실 수 있습니다. STEM에 특화된 상위권 학생을 위한 학교라는 점은 비슷하지만, 운영 방식은 상당히 다릅니다. 가장 큰 차이는 TJ가 등록금 없는 완전 무료 공립학교라는 점입니다. 별도의 학비 체계가 있는 것이 아니라, 다른 공립 고등학교와 동일하게 세금으로 운영됩니다.",
           "입학 전형 방식도 다릅니다. 과거 TJ는 별도의 입학시험을 치렀지만, 2021년부터는 시험 점수 없이 성적, 에세이, 학생이 제출하는 문제 해결 과정(Student Portrait Sheet 등)을 종합적으로 평가하는 '홀리스틱 리뷰(Holistic Review)' 방식으로 바뀌었습니다. 즉 단 하나의 시험 점수로 당락이 갈리는 구조가 아니라, 학생의 여러 면을 함께 살펴보는 방식입니다. 정확한 전형 요소와 비중은 매년 조정될 수 있으므로, 지원을 고려한다면 매년 가을 학교 공식 입학 안내(tjhsst.fcps.edu)를 확인하는 것이 가장 정확합니다.",
         ],
+        visual: {
+          type: "comparison",
+          columns: [
+            { label: "2021년 이전", tone: "standard", points: ["별도 입학시험 실시", "단일 시험 점수로 당락 결정"] },
+            { label: "현재 (Holistic Review)", tone: "advanced", points: ["시험 점수 없음", "성적·에세이·문제해결 과정 종합 평가"] },
+          ],
+        },
       },
       {
         heading: "지원은 언제, 어떻게 하나요?",
@@ -764,6 +1196,15 @@ export const blogPosts: BlogPost[] = [
           "TJ 지원은 8학년에 이루어지지만, 그 밑바탕이 되는 학업 습관과 사고력은 초등학교 시기에 쌓입니다. 가장 직접적으로 연결되는 것은 FCPS의 AAP(Advanced Academic Programs) 심화 수학 트랙입니다. 초등학교에서 AAP 수학을 꾸준히 이수하면 중학교에서 더 빠른 수학 진도를 밟게 되고, 이는 8학년 시점의 수학 역량 전반에 영향을 줍니다. AAP와 수학 경로에 대한 자세한 내용은 저희 블로그의 'FCPS AAP 수학, 제대로 이해하기' 글을 참고하세요.",
           "홀리스틱 리뷰는 에세이와 문제 해결 과정을 함께 평가하기 때문에, 수학 실력만큼이나 읽기·쓰기 습관도 중요합니다. 평소 책을 읽고 자기 생각을 글로 표현해보는 연습, 그리고 정답보다 풀이 과정을 설명해보는 습관이 장기적으로 큰 자산이 됩니다. MOEMS 같은 초등 수학 경시대회 경험도 문제 해결 과정을 글로 정리해보는 좋은 연습이 될 수 있습니다.",
         ],
+        visual: {
+          type: "pathway",
+          steps: [
+            { label: "초등 AAP", sublabel: "심화 수학 트랙" },
+            { label: "중학교", sublabel: "가속 수학 진입" },
+            { label: "8학년", sublabel: "TJ 지원 (Holistic Review)" },
+          ],
+          finalLabel: "TJHSST 9학년 입학",
+        },
       },
       {
         heading: "학부모들이 흔히 하는 오해",
@@ -771,6 +1212,20 @@ export const blogPosts: BlogPost[] = [
           "가장 흔한 오해는 '선행학습 학원을 많이 다니면 TJ에 갈 수 있다'는 생각입니다. 홀리스틱 리뷰 체제에서는 단순히 진도를 많이 나간 것보다, 개념을 얼마나 깊이 이해하고 스스로 문제를 풀어내는지, 그리고 그 과정을 얼마나 명확하게 설명할 수 있는지가 더 중요하게 평가됩니다. 진도만 빠르고 개념 이해가 얕은 경우, 오히려 에세이나 문제 해결 과정에서 어려움을 겪을 수 있습니다.",
           "또 다른 오해는 '초등학교 때 AAP에 들어가지 못하면 TJ는 불가능하다'는 생각입니다. AAP는 분명 유리한 경로이지만, 매년 재평가되는 시스템이며 중학교 시기에도 심화 수학 트랙에 진입할 기회가 있습니다. 초등 시기에 다소 늦었다고 느끼더라도, 꾸준히 개념을 다지고 사고력을 키우는 것이 여전히 의미 있는 준비가 됩니다.",
         ],
+        visual: {
+          type: "callout",
+          variant: "mythFact",
+          pairs: [
+            {
+              myth: "선행학습 학원을 많이 다니면 TJ에 갈 수 있다",
+              fact: "Holistic Review는 진도보다 개념 이해 깊이·독립적 문제해결·설명력을 더 중요하게 봅니다",
+            },
+            {
+              myth: "초등학교 때 AAP에 들어가지 못하면 TJ는 불가능하다",
+              fact: "AAP는 매년 재평가되며, 중학교 시기에도 심화 수학 트랙에 진입할 기회가 있습니다",
+            },
+          ],
+        },
       },
       {
         heading: "지금 초등 학부모가 실천할 수 있는 것",
@@ -794,6 +1249,13 @@ export const blogPosts: BlogPost[] = [
           "Parents who grew up in Korea's education system might picture TJ as similar to a Korean science high school (과학고) or gifted academy (영재고). Both serve academically strong students with a STEM focus, but the two systems work quite differently. The biggest difference is that TJ is a fully free public school — there's no separate tuition structure. It's funded like any other public high school.",
           "The admissions process is also different. TJ used to require a separate entrance exam, but since 2021 it has used a \"Holistic Review\" process instead — no test score, but a combined look at grades, a written essay, and a problem-solving submission (often called a Student Portrait Sheet). In other words, no single test score determines the outcome; several aspects of the student are considered together. The exact components and how they're weighted can shift from year to year, so families considering applying should check the school's official admissions page (tjhsst.fcps.edu) each fall for the current cycle's details.",
         ],
+        visual: {
+          type: "comparison",
+          columns: [
+            { label: "Before 2021", tone: "standard", points: ["Separate entrance exam", "Single test score determined outcome"] },
+            { label: "Now (Holistic Review)", tone: "advanced", points: ["No test score", "Grades, essay & problem-solving submission combined"] },
+          ],
+        },
       },
       {
         heading: "When and How Do Students Apply?",
@@ -808,6 +1270,15 @@ export const blogPosts: BlogPost[] = [
           "Although the application happens in 8th grade, the academic habits and reasoning skills behind it are built years earlier, starting in elementary school. The most direct connection is FCPS's AAP (Advanced Academic Programs) advanced math track. Students who stay on the AAP math track through elementary school move into a faster math sequence in middle school, which shapes their overall math readiness by 8th grade. For more on this pathway, see our earlier post, \"Understanding FCPS AAP Math.\"",
           "Because Holistic Review evaluates essays and problem-solving submissions alongside grades, reading and writing habits matter just as much as math skill. Regularly reading books, practicing writing down one's own thoughts, and explaining reasoning rather than just stating an answer are all habits that pay off years later. Experience with elementary math competitions like MOEMS can also double as good practice for articulating a problem-solving process in writing.",
         ],
+        visual: {
+          type: "pathway",
+          steps: [
+            { label: "Elementary AAP", sublabel: "Advanced math track" },
+            { label: "Middle School", sublabel: "Accelerated math sequence" },
+            { label: "8th Grade", sublabel: "TJ application (Holistic Review)" },
+          ],
+          finalLabel: "TJHSST",
+        },
       },
       {
         heading: "Common Misconceptions Parents Have",
@@ -815,6 +1286,20 @@ export const blogPosts: BlogPost[] = [
           "The most common misconception is that enrolling in enough acceleration-focused tutoring guarantees TJ admission. Under Holistic Review, what matters more than how far ahead a student has covered material is how deeply they understand the concepts, how independently they can solve problems, and how clearly they can explain their reasoning. A student who has moved fast but understands shallowly can actually struggle more with the essay and problem-solving components.",
           "Another misconception is that missing AAP placement in elementary school closes the door on TJ entirely. AAP is certainly an advantageous path, but placement is reassessed every year, and there are still opportunities to move into an advanced math track in middle school. Even if a family feels they started a bit later, consistently building conceptual understanding and reasoning skills is still meaningful preparation.",
         ],
+        visual: {
+          type: "callout",
+          variant: "mythFact",
+          pairs: [
+            {
+              myth: "Enrolling in enough acceleration-focused tutoring guarantees TJ admission",
+              fact: "Holistic Review weighs depth of understanding, independent problem-solving, and clear reasoning more than how far ahead a student has covered material",
+            },
+            {
+              myth: "Missing AAP placement in elementary school closes the door on TJ entirely",
+              fact: "AAP is reassessed every year, and there are still opportunities to move into an advanced math track in middle school",
+            },
+          ],
+        },
       },
       {
         heading: "What Elementary Parents Can Do Right Now",

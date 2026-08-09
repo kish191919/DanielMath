@@ -38,6 +38,7 @@ export const metadata: Metadata = {
     "3rd-6th grade math tutor",
     "영재 수학",
     "한인 수학 아카데미",
+    "버지니아 수학",
     "버지니아 수학 학원",
     "버지니아 수학 공부방",
     "북버지니아 수학 학원",
