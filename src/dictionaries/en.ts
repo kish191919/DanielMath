@@ -3,7 +3,7 @@ import type { Dictionary } from './ko'
 const en: Dictionary = {
   meta: {
     description:
-      "A small-group, ungraded math academy for Korean-American families in Northern Virginia that manages each student's math through leveled diagnostics and mistake tracking. AAP, CogAT/NNAT prep — 4 students per class, Mon/Tue/Thu/Fri.",
+      "Virginia math tutoring & academy in Fairfax. A small-group, ungraded math academy for Korean-American families in Northern Virginia that manages each student's math through leveled diagnostics and mistake tracking. AAP, CogAT/NNAT prep — 4 students per class, Mon/Tue/Thu/Fri.",
   },
   nav: {
     programs: "Programs",
@@ -14,8 +14,11 @@ const en: Dictionary = {
     welcome: "Free consultation welcome",
   },
   home: {
+    meta: {
+      title: "Virginia Math Tutoring & Academy | AAP, CogAT Prep",
+    },
     hero: {
-      badge: "",
+      badge: "Fairfax, VA · Virginia Math Academy",
       h1line1: "Small group.",
       h1highlight: "Managed,",
       h1line2: "ungraded math academy.",

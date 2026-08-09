@@ -1,7 +1,7 @@
 const ko = {
   meta: {
     description:
-      "4명 소수 정예, 무학년 수준별 진단으로 학생의 수학을 관리하는 한인 수학 아카데미. 오답 관리와 AAP·CogAT/NNAT 대비까지.",
+      "버지니아 Fairfax 소재 수학 공부방·수학 학원. 4명 소수 정예, 무학년 수준별 진단으로 학생의 수학을 관리하는 한인 수학 아카데미. 오답 관리와 AAP·CogAT/NNAT 대비까지.",
   },
   nav: {
     programs: "프로그램",
@@ -12,8 +12,11 @@ const ko = {
     welcome: "무료 상담 환영",
   },
   home: {
+    meta: {
+      title: "버지니아 수학 학원·공부방 | AAP·CogAT 대비",
+    },
     hero: {
-      badge: "",
+      badge: "Fairfax, VA · 버지니아 수학 공부방",
       h1line1: "소수 정예,",
       h1highlight: "관리형",
       h1line2: "무학년 수학 아카데미.",

@@ -4,9 +4,9 @@ export const siteConfig = {
   legalName: "CloudMasterIT LLC",
   url: "https://danielmath.com",
   description:
-    "4명 소수 정예, AAP·CogAT/NNAT 통합 커리큘럼으로 3-6학년 영재 수학을 키우는 한인 수학 아카데미.",
+    "버지니아 Fairfax 소재 수학 공부방·수학 학원. 4명 소수 정예, AAP·CogAT/NNAT 통합 커리큘럼으로 3-6학년 영재 수학을 키우는 한인 수학 아카데미.",
   descriptionEn:
-    "A small-group gifted math academy for Korean-American families in Northern Virginia, grades 3–6. AAP, CogAT/NNAT — 4 students per class, Mon/Tue/Thu/Fri.",
+    "A Virginia math tutoring academy in Fairfax for Korean-American families, grades 3–6. Small-group, gifted math with AAP, CogAT/NNAT prep — 4 students per class, Mon/Tue/Thu/Fri.",
   region: "Fairfax Virginia",
   address: {
     locality: "Fairfax",

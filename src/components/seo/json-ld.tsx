@@ -1,14 +1,15 @@
 import { siteConfig } from "@/lib/site-config";
 import type { BlogPost } from "@/lib/blog-posts";
 
-export function LocalBusinessJsonLd() {
+export function LocalBusinessJsonLd({ locale = "ko" }: { locale?: string }) {
+  const isKo = locale === "ko";
   const data = {
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
     name: siteConfig.name,
     alternateName: siteConfig.nameKo,
     url: siteConfig.url,
-    description: siteConfig.descriptionEn,
+    description: isKo ? siteConfig.description : siteConfig.descriptionEn,
     email: siteConfig.contactEmail,
     telephone: siteConfig.telephone,
     address: {

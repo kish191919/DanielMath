@@ -19,6 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const d = await getDictionary(locale as Locale);
   const isKo = locale === "ko";
   return {
+    title: d.home.meta.title,
     description: d.meta.description,
     alternates: pageAlternates(locale, "/"),
     openGraph: {
@@ -37,7 +38,7 @@ export default async function HomePage({ params }: Props) {
 
   return (
     <>
-      <LocalBusinessJsonLd />
+      <LocalBusinessJsonLd locale={locale as Locale} />
       <HeroSection d={d.home} lp={lp} isKo={isKo} />
       <Stats d={d.home} isKo={isKo} />
       <ProgramsPreview d={d.home} isKo={isKo} />
