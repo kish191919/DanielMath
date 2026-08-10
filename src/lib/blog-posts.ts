@@ -62,6 +62,8 @@ export type BlogSection = {
   visualPosition?: "before" | "after";
 };
 
+export type BlogImage = { src: string; altKo: string; altEn: string };
+
 export type BlogPost = {
   slug: string;
   publishedAt: string;
@@ -72,6 +74,7 @@ export type BlogPost = {
   titleEn: string;
   descKo: string;
   descEn: string;
+  heroImage?: BlogImage;
   bodyKo: BlogSection[];
   bodyEn: BlogSection[];
 };
@@ -87,6 +90,11 @@ export const blogPosts: BlogPost[] = [
     titleEn: "How to Read Your Child's FCPS Elementary Report Card",
     descKo: "버지니아 초등학교 성적표는 A·B·C가 아니라 1~4점 기준중심평가를 사용합니다. FCPS 성적표의 채점 방식, SOL 시험과의 차이, 그리고 학부모가 눈여겨봐야 할 부분을 정리했습니다.",
     descEn: "Virginia elementary report cards don't use A-B-C grades — FCPS scores students on a 1-4 standards-based scale. Here's how the scoring works, how it differs from the state SOL test, and what parents should actually look for.",
+    heroImage: {
+      src: "/blog/fcps-report-card-guide-hero.jpg",
+      altKo: "성적표를 함께 들여다보며 미소 짓는 부모와 아이를 그린 따뜻한 일러스트",
+      altEn: "Warm illustration of a parent and child smiling together while looking over a report card",
+    },
     bodyKo: [
       {
         heading: "성적표는 카운티마다 다릅니다",
@@ -500,6 +508,11 @@ export const blogPosts: BlogPost[] = [
     titleEn: "Why Singapore Math Works",
     descKo: "전 세계 영재 교육에서 주목받는 Singapore Math의 철학과 교육 방식, 그리고 미국의 전통적인 수학 교육과 어떻게 다른지 학부모 눈높이에서 설명합니다.",
     descEn: "An accessible explanation of what Singapore Math is, why it's widely adopted in gifted education programs, and how it differs from traditional US math instruction.",
+    heroImage: {
+      src: "/blog/singapore-math-explained-hero.jpg",
+      altKo: "책상에서 색색의 수학 교구 블록을 가지고 학습하는 아이를 그린 따뜻한 일러스트",
+      altEn: "Warm illustration of a child learning with colorful math manipulative blocks at a desk",
+    },
     bodyKo: [
       {
         heading: "Singapore Math란 무엇인가요?",

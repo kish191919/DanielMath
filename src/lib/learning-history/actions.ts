@@ -211,21 +211,32 @@ export async function confirmReviewAction(
   const { error: insertError } = await supabase.from("learning_items").insert(rows);
   if (insertError) return { error: insertError.message };
 
-  const { error: updateError } = await supabase
+  const { data: updated, error: updateError } = await supabase
     .from("worksheet_scans")
     .update({
       status: "reviewed",
       reviewed_at: new Date().toISOString(),
       reviewed_by: session.userId,
     })
-    .eq("id", parsed.data.scan_id);
+    .eq("id", parsed.data.scan_id)
+    .select("source_scan_id")
+    .single();
   if (updateError) return { error: updateError.message };
 
   revalidatePath("/dashboard/principal/worksheets");
   revalidatePath(`/dashboard/principal/students/${parsed.data.student_id}/history`);
   revalidatePath("/dashboard/principal/students");
   revalidatePath("/dashboard/parent/progress");
-  redirect(`/dashboard/principal/worksheets/${parsed.data.scan_id}`);
+  // A correction scan's own review page never shows the parent-message
+  // workspace (session notes always key off the raw scan — see
+  // ParentReportWorkspace usage in page.tsx), so land the teacher on the
+  // raw scan's page instead, where the just-confirmed corrections are
+  // already folded into the stats and the parent message can be composed.
+  const targetScanId = updated.source_scan_id ?? parsed.data.scan_id;
+  if (updated.source_scan_id) {
+    revalidatePath(`/dashboard/principal/worksheets/${updated.source_scan_id}`);
+  }
+  redirect(`/dashboard/principal/worksheets/${targetScanId}`);
 }
 
 export type SessionNoteFormState = {

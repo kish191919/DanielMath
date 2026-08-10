@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, ArrowRight, Clock } from "lucide-react";
 import { getDictionary } from "@/dictionaries";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
@@ -90,6 +91,19 @@ export default async function BlogPostPage({ params }: Props) {
                 {title}
               </h1>
             </div>
+
+            {post.heroImage && (
+              <div className="relative mb-10 aspect-[16/10] overflow-hidden rounded-2xl shadow-sm ring-1 ring-navy-100">
+                <Image
+                  src={post.heroImage.src}
+                  alt={isKo ? post.heroImage.altKo : post.heroImage.altEn}
+                  fill
+                  sizes="(min-width: 640px) 672px, 100vw"
+                  className="object-cover"
+                  loading="eager"
+                />
+              </div>
+            )}
 
             {/* Body */}
             <div className="space-y-14">

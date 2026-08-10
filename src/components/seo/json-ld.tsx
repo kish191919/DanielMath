@@ -56,6 +56,7 @@ export function BlogPostingJsonLd({
     headline: isKo ? post.titleKo : post.titleEn,
     description: isKo ? post.descKo : post.descEn,
     url,
+    image: post.heroImage ? `${siteConfig.url}${post.heroImage.src}` : undefined,
     datePublished: post.publishedAt,
     inLanguage: isKo ? "ko" : "en",
     author: {
