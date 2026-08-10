@@ -240,6 +240,11 @@ export const blogPosts: BlogPost[] = [
     titleEn: "Understanding FCPS AAP Math",
     descKo: "Fairfax County 초등학교의 Standard 수학과 AAP(심화) 수학의 차이, 배치 기준, 그리고 중학교·고등학교까지 이어지는 수학 경로를 정리했습니다.",
     descEn: "A clear breakdown of Standard vs. Advanced (AAP) math in FCPS, covering placement criteria and the long-term pathway through middle and high school.",
+    heroImage: {
+      src: "/blog/fcps-aap-math-guide-hero.jpg",
+      altKo: "손을 들고 발표하며 생각에 잠긴 아이를 그린 따뜻한 일러스트",
+      altEn: "Warm illustration of a child raising their hand and deep in thought",
+    },
     bodyKo: [
       {
         heading: "FCPS 수학에는 두 가지 트랙이 있습니다",
@@ -377,6 +382,11 @@ export const blogPosts: BlogPost[] = [
     titleEn: "A Complete Guide to the NGAT (formerly CogAT & NNAT)",
     descKo: "FCPS AAP 배치에 사용되는 NGAT 시험의 구조, 점수 방식, 시험 시기, 그리고 준비 방법을 학부모 눈높이에서 정리했습니다. 2025-2026학년도부터 기존 CogAT·NNAT를 대체했습니다.",
     descEn: "Everything parents need to know about the NGAT, the ability test now used for FCPS AAP placement, including structure, scoring, timing, and preparation strategies. It replaced CogAT and NNAT starting in the 2025-2026 school year.",
+    heroImage: {
+      src: "/blog/cogat-nnat-guide-hero.jpg",
+      altKo: "도형 패턴 퍼즐을 풀며 골똘히 생각하는 아이를 그린 따뜻한 일러스트",
+      altEn: "Warm illustration of a child thoughtfully solving a shape pattern puzzle",
+    },
     bodyKo: [
       {
         heading: "NGAT란 무엇인가요?",
@@ -628,6 +638,11 @@ export const blogPosts: BlogPost[] = [
     titleEn: "Math Competitions Open to FCPS Students",
     descKo: "MOEMS, AMC 8, Math Kangaroo 등 Fairfax 지역 초등학생이 참가할 수 있는 주요 수학 경시대회를 정리했습니다. 각 대회의 수준, 일정, 참가 방법을 확인하세요.",
     descEn: "An overview of major math competitions available to FCPS elementary students, including MOEMS, AMC 8, Math League, and Math Kangaroo, with details on difficulty, timing, and how to participate.",
+    heroImage: {
+      src: "/blog/math-competitions-fcps-hero.jpg",
+      altKo: "책상에서 트로피를 자랑스럽게 들어 올리는 아이를 그린 따뜻한 일러스트",
+      altEn: "Warm illustration of a child proudly holding up a trophy at their desk",
+    },
     bodyKo: [
       {
         heading: "왜 수학 경시대회에 참가하나요?",
@@ -743,6 +758,11 @@ export const blogPosts: BlogPost[] = [
     titleEn: "5 Evidence-Based Strategies for Building Math Skills at Home",
     descKo: "학원을 다니지 않아도 집에서 수학 실력을 꾸준히 키울 수 있는 방법 5가지를 연구 근거와 함께 소개합니다. 학부모가 바로 실천할 수 있는 구체적인 팁입니다.",
     descEn: "Five research-backed strategies parents can use at home to help their children build stronger math skills. No tutoring required to get started.",
+    heroImage: {
+      src: "/blog/math-practice-at-home-hero.jpg",
+      altKo: "따뜻한 조명 아래 부모와 아이가 함께 숙제하는 모습을 그린 일러스트",
+      altEn: "Warm illustration of a parent and child doing homework together under a cozy lamp",
+    },
     bodyKo: [
       {
         heading: "1. 짧게, 자주 반복하는 분산 학습의 힘",
@@ -888,6 +908,11 @@ export const blogPosts: BlogPost[] = [
     titleEn: "Preventing the Summer Math Slide Before School Starts",
     descKo: "여름방학 동안 수학 실력이 퇴보하는 'Summer Slide' 현상의 원인과 연구 근거, 그리고 개학 전 남은 몇 주 동안 학부모가 실천할 수 있는 구체적인 대비법을 정리했습니다.",
     descEn: "Why math skills fade faster than reading over summer break, what the research says, and practical steps parents can take in the final weeks before school starts.",
+    heroImage: {
+      src: "/blog/summer-math-slide-hero.jpg",
+      altKo: "해변가 담요 위에서 책을 읽는 아이를 그린 따뜻한 여름 일러스트",
+      altEn: "Warm summer illustration of a child reading a book on a beach blanket",
+    },
     bodyKo: [
       {
         heading: "여름 학습공백(Summer Slide)이란?",
@@ -1023,6 +1048,11 @@ export const blogPosts: BlogPost[] = [
     titleEn: "The Back-to-School Checklist Every Parent Should Run Through",
     descKo: "개학까지 몇 주 남지 않은 지금, 담임교사 확인부터 수학 감 되찾기, 생활 리듬 재조정까지 학부모가 놓치기 쉬운 준비 사항을 체크리스트로 정리했습니다.",
     descEn: "With just a few weeks left before school starts, here's a practical checklist covering everything from confirming your child's teacher to resetting sleep schedules and brushing up on math.",
+    heroImage: {
+      src: "/blog/back-to-school-checklist-hero.jpg",
+      altKo: "책가방을 메고 새 학기를 준비하는 아이를 그린 따뜻한 일러스트",
+      altEn: "Warm illustration of a child with a backpack getting ready for the new school year",
+    },
     bodyKo: [
       {
         heading: "개학까지 남은 시간, 지금부터 무엇을 챙겨야 할까",
@@ -1174,6 +1204,11 @@ export const blogPosts: BlogPost[] = [
     titleEn: "The TJHSST Roadmap: What Elementary Parents Should Know",
     descKo: "TJ(Thomas Jefferson High School for Science and Technology)가 정확히 어떤 학교인지, 한국의 과학고·영재고와 무엇이 다른지, 그리고 초등학교 때부터 무엇을 준비하면 좋은지 처음 듣는 학부모도 이해할 수 있도록 쉽게 정리했습니다.",
     descEn: "A parent-friendly introduction to TJHSST — what it actually is, how it differs from Korea's science and gifted high schools, and what elementary-age preparation actually looks like.",
+    heroImage: {
+      src: "/blog/tjhsst-roadmap-hero.jpg",
+      altKo: "언덕 위 학교를 향해 구불구불한 길을 걷는 아이를 그린 따뜻한 일러스트",
+      altEn: "Warm illustration of a child walking a winding path toward a school on a hill",
+    },
     bodyKo: [
       {
         heading: "TJ가 무엇인가요?",
