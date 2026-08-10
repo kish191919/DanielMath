@@ -156,7 +156,7 @@ export default async function PracticeSheetPrintPage({
                 {column.items.map((problem, localIndex) => (
                   <li
                     key={problem.id}
-                    className="mb-6 break-inside-avoid rounded-2xl border border-navy-200 p-5 [page-break-inside:avoid]"
+                    className="mb-6 break-inside-avoid p-5 [page-break-inside:avoid]"
                   >
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
                       <div className="flex flex-1 items-start gap-2.5">
@@ -195,7 +195,7 @@ export default async function PracticeSheetPrintPage({
                         />
                       )}
                     </div>
-                    <div className="mt-6 border-b border-navy-300">&nbsp;</div>
+                    <div className="mt-6 h-16 border-b border-navy-300">&nbsp;</div>
                   </li>
                 ))}
               </ol>

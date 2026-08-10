@@ -57,6 +57,15 @@ export const PARENT_REPORT_MODEL = process.env.ANTHROPIC_PARENT_REPORT_MODEL || 
 export const PARENT_REPORT_EFFORT = (process.env.ANTHROPIC_PARENT_REPORT_EFFORT ||
   "medium") as "low" | "medium" | "high" | "xhigh" | "max";
 
+// Turning concept/error-type labels into a parent-friendly explanation is the
+// same kind of localization work as PARENT_REPORT_EFFORT (not literal
+// translation), so it shares that effort tier by default.
+export const PARENT_ERROR_SUMMARY_MODEL =
+  process.env.ANTHROPIC_PARENT_ERROR_SUMMARY_MODEL || "claude-sonnet-5";
+
+export const PARENT_ERROR_SUMMARY_EFFORT = (process.env.ANTHROPIC_PARENT_ERROR_SUMMARY_EFFORT ||
+  "medium") as "low" | "medium" | "high" | "xhigh" | "max";
+
 export function getClaudeClient() {
   return new Anthropic();
 }

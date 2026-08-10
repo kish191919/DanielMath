@@ -6,7 +6,7 @@ import { Section } from "@/components/site/section";
 import { Button } from "@/components/ui/button";
 import { BackLink } from "@/components/ui/back-link";
 import { ReviewTable } from "@/components/dashboard/review-table";
-import { SessionNoteForm } from "@/components/dashboard/session-note-form";
+import { ParentReportWorkspace } from "@/components/dashboard/parent-report-workspace";
 import { ScanStatusBadge } from "@/components/dashboard/scan-status-badge";
 import { ConceptErrorAnalysis } from "@/components/dashboard/concept-error-analysis";
 import { CorrectionUploadForm } from "@/components/dashboard/correction-upload-form";
@@ -24,6 +24,7 @@ import {
 import { retryGradingAction, deleteWorksheetScanAction } from "@/lib/learning-history/actions";
 import { getStudent } from "@/lib/students/queries";
 import { SCAN_STATUS_LABELS } from "@/lib/learning-history/schema";
+import { computeSessionStats } from "@/lib/learning-history/stats";
 import { GradingStatusPoller } from "@/components/dashboard/grading-status-poller";
 import { isGradingStuck } from "@/lib/scan-status";
 import { WORKSHEET_GRADING_STUCK_THRESHOLD_MS } from "@/lib/ai/grading-config";
@@ -121,6 +122,8 @@ export default async function WorksheetScanReviewPage({
     const confirmedItems = await getConfirmedItemsForScans(
       reviewedCorrectionScans.map((s) => s.id),
     );
+    const stats = computeSessionStats(confirmedItems, concepts);
+    const { conceptLabels, errorTypeLabels } = sortedStatLabels(stats);
 
     return (
       <Section className="py-10 sm:py-14">
@@ -174,14 +177,16 @@ export default async function WorksheetScanReviewPage({
             />
           </div>
 
-          {confirmedItems.length > 0 && (
+          {stats.total > 0 && (
             <div className="mt-8">
-              <ConceptErrorAnalysis items={confirmedItems} concepts={concepts} />
+              <ConceptErrorAnalysis stats={stats} />
             </div>
           )}
 
           <div className="mt-8">
-            <SessionNoteForm
+            <ParentReportWorkspace
+              conceptLabels={conceptLabels}
+              errorTypeLabels={errorTypeLabels}
               studentId={scan.student_id}
               scanId={scanId}
               sessionDate={scan.session_date}
@@ -204,6 +209,11 @@ export default async function WorksheetScanReviewPage({
 
   const readOnly = scan.status === "reviewed";
   const stuck = isGradingStuck(scan.status, scan.updated_at, WORKSHEET_GRADING_STUCK_THRESHOLD_MS);
+  const stats = computeSessionStats(
+    items.filter((i) => i.confirmed),
+    concepts,
+  );
+  const { conceptLabels, errorTypeLabels } = sortedStatLabels(stats);
 
   return (
     <Section className="py-10 sm:py-14">
@@ -283,15 +293,17 @@ export default async function WorksheetScanReviewPage({
           </div>
         </div>
 
-        {readOnly && items.length > 0 && (
+        {readOnly && stats.total > 0 && (
           <div className="mt-8">
-            <ConceptErrorAnalysis items={items.filter((i) => i.confirmed)} concepts={concepts} />
+            <ConceptErrorAnalysis stats={stats} />
           </div>
         )}
 
         {!scan.source_scan_id && (
           <div className="mt-8">
-            <SessionNoteForm
+            <ParentReportWorkspace
+              conceptLabels={conceptLabels}
+              errorTypeLabels={errorTypeLabels}
               studentId={scan.student_id}
               scanId={scanId}
               sessionDate={scan.session_date}
@@ -303,4 +315,20 @@ export default async function WorksheetScanReviewPage({
       </Container>
     </Section>
   );
+}
+
+// byConcept/byErrorType come out of computeSessionStats keyed by id, not
+// ranked — sort by frequency so the AI summary (and any future ordering)
+// leads with what the student struggles with most.
+function sortedStatLabels(stats: ReturnType<typeof computeSessionStats>) {
+  return {
+    conceptLabels: stats.byConcept
+      .slice()
+      .sort((a, b) => b.total - a.total)
+      .map((c) => c.label),
+    errorTypeLabels: stats.byErrorType
+      .slice()
+      .sort((a, b) => b.count - a.count)
+      .map((e) => e.label),
+  };
 }

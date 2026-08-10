@@ -8,6 +8,7 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { triggerGradingJob } from "@/lib/ai/trigger-grading";
 import { generateParentReportDraft } from "@/lib/ai/generate-parent-report-draft";
+import { generateParentErrorSummary } from "@/lib/ai/generate-parent-error-summary";
 import { listGuardiansForStudent } from "@/lib/students/queries";
 import { getOrCreateThreadForParent } from "@/lib/messages/queries";
 import { generateParentMagicLink } from "@/lib/auth/magic-link";
@@ -20,6 +21,7 @@ import {
   reviewSubmissionSchema,
   sessionNoteSchema,
   noteTextSchema,
+  parentErrorSummaryInputSchema,
   type LearningItemInputValues,
 } from "./schema";
 
@@ -256,6 +258,35 @@ export async function generateParentReportDraftAction(
   } catch (err) {
     console.error("[generateParentReportDraftAction] failed", err);
     return { error: "AI 초안 생성에 실패했습니다. 잠시 후 다시 시도해주세요." };
+  }
+}
+
+export type GenerateParentErrorSummaryResult = { summary: string } | { error: string };
+
+// Turns a scan's concept/error-type breakdown into a short, parent-facing
+// Korean explanation (no problem/answer counts) — draft generation only, does
+// not touch the database. The teacher copies or inserts the result into
+// SessionNoteForm via sendSessionNoteAction/saveSessionNoteAction as usual.
+export async function generateParentErrorSummaryAction(
+  conceptLabels: string[],
+  errorTypeLabels: string[],
+): Promise<GenerateParentErrorSummaryResult> {
+  await requireRole("principal");
+
+  const parsed = parentErrorSummaryInputSchema.safeParse({ conceptLabels, errorTypeLabels });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "입력값을 확인해주세요." };
+  }
+
+  try {
+    const summary = await generateParentErrorSummary(parsed.data);
+    if (summary.length > 600) {
+      return { error: "생성된 문구가 너무 깁니다. 잠시 후 다시 시도해주세요." };
+    }
+    return { summary };
+  } catch (err) {
+    console.error("[generateParentErrorSummaryAction] failed", err);
+    return { error: "AI 문구 생성에 실패했습니다. 잠시 후 다시 시도해주세요." };
   }
 }
 

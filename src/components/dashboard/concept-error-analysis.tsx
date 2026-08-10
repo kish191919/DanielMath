@@ -1,21 +1,13 @@
-import { computeSessionStats } from "@/lib/learning-history/stats";
 import { ERROR_TYPE_LABELS } from "@/lib/learning-history/schema";
-import type { Concept, LearningItem } from "@/lib/supabase/types";
+import type { SessionStats } from "@/lib/learning-history/stats";
 
 // Read-only concept/error-type breakdown of confirmed wrong answers — the
 // deterministic analysis a teacher asked for after confirming a correction
 // upload ("어느 개념/유형에서 틀리는지"), computed from real data rather than
-// AI-authored prose.
-export function ConceptErrorAnalysis({
-  items,
-  concepts,
-}: {
-  items: LearningItem[];
-  concepts: Concept[];
-}) {
-  if (items.length === 0) return null;
-
-  const stats = computeSessionStats(items, concepts);
+// AI-authored prose. Stats are computed once by the page (computeSessionStats
+// is server-only) so this same data can also feed ParentReportWorkspace.
+export function ConceptErrorAnalysis({ stats }: { stats: SessionStats }) {
+  if (stats.total === 0) return null;
 
   return (
     <div className="rounded-2xl border border-navy-100 bg-white p-4 shadow-sm sm:p-5">

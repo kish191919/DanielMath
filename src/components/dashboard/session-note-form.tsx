@@ -12,19 +12,26 @@ import {
 } from "@/lib/learning-history/actions";
 import type { SessionNote, SessionNoteLanguage } from "@/lib/supabase/types";
 
-export function SessionNoteForm({
-  studentId,
-  scanId,
-  sessionDate,
-  existingNote,
-  initialLanguage = "ko",
-}: {
-  studentId: string;
-  scanId?: string;
-  sessionDate: string;
-  existingNote?: SessionNote | null;
-  initialLanguage?: SessionNoteLanguage;
-}) {
+export type SessionNoteFormHandle = {
+  // Appends text to the current note (or sets it, if the note is still
+  // empty) — used by ParentReportWorkspace to pipe an AI-generated parent
+  // explanation straight into this form without the teacher retyping it.
+  insertNote: (text: string) => void;
+};
+
+export const SessionNoteForm = React.forwardRef<
+  SessionNoteFormHandle,
+  {
+    studentId: string;
+    scanId?: string;
+    sessionDate: string;
+    existingNote?: SessionNote | null;
+    initialLanguage?: SessionNoteLanguage;
+  }
+>(function SessionNoteForm(
+  { studentId, scanId, sessionDate, existingNote, initialLanguage = "ko" },
+  ref,
+) {
   const noteId = existingNote?.id ?? null;
   const saveAction = saveSessionNoteAction.bind(null, noteId, studentId, scanId ?? "", sessionDate);
   const sendAction = sendSessionNoteAction.bind(null, noteId, studentId, scanId ?? "", sessionDate);
@@ -51,6 +58,13 @@ export function SessionNoteForm({
   } | null>(null);
   const [draftError, setDraftError] = React.useState<string | null>(null);
   const [isDrafting, startDraftTransition] = useTransition();
+
+  React.useImperativeHandle(ref, () => ({
+    insertNote(text: string) {
+      setNote((prev) => (prev.trim() ? `${prev}\n\n${text}` : text));
+      setPreDraftNote(null);
+    },
+  }));
 
   const isBusy = isSaving || isSending;
   const state = sendState?.success || sendState?.error ? sendState : saveState;
@@ -187,4 +201,4 @@ export function SessionNoteForm({
       </div>
     </form>
   );
-}
+});

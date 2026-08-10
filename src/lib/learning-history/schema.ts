@@ -79,6 +79,11 @@ export const reviewSubmissionSchema = z.object({
 
 export const noteTextSchema = z.string().min(1, "내용을 입력해주세요.").max(2000);
 
+export const parentErrorSummaryInputSchema = z.object({
+  conceptLabels: z.array(z.string().min(1).max(50)).min(1, "분석할 오답이 없습니다.").max(20),
+  errorTypeLabels: z.array(z.string().min(1).max(50)).max(20),
+});
+
 export const sessionNoteSchema = z.object({
   student_id: z.string().uuid(),
   scan_id: z.string().uuid().optional().or(z.literal("")),
