@@ -24,6 +24,8 @@ import {
   parentErrorSummaryInputSchema,
   type LearningItemInputValues,
 } from "./schema";
+import { listConcepts, listCorrectionScansForScan, getConfirmedItemsForScans } from "./queries";
+import { computeSessionStats, sortedStatLabels } from "./stats";
 
 const BUCKET = "worksheet-scans";
 
@@ -222,6 +224,39 @@ export async function confirmReviewAction(
     .select("source_scan_id")
     .single();
   if (updateError) return { error: updateError.message };
+
+  // Auto-generate the parent-facing explanation right away so the teacher
+  // never has to click "학부모용 설명 만들기" manually — it's ready by the time
+  // this redirects to the root scan's page below. Stored on the root scan
+  // (never on a correction scan) since that's the only scan ParentReportWorkspace
+  // renders against. Best-effort: a failure here must not block confirmation
+  // itself, same pattern as notifyGuardiansOfReport.
+  const rootScanId = updated.source_scan_id ?? parsed.data.scan_id;
+  try {
+    let confirmedItems;
+    if (updated.source_scan_id) {
+      const correctionScans = await listCorrectionScansForScan(rootScanId);
+      const reviewedScanIds = correctionScans
+        .filter((s) => s.status === "reviewed")
+        .map((s) => s.id);
+      confirmedItems = await getConfirmedItemsForScans(reviewedScanIds);
+    } else {
+      confirmedItems = await getConfirmedItemsForScans([rootScanId]);
+    }
+
+    if (confirmedItems.length > 0) {
+      const concepts = await listConcepts();
+      const stats = computeSessionStats(confirmedItems, concepts);
+      const { conceptLabels, errorTypeLabels } = sortedStatLabels(stats);
+      const summary = await generateParentErrorSummary({ conceptLabels, errorTypeLabels });
+      await supabase
+        .from("worksheet_scans")
+        .update({ parent_summary: summary.slice(0, 600) })
+        .eq("id", rootScanId);
+    }
+  } catch (err) {
+    console.error(`[confirmReviewAction] auto parent summary generation failed for ${rootScanId}`, err);
+  }
 
   revalidatePath("/dashboard/principal/worksheets");
   revalidatePath(`/dashboard/principal/students/${parsed.data.student_id}/history`);

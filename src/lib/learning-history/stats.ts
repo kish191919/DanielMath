@@ -66,3 +66,22 @@ export function computeSessionStats(items: LearningItem[], concepts: Concept[]):
     byErrorType,
   };
 }
+
+// byConcept/byErrorType come out of computeSessionStats keyed by id, not
+// ranked — sort by frequency so the AI parent summary (and any future
+// ordering) leads with what the student struggles with most.
+export function sortedStatLabels(stats: SessionStats): {
+  conceptLabels: string[];
+  errorTypeLabels: string[];
+} {
+  return {
+    conceptLabels: stats.byConcept
+      .slice()
+      .sort((a, b) => b.total - a.total)
+      .map((c) => c.label),
+    errorTypeLabels: stats.byErrorType
+      .slice()
+      .sort((a, b) => b.count - a.count)
+      .map((e) => e.label),
+  };
+}

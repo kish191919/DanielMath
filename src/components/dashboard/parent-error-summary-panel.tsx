@@ -8,18 +8,22 @@ import { generateParentErrorSummaryAction } from "@/lib/learning-history/actions
 
 // AI-authored, parent-facing explanation of *why* a student is missing
 // certain problems (no counts — see generate-parent-error-summary.ts's
-// PERSONA) — deliberately separate from ConceptErrorAnalysis, which stays a
-// deterministic, count-based breakdown for the teacher.
+// PERSONA). Normally arrives pre-filled via initialSummary — confirmReviewAction
+// auto-generates it the moment a correction scan is confirmed — so the
+// "만들기" button below is really just a fallback for when that auto-generation
+// had nothing to work with yet or failed.
 export function ParentErrorSummaryPanel({
   conceptLabels,
   errorTypeLabels,
+  initialSummary,
   onInsertToReport,
 }: {
   conceptLabels: string[];
   errorTypeLabels: string[];
+  initialSummary?: string | null;
   onInsertToReport?: (text: string) => void;
 }) {
-  const [summary, setSummary] = React.useState<string | null>(null);
+  const [summary, setSummary] = React.useState<string | null>(initialSummary ?? null);
   const [error, setError] = React.useState<string | null>(null);
   const [inserted, setInserted] = React.useState(false);
   const [isGenerating, startGenerating] = useTransition();
@@ -51,7 +55,7 @@ export function ParentErrorSummaryPanel({
         학부모용 설명
       </h3>
       <p className="mt-1 text-xs text-navy-600 font-ko" lang="ko">
-        AI가 위 분석을 바탕으로 학부모가 이해하기 쉬운 설명 문구를 만들어드려요.
+        오답 학습지를 확정하면 AI가 학부모가 이해하기 쉬운 설명 문구를 자동으로 만들어드려요.
       </p>
 
       {!summary && (

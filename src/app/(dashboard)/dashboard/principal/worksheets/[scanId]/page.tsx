@@ -8,7 +8,6 @@ import { BackLink } from "@/components/ui/back-link";
 import { ReviewTable } from "@/components/dashboard/review-table";
 import { ParentReportWorkspace } from "@/components/dashboard/parent-report-workspace";
 import { ScanStatusBadge } from "@/components/dashboard/scan-status-badge";
-import { ConceptErrorAnalysis } from "@/components/dashboard/concept-error-analysis";
 import { CorrectionUploadForm } from "@/components/dashboard/correction-upload-form";
 import { ConfirmSubmitButton } from "@/components/dashboard/confirm-submit-button";
 import { requireRole } from "@/lib/dal";
@@ -24,7 +23,7 @@ import {
 import { retryGradingAction, deleteWorksheetScanAction } from "@/lib/learning-history/actions";
 import { getStudent } from "@/lib/students/queries";
 import { SCAN_STATUS_LABELS } from "@/lib/learning-history/schema";
-import { computeSessionStats } from "@/lib/learning-history/stats";
+import { computeSessionStats, sortedStatLabels } from "@/lib/learning-history/stats";
 import { GradingStatusPoller } from "@/components/dashboard/grading-status-poller";
 import { isGradingStuck } from "@/lib/scan-status";
 import { WORKSHEET_GRADING_STUCK_THRESHOLD_MS } from "@/lib/ai/grading-config";
@@ -177,12 +176,6 @@ export default async function WorksheetScanReviewPage({
             />
           </div>
 
-          {stats.total > 0 && (
-            <div className="mt-8">
-              <ConceptErrorAnalysis stats={stats} />
-            </div>
-          )}
-
           <div className="mt-8">
             <ParentReportWorkspace
               conceptLabels={conceptLabels}
@@ -192,6 +185,7 @@ export default async function WorksheetScanReviewPage({
               sessionDate={scan.session_date}
               existingNote={existingNote}
               initialLanguage={lastNoteLanguage}
+              initialSummary={scan.parent_summary}
             />
           </div>
         </Container>
@@ -293,12 +287,6 @@ export default async function WorksheetScanReviewPage({
           </div>
         </div>
 
-        {readOnly && stats.total > 0 && (
-          <div className="mt-8">
-            <ConceptErrorAnalysis stats={stats} />
-          </div>
-        )}
-
         {!scan.source_scan_id && (
           <div className="mt-8">
             <ParentReportWorkspace
@@ -309,26 +297,11 @@ export default async function WorksheetScanReviewPage({
               sessionDate={scan.session_date}
               existingNote={existingNote}
               initialLanguage={lastNoteLanguage}
+              initialSummary={scan.parent_summary}
             />
           </div>
         )}
       </Container>
     </Section>
   );
-}
-
-// byConcept/byErrorType come out of computeSessionStats keyed by id, not
-// ranked — sort by frequency so the AI summary (and any future ordering)
-// leads with what the student struggles with most.
-function sortedStatLabels(stats: ReturnType<typeof computeSessionStats>) {
-  return {
-    conceptLabels: stats.byConcept
-      .slice()
-      .sort((a, b) => b.total - a.total)
-      .map((c) => c.label),
-    errorTypeLabels: stats.byErrorType
-      .slice()
-      .sort((a, b) => b.count - a.count)
-      .map((e) => e.label),
-  };
 }
