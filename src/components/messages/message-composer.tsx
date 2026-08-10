@@ -6,13 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { sendMessageAction, type SendMessageFormState } from "@/lib/messages/actions";
 import { MESSAGE_BODY_MAX } from "@/lib/messages/schema";
+import type { Message } from "@/lib/supabase/types";
 
 export function MessageComposer({
   threadId,
   isPrincipal,
+  onSent,
 }: {
   threadId: string;
   isPrincipal: boolean;
+  onSent?: (message: Message) => void;
 }) {
   const action = sendMessageAction.bind(null, threadId);
   const [state, formAction, isPending] = useActionState<SendMessageFormState | null, FormData>(
@@ -22,7 +25,10 @@ export function MessageComposer({
   const formRef = React.useRef<HTMLFormElement>(null);
 
   React.useEffect(() => {
-    if (!state?.error) formRef.current?.reset();
+    if (state?.error) return;
+    formRef.current?.reset();
+    if (state?.message) onSent?.(state.message);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {

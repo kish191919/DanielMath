@@ -8,7 +8,6 @@ const principalLinks = [
   { href: "/dashboard/principal/students", label: "학생" },
   { href: "/dashboard/principal/tuition", label: "정산" },
   { href: "/dashboard/principal/practice-sheets/new", label: "문제 생성" },
-  { href: "/dashboard/principal/messages", label: "메시지" },
   { href: "/dashboard/principal/inquiries", label: "상담 문의" },
 ];
 
@@ -16,7 +15,6 @@ const parentLinks = [
   { href: "/dashboard/parent/children", label: "Children" },
   { href: "/dashboard/parent/progress", label: "Progress" },
   { href: "/dashboard/parent/tuition", label: "Tuition" },
-  { href: "/dashboard/parent/messages", label: "Messages" },
 ];
 
 export function DashboardNav({ role, unreadCount = 0 }: { role: Role; unreadCount?: number }) {

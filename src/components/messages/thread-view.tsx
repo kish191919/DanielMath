@@ -91,7 +91,13 @@ export function ThreadView({
         />
         <div ref={bottomRef} />
       </div>
-      <MessageComposer threadId={threadId} isPrincipal={isPrincipal} />
+      <MessageComposer
+        threadId={threadId}
+        isPrincipal={isPrincipal}
+        onSent={(message) =>
+          setMessages((prev) => (prev.some((m) => m.id === message.id) ? prev : [...prev, message]))
+        }
+      />
     </div>
   );
 }

@@ -10,6 +10,7 @@ import { messageBodySchema } from "./schema";
 
 export type SendMessageFormState = {
   error?: string;
+  message?: Message;
 };
 
 async function verifyParticipant(threadId: string, userId: string, isPrincipal: boolean) {
@@ -43,12 +44,16 @@ export async function sendMessageAction(
   const thread = await verifyParticipant(threadId, session.userId, isPrincipal);
 
   const supabase = await createServerSupabase();
-  const { error } = await supabase.from("messages").insert({
-    thread_id: threadId,
-    sender_id: session.userId,
-    body: parsed.data,
-  });
-  if (error) return { error: error.message };
+  const { data: message, error } = await supabase
+    .from("messages")
+    .insert({
+      thread_id: threadId,
+      sender_id: session.userId,
+      body: parsed.data,
+    })
+    .select()
+    .single<Message>();
+  if (error || !message) return { error: error?.message ?? "메시지 전송에 실패했습니다." };
 
   // Best-effort preview update, same pattern as inquiries' secondary status
   // update — a failure here shouldn't fail the send itself.
@@ -67,7 +72,7 @@ export async function sendMessageAction(
   after(() => notifyNewMessage({ thread, isPrincipalSender: isPrincipal }));
 
   revalidatePath(isPrincipal ? "/dashboard/principal/messages" : "/dashboard/parent/messages");
-  return {};
+  return { message };
 }
 
 export async function deleteMessageAction(threadId: string, messageId: string): Promise<void> {
