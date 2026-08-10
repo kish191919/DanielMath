@@ -2,6 +2,7 @@ import "server-only";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { getClaudeClient, REFERENCE_SOLVE_MODEL, REFERENCE_SOLVE_EFFORT } from "./claude";
 import { ReferenceSolveSchema } from "./reference-solve-schema";
+import { MATH_NOTATION_INSTRUCTIONS } from "./math-notation";
 import type { ReferenceProblem } from "@/lib/supabase/types";
 
 const PERSONA =
@@ -17,7 +18,8 @@ const PERSONA =
   "solved_correct_option은 반드시 null로 두세요 — 억지로 가장 비슷한 보기를 고르지 마세요. " +
   "solved_answer에는 그래도 계산한 최선의 값을 채우세요(이 필드는 여전히 비워둘 수 없습니다). " +
   "틀린 '값'은 선생님이 숫자만 보고도 바로잡기 쉽지만, 틀린 '보기 알파벳'은 원본 보기와 조용히 어긋난 채 " +
-  "학생에게 잘못 전달될 위험이 훨씬 크므로, 확신이 없는 letter는 절대 지어내지 마세요.";
+  "학생에게 잘못 전달될 위험이 훨씬 크므로, 확신이 없는 letter는 절대 지어내지 마세요. " +
+  MATH_NOTATION_INSTRUCTIONS;
 
 type SolveInputItem = Pick<ReferenceProblem, "id" | "translated_problem" | "has_diagram" | "translated_options">;
 

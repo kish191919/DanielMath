@@ -10,6 +10,7 @@ import { SessionNoteForm } from "@/components/dashboard/session-note-form";
 import { ScanStatusBadge } from "@/components/dashboard/scan-status-badge";
 import { ConceptErrorAnalysis } from "@/components/dashboard/concept-error-analysis";
 import { CorrectionUploadForm } from "@/components/dashboard/correction-upload-form";
+import { ConfirmSubmitButton } from "@/components/dashboard/confirm-submit-button";
 import { requireRole } from "@/lib/dal";
 import {
   getScanWithItems,
@@ -20,7 +21,7 @@ import {
   listCorrectionScansForScan,
   getConfirmedItemsForScans,
 } from "@/lib/learning-history/queries";
-import { retryGradingAction } from "@/lib/learning-history/actions";
+import { retryGradingAction, deleteWorksheetScanAction } from "@/lib/learning-history/actions";
 import { getStudent } from "@/lib/students/queries";
 import { SCAN_STATUS_LABELS } from "@/lib/learning-history/schema";
 import { GradingStatusPoller } from "@/components/dashboard/grading-status-poller";
@@ -134,16 +135,27 @@ export default async function WorksheetScanReviewPage({
             {correctionScans.length > 0 && (
               <div className="space-y-2">
                 {correctionScans.map((cs) => (
-                  <Link
+                  <div
                     key={cs.id}
-                    href={`/dashboard/principal/worksheets/${cs.id}`}
                     className="flex items-center justify-between gap-3 rounded-2xl border border-navy-100 bg-white p-4 shadow-sm transition-colors hover:border-navy-300 hover:bg-navy-50"
                   >
-                    <span className="text-sm text-navy-800 font-ko" lang="ko">
-                      오답 재촬영본 — {new Date(cs.created_at).toLocaleString("ko-KR")}
-                    </span>
-                    <ScanStatusBadge status={cs.status} />
-                  </Link>
+                    <Link
+                      href={`/dashboard/principal/worksheets/${cs.id}`}
+                      className="flex flex-1 items-center justify-between gap-3"
+                    >
+                      <span className="text-sm text-navy-800 font-ko" lang="ko">
+                        오답 재촬영본 — {new Date(cs.created_at).toLocaleString("ko-KR")}
+                      </span>
+                      <ScanStatusBadge status={cs.status} />
+                    </Link>
+                    <form action={deleteWorksheetScanAction.bind(null, cs.id, scan.student_id, scanId)}>
+                      <ConfirmSubmitButton
+                        label="삭제"
+                        confirmMessage="이 재촬영본을 삭제하시겠습니까? 채점 결과가 함께 삭제되며 되돌릴 수 없습니다."
+                        className="ml-2 shrink-0 rounded-md border border-red-200 px-3 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
+                      />
+                    </form>
+                  </div>
                 ))}
               </div>
             )}

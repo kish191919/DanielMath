@@ -3,13 +3,15 @@ import type { z } from "zod";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { getClaudeClient, PRACTICE_GEN_MODEL, PRACTICE_GEN_EFFORT } from "./claude";
 import { GeneratePracticeSchema } from "./practice-problem-schema";
+import { MATH_NOTATION_INSTRUCTIONS } from "./math-notation";
 import { ERROR_TYPE_LABELS } from "@/lib/learning-history/schema";
 import type { Concept, LearningItem, ReferenceProblem } from "@/lib/supabase/types";
 
 const PERSONA =
   "당신은 미국 북버지니아(NoVa) K-6 AAP 준비 수학 공부방의 연습문제 출제 보조입니다. " +
   "이 공부방의 학생들은 모두 미국인 학생입니다 — 아래 원본 문제가 어떤 언어로 되어 있든 상관없이, " +
-  "당신이 생성하는 모든 problem_text와 answer_text는 반드시 자연스러운 영어(English)로만 작성해야 합니다. 한국어를 절대 사용하지 마세요.";
+  "당신이 생성하는 모든 problem_text와 answer_text는 반드시 자연스러운 영어(English)로만 작성해야 합니다. 한국어를 절대 사용하지 마세요. " +
+  MATH_NOTATION_INSTRUCTIONS;
 
 // 오답 기반: 숫자/표현만 바꿔 같은 구조·난이도의 문제를 재생성한다.
 const WRONG_ANSWER_INSTRUCTIONS = `아래는 학생이 틀린 문제들입니다. 각 문제마다 요청된 개수만큼, 같은 개념·같은 난이도의 유사 문제를 새로 만들어주세요.

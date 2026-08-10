@@ -3,6 +3,7 @@ import { GRADING_MODEL, GRADING_EFFORT } from "./claude";
 import { WorksheetGradingSchema, type GradedItem } from "./grading-schema";
 import { extractStructuredItems } from "./document-extraction";
 import { DEGRADED_GRADING_EFFORT, DEGRADED_PAGES_PER_CHUNK } from "./grading-config";
+import { MATH_NOTATION_INSTRUCTIONS } from "./math-notation";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import type { Concept, WorksheetScan } from "@/lib/supabase/types";
 
@@ -35,7 +36,8 @@ const GRADING_INSTRUCTIONS = `당신은 미국 북버지니아(NoVa) K-6 AAP 준
 5. error_type을 아래 7개 중 하나로 선택하세요: calculation_mistake(계산 실수), place_value_error(자릿수 오류), fraction_concept(분수 개념), word_problem_interpretation(단어 문제 해석), unit_conversion(단위 변환), pattern_recognition(패턴 인식), time_pressure(시간 부족).
 6. 이미지를 자르거나 좌표를 반환하지 마세요 — 문제 텍스트만 그대로 옮겨 적으면 됩니다.
 7. 확신이 서지 않는 부분(글씨 판독 어려움, 표시가 빨간색인지 애매함 등)은 confidence_note에 짧게 남기세요. 없으면 null.
-8. items를 절대 빈 배열로 반환하지 마세요. 이 업로드는 오답 표시가 있다는 전제로 이루어지므로, 빨간 표시를 찾기 어렵다고 느껴지면 페이지를 처음부터 다시 살펴보고 최소 1개 이상을 반드시 추출하세요.`;
+8. items를 절대 빈 배열로 반환하지 마세요. 이 업로드는 오답 표시가 있다는 전제로 이루어지므로, 빨간 표시를 찾기 어렵다고 느껴지면 페이지를 처음부터 다시 살펴보고 최소 1개 이상을 반드시 추출하세요.
+9. ${MATH_NOTATION_INSTRUCTIONS}`;
 
 function buildConceptListText(concepts: Concept[]): string {
   return concepts

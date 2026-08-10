@@ -1,10 +1,11 @@
 import { z } from "zod";
 import { ERROR_TYPES } from "@/lib/learning-history/schema";
+import { MATH_NOTATION_INSTRUCTIONS } from "./math-notation";
 
 export const GradedItemSchema = z.object({
   problem_number: z.string().nullable(),
-  transcribed_problem: z.string(),
-  transcribed_answer: z.string().nullable(),
+  transcribed_problem: z.string().describe(MATH_NOTATION_INSTRUCTIONS),
+  transcribed_answer: z.string().nullable().describe(MATH_NOTATION_INSTRUCTIONS),
   is_correct: z.boolean(),
   // Matched post-hoc against the concept list fetched at grading time
   // (concepts are teacher-editable, so this isn't a schema-level enum).

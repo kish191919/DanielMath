@@ -3,6 +3,7 @@ import Link from "next/link";
 import { PencilLine } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import { PrintButton } from "@/components/dashboard/print-button";
+import { MathText } from "@/components/math-text";
 import { requireRole } from "@/lib/dal";
 import { getPracticeSheetWithProblems } from "@/lib/practice-sheets/queries";
 import { getStudent } from "@/lib/students/queries";
@@ -80,7 +81,6 @@ export default async function PracticeSheetPrintPage({
   const problemColumns = chunkArray(problems, problemCols);
   const answerColumns = chunkArray(problems, answerCols);
 
-  const title = worksheet.title?.trim() || "연습문제";
   const answersUrl = `${siteConfig.url}/answers/${worksheet.share_token}`;
   const qrSvg = await QRCode.toString(answersUrl, { type: "svg", margin: 1 });
 
@@ -118,19 +118,12 @@ export default async function PracticeSheetPrintPage({
                 {siteConfig.name}
               </p>
             </div>
-            <h1 className="mt-1 text-2xl font-bold text-navy-900 font-ko" lang="ko">
-              {title}
-            </h1>
             <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-3 rounded-lg bg-navy-50 px-4 py-3 text-sm text-navy-800">
               <div className="flex items-center gap-2">
                 <dt className="font-ko font-medium" lang="ko">
                   이름
                 </dt>
-                {student ? (
-                  <dd>{student.full_name}</dd>
-                ) : (
-                  <dd className="min-w-32 border-b border-navy-400">&nbsp;</dd>
-                )}
+                <dd className="min-w-32 border-b border-navy-400">&nbsp;</dd>
               </div>
               <div className="flex items-center gap-2">
                 <dt className="font-ko font-medium" lang="ko">
@@ -179,7 +172,9 @@ export default async function PracticeSheetPrintPage({
                           {column.startIndex + localIndex + 1}
                         </span>
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-navy-900">{problem.problem_text}</p>
+                          <p className="text-sm font-medium text-navy-900">
+                            <MathText text={problem.problem_text} />
+                          </p>
                           {problem.options && (
                             <div className="mt-4 flex flex-wrap gap-2">
                               {problem.options.map((opt) => (
@@ -190,7 +185,9 @@ export default async function PracticeSheetPrintPage({
                                   <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-navy-900 text-[10px] font-bold text-white">
                                     {opt.label}
                                   </span>
-                                  <span className="text-sm text-navy-800">{opt.text}</span>
+                                  <span className="text-sm text-navy-800">
+                                    <MathText text={opt.text} />
+                                  </span>
                                 </div>
                               ))}
                             </div>
@@ -218,16 +215,6 @@ export default async function PracticeSheetPrintPage({
               </ol>
             ))}
         </div>
-
-        <div className="mt-6 flex flex-wrap items-center gap-3 break-inside-avoid rounded-lg border border-navy-200 p-3 [page-break-inside:avoid]">
-          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded border border-navy-400">
-            &nbsp;
-          </span>
-          <span className="whitespace-nowrap text-sm font-medium text-navy-800 font-ko" lang="ko">
-            학부모 확인
-          </span>
-          <span className="min-w-32 flex-1 border-b border-navy-300">&nbsp;</span>
-        </div>
       </section>
 
       <section className="page-break mt-10 pt-10">
@@ -239,13 +226,8 @@ export default async function PracticeSheetPrintPage({
             </p>
           </div>
           <h2 className="mt-1 text-lg font-bold text-navy-900 font-ko" lang="ko">
-            {title} — 답안지
+            답안지
           </h2>
-          {student && (
-            <p className="mt-1 text-sm text-navy-600 font-ko" lang="ko">
-              {student.full_name}
-            </p>
-          )}
         </header>
 
         <div className="mt-4 flex items-center gap-2 text-sm text-navy-800">
@@ -272,7 +254,7 @@ export default async function PracticeSheetPrintPage({
                         {problem.correct_option}
                       </span>
                     )}
-                    {problem.answer_text}
+                    <MathText text={problem.answer_text} />
                   </li>
                 ))}
               </ol>

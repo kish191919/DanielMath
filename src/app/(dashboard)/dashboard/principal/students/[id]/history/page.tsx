@@ -13,6 +13,7 @@ import {
 import { BackLink } from "@/components/ui/back-link";
 import { WrongAnswerWorkspace, type ItemGroup } from "@/components/dashboard/wrong-answer-workspace";
 import { ScanStatusBadge } from "@/components/dashboard/scan-status-badge";
+import { groupScansByRoot } from "@/lib/learning-history/scan-groups";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { GRADE_LABELS } from "@/lib/students/schema";
 import { todayInEasternTime } from "@/lib/dates";
@@ -63,6 +64,7 @@ export default async function StudentHistoryPage({
   );
 
   const scansById = new Map(scans.map((s) => [s.id, s]));
+  const scanGroups = groupScansByRoot(scans);
 
   const sessionGroups = new Map<string, LearningItem[]>();
   for (const item of items) {
@@ -165,24 +167,34 @@ export default async function StudentHistoryPage({
               학습지 목록
             </h2>
             <div className="mt-4 space-y-2">
-              {scans.length === 0 ? (
+              {scanGroups.length === 0 ? (
                 <p className="text-sm text-navy-600">아직 업로드된 학습지가 없습니다.</p>
               ) : (
-                scans.map((scan) => (
+                scanGroups.map(({ root, corrections }) => (
                   <Link
-                    key={scan.id}
-                    href={`/dashboard/principal/worksheets/${scan.id}`}
+                    key={root.id}
+                    href={`/dashboard/principal/worksheets/${root.id}`}
                     className="flex items-center justify-between gap-3 rounded-xl border border-navy-100 bg-white p-3 shadow-sm transition-colors hover:border-navy-300 hover:bg-navy-50"
                   >
                     <div className="flex flex-col">
                       <span className="text-sm font-medium text-navy-800">
-                        {scan.original_filename ?? scan.session_date}
+                        {root.original_filename ?? root.session_date}
                       </span>
-                      {scan.original_filename && (
-                        <span className="text-xs text-navy-500">{scan.session_date}</span>
+                      {root.original_filename && (
+                        <span className="text-xs text-navy-500">{root.session_date}</span>
+                      )}
+                      {corrections.length > 1 && (
+                        <span className="text-xs text-navy-500">
+                          오답 재촬영 {corrections.length}건
+                        </span>
                       )}
                     </div>
-                    <ScanStatusBadge status={scan.status} />
+                    <div className="flex shrink-0 flex-wrap items-center justify-end gap-1">
+                      <ScanStatusBadge status={root.status} />
+                      {corrections.length > 0 && (
+                        <ScanStatusBadge status={corrections.at(-1)!.status} />
+                      )}
+                    </div>
                   </Link>
                 ))
               )}

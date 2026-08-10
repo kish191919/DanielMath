@@ -1,11 +1,12 @@
 import { z } from "zod";
+import { MATH_NOTATION_INSTRUCTIONS } from "./math-notation";
 
 // A single multiple-choice option, as printed on the source — label is kept
 // verbatim (e.g. "A", "1)", "①") and never renormalized to A-E, since source
 // worksheets don't always use Latin letters.
 export const ProblemOptionSchema = z.object({
   label: z.string().min(1).max(3),
-  text: z.string().min(1),
+  text: z.string().min(1).describe(MATH_NOTATION_INSTRUCTIONS),
 });
 
 // Shared by every stage that carries an options array (extraction,

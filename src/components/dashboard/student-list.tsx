@@ -3,6 +3,7 @@ import { Plus } from "lucide-react";
 import { GRADE_LABELS } from "@/lib/students/schema";
 import { deleteStudentAction } from "@/lib/students/actions";
 import { WEEKDAYS, WEEKDAY_LABELS } from "@/lib/classes/schema";
+import { ConfirmSubmitButton } from "@/components/dashboard/confirm-submit-button";
 import { EnrollmentStatusBadge } from "@/components/dashboard/enrollment-status-badge";
 import type { StudentProgressOverview } from "@/lib/learning-history/queries";
 import type { Class } from "@/lib/supabase/types";
@@ -103,12 +104,11 @@ export function StudentList({
                 수정
               </Link>
               <form action={deleteStudentAction.bind(null, student.id)}>
-                <button
-                  type="submit"
+                <ConfirmSubmitButton
+                  label="삭제"
+                  confirmMessage={`${student.full_name} 학생을 삭제하시겠습니까? 되돌릴 수 없습니다.`}
                   className="rounded-md border border-red-200 bg-white px-3 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
-                >
-                  삭제
-                </button>
+                />
               </form>
             </div>
           </article>

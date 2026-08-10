@@ -4,6 +4,7 @@ import Script from "next/script";
 import { headers } from "next/headers";
 import { siteConfig } from "@/lib/site-config";
 import "./globals.css";
+import "katex/dist/katex.min.css";
 
 const inter = Inter({
   variable: "--font-inter",

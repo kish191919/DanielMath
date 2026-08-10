@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPracticeSheetAnswersByToken } from "@/lib/practice-sheets/queries";
+import { MathText } from "@/components/math-text";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -39,7 +40,7 @@ export default async function PublicAnswerKeyPage({
                   {answer.correct_option}
                 </span>
               )}
-              {answer.answer_text}
+              <MathText text={answer.answer_text} />
             </li>
           ))}
         </ol>

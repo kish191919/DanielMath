@@ -7,6 +7,7 @@ import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ERROR_TYPES, ERROR_TYPE_LABELS } from "@/lib/learning-history/schema";
 import { confirmReviewAction } from "@/lib/learning-history/actions";
+import { MathPreview } from "@/components/math-text";
 import type { LearningItemInputValues } from "@/lib/learning-history/schema";
 import type { Concept, ErrorType, LearningItem } from "@/lib/supabase/types";
 
@@ -122,13 +123,16 @@ export function ReviewTable({
                 disabled={readOnly}
                 onChange={(e) => updateRow(row.clientKey, { problem_number: e.target.value })}
               />
-              <Textarea
-                placeholder="문제 내용"
-                className="min-h-[44px]"
-                value={row.transcribed_problem}
-                disabled={readOnly}
-                onChange={(e) => updateRow(row.clientKey, { transcribed_problem: e.target.value })}
-              />
+              <div>
+                <Textarea
+                  placeholder="문제 내용"
+                  className="min-h-[44px]"
+                  value={row.transcribed_problem}
+                  disabled={readOnly}
+                  onChange={(e) => updateRow(row.clientKey, { transcribed_problem: e.target.value })}
+                />
+                <MathPreview text={row.transcribed_problem} />
+              </div>
             </div>
             {!readOnly && (
               <button
@@ -142,12 +146,15 @@ export function ReviewTable({
           </div>
 
           <div className="mt-3 grid gap-3 sm:grid-cols-3">
-            <Input
-              placeholder="학생 답"
-              value={row.transcribed_answer ?? ""}
-              disabled={readOnly}
-              onChange={(e) => updateRow(row.clientKey, { transcribed_answer: e.target.value })}
-            />
+            <div>
+              <Input
+                placeholder="학생 답"
+                value={row.transcribed_answer ?? ""}
+                disabled={readOnly}
+                onChange={(e) => updateRow(row.clientKey, { transcribed_answer: e.target.value })}
+              />
+              <MathPreview text={row.transcribed_answer ?? ""} />
+            </div>
 
             <label className="inline-flex items-center gap-2 text-sm text-navy-800">
               <input

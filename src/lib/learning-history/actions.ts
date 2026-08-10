@@ -446,7 +446,16 @@ export async function sendSessionNoteAction(
   return { success: true };
 }
 
-export async function deleteWorksheetScanAction(scanId: string, studentId: string) {
+export async function deleteWorksheetScanAction(
+  scanId: string,
+  studentId: string,
+  // Set when deleting a single correction scan from its root's own review
+  // page ([scanId]/page.tsx) — revalidates that root page too, since it's
+  // the one showing the correction list the deleted row needs to disappear
+  // from. Omitted by the flat list pages, which navigate away from the
+  // deleted row's own page rather than staying on it.
+  sourceScanId?: string,
+) {
   await requireRole("principal");
 
   const supabase = await createServerSupabase();
@@ -466,6 +475,7 @@ export async function deleteWorksheetScanAction(scanId: string, studentId: strin
   revalidatePath("/dashboard/principal/worksheets");
   revalidatePath(`/dashboard/principal/students/${studentId}/history`);
   revalidatePath("/dashboard/parent/progress");
+  if (sourceScanId) revalidatePath(`/dashboard/principal/worksheets/${sourceScanId}`);
 }
 
 // Posts the published report into each guardian's own chat thread (one

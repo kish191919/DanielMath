@@ -8,6 +8,7 @@ import { requireRole } from "@/lib/dal";
 import { listPendingScans, listRecentScans, listUndeliveredScans } from "@/lib/learning-history/queries";
 import { deleteWorksheetScanAction } from "@/lib/learning-history/actions";
 import { listStudents } from "@/lib/students/queries";
+import { groupScansByRoot, toSingleScanGroups } from "@/lib/learning-history/scan-groups";
 
 export default async function PrincipalWorksheetsPage({
   searchParams,
@@ -27,6 +28,8 @@ export default async function PrincipalWorksheetsPage({
     listStudents(),
   ]);
   const studentNameById = new Map(students.map((s) => [s.id, s.full_name]));
+  const scanRows =
+    isPendingFilter || isUndeliveredFilter ? toSingleScanGroups(scans) : groupScansByRoot(scans);
 
   return (
     <Section className="py-10 sm:py-14">
@@ -83,7 +86,7 @@ export default async function PrincipalWorksheetsPage({
         </div>
 
         <div className="mt-8 space-y-3">
-          {scans.length === 0 ? (
+          {scanRows.length === 0 ? (
             <div className="rounded-2xl border border-navy-100 bg-white p-8 text-center text-sm text-navy-600">
               {isPendingFilter
                 ? "확정 대기 중인 학습지가 없습니다."
@@ -92,24 +95,36 @@ export default async function PrincipalWorksheetsPage({
                   : "아직 업로드된 학습지가 없습니다."}
             </div>
           ) : (
-            scans.map((scan) => (
+            scanRows.map(({ root, corrections }) => (
               <div
-                key={scan.id}
+                key={root.id}
                 className="flex items-center justify-between gap-3 rounded-2xl border border-navy-100 bg-white p-4 shadow-sm transition-colors hover:border-navy-300 hover:bg-navy-50 sm:p-5"
               >
                 <Link
-                  href={`/dashboard/principal/worksheets/${scan.id}`}
+                  href={`/dashboard/principal/worksheets/${root.id}`}
                   className="flex flex-1 items-center justify-between gap-3"
                 >
                   <div>
                     <p className="text-sm font-semibold text-navy-900">
-                      {studentNameById.get(scan.student_id) ?? "알 수 없는 학생"}
+                      {studentNameById.get(root.student_id) ?? "알 수 없는 학생"}
                     </p>
-                    <p className="mt-1 text-xs text-navy-600">{scan.session_date}</p>
+                    <p className="mt-1 text-xs text-navy-600">{root.session_date}</p>
+                    {corrections.length > 1 && (
+                      <p className="mt-1 text-xs text-navy-500">
+                        오답 재촬영 {corrections.length}건
+                      </p>
+                    )}
                   </div>
-                  <ScanStatusBadge status={scan.status} />
+                  <div className="flex shrink-0 flex-wrap items-center justify-end gap-1">
+                    <ScanStatusBadge status={root.status} />
+                    {corrections.length > 0 && (
+                      <ScanStatusBadge status={corrections.at(-1)!.status} />
+                    )}
+                  </div>
                 </Link>
-                <form action={deleteWorksheetScanAction.bind(null, scan.id, scan.student_id)}>
+                <form
+                  action={deleteWorksheetScanAction.bind(null, root.id, root.student_id, undefined)}
+                >
                   <ConfirmSubmitButton
                     label="삭제"
                     confirmMessage="이 학습지 스캔을 삭제하시겠습니까? 채점 결과와 업로드된 원본 파일도 함께 삭제되며 되돌릴 수 없습니다."

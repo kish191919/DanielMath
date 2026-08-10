@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { confirmPracticeSheetAction } from "@/lib/practice-sheets/actions";
+import { MathPreview } from "@/components/math-text";
 import type { PracticeProblemInputValues } from "@/lib/practice-sheets/schema";
 import type { GeneratedProblemWithCrop } from "@/lib/practice-sheets/queries";
 
@@ -229,20 +230,26 @@ export function PracticeSheetReviewTable({
           </div>
 
           <div className="mt-2 grid gap-3 sm:grid-cols-2">
-            <Textarea
-              placeholder="문제 내용"
-              className="min-h-[80px]"
-              value={row.problem_text}
-              disabled={readOnly}
-              onChange={(e) => updateRow(row.clientKey, { problem_text: e.target.value })}
-            />
-            <Textarea
-              placeholder="정답"
-              className="min-h-[80px]"
-              value={row.answer_text}
-              disabled={readOnly}
-              onChange={(e) => updateRow(row.clientKey, { answer_text: e.target.value })}
-            />
+            <div>
+              <Textarea
+                placeholder="문제 내용"
+                className="min-h-[80px]"
+                value={row.problem_text}
+                disabled={readOnly}
+                onChange={(e) => updateRow(row.clientKey, { problem_text: e.target.value })}
+              />
+              <MathPreview text={row.problem_text} />
+            </div>
+            <div>
+              <Textarea
+                placeholder="정답"
+                className="min-h-[80px]"
+                value={row.answer_text}
+                disabled={readOnly}
+                onChange={(e) => updateRow(row.clientKey, { answer_text: e.target.value })}
+              />
+              <MathPreview text={row.answer_text} />
+            </div>
           </div>
 
           <div className="mt-3">
@@ -260,59 +267,62 @@ export function PracticeSheetReviewTable({
             {row.options && (
               <div className="mt-2 space-y-2">
                 {row.options.map((opt, optIndex) => (
-                  <div key={optIndex} className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name={`correct-${row.clientKey}`}
-                      className="h-3.5 w-3.5 shrink-0 accent-navy-700"
-                      checked={row.correct_option === opt.label}
-                      disabled={readOnly}
-                      onChange={() => setCorrectOption(row.clientKey, opt.label)}
-                      aria-label={`보기 ${opt.label}를 정답으로 표시`}
-                    />
-                    <Input
-                      className="w-14 shrink-0 text-center"
-                      value={opt.label}
-                      disabled={readOnly}
-                      onChange={(e) => updateOption(row.clientKey, optIndex, { label: e.target.value })}
-                    />
-                    <Input
-                      className="flex-1"
-                      placeholder="보기 내용"
-                      value={opt.text}
-                      disabled={readOnly}
-                      onChange={(e) => updateOption(row.clientKey, optIndex, { text: e.target.value })}
-                    />
-                    {!readOnly && (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => moveOption(row.clientKey, optIndex, -1)}
-                          disabled={optIndex === 0}
-                          className="shrink-0 rounded-md border border-navy-200 px-1.5 py-1 text-xs text-navy-600 hover:bg-navy-50 disabled:opacity-30"
-                          aria-label="위로 이동"
-                        >
-                          ↑
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => moveOption(row.clientKey, optIndex, 1)}
-                          disabled={optIndex === row.options!.length - 1}
-                          className="shrink-0 rounded-md border border-navy-200 px-1.5 py-1 text-xs text-navy-600 hover:bg-navy-50 disabled:opacity-30"
-                          aria-label="아래로 이동"
-                        >
-                          ↓
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => removeOption(row.clientKey, optIndex)}
-                          className="shrink-0 rounded-md border border-red-200 px-1.5 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
-                          aria-label="보기 삭제"
-                        >
-                          삭제
-                        </button>
-                      </>
-                    )}
+                  <div key={optIndex}>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name={`correct-${row.clientKey}`}
+                        className="h-3.5 w-3.5 shrink-0 accent-navy-700"
+                        checked={row.correct_option === opt.label}
+                        disabled={readOnly}
+                        onChange={() => setCorrectOption(row.clientKey, opt.label)}
+                        aria-label={`보기 ${opt.label}를 정답으로 표시`}
+                      />
+                      <Input
+                        className="w-14 shrink-0 text-center"
+                        value={opt.label}
+                        disabled={readOnly}
+                        onChange={(e) => updateOption(row.clientKey, optIndex, { label: e.target.value })}
+                      />
+                      <Input
+                        className="flex-1"
+                        placeholder="보기 내용"
+                        value={opt.text}
+                        disabled={readOnly}
+                        onChange={(e) => updateOption(row.clientKey, optIndex, { text: e.target.value })}
+                      />
+                      {!readOnly && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => moveOption(row.clientKey, optIndex, -1)}
+                            disabled={optIndex === 0}
+                            className="shrink-0 rounded-md border border-navy-200 px-1.5 py-1 text-xs text-navy-600 hover:bg-navy-50 disabled:opacity-30"
+                            aria-label="위로 이동"
+                          >
+                            ↑
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => moveOption(row.clientKey, optIndex, 1)}
+                            disabled={optIndex === row.options!.length - 1}
+                            className="shrink-0 rounded-md border border-navy-200 px-1.5 py-1 text-xs text-navy-600 hover:bg-navy-50 disabled:opacity-30"
+                            aria-label="아래로 이동"
+                          >
+                            ↓
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => removeOption(row.clientKey, optIndex)}
+                            className="shrink-0 rounded-md border border-red-200 px-1.5 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
+                            aria-label="보기 삭제"
+                          >
+                            삭제
+                          </button>
+                        </>
+                      )}
+                    </div>
+                    <MathPreview text={opt.text} />
                   </div>
                 ))}
                 {!readOnly && row.options.length < 6 && (

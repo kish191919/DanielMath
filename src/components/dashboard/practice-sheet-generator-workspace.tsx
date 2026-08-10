@@ -9,6 +9,7 @@ import { ConfirmSubmitButton } from "@/components/dashboard/confirm-submit-butto
 import { GradingStatusPoller } from "@/components/dashboard/grading-status-poller";
 import { ReferenceScanUploadForm } from "@/components/dashboard/reference-scan-upload-form";
 import { ReferenceProblemCropDialog } from "@/components/dashboard/reference-problem-crop-dialog";
+import { MathText } from "@/components/math-text";
 import { ERROR_TYPE_LABELS } from "@/lib/learning-history/schema";
 import { deleteLearningItemAction } from "@/lib/learning-history/actions";
 import { generatePracticeSheetAction } from "@/lib/practice-sheets/actions";
@@ -96,7 +97,7 @@ export function PracticeSheetGeneratorWorkspace({
   const [referenceMode, setReferenceMode] = React.useState<Record<string, ReferenceMode>>({});
   const [cropDialogProblemId, setCropDialogProblemId] = React.useState<string | null>(null);
   const [conceptFilter, setConceptFilter] = React.useState("");
-  const [countPerItem, setCountPerItem] = React.useState(3);
+  const [countPerItem, setCountPerItem] = React.useState(1);
   const [error, setError] = React.useState<string | null>(null);
   const [isPending, startTransition] = React.useTransition();
 
@@ -324,7 +325,7 @@ export function PracticeSheetGeneratorWorkspace({
                                       {item.problem_number && (
                                         <span className="mr-2 font-medium">#{item.problem_number}</span>
                                       )}
-                                      {item.transcribed_problem}
+                                      <MathText text={item.transcribed_problem} />
                                     </p>
                                     <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
                                       오답
@@ -333,7 +334,9 @@ export function PracticeSheetGeneratorWorkspace({
                                   <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-navy-500">
                                     <span>{item.session_date}</span>
                                     {item.transcribed_answer && (
-                                      <span>학생 답: {item.transcribed_answer}</span>
+                                      <span>
+                                        학생 답: <MathText text={item.transcribed_answer} />
+                                      </span>
                                     )}
                                     {item.error_type && <span>{ERROR_TYPE_LABELS[item.error_type]}</span>}
                                   </div>
@@ -571,21 +574,29 @@ export function PracticeSheetGeneratorWorkspace({
                                               #{problem.problem_number}
                                             </span>
                                           )}
-                                          {problem.transcribed_problem}
+                                          <MathText text={problem.transcribed_problem} />
                                         </p>
                                         {mode === "verbatim" && (
                                           <p className="mt-1 text-xs text-navy-500">
-                                            {problem.translated_problem ??
-                                              (translationPending ? "번역 대기 중..." : "번역 실패")}
+                                            {problem.translated_problem ? (
+                                              <MathText text={problem.translated_problem} />
+                                            ) : translationPending ? (
+                                              "번역 대기 중..."
+                                            ) : (
+                                              "번역 실패"
+                                            )}
                                           </p>
                                         )}
                                         {mode === "verbatim" && answerMissing && (
                                           <p className="mt-1 text-xs text-navy-500">
                                             정답:{" "}
-                                            {problem.solved_answer ??
-                                              (problem.solve_error
-                                                ? "풀이 실패"
-                                                : "정답이 없어 AI가 풀이 중...")}
+                                            {problem.solved_answer ? (
+                                              <MathText text={problem.solved_answer} />
+                                            ) : problem.solve_error ? (
+                                              "풀이 실패"
+                                            ) : (
+                                              "정답이 없어 AI가 풀이 중..."
+                                            )}
                                           </p>
                                         )}
 

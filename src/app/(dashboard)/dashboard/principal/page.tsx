@@ -15,6 +15,7 @@ import { requireRole } from "@/lib/dal";
 import { listPendingScans, listRecentScans, listUndeliveredScans } from "@/lib/learning-history/queries";
 import { retryGradingAction, deleteWorksheetScanAction } from "@/lib/learning-history/actions";
 import { listStudents } from "@/lib/students/queries";
+import { groupScansByRoot, toSingleScanGroups } from "@/lib/learning-history/scan-groups";
 import { listClassesWithCounts } from "@/lib/classes/queries";
 import { listSessionsByDate, listAttendanceSummaries } from "@/lib/class-sessions/queries";
 import { listInquiries } from "@/lib/inquiries/queries";
@@ -45,7 +46,9 @@ export default async function PrincipalHome() {
   ]);
   const unpaidStudentCount = new Set(unpaidTuition.map((p) => p.student_id)).size;
   const widgetScans =
-    pendingScans.length > 0 ? pendingScans.slice(0, 6) : await listRecentScans(6);
+    pendingScans.length > 0
+      ? toSingleScanGroups(pendingScans.slice(0, 6))
+      : groupScansByRoot(await listRecentScans(6));
   const studentNameById = new Map(students.map((s) => [s.id, s.full_name]));
 
   const todaySessions = await listSessionsByDate(todayInEasternTime());
@@ -160,25 +163,37 @@ export default async function PrincipalHome() {
                 아직 업로드된 학습지가 없습니다.
               </div>
             ) : (
-              widgetScans.map((scan) => (
+              widgetScans.map(({ root, corrections }) => (
                 <div
-                  key={scan.id}
+                  key={root.id}
                   className="overflow-hidden rounded-2xl border border-navy-100 bg-white shadow-sm"
                 >
                   <div className="flex items-center p-4">
                     <Link
-                      href={`/dashboard/principal/worksheets/${scan.id}`}
+                      href={`/dashboard/principal/worksheets/${root.id}`}
                       className="flex flex-1 items-center justify-between gap-3 transition-colors"
                     >
                       <div>
                         <p className="text-sm font-semibold text-navy-900">
-                          {studentNameById.get(scan.student_id) ?? "알 수 없는 학생"}
+                          {studentNameById.get(root.student_id) ?? "알 수 없는 학생"}
                         </p>
-                        <p className="mt-1 text-xs text-navy-600">{scan.session_date}</p>
+                        <p className="mt-1 text-xs text-navy-600">{root.session_date}</p>
+                        {corrections.length > 1 && (
+                          <p className="mt-1 text-xs text-navy-500">
+                            오답 재촬영 {corrections.length}건
+                          </p>
+                        )}
                       </div>
-                      <ScanStatusBadge status={scan.status} />
+                      <div className="flex shrink-0 flex-wrap items-center justify-end gap-1">
+                        <ScanStatusBadge status={root.status} />
+                        {corrections.length > 0 && (
+                          <ScanStatusBadge status={corrections.at(-1)!.status} />
+                        )}
+                      </div>
                     </Link>
-                    <form action={deleteWorksheetScanAction.bind(null, scan.id, scan.student_id)}>
+                    <form
+                      action={deleteWorksheetScanAction.bind(null, root.id, root.student_id, undefined)}
+                    >
                       <ConfirmSubmitButton
                         label="삭제"
                         confirmMessage="이 학습지 스캔을 삭제하시겠습니까? 채점 결과와 업로드된 원본 파일도 함께 삭제되며 되돌릴 수 없습니다."
@@ -186,12 +201,12 @@ export default async function PrincipalHome() {
                       />
                     </form>
                   </div>
-                  {scan.status === "grading_failed" && (
+                  {root.status === "grading_failed" && (
                     <div className="border-t border-red-100 bg-red-50 p-3">
-                      {scan.grading_error && (
-                        <p className="text-xs text-red-700">{scan.grading_error}</p>
+                      {root.grading_error && (
+                        <p className="text-xs text-red-700">{root.grading_error}</p>
                       )}
-                      <form action={retryGradingAction.bind(null, scan.id)} className="mt-2">
+                      <form action={retryGradingAction.bind(null, root.id)} className="mt-2">
                         <button
                           type="submit"
                           className="rounded-md border border-red-300 bg-white px-3 py-1.5 text-xs font-medium text-red-800 hover:bg-red-100"

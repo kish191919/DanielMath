@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
 import { ERROR_TYPE_LABELS } from "@/lib/learning-history/schema";
 import { generatePracticeSheetAction } from "@/lib/practice-sheets/actions";
+import { MathText } from "@/components/math-text";
 import type { LearningItem } from "@/lib/supabase/types";
 
 export type ItemGroup = {
@@ -43,7 +44,7 @@ export function WrongAnswerWorkspace({
   groups: ItemGroup[];
 }) {
   const [selected, setSelected] = React.useState<Record<string, boolean>>({});
-  const [countPerItem, setCountPerItem] = React.useState(3);
+  const [countPerItem, setCountPerItem] = React.useState(1);
   const [error, setError] = React.useState<string | null>(null);
   const [isPending, startTransition] = React.useTransition();
 
@@ -103,7 +104,7 @@ export function WrongAnswerWorkspace({
                       {item.problem_number && (
                         <span className="mr-2 font-medium">#{item.problem_number}</span>
                       )}
-                      {item.transcribed_problem}
+                      <MathText text={item.transcribed_problem} />
                     </p>
                     <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
                       오답
@@ -111,7 +112,11 @@ export function WrongAnswerWorkspace({
                   </div>
                   <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-navy-500">
                     <span>{item.session_date}</span>
-                    {item.transcribed_answer && <span>학생 답: {item.transcribed_answer}</span>}
+                    {item.transcribed_answer && (
+                      <span>
+                        학생 답: <MathText text={item.transcribed_answer} />
+                      </span>
+                    )}
                     {item.error_type && <span>{ERROR_TYPE_LABELS[item.error_type]}</span>}
                   </div>
                 </div>

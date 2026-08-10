@@ -1,6 +1,7 @@
 import "server-only";
 import { GRADING_MODEL, REFERENCE_EXTRACTION_EFFORT } from "./claude";
 import { ReferenceExtractionSchema, type ReferenceExtractedItem } from "./reference-extraction-schema";
+import { MATH_NOTATION_INSTRUCTIONS } from "./math-notation";
 import { extractStructuredItems } from "./document-extraction";
 import { translateReferenceProblems } from "./translate-reference-problems";
 import { solveReferenceProblems } from "./solve-reference-problems";
@@ -38,7 +39,8 @@ const REFERENCE_EXTRACTION_INSTRUCTIONS = `당신은 미국 북버지니아(NoVa
 5. 이미지를 자르거나 좌표를 반환하지 마세요.
 6. 확신이 서지 않는 부분(글씨 판독 어려움 등)은 confidence_note에 짧게 남기세요. 없으면 null.
 7. items를 절대 빈 배열로 반환하지 마세요. 페이지가 복잡해 보여도 그 안에 실제 문제가 있습니다. 문항을 찾기 어렵다고 느껴지면 페이지를 처음부터 다시 살펴보고 최소 1개 이상을 반드시 추출하세요.
-8. 이 문제를 정확히 풀려면 도형/그래프/표/그림이 반드시 필요한지 has_diagram에 true/false로 표시하세요. 5번 지침은 그대로입니다 — 좌표는 반환하지 마세요, true/false 판단만 하면 됩니다.`;
+8. 이 문제를 정확히 풀려면 도형/그래프/표/그림이 반드시 필요한지 has_diagram에 true/false로 표시하세요. 5번 지침은 그대로입니다 — 좌표는 반환하지 마세요, true/false 판단만 하면 됩니다.
+9. ${MATH_NOTATION_INSTRUCTIONS}`;
 
 function buildConceptListText(concepts: Concept[]): string {
   return concepts
