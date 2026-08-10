@@ -19,20 +19,20 @@ export default async function ParentChildrenPage() {
             className="inline-flex items-center gap-1.5 text-sm font-medium text-navy-500 hover:text-navy-900"
           >
             <ArrowLeft className="h-4 w-4" />
-            돌아가기
+            Back
           </Link>
           <p className="mt-3 text-sm font-semibold uppercase tracking-wider text-navy-500">
             Children
           </p>
-          <h1 className="mt-2 text-2xl font-bold text-navy-900 font-ko sm:text-3xl" lang="ko">
-            우리 아이
+          <h1 className="mt-2 text-2xl font-bold text-navy-900 sm:text-3xl">
+            My Children
           </h1>
         </div>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {children.length === 0 ? (
             <div className="col-span-full rounded-2xl border border-navy-100 bg-white p-8 text-center text-sm text-navy-600">
-              등록된 자녀가 없습니다. 원장님께 문의해주세요.
+              No children are registered yet. Please contact the director.
             </div>
           ) : (
             children.map((child) => (

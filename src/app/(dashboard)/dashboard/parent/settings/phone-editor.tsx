@@ -21,8 +21,8 @@ export function PhoneEditor({ defaultValue }: { defaultValue: string }) {
 
   return (
     <form action={formAction} className="space-y-2">
-      <label htmlFor="phone" className="block text-sm font-medium text-navy-900 font-ko" lang="ko">
-        연락처
+      <label htmlFor="phone" className="block text-sm font-medium text-navy-900">
+        Phone Number
       </label>
       <Input
         type="tel"
@@ -41,11 +41,11 @@ export function PhoneEditor({ defaultValue }: { defaultValue: string }) {
       )}
       {state?.success && !dirty && (
         <p className="text-xs text-navy-600" role="status">
-          저장되었습니다.
+          Saved.
         </p>
       )}
       <Button type="submit" size="md" disabled={isPending}>
-        {isPending ? "저장 중..." : "확인"}
+        {isPending ? "Saving..." : "Save"}
       </Button>
     </form>
   );

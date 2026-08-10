@@ -42,8 +42,14 @@ const en: Dictionary = {
       h3ko: "",
       body: "A one-time placement diagnostic determines each student's ability level, regardless of school grade. Every 70-minute session runs at each student's own pace with materials matched to their level: mistake review and 2–3 math olympiad problems (20 min) → leveled practice with regular workbooks (40 min) → math manipulatives, board games, or reinforcement (10 min).",
       classSize: { label: "Class Size", value: "Up to 4 students", sublabel: "" },
-      time: { label: "Time", value: "1–4×/wk · 70 min", sublabel: "" },
-      schedule: "Mon/Tue/Thu/Fri afternoons · 70-minute sessions",
+      time: { label: "Days", value: "Mon/Tue/Thu/Fri", sublabel: "1–4 sessions/week" },
+      schedule: {
+        note: "Mon/Tue/Thu/Fri · 70-minute sessions",
+        sessions: [
+          { label: "Session 1", time: "5:00 – 6:10 PM" },
+          { label: "Session 2", time: "6:30 – 7:40 PM" },
+        ],
+      },
       ctaDetails: "Program Details",
       ctaInquire: "Free Consultation",
     },

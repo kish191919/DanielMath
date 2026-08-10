@@ -7,7 +7,7 @@ import { hasLocale, localePath, type Locale } from "@/lib/i18n";
 import { pageAlternates } from "@/lib/seo";
 import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
-import { BlogListItem } from "@/components/site/blog-card";
+import { BlogCard } from "@/components/site/blog-card";
 import { getSortedPosts } from "@/lib/blog-posts";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -29,6 +29,7 @@ export default async function BlogPage({ params }: Props) {
   const d = await getDictionary(locale as Locale);
   const lp = (path: string) => localePath(locale as Locale, path);
   const isKo = locale === "ko";
+  const [featuredPost, ...restPosts] = getSortedPosts();
 
   return (
     <>
@@ -52,17 +53,30 @@ export default async function BlogPage({ params }: Props) {
             isKo={isKo}
           />
 
-          <div className="mt-10 flex flex-col divide-y divide-navy-100">
-            {getSortedPosts().map((post) => (
-              <BlogListItem
-                key={post.slug}
-                post={post}
+          <div className="mt-10 flex flex-col gap-6">
+            {featuredPost && (
+              <BlogCard
+                post={featuredPost}
                 locale={locale as Locale}
                 isKo={isKo}
                 readMore={d.blog.readMore}
-                minRead={d.blog.minRead}
+                featured
               />
-            ))}
+            )}
+
+            {restPosts.length > 0 && (
+              <div className="grid gap-6 sm:grid-cols-2">
+                {restPosts.map((post) => (
+                  <BlogCard
+                    key={post.slug}
+                    post={post}
+                    locale={locale as Locale}
+                    isKo={isKo}
+                    readMore={d.blog.readMore}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </Container>
       </Section>

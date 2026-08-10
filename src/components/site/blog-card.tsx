@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { type BlogPost } from "@/lib/blog-posts";
 import { localePath, type Locale } from "@/lib/i18n";
 
@@ -7,10 +8,10 @@ type Props = {
   locale: Locale;
   isKo: boolean;
   readMore: string;
-  minRead: string;
+  featured?: boolean;
 };
 
-export function BlogCard({ post, locale, isKo, readMore, minRead }: Props) {
+export function BlogCard({ post, locale, isKo, readMore, featured = false }: Props) {
   const href = localePath(locale, `/blog/${post.slug}`);
   const title = isKo ? post.titleKo : post.titleEn;
   const desc = isKo ? post.descKo : post.descEn;
@@ -24,71 +25,35 @@ export function BlogCard({ post, locale, isKo, readMore, minRead }: Props) {
   return (
     <Link
       href={href}
-      className="group flex flex-col rounded-2xl border border-navy-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+      className={`group flex flex-col rounded-2xl border border-navy-100 bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-gold-400/50 hover:shadow-lg hover:shadow-navy-900/5 ${
+        featured ? "sm:p-8" : ""
+      }`}
     >
-      <div className="mb-4 flex items-center gap-2">
-        <span className="rounded-full bg-navy-50 px-3 py-1 text-xs font-semibold text-navy-600">
-          {category}
-        </span>
-        <span className="text-xs text-navy-400">
-          {post.readingMins} {minRead}
-        </span>
-      </div>
+      <span className="text-xs font-bold uppercase tracking-wider text-gold-600">
+        {category}
+      </span>
 
-      <h3 className="mb-2 text-lg font-bold leading-snug text-navy-900 group-hover:text-navy-600 transition-colors">
+      <h3
+        className={`mt-3 font-bold leading-snug text-navy-900 transition-colors group-hover:text-navy-600 ${
+          featured ? "text-2xl sm:text-3xl" : "text-lg"
+        }`}
+      >
         {title}
       </h3>
 
-      <p className="mb-4 flex-1 text-sm leading-relaxed text-navy-600 line-clamp-3">
+      <p
+        className={`mt-3 flex-1 leading-relaxed text-navy-600 ${
+          featured ? "text-base line-clamp-3" : "text-sm line-clamp-2"
+        }`}
+      >
         {desc}
       </p>
 
-      <div className="flex items-center justify-between border-t border-navy-50 pt-4">
+      <div className="mt-6 flex items-center justify-between border-t border-navy-50 pt-4">
         <span className="text-xs text-navy-400">{date}</span>
-        <span className="text-xs font-semibold text-navy-500 group-hover:text-navy-800 transition-colors">
+        <span className="inline-flex items-center gap-1 text-xs font-semibold text-navy-500 transition-colors group-hover:text-navy-800">
           {readMore}
-        </span>
-      </div>
-    </Link>
-  );
-}
-
-export function BlogListItem({ post, locale, isKo, readMore, minRead }: Props) {
-  const href = localePath(locale, `/blog/${post.slug}`);
-  const title = isKo ? post.titleKo : post.titleEn;
-  const desc = isKo ? post.descKo : post.descEn;
-  const category = isKo ? post.category : post.categoryEn;
-
-  const date = new Date(post.publishedAt).toLocaleDateString(
-    isKo ? "ko-KR" : "en-US",
-    { year: "numeric", month: "long", day: "numeric" }
-  );
-
-  return (
-    <Link
-      href={href}
-      className="group flex items-start gap-4 py-5 px-2 -mx-2 rounded-lg hover:bg-navy-50/50 transition-colors"
-    >
-      <div className="w-24 shrink-0 pt-0.5 flex flex-col items-center gap-1">
-        <span className="rounded-full bg-navy-50 px-2.5 py-0.5 text-xs font-semibold text-navy-600 text-center leading-relaxed">
-          {category}
-        </span>
-        <span className="text-xs text-navy-400">
-          {post.readingMins} {minRead}
-        </span>
-      </div>
-
-      <div className="flex-1 min-w-0">
-        <h3 className="font-bold text-navy-900 group-hover:text-navy-600 transition-colors leading-snug">
-          {title}
-        </h3>
-        <p className="mt-0.5 text-sm text-navy-500 line-clamp-1">{desc}</p>
-      </div>
-
-      <div className="shrink-0 text-right flex flex-col gap-1 pt-0.5">
-        <span className="text-xs text-navy-400 whitespace-nowrap">{date}</span>
-        <span className="text-xs font-semibold text-navy-500 group-hover:text-navy-800 transition-colors whitespace-nowrap">
-          {readMore}
+          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
         </span>
       </div>
     </Link>

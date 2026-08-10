@@ -87,13 +87,6 @@ export function InquiryForm({ labels, errors: errMsgs, thanksPath, defaultInquir
       noValidate
       className="space-y-6 rounded-2xl border border-navy-100 bg-white p-6 shadow-sm sm:p-8"
     >
-      <Field label={labels.inquiryType.label}>
-        <div className="flex flex-col gap-2 sm:flex-row sm:gap-5">
-          <Radio {...register("inquiryType")} value="consult" label={labels.inquiryType.consult} />
-          <Radio {...register("inquiryType")} value="trial" label={labels.inquiryType.trial} />
-        </div>
-      </Field>
-
       <Field label={labels.parentName.label} error={errors.parentName?.message} required>
         <Input
           {...register("parentName")}

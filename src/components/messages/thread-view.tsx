@@ -71,12 +71,16 @@ export function ThreadView({
             className="inline-flex items-center gap-1.5 text-sm font-medium text-navy-500 hover:text-navy-900"
           >
             <ArrowLeft className="h-4 w-4" />
-            돌아가기
+            {isPrincipal ? "돌아가기" : "Back"}
           </Link>
         )}
-        <p className="text-sm font-semibold text-navy-900 font-ko" lang="ko">
-          {otherPartyLabel}
-        </p>
+        {isPrincipal ? (
+          <p className="text-sm font-semibold text-navy-900 font-ko" lang="ko">
+            {otherPartyLabel}
+          </p>
+        ) : (
+          <p className="text-sm font-semibold text-navy-900">{otherPartyLabel}</p>
+        )}
       </div>
       <div className="flex-1 overflow-y-auto p-4">
         <MessageBubbleList
@@ -87,7 +91,7 @@ export function ThreadView({
         />
         <div ref={bottomRef} />
       </div>
-      <MessageComposer threadId={threadId} />
+      <MessageComposer threadId={threadId} isPrincipal={isPrincipal} />
     </div>
   );
 }

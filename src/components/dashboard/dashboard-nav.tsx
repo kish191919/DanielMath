@@ -13,14 +13,15 @@ const principalLinks = [
 ];
 
 const parentLinks = [
-  { href: "/dashboard/parent/children", label: "자녀" },
-  { href: "/dashboard/parent/progress", label: "진행 상황" },
-  { href: "/dashboard/parent/tuition", label: "납부 현황" },
-  { href: "/dashboard/parent/messages", label: "메시지" },
+  { href: "/dashboard/parent/children", label: "Children" },
+  { href: "/dashboard/parent/progress", label: "Progress" },
+  { href: "/dashboard/parent/tuition", label: "Tuition" },
+  { href: "/dashboard/parent/messages", label: "Messages" },
 ];
 
 export function DashboardNav({ role, unreadCount = 0 }: { role: Role; unreadCount?: number }) {
-  const links = role === "principal" ? principalLinks : parentLinks;
+  const isPrincipal = role === "principal";
+  const links = isPrincipal ? principalLinks : parentLinks;
   const messagesHref = role === "principal" ? "/dashboard/principal/messages" : "/dashboard/parent/messages";
   return (
     <nav className="border-b border-navy-100 bg-navy-50/50 print:hidden">
@@ -32,9 +33,13 @@ export function DashboardNav({ role, unreadCount = 0 }: { role: Role; unreadCoun
                 href={link.href}
                 className="flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-medium text-navy-700 hover:bg-white hover:text-navy-900 sm:inline-flex sm:px-3"
               >
-                <span className="truncate font-ko" lang="ko">
-                  {link.label}
-                </span>
+                {isPrincipal ? (
+                  <span className="truncate font-ko" lang="ko">
+                    {link.label}
+                  </span>
+                ) : (
+                  <span className="truncate">{link.label}</span>
+                )}
                 {link.href === messagesHref && unreadCount > 0 && (
                   <span className="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white">
                     {unreadCount > 99 ? "99+" : unreadCount}

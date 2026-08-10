@@ -17,7 +17,7 @@ export function WorksheetViewerLink({ url, mimeType, className }: WorksheetViewe
       className={className ?? "mt-4 h-8 gap-1.5 px-3 text-xs"}
     >
       <Paperclip className="h-3.5 w-3.5" />
-      원본 학습지 보기
+      View Original Worksheet
     </Button>
   );
 }

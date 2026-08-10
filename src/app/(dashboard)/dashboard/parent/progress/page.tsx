@@ -88,16 +88,16 @@ export default async function ParentProgressPage({
             className="inline-flex items-center gap-1.5 text-sm font-medium text-navy-500 hover:text-navy-900"
           >
             <ArrowLeft className="h-4 w-4" />
-            돌아가기
+            Back
           </Link>
           <p className="mt-3 text-sm font-semibold uppercase tracking-wider text-navy-500">
             Progress
           </p>
-          <h1 className="mt-2 text-2xl font-bold text-navy-900 font-ko sm:text-3xl" lang="ko">
-            우리 아이 진행 상황
+          <h1 className="mt-2 text-2xl font-bold text-navy-900 sm:text-3xl">
+            My Children&apos;s Progress
           </h1>
-          <p className="mt-2 text-sm text-navy-700 font-ko" lang="ko">
-            선생님이 남긴 학습 리포트를 확인하세요.
+          <p className="mt-2 text-sm text-navy-700">
+            View the learning reports your teacher has shared.
           </p>
           {filterChildId && (
             <Link
@@ -107,14 +107,14 @@ export default async function ParentProgressPage({
               })}
               className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-navy-500 hover:text-navy-900"
             >
-              전체 자녀 보기
+              View all children
             </Link>
           )}
         </div>
 
         {childData.length === 0 ? (
           <div className="mt-8 rounded-2xl border border-navy-100 bg-white p-8 text-center text-sm text-navy-600">
-            등록된 자녀가 없습니다. 원장님께 문의해주세요.
+            No children are registered yet. Please contact the director.
           </div>
         ) : (
           <div className="mt-8 space-y-10">
@@ -131,8 +131,8 @@ export default async function ParentProgressPage({
 
                 <div className="mt-4 pl-6">
                 <div className="mt-4">
-                  <h3 className="text-sm font-semibold text-navy-700 font-ko" lang="ko">
-                    출석 현황
+                  <h3 className="text-sm font-semibold text-navy-700">
+                    Attendance
                   </h3>
                   <AttendanceCalendar
                     month={month}
@@ -145,8 +145,8 @@ export default async function ParentProgressPage({
 
                 <div className="mt-4">
                   <div className="flex items-center justify-between gap-2">
-                    <h3 className="text-sm font-semibold text-navy-700 font-ko" lang="ko">
-                      {noteDate ? `${noteDate} 학습 리포트` : "학습 리포트 (최근 3개)"}
+                    <h3 className="text-sm font-semibold text-navy-700">
+                      {noteDate ? `${noteDate} Learning Report` : "Learning Reports (Last 3)"}
                     </h3>
                     {noteDate && (
                       <Link
@@ -156,15 +156,15 @@ export default async function ParentProgressPage({
                         })}
                         className="text-xs font-medium text-navy-500 hover:text-navy-900"
                       >
-                        최근 리포트 보기
+                        View recent reports
                       </Link>
                     )}
                   </div>
                   {(noteDate ? dateNotes : notes).length === 0 ? (
                     <p className="mt-2 text-sm text-navy-600">
                       {noteDate
-                        ? "이 날짜에 작성된 학습 리포트가 없습니다."
-                        : "아직 남겨진 메모가 없습니다."}
+                        ? "No learning report was written for this date."
+                        : "No notes yet."}
                     </p>
                   ) : (
                     <div className="mt-2 space-y-2">

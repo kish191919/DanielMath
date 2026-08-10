@@ -39,30 +39,30 @@ export default async function ParentTuitionPage({
             className="inline-flex items-center gap-1.5 text-sm font-medium text-navy-500 hover:text-navy-900"
           >
             <ArrowLeft className="h-4 w-4" />
-            돌아가기
+            Back
           </Link>
           <p className="mt-3 text-sm font-semibold uppercase tracking-wider text-navy-500">
             Tuition
           </p>
-          <h1 className="mt-2 text-2xl font-bold text-navy-900 font-ko sm:text-3xl" lang="ko">
-            납부 현황
+          <h1 className="mt-2 text-2xl font-bold text-navy-900 sm:text-3xl">
+            Tuition
           </h1>
-          <p className="mt-2 text-sm text-navy-700 font-ko" lang="ko">
-            자녀의 학원비 납부 내역을 확인하세요.
+          <p className="mt-2 text-sm text-navy-700">
+            View your child&apos;s tuition payment history.
           </p>
           {filterChildId && (
             <Link
               href="/dashboard/parent/tuition"
               className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-navy-500 hover:text-navy-900"
             >
-              전체 자녀 보기
+              View all children
             </Link>
           )}
         </div>
 
         {childData.length === 0 ? (
           <div className="mt-8 rounded-2xl border border-navy-100 bg-white p-8 text-center text-sm text-navy-600">
-            등록된 자녀가 없습니다. 원장님께 문의해주세요.
+            No children are registered yet. Please contact the director.
           </div>
         ) : (
           <div className="mt-8 space-y-8">
@@ -77,7 +77,7 @@ export default async function ParentTuitionPage({
 
                 <div className="mt-3 space-y-2">
                   {payments.length === 0 ? (
-                    <p className="text-sm text-navy-600">납부 내역이 없습니다.</p>
+                    <p className="text-sm text-navy-600">No payment history yet.</p>
                   ) : (
                     payments.map((payment) => (
                       <div

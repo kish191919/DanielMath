@@ -24,7 +24,7 @@ export const siteConfig = {
     "Centreville",
     "Chantilly",
   ],
-  contactEmail: "kish1919@gmail.com",
+  contactEmail: "admin@danielmath.com",
   googleReviewUrl: "https://search.google.com/local/writereview?placeid=ChIJnevfwD-qOQ8RLR0h-1JQfXQ",
   hours: "M · T · Th · F · 5–8 PM",
   hoursKo: "월·화·목·금 오후 5–8시",

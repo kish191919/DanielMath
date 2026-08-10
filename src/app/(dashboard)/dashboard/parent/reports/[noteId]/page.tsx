@@ -38,14 +38,14 @@ export default async function ParentReportDetailPage({
             className="inline-flex items-center gap-1.5 text-sm font-medium text-navy-500 hover:text-navy-900"
           >
             <ArrowLeft className="h-4 w-4" />
-            돌아가기
+            Back
           </Link>
           <p className="mt-3 text-sm font-semibold uppercase tracking-wider text-navy-500">
             Learning Report
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
-            <h1 className="text-2xl font-bold text-navy-900 font-ko sm:text-3xl" lang="ko">
-              {student.full_name} 학생의 학습 리포트
+            <h1 className="text-2xl font-bold text-navy-900 sm:text-3xl">
+              {student.full_name}&apos;s Learning Report
             </h1>
             <span className="inline-flex items-center rounded-full bg-navy-50 px-2 py-0.5 text-xs font-medium text-navy-800">
               {GRADE_LABELS[student.grade]}
@@ -73,7 +73,7 @@ export default async function ParentReportDetailPage({
           href={`/dashboard/parent/progress?child=${student.id}`}
           className="mt-6 inline-block text-sm font-medium text-navy-500 hover:text-navy-900"
         >
-          전체 진행 상황 보기 →
+          View full progress →
         </Link>
       </Container>
     </Section>

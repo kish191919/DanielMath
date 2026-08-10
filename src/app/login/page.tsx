@@ -8,7 +8,7 @@ import { verifySession } from "@/lib/dal";
 import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = {
-  title: "로그인",
+  title: "Login",
   robots: { index: false, follow: false },
 };
 
@@ -37,9 +37,6 @@ export default async function LoginPage({
               <span className="text-lg font-bold tracking-tight text-navy-900">
                 {siteConfig.name}
               </span>
-              <span className="hidden text-sm text-navy-600 sm:inline font-ko" lang="ko">
-                {siteConfig.nameKo}
-              </span>
             </Link>
           </div>
         </Container>
@@ -49,9 +46,8 @@ export default async function LoginPage({
         <Section className="py-12 sm:py-20">
           <Container className="max-w-md">
             <SectionHeader
-              eyebrow="Login · 로그인"
+              eyebrow="Login"
               title="Welcome back."
-              titleKo="로그인"
             />
             <div className="mt-10">
               <LoginForm next={isSafeNext(next) ? next : undefined} />

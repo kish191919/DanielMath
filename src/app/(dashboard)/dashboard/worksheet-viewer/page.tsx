@@ -26,7 +26,7 @@ function extractStoragePath(url: string, base: string): string {
 
 function downloadFilename(mime: string | undefined): string {
   const ext = mime === "application/pdf" ? "pdf" : mime === "image/png" ? "png" : "jpg";
-  return `원본_학습지.${ext}`;
+  return `original-worksheet.${ext}`;
 }
 
 export default async function WorksheetViewerPage({
@@ -50,15 +50,15 @@ export default async function WorksheetViewerPage({
     <Section className="py-6 sm:py-10">
       <Container className="max-w-3xl">
         <div className="flex items-center justify-between border-b border-navy-100 pb-3">
-          <span className="font-ko text-sm font-semibold text-navy-900" lang="ko">
-            원본 학습지
+          <span className="text-sm font-semibold text-navy-900">
+            Original Worksheet
           </span>
           <div className="flex items-center gap-1">
             {downloadUrl && (
               <a
                 href={downloadUrl}
                 download
-                aria-label="다운로드"
+                aria-label="Download"
                 className="rounded-full p-1.5 text-navy-500 hover:bg-navy-50 hover:text-navy-900"
               >
                 <Download className="h-5 w-5" />
@@ -72,11 +72,11 @@ export default async function WorksheetViewerPage({
           {isPdf ? (
             <WorksheetPdfViewer url={url} />
           ) : (
-            <ZoomableMedia label="원본 학습지 이미지" className="max-h-[80vh]">
+            <ZoomableMedia label="Original worksheet image" className="max-h-[80vh]">
               {/* eslint-disable-next-line @next/next/no-img-element -- signed Supabase URL, not a static asset */}
               <img
                 src={url}
-                alt="원본 학습지"
+                alt="Original worksheet"
                 className="max-h-[80vh] w-full object-contain"
               />
             </ZoomableMedia>

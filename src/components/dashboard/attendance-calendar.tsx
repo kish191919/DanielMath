@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { shiftMonth } from "@/lib/dates";
-import { ATTENDANCE_LABELS } from "@/lib/class-sessions/schema";
 import type { AttendanceStatus } from "@/lib/supabase/types";
 import type { AttendanceCalendarEntry } from "@/lib/learning-history/queries";
 
@@ -10,7 +9,12 @@ const STATUS_CLASSNAMES: Record<AttendanceStatus, string> = {
   absent: "border-red-300 bg-red-100 text-red-800",
 };
 
-const WEEKDAY_LABELS_KO = ["일", "월", "화", "수", "목", "금", "토"];
+const ATTENDANCE_LABELS_EN: Record<AttendanceStatus, string> = {
+  present: "Present",
+  absent: "Absent",
+};
+
+const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function buildMonthGrid(month: string): (string | null)[] {
   const [year, monthNum] = month.split("-").map(Number);
@@ -64,24 +68,27 @@ export function AttendanceCalendar({
         <Link
           href={monthHref(basePath, extraParams, shiftMonth(month, -1))}
           className="rounded-full p-1.5 text-navy-500 hover:bg-navy-50 hover:text-navy-900"
-          aria-label="이전 달"
+          aria-label="Previous month"
         >
           <ChevronLeft className="h-4 w-4" />
         </Link>
         <p className="text-sm font-semibold text-navy-900">
-          {year}년 {Number(monthNum)}월
+          {new Date(Number(year), Number(monthNum) - 1).toLocaleDateString("en-US", {
+            month: "long",
+            year: "numeric",
+          })}
         </p>
         <Link
           href={monthHref(basePath, extraParams, shiftMonth(month, 1))}
           className="rounded-full p-1.5 text-navy-500 hover:bg-navy-50 hover:text-navy-900"
-          aria-label="다음 달"
+          aria-label="Next month"
         >
           <ChevronRight className="h-4 w-4" />
         </Link>
       </div>
 
       <div className="mt-3 grid grid-cols-7 gap-1 text-center text-xs">
-        {WEEKDAY_LABELS_KO.map((label) => (
+        {WEEKDAY_LABELS.map((label) => (
           <div key={label} className="py-1 font-medium text-navy-500">
             {label}
           </div>
@@ -118,8 +125,8 @@ export function AttendanceCalendar({
         })}
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-navy-600 font-ko" lang="ko">
-        {(Object.entries(ATTENDANCE_LABELS) as [AttendanceStatus, string][]).map(([status, label]) => (
+      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-navy-600">
+        {(Object.entries(ATTENDANCE_LABELS_EN) as [AttendanceStatus, string][]).map(([status, label]) => (
           <span key={status} className="inline-flex items-center gap-1.5">
             <span className={`inline-block h-3 w-3 rounded-sm border ${STATUS_CLASSNAMES[status]}`} />
             {label}

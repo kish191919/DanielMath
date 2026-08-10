@@ -18,7 +18,7 @@ export default async function DashboardLayout({
 
   return (
     <>
-      <DashboardHeader email={session.email} />
+      <DashboardHeader email={session.email} role={session.profile.role} />
       <DashboardNav role={session.profile.role} unreadCount={unreadCount} />
       <main className="flex-1 bg-navy-50/30 print:bg-white">{children}</main>
     </>

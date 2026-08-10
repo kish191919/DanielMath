@@ -16,7 +16,7 @@ export default async function ParentMessagesPage() {
         threadId={thread.id}
         initialMessages={messages}
         currentUserId={session.userId}
-        otherPartyLabel="원장님"
+        otherPartyLabel="Director"
         isPrincipal={session.profile.role === "principal"}
         backHref="/dashboard/parent"
       />

@@ -9,26 +9,26 @@ import { siteConfig } from "@/lib/site-config";
 const cards = [
   {
     href: "/dashboard/parent/children",
-    title: "자녀",
-    description: "등록된 자녀와 학년 정보를 확인합니다.",
+    title: "Children",
+    description: "View your registered children and their grade information.",
     ready: true,
   },
   {
     href: "/dashboard/parent/progress",
-    title: "진행 상황",
-    description: "선생님이 남긴 학습 리포트를 확인합니다.",
+    title: "Progress",
+    description: "View learning reports left by your teacher.",
     ready: true,
   },
   {
     href: "/dashboard/parent/tuition",
-    title: "납부 현황",
-    description: "이번 달 학원비 납부 상태를 확인합니다.",
+    title: "Tuition",
+    description: "Check this month's tuition payment status.",
     ready: true,
   },
   {
     href: "/dashboard/parent/settings",
-    title: "설정",
-    description: "SMS 알림 수신 동의 여부를 관리합니다.",
+    title: "Settings",
+    description: "Manage your SMS notification preferences.",
     ready: true,
   },
 ];
@@ -41,10 +41,10 @@ export default async function ParentHome() {
       <Container>
         <div className="max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-wider text-navy-500">
-            학부모
+            Parent
           </p>
           <h1 className="mt-2 text-2xl font-bold text-navy-900 sm:text-3xl">
-            안녕하세요, {session.profile.full_name ?? session.email} 학부모님
+            Welcome back, {session.profile.full_name ?? session.email}
           </h1>
         </div>
 
@@ -56,16 +56,16 @@ export default async function ParentHome() {
               className="group flex flex-col rounded-2xl border border-navy-100 bg-white p-6 shadow-sm transition-colors hover:border-navy-300 hover:bg-navy-50"
             >
               <div className="flex items-baseline justify-between">
-                <h2 className="text-lg font-semibold text-navy-900 font-ko" lang="ko">
+                <h2 className="text-lg font-semibold text-navy-900">
                   {card.title}
                 </h2>
               </div>
-              <p className="mt-3 flex-1 text-sm text-navy-700 font-ko" lang="ko">
+              <p className="mt-3 flex-1 text-sm text-navy-700">
                 {card.description}
               </p>
               {!card.ready && (
                 <p className="mt-4 inline-flex w-fit items-center rounded-full bg-gold-300/30 px-2 py-0.5 text-xs font-medium text-navy-800">
-                  Phase B-2 예정
+                  Coming in Phase B-2
                 </p>
               )}
             </Link>
@@ -76,16 +76,16 @@ export default async function ParentHome() {
           <div className="flex items-start gap-3">
             <Star className="mt-0.5 h-5 w-5 shrink-0 text-gold-500" fill="currentColor" />
             <div>
-              <h2 className="text-sm font-semibold text-navy-900 font-ko" lang="ko">
-                다니엘 수학이 마음에 드셨나요?
+              <h2 className="text-sm font-semibold text-navy-900">
+                Enjoying Daniel Math?
               </h2>
-              <p className="mt-1 text-sm text-navy-700 font-ko" lang="ko">
-                소중한 리뷰 한 줄이 다른 학부모님들께 큰 도움이 됩니다.
+              <p className="mt-1 text-sm text-navy-700">
+                A quick review helps other families find us.
               </p>
             </div>
           </div>
-          <Button href={siteConfig.googleReviewUrl} external variant="secondary" size="md" className="shrink-0 font-ko">
-            Google에 리뷰 남기기
+          <Button href={siteConfig.googleReviewUrl} external variant="secondary" size="md" className="shrink-0">
+            Leave a Google Review
           </Button>
         </div>
       </Container>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { Sparkles, Clock, Users, BarChart2, BookOpen, Puzzle } from "lucide-react";
+import { Sparkles, Clock, Users, CalendarDays, BarChart2, BookOpen, Puzzle } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
 import { HeroBackground } from "@/components/site/hero-background";
@@ -166,7 +166,7 @@ function ProgramsPreview({ d, isKo }: { d: Awaited<ReturnType<typeof getDictiona
                   {f.label === p.classSize.label ? (
                     <Users className="h-4 w-4" />
                   ) : (
-                    <Clock className="h-4 w-4" />
+                    <CalendarDays className="h-4 w-4" />
                   )}
                   <span className={`text-[11px] font-semibold uppercase tracking-wider text-navy-500${isKo ? " font-ko" : ""}`}>
                     {f.label}
@@ -177,7 +177,21 @@ function ProgramsPreview({ d, isKo }: { d: Awaited<ReturnType<typeof getDictiona
               </div>
             ))}
             <div className="col-span-full rounded-xl border border-navy-100 bg-white p-4 shadow-sm">
-              <p className={`text-sm font-semibold text-navy-900${isKo ? " font-ko" : ""}`}>{p.schedule}</p>
+              <div className="flex items-center gap-2 text-navy-700">
+                <Clock className="h-4 w-4" />
+                <span className={`text-[11px] font-semibold uppercase tracking-wider text-navy-500${isKo ? " font-ko" : ""}`}>
+                  {isKo ? "시간표" : "Class Times"}
+                </span>
+              </div>
+              <p className={`mt-2 text-xs text-navy-600${isKo ? " font-ko" : ""}`}>{p.schedule.note}</p>
+              <div className="mt-3 divide-y divide-navy-100">
+                {p.schedule.sessions.map((s) => (
+                  <div key={s.label} className="flex items-center justify-between py-2 first:pt-0 last:pb-0">
+                    <span className={`text-xs font-medium text-navy-500${isKo ? " font-ko" : ""}`}>{s.label}</span>
+                    <span className={`text-sm font-semibold text-navy-900${isKo ? " font-ko" : ""}`}>{s.time}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

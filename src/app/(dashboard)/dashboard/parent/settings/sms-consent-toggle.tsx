@@ -22,8 +22,8 @@ export function SmsConsentToggle({ defaultChecked }: { defaultChecked: boolean }
           className="mt-0.5 h-4 w-4 accent-navy-700"
         />
         <span>
-          <span className="font-medium text-navy-900 font-ko" lang="ko">
-            SMS 알림 수신 동의
+          <span className="font-medium text-navy-900">
+            SMS Notification Consent
           </span>
           <br />
           I agree to receive SMS notifications for learning reports,
@@ -46,7 +46,7 @@ export function SmsConsentToggle({ defaultChecked }: { defaultChecked: boolean }
         </p>
       )}
       <Button type="submit" size="md" disabled={isPending}>
-        {isPending ? "저장 중..." : "확인"}
+        {isPending ? "Saving..." : "Save"}
       </Button>
     </form>
   );

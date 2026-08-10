@@ -18,11 +18,11 @@ export default async function ParentSettings() {
             className="inline-flex items-center gap-1.5 text-sm font-medium text-navy-500 hover:text-navy-900"
           >
             <ArrowLeft className="h-4 w-4" />
-            돌아가기
+            Back
           </Link>
-          <p className="mt-3 text-sm font-semibold uppercase tracking-wider text-navy-500">설정</p>
-          <h1 className="mt-2 text-2xl font-bold text-navy-900 sm:text-3xl font-ko" lang="ko">
-            알림 설정
+          <p className="mt-3 text-sm font-semibold uppercase tracking-wider text-navy-500">Settings</p>
+          <h1 className="mt-2 text-2xl font-bold text-navy-900 sm:text-3xl">
+            Notification Settings
           </h1>
         </div>
         <div className="mt-8 max-w-xl rounded-2xl border border-navy-100 bg-white p-6 shadow-sm">

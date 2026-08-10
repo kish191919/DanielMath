@@ -33,7 +33,7 @@ export function LoginForm({ next }: { next?: string }) {
     >
       {next && <input type="hidden" name="next" value={next} />}
       <Field
-        label="이메일 / Email"
+        label="Email"
         error={errors.email?.message ?? state?.fieldErrors?.email}
         required
       >
@@ -47,7 +47,7 @@ export function LoginForm({ next }: { next?: string }) {
       </Field>
 
       <Field
-        label="비밀번호 / Password"
+        label="Password"
         error={errors.password?.message ?? state?.fieldErrors?.password}
         required
       >
@@ -68,15 +68,15 @@ export function LoginForm({ next }: { next?: string }) {
 
       <div className="border-t border-navy-100 pt-5">
         <Button size="lg" type="submit" disabled={isPending} className="w-full">
-          {isPending ? "로그인 중..." : "로그인 / Sign in"}
+          {isPending ? "Signing in..." : "Sign in"}
         </Button>
-        <p className="mt-3 text-center text-xs text-navy-600 font-ko" lang="ko">
-          비밀번호를 잊으셨나요? 관리자에게 문의해주세요.
+        <p className="mt-3 text-center text-xs text-navy-600">
+          Forgot your password? Contact your administrator.
         </p>
-        <p className="mt-2 text-center text-xs text-navy-600 font-ko" lang="ko">
-          계정이 없으신가요?{" "}
+        <p className="mt-2 text-center text-xs text-navy-600">
+          Don&apos;t have an account?{" "}
           <Link href="/signup" className="text-navy-800 underline underline-offset-2">
-            회원가입
+            Sign up
           </Link>
         </p>
       </div>
