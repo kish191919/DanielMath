@@ -56,12 +56,19 @@ export default async function WorksheetScanReviewPage({
   ]);
   if (!student) notFound();
 
-  // A raw (never AI-graded) full-session upload never leaves "uploaded" —
-  // confirmUploadAction only kicks off grading for correction uploads, and
-  // every scan created before this change already advanced past "uploaded"
-  // the moment it was uploaded, so this also keeps old scans on the
-  // original AI-review screen below with no behavior change for them.
-  const isRawScan = scan.status === "uploaded";
+  // A raw (never AI-graded) full-session upload starts at "uploaded" and,
+  // if the teacher sends the session report before ever uploading a
+  // correction re-scan, sendSessionNoteAction flips it to
+  // "delivered_to_parent" (see actions.ts) — that must NOT hide the
+  // correction-upload UI below, since this scan still hasn't been graded.
+  // graded_at/source_scan_id are the actual "has this ever been graded"
+  // signal: every scan created before this feature shipped already went
+  // through the old direct-grading flow and has graded_at set, so this
+  // still keeps those legacy scans on the AI-review screen below with no
+  // behavior change for them.
+  const isRawScan =
+    scan.status === "uploaded" ||
+    (scan.status === "delivered_to_parent" && !scan.graded_at && !scan.source_scan_id);
 
   const viewer = viewUrl && (
     <>

@@ -1,8 +1,8 @@
 import QRCode from "qrcode";
 import Link from "next/link";
-import { PencilLine } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import { PrintButton } from "@/components/dashboard/print-button";
+import { NamePrintToggle } from "@/components/dashboard/name-print-toggle";
 import { MathText } from "@/components/math-text";
 import { requireRole } from "@/lib/dal";
 import { getPracticeSheetWithProblems } from "@/lib/practice-sheets/queries";
@@ -25,14 +25,6 @@ const LAYOUTS = {
   },
 } as const;
 type Layout = keyof typeof LAYOUTS;
-
-function BrandMark() {
-  return (
-    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-navy-900 text-xs font-bold text-white">
-      D
-    </span>
-  );
-}
 
 function pillClass(active: boolean) {
   return `inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium transition-colors font-ko ${
@@ -60,12 +52,13 @@ export default async function PracticeSheetPrintPage({
   searchParams,
 }: {
   params: Promise<{ worksheetId: string }>;
-  searchParams: Promise<{ layout?: string }>;
+  searchParams: Promise<{ layout?: string; showName?: string }>;
 }) {
   await requireRole("principal");
   const { worksheetId } = await params;
-  const { layout: rawLayout } = await searchParams;
+  const { layout: rawLayout, showName: rawShowName } = await searchParams;
   const layout: Layout = rawLayout === "1" ? "1" : "2";
+  const showName = rawShowName !== "0";
   const { problemCols, answerCols, problemGridClass, answerGridClass } = LAYOUTS[layout];
 
   const result = await getPracticeSheetWithProblems(worksheetId);
@@ -106,24 +99,23 @@ export default async function PracticeSheetPrintPage({
             1열 (전체 폭)
           </Link>
         </div>
-        <PrintButton />
+        <div className="flex items-center gap-4">
+          {student && <NamePrintToggle defaultChecked={showName} />}
+          <PrintButton />
+        </div>
       </div>
 
       <section>
         <header className="flex items-start justify-between gap-6 border-b-2 border-navy-900 pb-4">
           <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <BrandMark />
-              <p className="text-xs font-semibold uppercase tracking-widest text-navy-500">
-                {siteConfig.name}
-              </p>
-            </div>
-            <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-3 rounded-lg bg-navy-50 px-4 py-3 text-sm text-navy-800">
+            <dl className="flex flex-wrap gap-x-8 gap-y-3 rounded-lg bg-navy-50 px-4 py-3 text-sm text-navy-800">
               <div className="flex items-center gap-2">
                 <dt className="font-ko font-medium" lang="ko">
                   이름
                 </dt>
-                <dd className="min-w-32 border-b border-navy-400">&nbsp;</dd>
+                <dd className="min-w-32 border-b border-navy-400">
+                  {showName && student ? student.full_name : <>&nbsp;</>}
+                </dd>
               </div>
               <div className="flex items-center gap-2">
                 <dt className="font-ko font-medium" lang="ko">
@@ -203,13 +195,7 @@ export default async function PracticeSheetPrintPage({
                         />
                       )}
                     </div>
-                    <div className="mt-6 flex items-center gap-1.5 text-navy-400">
-                      <PencilLine className="h-3.5 w-3.5" />
-                      <span className="text-[10px] font-medium tracking-wide font-ko" lang="ko">
-                        풀이 공간
-                      </span>
-                    </div>
-                    <div className="mt-2 border-b border-navy-300">&nbsp;</div>
+                    <div className="mt-6 border-b border-navy-300">&nbsp;</div>
                   </li>
                 ))}
               </ol>
@@ -219,13 +205,7 @@ export default async function PracticeSheetPrintPage({
 
       <section className="page-break mt-10 pt-10">
         <header className="border-b-2 border-navy-900 pb-3">
-          <div className="flex items-center gap-2">
-            <BrandMark />
-            <p className="text-xs font-semibold uppercase tracking-widest text-navy-500">
-              {siteConfig.name}
-            </p>
-          </div>
-          <h2 className="mt-1 text-lg font-bold text-navy-900 font-ko" lang="ko">
+          <h2 className="text-lg font-bold text-navy-900 font-ko" lang="ko">
             답안지
           </h2>
         </header>
