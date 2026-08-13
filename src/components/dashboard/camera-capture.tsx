@@ -28,7 +28,24 @@ export function CameraCapture({ initialPages, onComplete, onCancel }: CameraCapt
   const [devices, setDevices] = React.useState<MediaDeviceInfo[]>([]);
   const [selectedDeviceId, setSelectedDeviceId] = React.useState<string | null>(null);
   const [activeDeviceId, setActiveDeviceId] = React.useState<string | null>(null);
-  const [rotated180, setRotated180] = React.useState(false);
+  const [rotation, setRotation] = React.useState<0 | 90 | 180 | 270>(0);
+  const previewContainerRef = React.useRef<HTMLDivElement>(null);
+  const [containerSize, setContainerSize] = React.useState({ width: 0, height: 0 });
+
+  React.useLayoutEffect(() => {
+    const el = previewContainerRef.current;
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    setContainerSize({ width: rect.width, height: rect.height });
+
+    const observer = new ResizeObserver(([entry]) => {
+      const box = entry.contentRect;
+      setContainerSize({ width: box.width, height: box.height });
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -105,16 +122,19 @@ export function CameraCapture({ initialPages, onComplete, onCancel }: CameraCapt
 
     setCapturing(true);
     try {
+      const swapped = rotation === 90 || rotation === 270;
       const canvas = document.createElement("canvas");
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+      canvas.width = swapped ? video.videoHeight : video.videoWidth;
+      canvas.height = swapped ? video.videoWidth : video.videoHeight;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
-      if (rotated180) {
-        ctx.translate(canvas.width, canvas.height);
-        ctx.rotate(Math.PI);
+      if (rotation !== 0) {
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate((rotation * Math.PI) / 180);
+        ctx.drawImage(video, -video.videoWidth / 2, -video.videoHeight / 2);
+      } else {
+        ctx.drawImage(video, 0, 0);
       }
-      ctx.drawImage(video, 0, 0);
 
       const blob = await compressFrameToJpeg(canvas);
       const page: CapturedPage = {
@@ -203,10 +223,10 @@ export function CameraCapture({ initialPages, onComplete, onCancel }: CameraCapt
           )}
           <button
             type="button"
-            onClick={() => setRotated180((v) => !v)}
-            aria-label="화면 180도 회전"
-            aria-pressed={rotated180}
-            className={`rounded-full p-2 text-white ${rotated180 ? "bg-white/40" : "bg-black/40"}`}
+            onClick={() => setRotation((r) => (((r + 90) % 360) as 0 | 90 | 180 | 270))}
+            aria-label="화면 회전"
+            aria-pressed={rotation !== 0}
+            className={`rounded-full p-2 text-white ${rotation !== 0 ? "bg-white/40" : "bg-black/40"}`}
           >
             <RotateCw className="h-5 w-5" />
           </button>
@@ -221,15 +241,17 @@ export function CameraCapture({ initialPages, onComplete, onCancel }: CameraCapt
         </div>
       </div>
 
-      <div className="relative flex-1 overflow-hidden">
-        <video
-          ref={videoRef}
-          playsInline
-          muted
-          autoPlay
-          className="h-full w-full object-cover"
-          style={rotated180 ? { transform: "rotate(180deg)" } : undefined}
-        />
+      <div ref={previewContainerRef} className="relative flex-1 overflow-hidden">
+        <div
+          className="absolute left-1/2 top-1/2"
+          style={{
+            width: rotation === 90 || rotation === 270 ? containerSize.height : containerSize.width,
+            height: rotation === 90 || rotation === 270 ? containerSize.width : containerSize.height,
+            transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
+          }}
+        >
+          <video ref={videoRef} playsInline muted autoPlay className="h-full w-full object-cover" />
+        </div>
 
         {previewPage && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/95 p-4">
