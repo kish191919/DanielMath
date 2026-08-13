@@ -25,30 +25,61 @@ export function CameraCapture({ initialPages, onComplete, onCancel }: CameraCapt
   const [previewIndex, setPreviewIndex] = React.useState<number | null>(null);
   const [validationMessage, setValidationMessage] = React.useState<string | null>(null);
   const [capturing, setCapturing] = React.useState(false);
+  const [devices, setDevices] = React.useState<MediaDeviceInfo[]>([]);
+  const [selectedDeviceId, setSelectedDeviceId] = React.useState<string | null>(null);
+  const [activeDeviceId, setActiveDeviceId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     let cancelled = false;
 
-    navigator.mediaDevices
-      ?.getUserMedia({ video: { facingMode: "environment" }, audio: false })
-      .then((stream) => {
+    async function start() {
+      try {
+        const constraints: MediaStreamConstraints = selectedDeviceId
+          ? { video: { deviceId: { exact: selectedDeviceId } }, audio: false }
+          : { video: { facingMode: "environment" }, audio: false };
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
         if (cancelled) {
           stream.getTracks().forEach((t) => t.stop());
           return;
         }
+        streamRef.current?.getTracks().forEach((t) => t.stop());
         streamRef.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
-      })
-      .catch((err: unknown) => {
+        const trackDeviceId = stream.getVideoTracks()[0]?.getSettings().deviceId ?? null;
+        setActiveDeviceId(trackDeviceId);
+
+        // Device labels are only populated once permission has been granted,
+        // so refresh the list here. If a Continuity Camera iPhone is present
+        // and nothing has been explicitly chosen yet, prefer it automatically.
+        const list = (await navigator.mediaDevices.enumerateDevices()).filter(
+          (d) => d.kind === "videoinput",
+        );
+        if (cancelled) return;
+        setDevices(list);
+        if (!selectedDeviceId) {
+          const iphone = list.find((d) => /iphone/i.test(d.label));
+          if (iphone && iphone.deviceId !== trackDeviceId) {
+            setSelectedDeviceId(iphone.deviceId);
+          }
+        }
+      } catch (err) {
         if (cancelled) return;
         const name = err instanceof Error ? err.name : "";
         setCameraError(name === "NotAllowedError" || name === "PermissionDeniedError" ? "denied" : "unavailable");
-      });
+      }
+    }
+
+    start();
 
     return () => {
       cancelled = true;
+    };
+  }, [selectedDeviceId]);
+
+  React.useEffect(() => {
+    return () => {
       streamRef.current?.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
     };
@@ -146,18 +177,34 @@ export function CameraCapture({ initialPages, onComplete, onCancel }: CameraCapt
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
-      <div className="flex items-center justify-between px-4 py-3">
+      <div className="flex items-center justify-between gap-2 px-4 py-3">
         <span className="font-ko text-sm text-white" lang="ko">
           촬영한 페이지 {pages.length}장
         </span>
-        <button
-          type="button"
-          onClick={handleCancel}
-          aria-label="취소"
-          className="rounded-full bg-black/40 p-2 text-white"
-        >
-          <X className="h-5 w-5" />
-        </button>
+        <div className="flex items-center gap-2">
+          {devices.length > 1 && (
+            <select
+              value={selectedDeviceId ?? activeDeviceId ?? ""}
+              onChange={(e) => setSelectedDeviceId(e.target.value)}
+              aria-label="카메라 선택"
+              className="max-w-[9rem] truncate rounded-md bg-black/40 px-2 py-1.5 text-xs text-white"
+            >
+              {devices.map((d) => (
+                <option key={d.deviceId} value={d.deviceId} className="text-black">
+                  {d.label || "카메라"}
+                </option>
+              ))}
+            </select>
+          )}
+          <button
+            type="button"
+            onClick={handleCancel}
+            aria-label="취소"
+            className="rounded-full bg-black/40 p-2 text-white"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
       </div>
 
       <div className="relative flex-1 overflow-hidden">
