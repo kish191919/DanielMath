@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Camera, Trash2, X, RotateCcw, Check } from "lucide-react";
+import { Camera, Trash2, X, RotateCcw, RotateCw, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { compressFrameToJpeg, type CapturedPage } from "@/lib/images/build-scan-pdf";
 
@@ -28,6 +28,7 @@ export function CameraCapture({ initialPages, onComplete, onCancel }: CameraCapt
   const [devices, setDevices] = React.useState<MediaDeviceInfo[]>([]);
   const [selectedDeviceId, setSelectedDeviceId] = React.useState<string | null>(null);
   const [activeDeviceId, setActiveDeviceId] = React.useState<string | null>(null);
+  const [rotated180, setRotated180] = React.useState(false);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -109,6 +110,10 @@ export function CameraCapture({ initialPages, onComplete, onCancel }: CameraCapt
       canvas.height = video.videoHeight;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
+      if (rotated180) {
+        ctx.translate(canvas.width, canvas.height);
+        ctx.rotate(Math.PI);
+      }
       ctx.drawImage(video, 0, 0);
 
       const blob = await compressFrameToJpeg(canvas);
@@ -198,6 +203,15 @@ export function CameraCapture({ initialPages, onComplete, onCancel }: CameraCapt
           )}
           <button
             type="button"
+            onClick={() => setRotated180((v) => !v)}
+            aria-label="화면 180도 회전"
+            aria-pressed={rotated180}
+            className={`rounded-full p-2 text-white ${rotated180 ? "bg-white/40" : "bg-black/40"}`}
+          >
+            <RotateCw className="h-5 w-5" />
+          </button>
+          <button
+            type="button"
             onClick={handleCancel}
             aria-label="취소"
             className="rounded-full bg-black/40 p-2 text-white"
@@ -208,7 +222,14 @@ export function CameraCapture({ initialPages, onComplete, onCancel }: CameraCapt
       </div>
 
       <div className="relative flex-1 overflow-hidden">
-        <video ref={videoRef} playsInline muted autoPlay className="h-full w-full object-cover" />
+        <video
+          ref={videoRef}
+          playsInline
+          muted
+          autoPlay
+          className="h-full w-full object-cover"
+          style={rotated180 ? { transform: "rotate(180deg)" } : undefined}
+        />
 
         {previewPage && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/95 p-4">
