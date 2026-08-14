@@ -52,14 +52,17 @@ export function CameraCapture({ initialPages, onComplete, onCancel }: CameraCapt
 
     async function start() {
       try {
-        // Request the iPhone's native photo aspect ratio (4:3) at a high
-        // ideal resolution. Without this, Continuity Camera / the browser
-        // negotiates a narrow-FOV webcam preset (cropped 16:9, low-res)
-        // instead of the wider field of view the Camera app captures.
-        const videoConstraints: MediaTrackConstraints = {
+        // Request the iPhone's native photo aspect ratio (4:3) at a modest
+        // ideal resolution, with resizeMode "none" so the browser picks a
+        // native capture mode instead of cropping-and-scaling the stream to
+        // match our request — that crop-then-upscale is what produces a
+        // zoomed-in-looking image when the requested size doesn't line up
+        // with a mode the camera actually supports.
+        const videoConstraints: MediaTrackConstraints & { resizeMode?: ConstrainDOMString } = {
           aspectRatio: { ideal: 4 / 3 },
-          width: { ideal: 4032 },
-          height: { ideal: 3024 },
+          width: { ideal: 1920 },
+          height: { ideal: 1440 },
+          resizeMode: { ideal: "none" },
           ...(selectedDeviceId
             ? { deviceId: { exact: selectedDeviceId } }
             : { facingMode: "environment" }),
@@ -94,6 +97,11 @@ export function CameraCapture({ initialPages, onComplete, onCancel }: CameraCapt
         } catch {
           // Zoom reset is a best-effort enhancement; ignore failures.
         }
+
+        // Diagnostic: log what the browser actually negotiated, so if the
+        // framing still looks off we can see the real width/height/zoom
+        // instead of guessing again.
+        console.debug("[camera-capture] negotiated track settings", track?.getSettings());
 
         // Device labels are only populated once permission has been granted,
         // so refresh the list here. If a Continuity Camera iPhone is present
