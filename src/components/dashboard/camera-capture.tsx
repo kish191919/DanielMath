@@ -29,6 +29,10 @@ export function CameraCapture({ initialPages, onComplete, onCancel }: CameraCapt
   const [selectedDeviceId, setSelectedDeviceId] = React.useState<string | null>(null);
   const [activeDeviceId, setActiveDeviceId] = React.useState<string | null>(null);
   const [rotation, setRotation] = React.useState<0 | 90 | 180 | 270>(0);
+  // Continuity Camera streams the iPhone's raw sensor orientation with no
+  // EXIF-style correction, so it consistently arrives rotated. Auto-apply
+  // the correction once per session; a manual rotate afterward is respected.
+  const autoRotationAppliedRef = React.useRef(false);
   const previewContainerRef = React.useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = React.useState({ width: 0, height: 0 });
 
@@ -116,6 +120,15 @@ export function CameraCapture({ initialPages, onComplete, onCancel }: CameraCapt
           if (iphone && iphone.deviceId !== trackDeviceId) {
             setSelectedDeviceId(iphone.deviceId);
           }
+        }
+
+        // iPhone's live video orientation needs a 90deg clockwise correction
+        // by default; apply it once per session so the user doesn't have to
+        // rotate manually every time.
+        const activeIsIphone = list.some((d) => d.deviceId === trackDeviceId && /iphone/i.test(d.label));
+        if (activeIsIphone && !autoRotationAppliedRef.current) {
+          autoRotationAppliedRef.current = true;
+          setRotation(90);
         }
       } catch (err) {
         if (cancelled) return;
@@ -285,7 +298,7 @@ export function CameraCapture({ initialPages, onComplete, onCancel }: CameraCapt
             transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
           }}
         >
-          <video ref={videoRef} playsInline muted autoPlay className="h-full w-full object-cover" />
+          <video ref={videoRef} playsInline muted autoPlay className="h-full w-full object-contain" />
         </div>
 
         {previewPage && (
