@@ -52,9 +52,19 @@ export function CameraCapture({ initialPages, onComplete, onCancel }: CameraCapt
 
     async function start() {
       try {
-        const constraints: MediaStreamConstraints = selectedDeviceId
-          ? { video: { deviceId: { exact: selectedDeviceId } }, audio: false }
-          : { video: { facingMode: "environment" }, audio: false };
+        // Request the iPhone's native photo aspect ratio (4:3) at a high
+        // ideal resolution. Without this, Continuity Camera / the browser
+        // negotiates a narrow-FOV webcam preset (cropped 16:9, low-res)
+        // instead of the wider field of view the Camera app captures.
+        const videoConstraints: MediaTrackConstraints = {
+          aspectRatio: { ideal: 4 / 3 },
+          width: { ideal: 4032 },
+          height: { ideal: 3024 },
+          ...(selectedDeviceId
+            ? { deviceId: { exact: selectedDeviceId } }
+            : { facingMode: "environment" }),
+        };
+        const constraints: MediaStreamConstraints = { video: videoConstraints, audio: false };
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         if (cancelled) {
           stream.getTracks().forEach((t) => t.stop());
@@ -65,8 +75,25 @@ export function CameraCapture({ initialPages, onComplete, onCancel }: CameraCapt
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
-        const trackDeviceId = stream.getVideoTracks()[0]?.getSettings().deviceId ?? null;
+        const track = stream.getVideoTracks()[0];
+        const trackDeviceId = track?.getSettings().deviceId ?? null;
         setActiveDeviceId(trackDeviceId);
+
+        // Continuity Camera can start at a non-1x zoom level. Reset to the
+        // minimum (1x) when the track exposes the non-standard `zoom`
+        // capability; silently no-op on cameras/browsers that don't.
+        try {
+          const caps = track?.getCapabilities?.() as
+            | (MediaTrackCapabilities & { zoom?: { min: number; max: number; step: number } })
+            | undefined;
+          if (caps?.zoom) {
+            await track?.applyConstraints({
+              advanced: [{ zoom: caps.zoom.min } as MediaTrackConstraintSet],
+            });
+          }
+        } catch {
+          // Zoom reset is a best-effort enhancement; ignore failures.
+        }
 
         // Device labels are only populated once permission has been granted,
         // so refresh the list here. If a Continuity Camera iPhone is present
