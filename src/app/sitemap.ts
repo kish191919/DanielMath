@@ -11,6 +11,7 @@ const marketingPaths = [
   "/resources/sol",
   "/resources/testing",
   "/resources/testing/moems",
+  "/resources/testing/amc-8",
   "/resources/testing/virginia-sol",
   "/resources/testing/ngat",
   "/school-calendar",
