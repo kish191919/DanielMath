@@ -139,16 +139,22 @@ export function SiteFooter({ locale }: { locale: Locale }) {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-navy-200 pt-6 text-xs text-navy-500 sm:flex-row sm:items-center">
-          <p>© {new Date().getFullYear()} {siteConfig.name}. All rights reserved.</p>
-          <Link href={lp("/privacy")} className="underline underline-offset-2 hover:text-navy-900">
-            Privacy Policy
-          </Link>
-          <Link href={lp("/terms")} className="underline underline-offset-2 hover:text-navy-900">
-            SMS Terms
-          </Link>
-          <p>We do not directly collect personal data from children under 13 (COPPA compliant).</p>
-          <p>{siteConfig.name} is operated by {siteConfig.legalName}.</p>
+        <div className="mt-10 border-t border-navy-200 pt-6">
+          <div className="flex flex-col gap-3 text-xs text-navy-500 sm:flex-row sm:items-center sm:justify-between">
+            <p>© {new Date().getFullYear()} {siteConfig.name}. All rights reserved.</p>
+            <div className="flex items-center gap-4">
+              <Link href={lp("/privacy")} className="underline underline-offset-2 hover:text-navy-900">
+                Privacy Policy
+              </Link>
+              <Link href={lp("/terms")} className="underline underline-offset-2 hover:text-navy-900">
+                SMS Terms
+              </Link>
+            </div>
+          </div>
+          <div className="mt-4 space-y-1.5 border-t border-navy-100 pt-4 text-[11px] leading-5 text-navy-400">
+            <p>We do not directly collect personal data from children under 13 (COPPA compliant).</p>
+            <p>{siteConfig.name} is operated by {siteConfig.legalName}.</p>
+          </div>
         </div>
       </Container>
     </footer>
