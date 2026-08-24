@@ -65,6 +65,14 @@ export const metadata: Metadata = {
     description: siteConfig.description,
     images: [`${siteConfig.url}${siteConfig.ogImage}`],
   },
+  alternates: {
+    types: {
+      "application/rss+xml": [
+        { url: "/feed.xml", title: `${siteConfig.nameKo} 블로그` },
+        { url: "/en/feed.xml", title: `${siteConfig.name} Blog` },
+      ],
+    },
+  },
   robots: { index: true, follow: true },
   verification: {
     google: process.env.GOOGLE_SITE_VERIFICATION,
