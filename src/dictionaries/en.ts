@@ -19,28 +19,28 @@ const en: Dictionary = {
     },
     hero: {
       badge: "Fairfax, VA · Virginia Math Academy",
-      h1line1: "Small-Group,",
-      h1highlight: "Personalized",
-      h1line2: "Math Enrichment.",
-      subtitle: "4 students per class. No grade levels — worksheets matched to each student's ability.",
-      desc: "From placement diagnostic to mistake tracking, all in one class",
+      h1line1: "A Small-Group Math Academy",
+      h1highlight: "for Grades 3–6",
+      h1line2: "in Fairfax, VA.",
+      subtitle: "Diagnostic → Leveled Practice → Mistake Tracking → Deeper Reasoning",
+      desc: "4 students per class, matched to each student's level through a placement diagnostic.",
       ctaInquire: "Schedule a Consult",
       ctaPrograms: "View Program",
     },
     stats: [
-      { value: "Ungraded", label: "No grade levels", sublabel: "Individually leveled worksheets" },
+      { value: "Grades 3–6", label: "Who we serve", sublabel: "Elementary, upper grades" },
       { value: "4", label: "Per class", sublabel: "Students per class" },
       { value: "1–4×/wk", label: "Flexible days & sessions", sublabel: "Mon/Tue/Thu/Fri" },
       { value: "70 min", label: "Session length", sublabel: "Per session" },
     ],
     programs: {
       eyebrow: "Program",
-      title: "Small group. Personalized by ability, not grade.",
+      title: "Small group, personalized for grades 3–6.",
       titleKo: "",
-      desc: "Not grouped by grade — each student's worksheets are matched to their own ability, and we track mistakes to revisit them.",
-      h3en: "Not grade-based. Individually leveled.",
+      desc: "Each student's worksheets are matched to their own ability, and we track mistakes to revisit them.",
+      h3en: "Leveled to each student's ability.",
       h3ko: "",
-      body: "A one-time placement diagnostic determines each student's ability level, regardless of school grade. Every 70-minute session runs at each student's own pace with materials matched to their level: mistake review and 2–3 math olympiad problems (20 min) → leveled practice with regular workbooks (40 min) → math manipulatives, board games, or reinforcement (10 min).",
+      body: "A one-time placement diagnostic determines each student's ability level. Every 70-minute session runs at each student's own pace with materials matched to their level: mistake review and 2–3 math olympiad problems (20 min) → leveled practice with regular workbooks (40 min) → math manipulatives, board games, or reinforcement (10 min).",
       classSize: { label: "Class Size", value: "Up to 4 students", sublabel: "" },
       time: { label: "Days", value: "Mon/Tue/Thu/Fri", sublabel: "1–4 sessions/week" },
       schedule: {
@@ -142,19 +142,19 @@ const en: Dictionary = {
   programs: {
     meta: {
       title: "Program",
-      description: "Ungraded small group classes for grades 3–6. Each student works through textbooks and worksheets matched to their own ability level, not their grade.",
+      description: "Small-group math classes for grades 3–6 — only 4 students per class. Each student works through textbooks and worksheets matched to their own ability level.",
     },
     header: {
       eyebrow: "Program",
-      title: "Ungraded. Small groups. Proven materials.",
+      title: "Small groups, proven materials, grades 3–6.",
       titleKo: "",
-      desc: "Small classes of up to 4, not grouped by grade or ability — each student uses textbooks and worksheets matched to their own level.",
+      desc: "Small classes of up to 4 students, each using textbooks and worksheets matched to their own level.",
     },
     pillars: [
       {
         title: "Personalized by Level",
         titleKo: "",
-        desc: "Textbooks and worksheets are matched to each student's own level, not their grade.",
+        desc: "Textbooks and worksheets are matched to each student's own level.",
       },
       {
         title: "Three-Step Curriculum",
