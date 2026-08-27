@@ -1358,6 +1358,186 @@ export const blogPosts: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "math-anxiety-guide",
+    publishedAt: "2026-08-27",
+    readingMins: 6,
+    category: "학습심리",
+    categoryEn: "Learning & Mindset",
+    titleKo: "수학 불안, 우리 아이도 겪고 있을까요?",
+    titleEn: "Does Your Child Have Math Anxiety?",
+    descKo: "숫자만 보면 얼어붙거나 \"난 수학머리가 없어\"라고 말하는 아이들, 단순한 싫증이 아닐 수 있습니다. 수학 불안의 신호와 원인, 그리고 집에서 부모가 할 수 있는 실질적인 도움을 정리했습니다.",
+    descEn: "Kids who freeze at word problems or say \"I'm just not a math person\" may be dealing with something more than dislike. Here's how to recognize math anxiety, what causes it, and what parents can actually do at home.",
+    heroImage: {
+      src: "/blog/math-anxiety-guide-hero.jpg",
+      altKo: "문제지를 보며 걱정스러운 표정을 짓는 아이를 부모가 다정하게 다독이는 따뜻한 일러스트",
+      altEn: "Warm illustration of a parent gently reassuring a child who looks worried while looking at a worksheet",
+    },
+    bodyKo: [
+      {
+        heading: "수학 불안이란 무엇인가요?",
+        paragraphs: [
+          "수학 불안(Math Anxiety)은 단순히 수학을 싫어하는 것과 다릅니다. 숫자나 수학 문제를 마주했을 때 긴장, 걱정, 심하면 두려움을 느끼는 정서적 반응으로, 실제 수학 실력과는 별개로 나타날 수 있습니다. 개념을 충분히 이해하고 있는 아이도 시험지를 받는 순간 머릿속이 하얘지는 경험을 할 수 있습니다.",
+          "연구에 따르면 수학 불안은 생각보다 이른 시기, 심지어 1학년 무렵부터 나타날 수 있습니다. 문제는 이 불안이 실제 수학 수행 능력을 떨어뜨린다는 점입니다. 불안한 상태에서는 작업기억(Working Memory)이 걱정하는 데 쓰이면서, 정작 문제를 푸는 데 쓸 수 있는 인지 자원이 줄어듭니다.",
+        ],
+      },
+      {
+        heading: "우리 아이도 그런 걸까요? 흔한 신호들",
+        paragraphs: [
+          "수학 불안은 겉으로 \"수학이 싫어\"라는 말로만 나타나지 않습니다. 배가 아프다, 숙제 시작을 자꾸 미룬다, 쉬운 문제도 지우개로 여러 번 지운다처럼 간접적인 형태로 드러나는 경우가 많아 부모가 알아차리기 어렵습니다.",
+          "특히 다른 과목에서는 자신감 있는 아이가 유독 수학 시간에만 위축된다면, 실력의 문제가 아니라 불안의 문제일 가능성이 큽니다.",
+        ],
+        visual: {
+          type: "checklist",
+          title: "이런 모습이 반복된다면 확인해보세요",
+          items: [
+            { text: "수학 숙제 시작을 유난히 미루거나 피한다" },
+            { text: "수학 시험 전날 배가 아프다, 잠을 설친다고 한다" },
+            { text: "쉬운 문제도 여러 번 지우고 다시 쓴다", note: "완벽해야 한다는 부담" },
+            { text: "\"난 원래 수학머리가 없어\"라는 말을 자주 한다" },
+            { text: "다른 과목은 자신 있어 하면서 수학 시간에만 위축된다" },
+          ],
+        },
+      },
+      {
+        heading: "수학 불안은 어디서 시작될까요?",
+        paragraphs: [
+          "가장 흔한 원인 중 하나는 시간 제한이 있는 연산 테스트입니다. 정해진 시간 안에 정확히 풀어야 한다는 압박은 실력과 무관하게 불안을 유발합니다. 실수를 허용하지 않는 분위기, 틀린 문제를 공개적으로 지적받는 경험도 누적되면 불안으로 이어집니다.",
+          "부모나 교사가 무심코 보이는 태도도 영향을 줍니다. 아이는 어른의 표정과 말투에서 수학이 '무서운 것' 또는 '타고난 재능이 있어야만 잘하는 것'이라는 메시지를 흡수합니다. 부모가 자신의 학창 시절 수학 경험을 부정적으로 이야기하는 것만으로도 아이에게 영향을 줄 수 있습니다.",
+        ],
+      },
+      {
+        heading: "학부모가 무심코 하는 말들",
+        paragraphs: [
+          "좋은 의도로 하는 말이 오히려 불안을 키우는 경우가 있습니다. 아래는 흔히 쓰이지만 다시 생각해볼 만한 표현들입니다.",
+        ],
+        visual: {
+          type: "callout",
+          variant: "mythFact",
+          pairs: [
+            {
+              myth: "\"엄마도 수학 진짜 못했어, 너도 그럴 수 있어\"",
+              fact: "부모가 수학에 자신 없다는 말을 반복하면, 아이는 수학 실력이 물려받는 고정된 것이라 믿게 되기 쉽습니다. 대신 \"엄마도 처음엔 어려웠는데 연습하니까 늘더라\"처럼 노력과 성장에 초점을 맞춰 말해보세요.",
+            },
+            {
+              myth: "\"이렇게 쉬운 걸 왜 틀려?\"",
+              fact: "실수를 지적하는 말은 다음 문제를 풀 때 아이를 더 긴장하게 만듭니다. 틀린 답보다 어떤 풀이 과정을 거쳤는지 먼저 물어보는 것이 아이의 사고 과정을 이해하는 데 도움이 됩니다.",
+            },
+            {
+              myth: "\"빨리 풀어야 잘하는 거야\"",
+              fact: "속도와 이해는 다른 문제입니다. 천천히 정확하게 개념을 이해하는 아이가 결국 더 단단한 실력을 쌓습니다. 시간 압박을 강조할수록 불안은 커집니다.",
+            },
+          ],
+        },
+      },
+      {
+        heading: "집에서 실천할 수 있는 것",
+        paragraphs: [
+          "거창한 프로그램보다 매일의 작은 습관이 수학 불안을 낮추는 데 더 효과적입니다. 아래 다섯 가지부터 시작해보세요.",
+        ],
+        visual: {
+          type: "checklist",
+          title: "집에서 시도해볼 수 있는 5가지",
+          items: [
+            { text: "타이머를 없애고 정확성 먼저", note: "시간 압박 없이 문제를 풀 기회를 준다" },
+            { text: "틀린 답이 아니라 풀이 과정을 물어본다", note: "\"어떻게 그렇게 생각했어?\"" },
+            { text: "실수를 학습의 정상적인 과정으로 이야기한다", note: "실수하는 순간 뇌가 가장 활발히 성장한다고 알려져 있다" },
+            { text: "구체물이나 그림으로 다시 설명해본다", note: "Singapore Math의 CPA 접근법과도 통한다" },
+            { text: "매일 짧게, 꾸준히 반복한다", note: "몰아서 하는 학습보다 매일 10~15분이 더 효과적" },
+          ],
+        },
+      },
+      {
+        heading: "학교와 협력하기 — 언제 도움을 요청해야 할까요?",
+        paragraphs: [
+          "가정에서의 노력만으로 나아지지 않고, 수학과 관련된 불안이 등교 거부나 신체 증상으로까지 이어진다면 담임교사나 학교 상담사와 상담하는 것이 좋습니다. FCPS 담임교사는 교실에서 아이가 실제로 어떤 상황에서 위축되는지 구체적인 관찰 정보를 갖고 있는 경우가 많습니다.",
+          "수학 실력 자체가 걱정이라면, 불안 해소와 개념 이해를 함께 다루는 것이 중요합니다. 무작정 문제를 더 많이 풀리기보다, 아이가 이미 아는 것부터 시작해 작은 성공 경험을 쌓아가는 방식이 장기적으로 더 효과적입니다.",
+        ],
+      },
+    ],
+    bodyEn: [
+      {
+        heading: "What Is Math Anxiety?",
+        paragraphs: [
+          "Math anxiety isn't the same as disliking math. It's an emotional response — tension, worry, sometimes real fear — triggered by numbers or math problems, and it can show up regardless of a child's actual math ability. A student who understands the material can still go blank the moment a worksheet or test lands in front of them.",
+          "Research shows math anxiety can appear surprisingly early, sometimes as young as first grade. The core problem is that anxiety itself hurts performance: worrying consumes working memory, leaving fewer cognitive resources available for actually solving the problem.",
+        ],
+      },
+      {
+        heading: "Is This Happening to Your Child? Common Signs",
+        paragraphs: [
+          "Math anxiety rarely announces itself with a simple \"I hate math.\" It often shows up indirectly — a stomachache before a test, chronic procrastination on math homework, erasing and rewriting an easy answer over and over — which makes it easy for parents to miss.",
+          "If a child is confident in other subjects but consistently shrinks during math, that's often a sign of anxiety rather than a lack of ability.",
+        ],
+        visual: {
+          type: "checklist",
+          title: "Watch for these recurring patterns",
+          items: [
+            { text: "Unusually avoids or delays starting math homework" },
+            { text: "Complains of a stomachache or trouble sleeping before a math test" },
+            { text: "Erases and rewrites even easy answers repeatedly", note: "pressure to be perfect" },
+            { text: "Says \"I'm just not a math person\" often" },
+            { text: "Confident in other subjects but shrinks specifically during math" },
+          ],
+        },
+      },
+      {
+        heading: "Where Does Math Anxiety Come From?",
+        paragraphs: [
+          "One of the most common triggers is timed computation drills. The pressure to answer correctly within a fixed time creates anxiety regardless of actual ability. An environment that doesn't tolerate mistakes, or repeated experiences of being corrected in front of others, also builds anxiety over time.",
+          "Adults' attitudes matter too, often without anyone realizing it. Children pick up on tone and facial expressions and absorb the message that math is something to fear, or something only certain people are naturally good at. Even a parent casually saying they were bad at math as a kid can shape how a child feels about the subject.",
+        ],
+      },
+      {
+        heading: "Things Parents Say Without Realizing the Impact",
+        paragraphs: [
+          "Well-intentioned comments can sometimes deepen the anxiety rather than ease it. Here are a few common phrases worth reconsidering.",
+        ],
+        visual: {
+          type: "callout",
+          variant: "mythFact",
+          pairs: [
+            {
+              myth: "\"I was terrible at math too, so it's okay if you are.\"",
+              fact: "Repeating that you struggled with math can lead a child to believe math ability is fixed and inherited. Try framing it around effort instead: \"I found it hard at first too, but I got better with practice.\"",
+            },
+            {
+              myth: "\"How did you get this wrong? It's so easy.\"",
+              fact: "Pointing out mistakes makes a child more tense going into the next problem. Asking about the process — \"how did you approach this?\" — before the answer helps you understand their thinking and lowers the stakes.",
+            },
+            {
+              myth: "\"Being fast means you're good at math.\"",
+              fact: "Speed and understanding are different things. A child who works slowly but accurately toward real understanding builds a sturdier foundation. The more speed is emphasized, the more anxiety tends to grow.",
+            },
+          ],
+        },
+      },
+      {
+        heading: "What You Can Try at Home",
+        paragraphs: [
+          "Small daily habits do more to lower math anxiety than any elaborate program. Start with these five.",
+        ],
+        visual: {
+          type: "checklist",
+          title: "Five things to try at home",
+          items: [
+            { text: "Drop the timer, prioritize accuracy", note: "let them work problems without a time pressure" },
+            { text: "Ask about the process, not just the answer", note: "\"how did you think about this one?\"" },
+            { text: "Talk about mistakes as a normal part of learning", note: "the brain is thought to grow most in the moment of making a mistake" },
+            { text: "Re-explain with objects or pictures", note: "connects to Singapore Math's CPA approach" },
+            { text: "Short and consistent beats long and occasional", note: "10-15 minutes daily is more effective than cramming" },
+          ],
+        },
+      },
+      {
+        heading: "Partnering with the School — When to Ask for Help",
+        paragraphs: [
+          "If effort at home isn't enough and math-related anxiety starts leading to school avoidance or physical symptoms, it's worth talking to the classroom teacher or school counselor. FCPS teachers often have specific classroom observations about exactly when and how a child shuts down.",
+          "If the underlying math skills are also a genuine concern, it's important to address the anxiety and the conceptual gaps together. Rather than simply assigning more problems, starting from what a child already knows and building small, real wins tends to work far better over time.",
+        ],
+      },
+    ],
+  },
 ];
 
 export function getBlogPost(slug: string): BlogPost | undefined {
