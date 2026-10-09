@@ -1548,6 +1548,11 @@ export const blogPosts: BlogPost[] = [
     titleEn: "FCPS Math Pathways Explained: When Will Your Child Take Algebra 1?",
     descKo: "FCPS는 6학년에서 수학 과목이 세 갈래로 나뉘고, 그에 따라 Algebra 1을 6·7·8학년 중 언제 듣는지가 달라집니다. 6학년 Algebra 1 확대와 IAAT 기준 변경 등 최근 바뀐 내용을 반영해, 초등 학부모가 알아야 할 수학 경로를 정리했습니다.",
     descEn: "In FCPS, math splits into three course options in 6th grade, and that choice decides whether a student takes Algebra 1 in 6th, 7th, or 8th grade. Here is the current pathway for elementary parents, including the expansion of 6th-grade Algebra 1 and the end of the IAAT requirement.",
+    heroImage: {
+      src: "/blog/fcps-math-pathways-hero.jpg",
+      altKo: "언덕 위 학교로 이어지는 세 갈래 길 앞에 서서 이정표를 바라보는 아이를 그린 따뜻한 일러스트",
+      altEn: "Warm illustration of a child standing by a signpost where a path splits into three routes that all lead to a school on a hill",
+    },
     bodyKo: [
       {
         heading: "수학 패스웨이란 무엇인가요?",
@@ -1790,6 +1795,337 @@ export const blogPosts: BlogPost[] = [
             { text: "Gather MAP reports and math SOL scores", note: "RIT score, percentile, and growth" },
             { text: "Explore pathways through high school with the FCPS Math Course Explorer" },
             { text: "Attend the curriculum night at the middle school your child will attend" },
+          ],
+        },
+      },
+    ],
+  },
+  {
+    slug: "amc-8-2027-guide",
+    publishedAt: "2026-10-08",
+    readingMins: 9,
+    category: "경시대회",
+    categoryEn: "Competitions",
+    titleKo: "2027 AMC 8 완전 가이드: 시험 일정, 등록, 준비 방법, 시상까지",
+    titleEn: "AMC 8 2027: Dates, Registration, Prep Plan, and Awards",
+    descKo: "2027년 AMC 8은 1월 21일부터 27일 사이에 치러집니다. 학부모가 MAA에 직접 등록할 수 없는 시험이라 일정을 미리 챙겨야 합니다. 시험 일정과 등록 방법, 남은 15주 준비 계획, 유용한 무료 사이트, 점수별 시상과 실제 혜택을 정리했습니다.",
+    descEn: "The 2027 AMC 8 runs January 21-27, and families can't register with the MAA directly, so the timeline matters. Here are the dates, how registration works, a 15-week prep plan, free practice sites, and what each award actually means.",
+    bodyKo: [
+      {
+        heading: "AMC 8은 어떤 시험인가요?",
+        paragraphs: [
+          "AMC 8(American Mathematics Competition 8)은 미국수학협회(MAA)가 매년 1월에 주관하는 수학 경시대회입니다. 25문항을 40분 동안 푸는 5지선다 객관식 시험이며, 정답 하나에 1점이고 오답 감점은 없습니다. 계산기는 쓸 수 없습니다.",
+          "8학년 이하이면서 시험 당일 만 15.5세 미만이면 응시할 수 있고, 최소 학년 제한은 없습니다. 그래서 수학을 좋아하는 4~6학년 학생도 많이 도전합니다. 다만 출제 범위가 중학교 수학이어서 초등학생에게는 쉽지 않습니다. 2026년 시험의 전체 평균은 25점 만점에 약 12점이었습니다.",
+        ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "info",
+          title: "시험 형식과 규정 자세히 보기",
+          text: "응시 규정과 2024·2025년 기출문제 PDF 링크는 AMC 8 안내 페이지에 모아 두었습니다.",
+          linkHref: "/resources/testing/amc-8",
+          linkLabel: "AMC 8 안내 페이지 보기",
+        },
+      },
+      {
+        heading: "2027년 시험은 언제인가요?",
+        paragraphs: [
+          "2026-27 시즌 AMC 8의 응시 기간은 2027년 1월 21일(목)부터 1월 27일(수)까지입니다. 이 일주일 가운데 실제 시험 날짜와 시간은 시험을 여는 학교나 기관이 정합니다. 같은 지역이라도 학교마다 시험일이 다를 수 있습니다.",
+          "아래 등록 마감일은 학생이 아니라 시험을 여는 학교·기관의 담당자(Competition Manager)가 MAA에 등록하는 기한입니다. 등록비도 학교·기관이 내는 금액이며, 학생 한 명당 응시료는 시험장이 따로 정합니다. 일정은 바뀔 수 있으니 최신 내용은 MAA 공식 페이지에서 확인하세요.",
+        ],
+        visual: {
+          type: "table",
+          headers: ["", "날짜", "비고"],
+          rows: [
+            { label: "얼리버드 등록 마감", values: ["2026년 10월 28일", "등록비 $55"] },
+            { label: "정규 등록 마감", values: ["2027년 1월 5일", "등록비 $75, 처음 시행하는 학교의 최종 기한"] },
+            { label: "지연 등록 마감", values: ["2027년 1월 14일", "등록비 $115, 시행 경험이 있는 학교만 가능"] },
+            { label: "시험 응시 기간", values: ["2027년 1월 21일(목)~27일(수)", "실제 시험일은 학교·기관이 지정"] },
+          ],
+        },
+      },
+      {
+        heading: "등록은 어떻게 하나요?",
+        paragraphs: [
+          "AMC 8은 학부모나 학생이 MAA에 직접 등록할 수 없습니다. 학생은 Competition Manager가 있는 학교나 기관을 통해 응시합니다. 그래서 가장 먼저 할 일은 자녀의 학교가 올해 AMC 8을 시행하는지 확인하는 것입니다. FCPS에서는 중학교를 중심으로 시행하는 학교가 있고, 초등학교는 학교마다 다릅니다. 수학 담당 교사나 AART에게 시행 여부와 교내 신청 방법을 물어보세요.",
+          "학교에서 시행하지 않는다면 외부 학생을 받는 공개 시험장을 찾아야 합니다. 대학, 수학 서클, 학습 기관이 시험장을 열며, 등록 기간에는 MAA 등록 안내 페이지(maa.org/amcreg)에서 우편번호로 가까운 시험장을 찾을 수 있습니다. 공개 시험장은 좌석이 적고, MAA 마감일보다 훨씬 이른 12월 중순에 접수를 닫는 곳도 있습니다. 지금 시기에는 공부보다 등록 확인이 더 급합니다.",
+        ],
+        visual: {
+          type: "checklist",
+          title: "등록 순서",
+          items: [
+            { text: "학교에 AMC 8 시행 여부 문의", note: "수학 담당 교사 또는 AART에게, 10~11월 중" },
+            { text: "교내 신청 마감일과 응시료 확인", note: "교내 마감은 MAA 마감보다 이를 수 있음" },
+            { text: "학교에서 시행하지 않으면 공개 시험장 검색", note: "maa.org/amcreg, 12월 초까지 신청 권장" },
+            { text: "시험 날짜, 시간, 방식 확인", note: "지필 또는 온라인, 시험장마다 다름" },
+          ],
+        },
+      },
+      {
+        heading: "점수에 따라 어떤 상을 받나요?",
+        paragraphs: [
+          "AMC 8의 개인 상은 전체 응시자 가운데 상위 몇 퍼센트에 드는지로 정해집니다. 상위 5%는 Honor Roll, 상위 1%는 Distinguished Honor Roll에 오르고, 25점 만점자는 Certificate of Distinction을 받습니다. Distinguished Honor Roll은 인증서에 Honor Roll of Distinction으로 적히기도 합니다.",
+          "초등 학부모가 눈여겨볼 상은 Achievement Roll입니다. 6학년 이하 학생이 15점 이상을 받으면 주어지며, 기준 점수가 해마다 바뀌지 않습니다. 이 밖에 시험장별 최고 득점자에게 주는 School Winner 핀과 상위 3명에게 주는 금·은·동 인증서가 있습니다. 교내 시상을 실제로 하는지는 시험장에 따라 다릅니다.",
+        ],
+        visual: {
+          type: "table",
+          headers: ["상", "기준", "2026년 커트라인"],
+          rows: [
+            { label: "Certificate of Distinction", values: ["만점", "25점"] },
+            { label: "Distinguished Honor Roll", values: ["전체 상위 1%", "24점"] },
+            { label: "Honor Roll", values: ["전체 상위 5%", "21점"] },
+            { label: "Achievement Roll", values: ["6학년 이하, 15점 이상", "15점 (매년 동일)"] },
+          ],
+        },
+      },
+      {
+        heading: "커트라인은 매년 달라집니다",
+        paragraphs: [
+          "Honor Roll과 Distinguished Honor Roll은 백분위로 정해지기 때문에 그해 시험의 난이도에 따라 커트라인이 움직입니다. 최근 4년 동안 Honor Roll 커트라인은 17점에서 21점으로, Distinguished Honor Roll은 21점에서 24점으로 올랐습니다. 2027년 커트라인은 시험이 끝난 뒤 보통 2월 중에 발표됩니다.",
+          "그래서 몇 점이면 상을 받는다고 미리 단정하기는 어렵습니다. 목표를 세울 때는 변하지 않는 기준인 15점(Achievement Roll)을 첫 번째 목표로 삼고, 그 다음에 최근 커트라인을 참고해 20점대를 바라보는 순서가 현실적입니다.",
+        ],
+        visual: {
+          type: "table",
+          headers: ["연도", "Honor Roll (상위 5%)", "Distinguished Honor Roll (상위 1%)"],
+          rows: [
+            { label: "2026", values: ["21점", "24점"] },
+            { label: "2025", values: ["19점", "23점"] },
+            { label: "2024", values: ["18점", "22점"] },
+            { label: "2023", values: ["17점", "21점"] },
+          ],
+        },
+      },
+      {
+        heading: "상을 받으면 어떤 혜택이 있나요?",
+        paragraphs: [
+          "먼저 오해부터 짚겠습니다. AMC 8 점수로 다음 단계 대회의 출전 자격이 생기지는 않습니다. AIME 진출권은 AMC 10과 AMC 12 성적으로만 주어집니다. FCPS의 AAP 선발이나 TJ 입학 전형도 AMC 8 점수를 요구하지 않습니다.",
+          "실제 혜택은 다른 데 있습니다. MAA 명의의 인증서가 남고, 전국의 같은 또래와 견준 객관적인 위치를 알 수 있습니다. 경시대회 성적을 묻는 수학 캠프나 심화 프로그램에 지원할 때 적을 수 있는 기록도 됩니다. 무엇보다 AMC 8을 준비하며 익힌 내용은 중학교의 MATHCOUNTS와 AMC 10으로 그대로 이어집니다. AMC 10은 최소 학년 제한이 없어, AMC 8에서 좋은 성적을 낸 학생은 중학교 때부터 응시하기도 합니다.",
+        ],
+        visual: {
+          type: "callout",
+          variant: "mythFact",
+          pairs: [
+            {
+              myth: "AMC 8에서 상을 받으면 상위 대회 출전권이 생긴다",
+              fact: "AMC 8에는 다음 라운드가 없습니다. AIME 진출은 AMC 10·12 성적으로 결정됩니다.",
+            },
+            {
+              myth: "초등학생이 응시하기에는 너무 이르다",
+              fact: "최소 학년 제한이 없고, 6학년 이하는 15점 이상이면 Achievement Roll에 오릅니다.",
+            },
+          ],
+        },
+      },
+      {
+        heading: "남은 15주, 이렇게 준비하세요",
+        paragraphs: [
+          "AMC 8은 수와 연산, 비율과 퍼센트, 초급 대수, 기하, 경우의 수와 확률, 정수론에서 고르게 출제됩니다. 문제는 뒤로 갈수록 어려워집니다. 대체로 앞의 15문제는 개념을 알면 풀 수 있고, 후반부 10문제는 여러 개념을 엮어야 풀립니다. 처음 응시하는 초등학생이라면 앞의 15문제를 실수 없이 맞히는 것을 목표로 삼으세요. 그 점수가 Achievement Roll 기준입니다.",
+          "이 글을 쓰는 10월 초 기준으로 응시 기간 첫날까지 15주가 남았습니다. 가장 좋은 교재는 기출문제입니다. 처음에는 시간을 재지 않고 풀면서 모르는 개념을 채우고, 11월 중순부터는 40분을 재고 실전처럼 풉니다. 틀린 문제는 답만 확인하지 말고 다음 날 해설 없이 다시 풀어 보게 하세요. Singapore Math나 Beast Academy로 개념을 다져 온 학생이라면 비율, 넓이, 경우의 수 단원이 기출문제와 자연스럽게 연결됩니다.",
+        ],
+        visual: {
+          type: "table",
+          headers: ["기간", "목표", "할 일"],
+          rows: [
+            { label: "10월~11월 중순", values: ["개념 채우기", "영역별 개념 정리, 기출 1~15번을 시간 제한 없이 풀기"] },
+            { label: "11월 중순~12월", values: ["실전 적응", "주 1회 40분 실전 풀이, 틀린 문제는 다음 날 다시 풀기"] },
+            { label: "1월 (시험 전 3주)", values: ["마무리", "주 2회 실전 풀이, 오답 복습, 시간 배분 연습"] },
+          ],
+        },
+      },
+      {
+        heading: "시험 당일 전략",
+        paragraphs: [
+          "오답 감점이 없으므로 답안을 비워 두면 손해입니다. 모르는 문제도 보기를 하나라도 지운 뒤 반드시 답을 고르게 하세요. 40분에 25문제이므로 문제당 평균 1분 36초가 주어집니다. 한 문제에 3분 넘게 매달리면 뒤에 있는 풀 수 있는 문제를 놓치게 됩니다.",
+          "문제를 두 번에 나눠 푸는 방법을 권합니다. 첫 번째에는 바로 풀리는 문제만 풀고, 막히는 문제는 표시해 둔 채 넘어갑니다. 끝까지 간 뒤 남은 시간에 표시한 문제로 돌아옵니다. 객관식이므로 보기를 식에 대입해 보거나 어림해서 보기를 줄이는 방법도 통합니다.",
+        ],
+        visual: {
+          type: "checklist",
+          title: "시험 당일 체크리스트",
+          items: [
+            { text: "모든 문항에 답 표시하기", note: "오답 감점 없음" },
+            { text: "막히면 표시하고 넘어가기", note: "문제당 평균 1분 36초" },
+            { text: "보기 활용하기", note: "대입, 어림, 소거" },
+            { text: "문제의 마지막 문장 다시 읽기", note: "무엇을 구하는 문제인지 확인" },
+            { text: "준비물 확인하기", note: "계산기 사용 불가, 온라인 시험이면 기기 지참 여부 확인" },
+          ],
+        },
+      },
+      {
+        heading: "유용한 무료 사이트",
+        paragraphs: [
+          "AMC 8 준비에 필요한 자료는 대부분 무료로 구할 수 있습니다. 기출문제와 풀이는 AoPS 위키와 Po-Shen Loh 교수의 LIVE 사이트에 연도별로 정리되어 있습니다. LIVE 사이트는 MAA의 허가를 받아 기출문제 PDF와 동영상 해설을 함께 제공합니다.",
+          "개념별 연습에는 AoPS의 Alcumus가 좋습니다. 학생의 정답률에 맞춰 난이도가 조절되는 무료 문제 은행입니다. 유료 강의나 교재는 기출문제를 몇 회 풀어 본 뒤, 부족한 영역이 드러났을 때 고려해도 늦지 않습니다.",
+        ],
+        visual: {
+          type: "table",
+          headers: ["사이트", "주소", "용도"],
+          rows: [
+            { label: "MAA AMC 공식", values: ["maa.org/student-programs/amc", "공식 일정과 규정, 등록 안내"] },
+            { label: "AoPS Wiki", values: ["artofproblemsolving.com/wiki", "1985년부터의 기출문제와 풀이"] },
+            { label: "Po-Shen Loh LIVE", values: ["live.poshenloh.com/past-contests", "기출 PDF와 동영상 해설"] },
+            { label: "AoPS Alcumus", values: ["artofproblemsolving.com/alcumus", "개념별 적응형 문제 연습"] },
+            { label: "AMC Trivial", values: ["amctrivial.com", "기출문제로 모의고사 구성"] },
+            { label: "MATHCOUNTS", values: ["mathcounts.org", "지난 시즌 대회 문제와 풀이"] },
+          ],
+        },
+      },
+    ],
+    bodyEn: [
+      {
+        heading: "What Is the AMC 8?",
+        paragraphs: [
+          "The AMC 8 (American Mathematics Competition 8) is a math contest run every January by the Mathematical Association of America (MAA). Students answer 25 multiple-choice questions in 40 minutes. Each correct answer is worth one point, wrong answers carry no penalty, and calculators are not allowed.",
+          "Any student in grade 8 or below who is under 15.5 years old on test day can take it, and there is no minimum grade. Many 4th through 6th graders who enjoy math take it for that reason. The content is middle school math, though, so it is a real stretch for elementary students. The overall average on the 2026 contest was about 12 out of 25.",
+        ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "info",
+          title: "Format and rules in detail",
+          text: "Our AMC 8 page covers the test-day rules and links to the 2024 and 2025 exams as free PDFs.",
+          linkHref: "/en/resources/testing/amc-8",
+          linkLabel: "See the AMC 8 guide page",
+        },
+      },
+      {
+        heading: "When Is the 2027 AMC 8?",
+        paragraphs: [
+          "For the 2026-27 season, the AMC 8 window runs from Thursday, January 21 through Wednesday, January 27, 2027. The school or organization hosting the contest picks the actual day and time within that week. Two schools in the same area can test on different days.",
+          "The registration deadlines below apply to the school or organization's Competition Manager, who registers with the MAA. They are not deadlines for students. The fees are also what the host pays, and each site sets its own per-student cost. Dates can change, so check the MAA's official page for the latest.",
+        ],
+        visual: {
+          type: "table",
+          headers: ["", "Date", "Notes"],
+          rows: [
+            { label: "Early-bird deadline", values: ["October 28, 2026", "$55 registration fee"] },
+            { label: "Regular deadline", values: ["January 5, 2027", "$75 fee; last date for first-time hosts"] },
+            { label: "Late deadline", values: ["January 14, 2027", "$115 fee; returning hosts only"] },
+            { label: "Competition window", values: ["January 21-27, 2027 (Thu-Wed)", "The host picks the test day"] },
+          ],
+        },
+      },
+      {
+        heading: "How Does Registration Work?",
+        paragraphs: [
+          "Parents and students cannot register for the AMC 8 with the MAA directly. Students take it through a school or organization that has a Competition Manager. The first step is to find out whether your child's school is offering the AMC 8 this year. In FCPS, the schools that offer it are mostly middle schools, and elementary schools vary. Ask the math teacher or the AART whether the school participates and how students sign up.",
+          "If the school doesn't offer it, look for a public testing site that accepts outside students. Universities, math circles, and learning centers host the contest, and during the registration season the MAA's registration page (maa.org/amcreg) lets you search for sites by ZIP code. Public sites have few seats, and some close sign-ups in mid-December, well before the MAA deadlines. Right now, confirming a seat matters more than studying.",
+        ],
+        visual: {
+          type: "checklist",
+          title: "Registration steps",
+          items: [
+            { text: "Ask the school whether it offers the AMC 8", note: "Math teacher or AART, in October or November" },
+            { text: "Confirm the school's sign-up deadline and cost", note: "School deadlines can fall earlier than the MAA's" },
+            { text: "If the school doesn't offer it, search for a public testing site", note: "maa.org/amcreg; aim to sign up by early December" },
+            { text: "Confirm the test date, time, and format", note: "Paper or online, depending on the site" },
+          ],
+        },
+      },
+      {
+        heading: "Which Awards Go With Which Scores?",
+        paragraphs: [
+          "Individual AMC 8 awards depend on where a student's score falls among all participants. The top 5% make the Honor Roll, the top 1% make the Distinguished Honor Roll, and a perfect 25 earns a Certificate of Distinction. The Distinguished Honor Roll sometimes appears on certificates as the Honor Roll of Distinction.",
+          "The award elementary parents should know is the Achievement Roll. It goes to any student in grade 6 or below who scores 15 or higher, and that threshold does not change from year to year. There is also a School Winner pin for the top scorer at each site, and gold, silver, and bronze certificates for the top three. Whether these are actually handed out depends on the site.",
+        ],
+        visual: {
+          type: "table",
+          headers: ["Award", "Criteria", "2026 cutoff"],
+          rows: [
+            { label: "Certificate of Distinction", values: ["Perfect score", "25"] },
+            { label: "Distinguished Honor Roll", values: ["Top 1% overall", "24"] },
+            { label: "Honor Roll", values: ["Top 5% overall", "21"] },
+            { label: "Achievement Roll", values: ["Grade 6 or below, 15 or higher", "15 (same every year)"] },
+          ],
+        },
+      },
+      {
+        heading: "Cutoffs Change Every Year",
+        paragraphs: [
+          "The Honor Roll and Distinguished Honor Roll are set by percentile, so the cutoffs move with the difficulty of each year's contest. Over the last four years the Honor Roll cutoff rose from 17 to 21, and the Distinguished Honor Roll cutoff rose from 21 to 24. The 2027 cutoffs will be announced after the contest, usually in February.",
+          "That makes it hard to say in advance what score will earn an award. A realistic approach is to make 15, the fixed Achievement Roll threshold, the first goal, and then use recent cutoffs as a guide when aiming for the low 20s.",
+        ],
+        visual: {
+          type: "table",
+          headers: ["Year", "Honor Roll (top 5%)", "Distinguished Honor Roll (top 1%)"],
+          rows: [
+            { label: "2026", values: ["21", "24"] },
+            { label: "2025", values: ["19", "23"] },
+            { label: "2024", values: ["18", "22"] },
+            { label: "2023", values: ["17", "21"] },
+          ],
+        },
+      },
+      {
+        heading: "What Does an Award Actually Get You?",
+        paragraphs: [
+          "Start with what it doesn't do. An AMC 8 score does not qualify a student for a next-round contest. Only AMC 10 and AMC 12 scores lead to the AIME. FCPS's AAP screening and TJ admissions don't ask for AMC 8 scores either.",
+          "The real benefits are elsewhere. Students receive a certificate from the MAA and an objective read on where they stand among peers nationwide. The result is also something to list when a math camp or enrichment program asks about contest experience. Above all, what a student learns while preparing carries straight into MATHCOUNTS and the AMC 10 in middle school. The AMC 10 has no minimum grade, so students who do well on the AMC 8 sometimes start taking it in middle school.",
+        ],
+        visual: {
+          type: "callout",
+          variant: "mythFact",
+          pairs: [
+            {
+              myth: "An AMC 8 award qualifies a student for a higher-level contest",
+              fact: "The AMC 8 has no next round. AIME qualification comes from AMC 10 and AMC 12 scores.",
+            },
+            {
+              myth: "Elementary students are too young to take it",
+              fact: "There is no minimum grade, and a student in grade 6 or below who scores 15 or higher makes the Achievement Roll.",
+            },
+          ],
+        },
+      },
+      {
+        heading: "A 15-Week Prep Plan",
+        paragraphs: [
+          "The AMC 8 draws evenly from arithmetic, ratios and percents, beginning algebra, geometry, counting and probability, and number theory. Questions get harder as the test goes on. In general, the first 15 can be solved by a student who knows the concepts, and the last 10 require combining several ideas. For an elementary student taking it for the first time, a good goal is to get the first 15 right without careless errors. That score is the Achievement Roll threshold.",
+          "As of early October, when this post was written, 15 weeks remain before the first day of the window. Past exams are the best study material. Begin untimed, filling in concepts your child hasn't seen yet, and from mid-November switch to full 40-minute timed runs. For each missed problem, have your child re-solve it the next day without the solution instead of only checking the answer. Students who have built their foundations with Singapore Math or Beast Academy will find that ratios, area, and counting connect naturally to past AMC 8 problems.",
+        ],
+        visual: {
+          type: "table",
+          headers: ["Period", "Goal", "What to do"],
+          rows: [
+            { label: "October to mid-November", values: ["Fill in concepts", "Review each topic; solve problems 1-15 from past exams untimed"] },
+            { label: "Mid-November to December", values: ["Adjust to test conditions", "One timed 40-minute exam a week; re-solve missed problems the next day"] },
+            { label: "January (last 3 weeks)", values: ["Final review", "Two timed exams a week; review past mistakes; practice pacing"] },
+          ],
+        },
+      },
+      {
+        heading: "Test-Day Strategy",
+        paragraphs: [
+          "Because wrong answers carry no penalty, a blank answer only costs points. Even on a problem your child can't solve, have them rule out at least one choice and then pick an answer. Twenty-five questions in 40 minutes works out to an average of 1 minute 36 seconds each. Spending more than three minutes on one problem means missing solvable ones later in the test.",
+          "We recommend working through the test in two passes. On the first pass, solve only the problems that come quickly, and mark the rest and move on. After reaching the end, return to the marked problems with the time that's left. Since the test is multiple-choice, plugging the choices into the problem or estimating to narrow them down also works.",
+        ],
+        visual: {
+          type: "checklist",
+          title: "Test-day checklist",
+          items: [
+            { text: "Answer every question", note: "No penalty for wrong answers" },
+            { text: "Mark it and move on when stuck", note: "About 1 minute 36 seconds per question" },
+            { text: "Use the answer choices", note: "Plug in, estimate, eliminate" },
+            { text: "Re-read the last sentence of the problem", note: "Confirm what it is asking for" },
+            { text: "Check what to bring", note: "No calculators; for an online test, ask whether to bring a device" },
+          ],
+        },
+      },
+      {
+        heading: "Free Sites Worth Bookmarking",
+        paragraphs: [
+          "Most of what a student needs to prepare for the AMC 8 is available free. Past exams and solutions are organized by year on the AoPS Wiki and on Professor Po-Shen Loh's LIVE site. The LIVE site hosts past exam PDFs along with video solutions, with the MAA's permission.",
+          "For practice by topic, AoPS's Alcumus is a good choice. It is a free problem bank that adjusts difficulty to how the student is doing. Paid courses and books can wait until your child has worked through a few past exams and the weak areas are clear.",
+        ],
+        visual: {
+          type: "table",
+          headers: ["Site", "Address", "Use it for"],
+          rows: [
+            { label: "MAA AMC (official)", values: ["maa.org/student-programs/amc", "Official dates, rules, and registration info"] },
+            { label: "AoPS Wiki", values: ["artofproblemsolving.com/wiki", "Past exams and solutions back to 1985"] },
+            { label: "Po-Shen Loh LIVE", values: ["live.poshenloh.com/past-contests", "Past exam PDFs and video solutions"] },
+            { label: "AoPS Alcumus", values: ["artofproblemsolving.com/alcumus", "Adaptive practice by topic"] },
+            { label: "AMC Trivial", values: ["amctrivial.com", "Mock tests built from past problems"] },
+            { label: "MATHCOUNTS", values: ["mathcounts.org", "Last season's competition problems and solutions"] },
           ],
         },
       },

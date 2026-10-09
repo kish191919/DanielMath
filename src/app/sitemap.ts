@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/site-config";
 import { blogPosts } from "@/lib/blog-posts";
+import { grades } from "@/lib/curriculum-data";
+import { pageAlternates } from "@/lib/seo";
 
 const marketingPaths = [
   "",
@@ -18,13 +20,7 @@ const marketingPaths = [
   "/blog",
   "/privacy",
   "/terms",
-  "/resources/curriculum/kindergarten",
-  "/resources/curriculum/grade-1",
-  "/resources/curriculum/grade-2",
-  "/resources/curriculum/grade-3",
-  "/resources/curriculum/grade-4",
-  "/resources/curriculum/grade-5",
-  "/resources/curriculum/grade-6",
+  ...grades.map((g) => `/resources/curriculum/${g.slug}`),
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -32,13 +28,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
   const priority = (p: string) => (p === "" ? 1 : p.split("/").length <= 2 ? 0.8 : 0.6);
+  // Same hreflang set the pages emit in <head> (ko, en, x-default).
+  const alternates = (p: string) => ({ languages: pageAlternates("ko", p).languages });
 
   const koEntries = marketingPaths.map((p) => ({
     url: `${base}${p}`,
     lastModified: now,
     changeFrequency: "monthly" as const,
     priority: priority(p),
-    alternates: { languages: { ko: `${base}${p}`, en: `${base}/en${p}` } },
+    alternates: alternates(p),
   }));
 
   const enEntries = marketingPaths.map((p) => ({
@@ -46,7 +44,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: now,
     changeFrequency: "monthly" as const,
     priority: priority(p) * 0.9,
-    alternates: { languages: { ko: `${base}${p}`, en: `${base}/en${p}` } },
+    alternates: alternates(p),
   }));
 
   const blogKoEntries = blogPosts.map((p) => ({
@@ -54,7 +52,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: new Date(p.publishedAt),
     changeFrequency: "monthly" as const,
     priority: 0.7,
-    alternates: { languages: { ko: `${base}/blog/${p.slug}`, en: `${base}/en/blog/${p.slug}` } },
+    alternates: alternates(`/blog/${p.slug}`),
   }));
 
   const blogEnEntries = blogPosts.map((p) => ({
@@ -62,7 +60,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: new Date(p.publishedAt),
     changeFrequency: "monthly" as const,
     priority: 0.63,
-    alternates: { languages: { ko: `${base}/blog/${p.slug}`, en: `${base}/en/blog/${p.slug}` } },
+    alternates: alternates(`/blog/${p.slug}`),
   }));
 
   return [...koEntries, ...enEntries, ...blogKoEntries, ...blogEnEntries];
