@@ -1541,12 +1541,12 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "fcps-math-pathways",
     publishedAt: "2026-10-08",
-    readingMins: 7,
+    readingMins: 9,
     category: "수학 패스웨이",
     categoryEn: "Math Pathways",
     titleKo: "FCPS 수학 패스웨이 총정리: Algebra 1, 몇 학년에 듣게 될까요?",
     titleEn: "FCPS Math Pathways Explained: When Will Your Child Take Algebra 1?",
-    descKo: "FCPS는 6학년에서 수학 과목이 세 갈래로 나뉘고, 그에 따라 Algebra 1을 6·7·8학년 중 언제 듣는지가 달라집니다. 6학년 Algebra 1 확대와 IAAT 기준 변경 등 최근 바뀐 내용을 반영해, 초등 학부모가 알아야 할 수학 경로를 정리했습니다.",
+    descKo: "한국에서 막 오신 학부모님을 위해 FCPS 수학 경로를 쉽게 풀었습니다. 미국 학제와 과목 이름부터, Algebra 1을 6·7·8학년 중 언제 듣게 되는지, 최근 바뀐 배치 기준까지 차례로 설명합니다.",
     descEn: "In FCPS, math splits into three course options in 6th grade, and that choice decides whether a student takes Algebra 1 in 6th, 7th, or 8th grade. Here is the current pathway for elementary parents, including the expansion of 6th-grade Algebra 1 and the end of the IAAT requirement.",
     heroImage: {
       src: "/blog/fcps-math-pathways-hero.jpg",
@@ -1555,17 +1555,80 @@ export const blogPosts: BlogPost[] = [
     },
     bodyKo: [
       {
-        heading: "수학 패스웨이란 무엇인가요?",
+        heading: "결론부터: 기준은 8학년, 빠르면 6·7학년입니다",
         paragraphs: [
-          "수학 패스웨이(Math Pathway)는 학생이 어느 학년에 어떤 수학 과목을 듣는지를 순서대로 이어 놓은 경로입니다. FCPS에서 이 경로를 가르는 기준은 Algebra 1을 몇 학년에 듣느냐입니다. Algebra 1은 고등학교 수학의 출발점이 되는 과목이어서, 이 과목을 듣는 시점에 따라 졸업 전까지 들을 수 있는 수학 과목의 범위가 달라집니다.",
-          "FCPS는 전략 계획(Strategic Plan)에 따라 모든 학생이 8학년까지 Algebra 1을 마치는 것을 목표로 하고 있습니다. 여기에 더해 최근 두 학년도 사이에 6학년 Algebra 1 확대, 7학년 배치 기준 변경, 새 교재 도입이 이어졌습니다. 몇 해 전에 자녀를 중학교에 보낸 선배 학부모의 경험담이 지금은 맞지 않을 수 있습니다. 이 글은 2026년 10월 기준 FCPS 공개 자료를 바탕으로 정리했습니다.",
+          "Algebra 1은 방정식과 함수를 본격적으로 배우는 수학 과목입니다. Fairfax County 공립학교(FCPS)에서는 이 과목을 6학년, 7학년, 8학년 중 한 해에 듣습니다.",
+          "기준이 되는 시기는 8학년입니다. FCPS는 모든 학생이 8학년까지 Algebra 1을 마치는 것을 목표로 삼고 있습니다. 준비가 된 학생은 7학년이나 6학년에 먼저 들을 수 있습니다.",
         ],
+        visual: {
+          type: "scale",
+          items: [
+            { level: "8학년", label: "기본 경로", desc: "FCPS가 모든 학생에게 목표로 삼는 시기. 12학년에 AP Calculus 도달", tone: "mid" },
+            { level: "7학년", label: "1년 빠른 경로", desc: "11학년에 AP Calculus 도달", tone: "mid" },
+            { level: "6학년", label: "2년 빠른 경로", desc: "10학년에 AP Calculus 도달", tone: "mid" },
+          ],
+          note: {
+            tone: "info",
+            text: "AP Calculus는 고등학교에서 듣는 대학 수준의 미적분 과목입니다. 한 해에 한 과목씩 들으면 세 경로 모두 졸업 전에 이 과목까지 갑니다.",
+          },
+        },
       },
       {
-        heading: "6학년에서 길이 세 갈래로 나뉩니다",
+        heading: "한국과 다른 점 ①: 6학년은 아직 초등학생입니다",
         paragraphs: [
-          "2026-27학년도 FCPS 과목 안내를 보면 6학년 수학은 Math 6, Advanced Math 6(Math 6 Advanced), Algebra 1 Honors 세 가지입니다. Math 6는 6학년 학년 수준 과정이고, Advanced Math 6는 7학년 내용과 8학년 내용 일부를 미리 배우는 과정입니다. Algebra 1 Honors는 고등학교 과목을 6학년에 듣는 가장 빠른 길입니다.",
-          "7학년 과목인 Prealgebra는 7학년과 8학년 수학을 1년으로 압축한 과정입니다. Prealgebra Honors는 누구나 신청할 수 있는 오픈 등록(open enrollment) 과목이고, 8학년 Algebra 1 Honors도 마찬가지입니다. 그래서 6학년에 Math 6를 들은 학생도 8학년에는 Algebra 1 Honors까지 갈 수 있습니다. 과목 구성은 학교마다 조금씩 다를 수 있으니 진학할 중학교의 안내를 함께 확인하세요.",
+          "FCPS는 학교를 나누는 방식이 한국과 다릅니다. 대부분의 학교에서 초등학교는 킨더가든(K)부터 6학년까지, 중학교는 7~8학년, 고등학교는 9~12학년입니다. 그래서 '6학년에 Algebra 1을 듣는다'는 말은 초등학교에서 듣는다는 뜻입니다.",
+          "학년도는 8월에 시작해 이듬해 6월에 끝납니다. '2026-27학년도'는 2026년 8월부터 2027년 6월까지입니다. 학년이 시작하는 달이 한국과 달라서, 전학 오면 한국에서 다니던 학년과 다른 학년에 배정될 수 있습니다.",
+        ],
+        visual: {
+          type: "table",
+          headers: ["FCPS 학년", "학교", "한국 학년으로는 (대략)"],
+          rows: [
+            { label: "K~6학년", values: ["초등학교 (Elementary School)", "유치원 마지막 해~초등 6학년"] },
+            { label: "7~8학년", values: ["중학교 (Middle School)", "중학교 1~2학년"] },
+            { label: "9~12학년", values: ["고등학교 (High School)", "중학교 3학년~고등학교 3학년"] },
+          ],
+        },
+      },
+      {
+        heading: "한국과 다른 점 ②: 수학을 학년이 아니라 과목으로 배웁니다",
+        paragraphs: [
+          "한국에서는 같은 학년이면 모두 같은 수학을 배웁니다. 미국은 다릅니다. 중학교부터는 Algebra 1, Geometry처럼 이름이 붙은 과목을 한 해에 하나씩 듣습니다. 같은 7학년이어도 학생마다 듣는 과목이 다를 수 있습니다.",
+          "과목은 정해진 순서대로 이어집니다. 앞 과목을 마쳐야 다음 과목으로 넘어갑니다. 어느 학년에 어떤 과목을 듣는지 이어 놓은 이 순서를 수학 패스웨이(Math Pathway)라고 부릅니다. 이 글에서는 '경로'라고 쓰겠습니다.",
+          "Algebra 1은 이 순서의 첫 과목이자 고등학교 수학의 출발점입니다. 일차방정식, 연립방정식, 일차함수, 이차방정식을 배우며, 한국 중학교 수학의 방정식·함수 단원과 내용이 비슷합니다. 그래서 Algebra 1을 시작하는 학년이 그 뒤 모든 과목의 시기를 정합니다.",
+          "한 해에 한 과목씩 들으면 8학년에 시작한 학생은 12학년에, 7학년에 시작한 학생은 11학년에, 6학년에 시작한 학생은 10학년에 AP Calculus에 도달합니다. 일찍 도달한 학생은 남은 학년에 AP Statistics(통계)나 다변수 미적분 같은 과목을 더 들을 수 있습니다. 실제로 들을 수 있는 과목은 고등학교와 학생의 선택에 따라 달라집니다.",
+        ],
+        visual: {
+          type: "pathway",
+          steps: [
+            { label: "Algebra 1", sublabel: "대수 1" },
+            { label: "Geometry", sublabel: "기하" },
+            { label: "Algebra 2", sublabel: "대수 2" },
+            { label: "Precalculus", sublabel: "미적분 준비" },
+          ],
+          finalLabel: "AP Calculus",
+        },
+      },
+      {
+        heading: "6학년 수학 과목은 세 가지입니다",
+        paragraphs: [
+          "경로가 처음 갈리는 때는 6학년입니다. 2026-27학년도 FCPS 과목 안내에는 6학년 수학이 Math 6, Advanced Math 6, Algebra 1 Honors 세 가지로 나와 있습니다.",
+          "과목 이름 뒤에 붙는 Honors는 같은 과목을 더 깊고 빠르게 배우는 심화반이라는 뜻입니다. Advanced Math 6는 Math 6 Advanced라고 쓰기도 하는데, 같은 과목입니다.",
+        ],
+        visual: {
+          type: "comparison",
+          columns: [
+            { label: "Math 6", tone: "standard", points: ["6학년 수준의 수학을 배우는 과정"] },
+            { label: "Advanced Math 6", tone: "standard", points: ["7학년 내용과 8학년 내용 일부를 미리 배우는 과정"] },
+            { label: "Algebra 1 Honors", tone: "advanced", points: ["고등학교 과목을 6학년에 듣는 과정", "가장 빠른 경로"] },
+          ],
+        },
+      },
+      {
+        heading: "6학년 과목에 따라 7·8학년이 이렇게 이어집니다",
+        paragraphs: [
+          "아래 표는 6학년 과목별로 7학년과 8학년에 들을 수 있는 과목을 정리한 것입니다. 표에 나오는 Prealgebra는 Algebra 1 바로 앞 단계 과목으로, 7학년과 8학년 수학을 1년에 압축해서 배웁니다.",
+          "눈여겨볼 점은 Math 6로 시작해도 8학년에는 Algebra 1 Honors까지 갈 수 있다는 것입니다. 7학년 Prealgebra Honors와 8학년 Algebra 1 Honors가 원하는 학생은 누구나 신청할 수 있는 과목(open enrollment)이기 때문입니다.",
+          "과목 구성은 학교마다 조금씩 다를 수 있습니다. 자녀가 진학할 중학교의 안내도 함께 확인하세요.",
         ],
         visual: {
           type: "table",
@@ -1573,15 +1636,17 @@ export const blogPosts: BlogPost[] = [
           rows: [
             { label: "Math 6", values: ["Prealgebra 또는 Prealgebra Honors", "Algebra 1 또는 Algebra 1 Honors"] },
             { label: "Advanced Math 6", values: ["Prealgebra Honors 또는 Algebra 1 Honors", "Algebra 1 Honors 또는 Geometry Honors"] },
-            { label: "Algebra 1 Honors", values: ["Geometry Honors", "Algebra 2 Honors (고등학교에서 수강)"] },
+            { label: "Algebra 1 Honors", values: ["Geometry Honors", "Algebra 2 Honors (고등학교에 가서 수강)"] },
           ],
         },
       },
       {
-        heading: "6학년 Algebra 1, 이제 모든 초등학교로 확대됩니다",
+        heading: "최근 변화 ①: 6학년 Algebra 1이 모든 초등학교로 넓어졌습니다",
         paragraphs: [
-          "예전에는 6학년에 Algebra 1을 듣는 학생이 FCPS 전체 초등학교를 합쳐 한 해 30명 정도였습니다. FCPS는 2025년 가을 초등학교 142곳 중 3분의 1 이상이 참여하는 파일럿을 시작했고, 그해 700명이 넘는 6학년 학생이 Algebra 1을 수강했습니다. 2026-27학년도에는 대상을 모든 초등학교로 넓혔습니다. 수강생이 15명 미만이거나 교사 배정이 어려운 학교는 매일 온라인 수업으로 운영할 수 있습니다.",
-          "파일럿 첫해의 자격 기준은 두 가지였습니다. 5학년 때 6학년 수학 SOL을 치러 Pass Advanced(500점 이상)를 받고, 다른 수학 평가에서도 기준 점수를 넘어야 했습니다. 올해 기준은 달라졌을 수 있으므로 5학년 자녀를 둔 가정은 학교 수학 담당 교사에게 직접 확인하는 것이 좋습니다. 같은 시기에 Math 6부터 Algebra 2까지의 과목에는 새 교재도 도입되었습니다.",
+          "몇 해 전에 자녀를 중학교에 보낸 선배 학부모의 경험담은 지금과 다를 수 있습니다. 최근 두 학년도 사이에 큰 변화가 두 가지 있었고, Math 6부터 Algebra 2까지는 교재도 새로 바뀌었습니다. 이 글은 2026년 10월 기준 FCPS 공개 자료를 바탕으로 썼습니다.",
+          "첫 번째 변화는 6학년에 Algebra 1을 들을 기회가 넓어진 것입니다. 예전에는 FCPS 전체에서 한 해 30명 정도만 들었습니다. 2025년 가을에 초등학교 142곳 중 3분의 1 이상이 참여한 시범 운영(파일럿)이 시작됐고, 그해 700명이 넘는 6학년 학생이 수강했습니다. 2026-27학년도부터는 모든 초등학교가 대상입니다. 수강생이 15명 미만이거나 선생님을 배정하기 어려운 학교는 매일 온라인 수업으로 운영할 수 있습니다.",
+          "누구나 들을 수 있는 것은 아닙니다. 시범 운영 첫해에는 두 조건을 모두 채워야 했습니다. 하나는 5학년 때 6학년 수학 SOL을 치러 500점 이상(Pass Advanced)을 받는 것이고, 다른 하나는 다른 수학 평가에서도 기준 점수를 넘는 것입니다. SOL은 버지니아주가 매년 봄에 치르는 학력 평가입니다.",
+          "올해 기준은 달라졌을 수 있습니다. 5학년 자녀가 있다면 학교 수학 선생님께 직접 확인하세요.",
         ],
         visual: {
           type: "stat",
@@ -1591,24 +1656,27 @@ export const blogPosts: BlogPost[] = [
         },
       },
       {
-        heading: "7학년 Algebra 1, IAAT는 더 이상 조건이 아닙니다",
+        heading: "최근 변화 ②: 7학년 Algebra 1에 IAAT 점수가 필요 없어졌습니다",
         paragraphs: [
-          "7학년에 Algebra 1 Honors를 들으려면 오랫동안 세 가지 조건을 모두 채워야 했습니다. Advanced Math 6 이수, IAAT(Iowa Algebra Aptitude Test) 백분위 91 이상, 7학년 수학 SOL 500점 이상입니다. 지금도 여러 학교 웹페이지와 학부모 커뮤니티 글에는 이 기준이 그대로 남아 있습니다.",
-          "FCPS는 2025-26학년도부터 Algebra 1 Honors 배치에 IAAT 결과를 사용하지 않는다고 안내하고 있습니다. 현재 FCPS 안내에 적힌 조건은 Math 6 Advanced 이수입니다. IAAT 자체는 Advanced Math 6 학생을 대상으로 1~3월에 계속 시행되며, 점수는 가정에서 7학년 과목을 고를 때 참고 자료로 쓸 수 있습니다. 점수로 걸러 내던 방식에서 가정의 판단 비중이 커진 방식으로 바뀐 것입니다.",
+          "두 번째 변화는 7학년에 Algebra 1 Honors를 듣는 조건이 간단해진 것입니다. IAAT(Iowa Algebra Aptitude Test)는 Algebra를 배울 준비가 됐는지 알아보는 시험입니다. 예전에는 이 시험에서 백분위 91 이상(상위 9% 정도)을 받아야 했고, 다른 두 조건도 함께 채워야 했습니다.",
+          "FCPS는 2025-26학년도부터 Algebra 1 Honors 배치에 IAAT 결과를 쓰지 않는다고 안내합니다. 지금 FCPS 안내에 적힌 조건은 Advanced Math 6를 마치는 것 하나입니다.",
+          "IAAT 시험이 없어진 것은 아닙니다. Advanced Math 6 학생은 지금도 1~3월에 이 시험을 봅니다. 다만 점수는 가정에서 7학년 과목을 고를 때 참고하는 자료로 쓰입니다. 점수로 걸러 내던 방식에서 부모의 판단이 더 중요한 방식으로 바뀐 것입니다.",
+          "여러 학교 웹페이지와 학부모 커뮤니티 글에는 아직 예전 기준이 남아 있습니다. 검색으로 찾은 글은 언제 쓴 글인지 꼭 확인하세요.",
         ],
         visual: {
           type: "comparison",
           columns: [
             { label: "예전 기준", tone: "standard", points: ["Advanced Math 6 이수", "IAAT 백분위 91 이상", "7학년 수학 SOL 500점 이상"] },
-            { label: "2025-26학년도부터", tone: "advanced", points: ["Math 6 Advanced 이수", "IAAT 결과는 배치에 쓰지 않고 가정의 참고 자료로만 활용"] },
+            { label: "2025-26학년도부터", tone: "advanced", points: ["Advanced Math 6 이수", "IAAT 점수는 과목을 고를 때 참고 자료로만 사용"] },
           ],
         },
       },
       {
-        heading: "초등 3~5학년에는 무엇이 정해지나요?",
+        heading: "초등학교 3~5학년에는 무엇을 봐야 하나요?",
         paragraphs: [
-          "FCPS는 3학년부터 6학년까지 Advanced Math 과정을 운영합니다. 6학년에 Algebra 1을 들으려면 5학년에 이미 6학년 수학 SOL을 치를 만큼 앞서 있어야 하고, 7학년에 들으려면 6학년에 Advanced Math 6를 마쳐야 합니다. 빠른 경로일수록 초등 3~5학년의 배치가 직접 영향을 줍니다.",
-          "그렇다고 한 번의 배치로 경로가 굳어지는 것은 아닙니다. FCPS는 일반 과정에서도 상위 학년 내용을 확장해 가르치고, 3~6학년 동안 해마다 Advanced Math로 옮겨 갈 수 있게 하겠다고 밝혔습니다. 현재 초등 저학년 학생부터는 6학년을 마칠 때까지 모든 학생이 7학년 기준의 절반 이상을 배우게 한다는 계획도 있습니다. 자녀가 지금 어느 과정에 있는지 확인하는 방법은 아래 글에 정리해 두었습니다.",
+          "FCPS는 3학년부터 6학년까지 Advanced Math라는 심화 수학 과정을 운영합니다. 빠른 경로는 이 과정과 이어져 있습니다. 7학년에 Algebra 1을 들으려면 6학년에 Advanced Math 6를 마쳐야 합니다. 6학년에 들으려면 5학년에 이미 6학년 수학 SOL을 치를 만큼 앞서 있어야 합니다.",
+          "그렇다고 한 번의 배치로 경로가 굳어지지는 않습니다. FCPS는 3~6학년 동안 해마다 Advanced Math로 옮겨 갈 수 있게 하겠다고 밝혔습니다. 일반 과정에서도 윗학년 내용을 넓혀서 가르칩니다. 지금의 초등 저학년부터는 모든 학생이 6학년을 마칠 때까지 7학년 내용의 절반 이상을 배우게 한다는 계획도 있습니다.",
+          "자녀가 지금 어느 과정에 있는지 확인하는 방법은 아래 글에 정리해 두었습니다.",
         ],
         visual: {
           type: "callout",
@@ -1621,27 +1689,13 @@ export const blogPosts: BlogPost[] = [
         },
       },
       {
-        heading: "고등학교에서는 어떻게 이어지나요?",
+        heading: "빨리 듣는 것이 항상 좋을까요?",
         paragraphs: [
-          "Algebra 1 다음에는 보통 Geometry, Algebra 2, Precalculus, AP Calculus 순서로 과목이 이어집니다. 한 해에 한 과목씩 듣는다고 보면 8학년에 Algebra 1을 들은 학생은 12학년에, 7학년에 들은 학생은 11학년에, 6학년에 들은 학생은 10학년에 AP Calculus에 도달합니다.",
-          "FCPS가 목표로 삼는 '8학년 Algebra 1'만으로도 고등학교 졸업 전에 AP Calculus까지 갈 수 있습니다. 더 일찍 시작한 학생은 그 뒤에 AP Statistics나 다변수 미적분 같은 과목을 들을 시간이 생깁니다. 실제 과목 구성은 고등학교와 학생의 선택에 따라 달라집니다. FCPS 웹사이트의 Math Course Explorer에서 6학년 과목부터 차례로 골라 보면 가능한 경로를 직접 확인할 수 있습니다.",
-        ],
-        visual: {
-          type: "pathway",
-          steps: [
-            { label: "Algebra 1" },
-            { label: "Geometry" },
-            { label: "Algebra 2" },
-            { label: "Precalculus" },
-          ],
-          finalLabel: "AP Calculus",
-        },
-      },
-      {
-        heading: "빨리 가는 것이 항상 유리할까요?",
-        paragraphs: [
-          "FCPS는 Math 6 Advanced와 Algebra 1 Honors 사이에서 신중하게 선택하라고 가정에 권합니다. Algebra 1 Honors는 고등학교 학점이 부여되는 과목이어서 성적이 고등학교 성적증명서(transcript)에 남고, 0.5의 가중치가 붙습니다. 이 과목을 고르면 7·8학년 수학 기준을 수업으로 배우지 않고 건너뛰게 되며, 진도도 매우 빠릅니다.",
-          "FCPS는 MAP 평가 리포트(RIT 점수, 백분위, 성장도), 지금까지의 수학 SOL 점수, 교실 평가 결과, 그리고 아이가 그 속도를 따라가는 데 필요한 시간과 노력을 함께 보라고 안내합니다. 점수가 기준을 넘는지 보기 전에, 아이가 비율이나 퍼센트 응용 같은 중간 단계 개념을 자기 말로 설명할 수 있는지 먼저 확인해 보세요.",
+          "한국에서 선행 학습을 해 온 가정이라면 가장 빠른 경로가 당연해 보일 수 있습니다. 하지만 FCPS는 Advanced Math 6와 Algebra 1 Honors 사이에서 신중하게 고르라고 권합니다. 이유는 세 가지입니다.",
+          "첫째, 성적이 오래 남습니다. Algebra 1 Honors는 고등학교 학점을 받는 과목입니다. 6학년이나 7학년에 받은 성적도 대학에 지원할 때 내는 고등학교 성적증명서(transcript)에 올라가고, 0.5의 가중치가 붙습니다.",
+          "둘째, 7·8학년 수학 내용을 수업으로 배우지 않고 건너뜁니다. 셋째, 진도가 매우 빠릅니다. 한국에서 수학을 앞서 배운 아이도 처음에는 영어로 된 수학 용어와 문장제 문제가 낯설 수 있습니다.",
+          "FCPS는 네 가지를 함께 보라고 안내합니다. MAP 평가 결과(RIT 점수, 백분위, 성장도), 지금까지의 수학 SOL 점수, 교실 평가 결과, 그리고 아이가 그 속도를 따라가는 데 드는 시간과 노력입니다. MAP은 학교에서 컴퓨터로 치르는 학력 진단 평가입니다.",
+          "점수가 기준을 넘는지 보기 전에 먼저 확인할 것이 있습니다. 아이가 비율이나 퍼센트 응용 같은 중간 단계 개념을 자기 말로 설명할 수 있는지 물어보세요.",
         ],
         visual: {
           type: "callout",
@@ -1653,24 +1707,46 @@ export const blogPosts: BlogPost[] = [
             },
             {
               myth: "6학년에 Algebra 1을 못 들으면 이미 늦은 것이다",
-              fact: "FCPS의 목표는 8학년까지 Algebra 1을 마치는 것이며, 그 경로로도 12학년에 AP Calculus를 들을 수 있습니다.",
+              fact: "FCPS의 목표는 8학년까지 Algebra 1을 마치는 것입니다. 그 경로로도 12학년에 AP Calculus를 들을 수 있습니다.",
             },
+          ],
+        },
+      },
+      {
+        heading: "학교에서 자주 듣게 될 용어",
+        paragraphs: [
+          "이 글에 나온 용어는 학교 안내문과 상담에서도 계속 나옵니다. 한 번에 찾아볼 수 있게 모았습니다.",
+        ],
+        visual: {
+          type: "table",
+          headers: ["용어", "뜻"],
+          rows: [
+            { label: "FCPS", values: ["Fairfax County Public Schools. 페어팩스 카운티의 공립학교를 운영하는 교육청"] },
+            { label: "Advanced Math", values: ["FCPS가 3~6학년에 운영하는 심화 수학 과정"] },
+            { label: "Honors", values: ["같은 과목을 더 깊고 빠르게 배우는 심화반"] },
+            { label: "AP", values: ["Advanced Placement. 고등학교에서 듣는 대학 수준 과목"] },
+            { label: "SOL", values: ["Standards of Learning. 버지니아주가 매년 봄에 치르는 학력 평가. 400점 이상이면 합격, 500점 이상이면 Pass Advanced"] },
+            { label: "MAP", values: ["학교에서 컴퓨터로 치르는 학력 진단 평가. 결과가 RIT 점수와 백분위로 나옴"] },
+            { label: "IAAT", values: ["Iowa Algebra Aptitude Test. Algebra를 배울 준비가 됐는지 알아보는 시험"] },
+            { label: "Transcript", values: ["고등학교 성적증명서. 대학에 지원할 때 제출"] },
+            { label: "ParentVUE", values: ["자녀의 수강 과목과 성적을 볼 수 있는 FCPS 학부모용 웹사이트"] },
           ],
         },
       },
       {
         heading: "지금 학부모가 확인할 것",
         paragraphs: [
-          "배치 기준과 과목 이름은 학년도마다 바뀌고, 학교 웹페이지가 최신 내용을 반영하지 못한 경우도 있습니다. 내년 과목 선택이 다가오기 전에 아래 항목을 미리 확인해 두면 설명회나 상담에서 필요한 질문을 정확히 할 수 있습니다.",
+          "한국에서 막 오셨다면 자녀가 어떤 수학 과목에 배정됐는지부터 확인하세요. 과목 이름은 ParentVUE에서 볼 수 있고, 담임 선생님께 물어봐도 됩니다. 한국에서 어디까지 배웠는지 알려 드리면 배치를 상의할 때 도움이 됩니다.",
+          "배치 기준과 과목 이름은 학년도마다 바뀌고, 학교 웹페이지가 최신 내용을 반영하지 못한 경우도 있습니다. 내년 과목 선택이 다가오기 전에 아래 항목을 확인해 두면 설명회나 상담에서 필요한 질문을 정확히 할 수 있습니다.",
         ],
         visual: {
           type: "checklist",
           title: "과목 선택 전 체크리스트",
           items: [
             { text: "ParentVUE에서 자녀의 현재 수학 과목명 확인", note: "Advanced Math 과정인지 확인" },
-            { text: "수학 교사에게 내년 과목 배치 기준 문의", note: "6학년 Algebra 1 기준은 5학년 때 미리 확인" },
-            { text: "MAP 리포트와 수학 SOL 점수 모아 두기", note: "RIT 점수, 백분위, 성장도" },
-            { text: "FCPS Math Course Explorer로 고등학교까지의 경로 살펴보기" },
+            { text: "수학 선생님께 내년 과목 배치 기준 문의", note: "6학년 Algebra 1 기준은 5학년 때 미리 확인" },
+            { text: "MAP 결과지와 수학 SOL 점수 모아 두기", note: "RIT 점수, 백분위, 성장도" },
+            { text: "FCPS Math Course Explorer로 고등학교까지의 경로 살펴보기", note: "FCPS 웹사이트에서 6학년 과목부터 차례로 골라 보는 도구" },
             { text: "진학할 중학교의 과목 설명회(Curriculum Night) 참석" },
           ],
         },
@@ -1810,6 +1886,11 @@ export const blogPosts: BlogPost[] = [
     titleEn: "AMC 8 2027: Dates, Registration, Prep Plan, and Awards",
     descKo: "2027년 AMC 8은 1월 21일부터 27일 사이에 치러집니다. 학부모가 MAA에 직접 등록할 수 없는 시험이라 일정을 미리 챙겨야 합니다. 시험 일정과 등록 방법, 남은 15주 준비 계획, 유용한 무료 사이트, 점수별 시상과 실제 혜택을 정리했습니다.",
     descEn: "The 2027 AMC 8 runs January 21-27, and families can't register with the MAA directly, so the timeline matters. Here are the dates, how registration works, a 15-week prep plan, free practice sites, and what each award actually means.",
+    heroImage: {
+      src: "/blog/amc-8-2027-guide-hero.jpg",
+      altKo: "달력과 스톱워치, 상장 리본 사이에서 책상에 앉아 객관식 답안지를 채우는 아이를 그린 따뜻한 일러스트",
+      altEn: "Warm illustration of a child at a desk filling in a multiple-choice answer sheet, with a calendar, a stopwatch, and an award ribbon nearby",
+    },
     bodyKo: [
       {
         heading: "AMC 8은 어떤 시험인가요?",
