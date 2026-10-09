@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!hasLocale(locale)) return {};
   const alt = pageAlternates(locale, "/resources/curriculum");
   return locale === "ko"
-    ? { title: "FCPS 초등 수학 커리큘럼", description: "Fairfax County 초등학교 수학 프로그램 전체 안내. 유치원~6학년 일반·심화(AAP) 수학 트랙을 한국어로 설명합니다.", alternates: alt }
+    ? { title: "FCPS 초등수학 커리큘럼 | 일반·AAP 수학 비교", description: "Fairfax County(FCPS) 초등수학 프로그램 전체 안내. 유치원~6학년 일반 수학과 AAP 수학(심화) 트랙을 한국어로 설명합니다.", alternates: alt }
     : { title: "FCPS Elementary Math Curriculum", description: "A complete guide to Fairfax County elementary math. Compare Standard and Advanced (AAP) tracks for grades K–6, quarter by quarter.", alternates: alt };
 }
 

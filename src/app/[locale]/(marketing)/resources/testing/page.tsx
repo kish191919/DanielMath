@@ -39,8 +39,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!hasLocale(locale)) return {};
   const alt = pageAlternates(locale, "/resources/testing");
   return locale === "ko"
-    ? { title: "시험 & 대회 일정", description: "Fairfax County AAP 스크리닝 (NGAT), Virginia SOL 시험, MOEMS 등 수학 관련 시험과 대회 일정을 한국어로 안내합니다.", alternates: alt }
-    : { title: "Test & Competition Calendar", description: "AAP screening (NGAT), Virginia SOL tests, MOEMS, and more — all test and competition calendars for Fairfax County students.", alternates: alt };
+    ? { title: "수학 시험 & 경시대회 일정 | NGAT·SOL·MOEMS·AMC 8", description: "Fairfax County AAP 스크리닝(NGAT), Virginia SOL 시험, MOEMS·AMC 8 수학 경시대회 일정을 한국어로 안내합니다.", alternates: alt }
+    : { title: "Math Test & Competition Calendar | NGAT, SOL, MOEMS, AMC 8", description: "AAP screening (NGAT), Virginia SOL tests, MOEMS, AMC 8, and more — all test and competition calendars for Fairfax County students.", alternates: alt };
 }
 
 export default async function TestingPage({ params }: Props) {

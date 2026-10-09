@@ -49,12 +49,16 @@ export function SiteFooter({ locale }: { locale: Locale }) {
               lang={isKo ? "ko" : undefined}
             >
               {isKo
-                ? "북버지니아 한인 3–6학년을 위한 영재 수학 아카데미. AAP·CogAT 통합 커리큘럼, 4명 소수 정예."
-                : "A gifted math academy for Korean-American families in Northern Virginia, grades 3–6. Integrated AAP & CogAT curriculum, small groups of 4."}
+                ? "버지니아 페어팩스 한인 초등수학 학원. 3–6학년 4명 소수정예 맞춤수학 — FCPS 초등수학·AAP 수학 심화, 수학 경시대회 준비."
+                : "A small-group elementary math academy in Fairfax, Virginia for Korean-American families, grades 3–6. Personalized math for FCPS and AAP students, in groups of 4."}
             </p>
             <p className={`mt-3 flex items-center gap-1.5 text-xs text-navy-500${isKo ? " font-ko" : ""}`}>
               <Clock className="h-3.5 w-3.5 shrink-0" />
               {isKo ? siteConfig.hoursKo : siteConfig.hours}
+            </p>
+            <p className="mt-2 flex max-w-xs items-start gap-1.5 text-xs leading-5 text-navy-500">
+              <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              {siteConfig.serviceAreas.join(" · ")}
             </p>
           </div>
 

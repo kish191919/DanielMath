@@ -5,7 +5,7 @@ import Image from "next/image";
 import { ArrowLeft, ArrowRight, Clock } from "lucide-react";
 import { getDictionary } from "@/dictionaries";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
-import { pageAlternates } from "@/lib/seo";
+import { ogImages, pageAlternates } from "@/lib/seo";
 import { Container } from "@/components/site/container";
 import { getBlogPost, getAllSlugs, getAdjacentPosts } from "@/lib/blog-posts";
 import { BlogPostingJsonLd } from "@/components/seo/json-ld";
@@ -32,6 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       type: "article",
       publishedTime: post.publishedAt,
+      images: ogImages,
     },
   };
 }

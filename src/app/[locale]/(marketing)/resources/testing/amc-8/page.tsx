@@ -20,8 +20,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const alt = pageAlternates(locale, "/resources/testing/amc-8");
   return locale === "ko"
     ? {
-        title: "AMC 8란 무엇인가요? 학부모 가이드",
-        description: "응시 자격, 시험 형식, 등록 일정, 채점 및 시상 내역까지 — 학부모를 위한 AMC 8 완전 가이드.",
+        title: "AMC 8(AMC8) 수학 경시대회란? 학부모 가이드",
+        description: "응시 자격, 시험 형식, 등록 일정, 채점 및 시상 내역까지 — 학부모를 위한 AMC 8(AMC8) 수학 경시대회 완전 가이드.",
         alternates: alt,
       }
     : {

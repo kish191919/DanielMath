@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!g) return {};
   const alt = pageAlternates(locale, `/resources/curriculum/${slug}`);
   return locale === "ko"
-    ? { title: `${g.gradeKo} 수학 커리큘럼`, description: `FCPS ${g.gradeKo} 일반·심화(AAP) 수학 분기별 학습 내용 비교.`, alternates: alt }
+    ? { title: `FCPS ${g.gradeKo} 수학 커리큘럼`, description: `FCPS ${g.gradeKo} 초등수학 — 일반 수학과 AAP 수학(심화)의 분기별 학습 내용 비교.`, alternates: alt }
     : { title: `${g.grade} Math Curriculum — FCPS`, description: `FCPS ${g.grade} Standard and Advanced (AAP) math — quarter-by-quarter comparison.`, alternates: alt };
 }
 

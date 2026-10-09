@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return locale === "ko"
     ? {
         title: "MOEMS 수학 올림피아드란? 학부모 가이드",
-        description: "대회 방식, 응시 규정, 채점, 시상 내역까지 — 학부모를 위한 MOEMS(초·중등 수학 올림피아드) 완전 가이드.",
+        description: "대회 방식, 응시 규정, 채점, 시상 내역까지 — 학부모를 위한 MOEMS(초·중등 수학 올림피아드, 수학 경시대회) 완전 가이드.",
         alternates: alt,
       }
     : {

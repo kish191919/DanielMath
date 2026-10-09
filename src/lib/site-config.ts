@@ -4,9 +4,9 @@ export const siteConfig = {
   legalName: "CloudMasterIT LLC",
   url: "https://danielmath.com",
   description:
-    "버지니아 Fairfax 소재 3-6학년 대상 4명 소수정예 맞춤수학 아카데미. 진단 평가부터 수준별 학습, 오답 관리, 사고력 확장까지 — AAP 수준의 심화 사고력을 기르는 한인 수학 공부방.",
+    "버지니아 페어팩스(Fairfax) 한인 초등수학 학원. 3-6학년 4명 소수정예 맞춤수학으로 FCPS 초등수학·AAP 수학 심화부터 MOEMS·AMC 8 경시대회 준비까지, 과외처럼 꼼꼼하게 진도와 오답을 관리합니다.",
   descriptionEn:
-    "A small-group, personalized math enrichment academy in Fairfax, VA for Korean-American families, grades 3–6 — only 4 students per class, Mon/Tue/Thu/Fri. Diagnostic-driven, leveled practice with mistake tracking, building AAP-level depth of thinking.",
+    "A small-group, personalized elementary math academy in Fairfax, VA for Korean-American families, grades 3–6 — only 4 students per class, Mon/Tue/Thu/Fri. Diagnostic-driven, leveled practice with mistake tracking for FCPS and AAP math.",
   region: "Fairfax Virginia",
   address: {
     locality: "Fairfax",
@@ -28,6 +28,11 @@ export const siteConfig = {
   googleReviewUrl: "https://search.google.com/local/writereview?placeid=ChIJnevfwD-qOQ8RLR0h-1JQfXQ",
   hours: "M · T · Th · F · 5–8 PM",
   hoursKo: "월·화·목·금 오후 5–8시",
+  openingHours: {
+    days: ["Monday", "Tuesday", "Thursday", "Friday"],
+    opens: "17:00",
+    closes: "20:00",
+  },
   ogImage: "/og.png",
   nav: [
     { href: "/programs", label: "Programs", labelKo: "프로그램" },

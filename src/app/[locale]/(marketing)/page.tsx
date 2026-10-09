@@ -1,15 +1,18 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { Sparkles, Clock, Users, CalendarDays, BarChart2, BookOpen, Puzzle } from "lucide-react";
+import Link from "next/link";
+import { Sparkles, Clock, Users, CalendarDays, BarChart2, BookOpen, MapPin } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
 import { HeroBackground } from "@/components/site/hero-background";
+import { FaqAccordion } from "@/components/site/faq-accordion";
 import { Button } from "@/components/ui/button";
 import { getDictionary } from "@/dictionaries";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
-import { pageAlternates } from "@/lib/seo";
-import { LocalBusinessJsonLd } from "@/components/seo/json-ld";
+import { ogImages, pageAlternates } from "@/lib/seo";
+import { siteConfig } from "@/lib/site-config";
+import { FaqJsonLd, LocalBusinessJsonLd, WebSiteJsonLd } from "@/components/seo/json-ld";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -19,12 +22,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const d = await getDictionary(locale as Locale);
   const isKo = locale === "ko";
   return {
-    title: d.home.meta.title,
+    title: { absolute: d.home.meta.title },
     description: d.meta.description,
     alternates: pageAlternates(locale, "/"),
     openGraph: {
       locale: isKo ? "ko_KR" : "en_US",
       alternateLocale: isKo ? "en_US" : "ko_KR",
+      images: ogImages,
     },
   };
 }
@@ -39,10 +43,14 @@ export default async function HomePage({ params }: Props) {
   return (
     <>
       <LocalBusinessJsonLd locale={locale as Locale} />
+      <WebSiteJsonLd />
+      <FaqJsonLd items={d.home.faq.items} />
       <HeroSection d={d.home} lp={lp} isKo={isKo} />
       <Stats d={d.home} isKo={isKo} />
       <ProgramsPreview d={d.home} isKo={isKo} />
       <HowItWorks d={d.home} isKo={isKo} />
+      <About d={d.home} lp={lp} isKo={isKo} />
+      <Faq d={d.home} isKo={isKo} />
       <FinalCTA d={d.home} lp={lp} isKo={isKo} />
     </>
   );
@@ -201,7 +209,7 @@ function ProgramsPreview({ d, isKo }: { d: Awaited<ReturnType<typeof getDictiona
 }
 
 function HowItWorks({ d, isKo }: { d: Awaited<ReturnType<typeof getDictionary>>["home"]; isKo: boolean }) {
-  const icons = [BarChart2, BookOpen, Puzzle];
+  const icons = [BarChart2, BookOpen];
   return (
     <Section className="bg-white">
       <Container>
@@ -252,6 +260,70 @@ function HowItWorks({ d, isKo }: { d: Awaited<ReturnType<typeof getDictionary>>[
             })}
           </div>
         </div>
+      </Container>
+    </Section>
+  );
+}
+
+function About({ d, lp, isKo }: { d: Awaited<ReturnType<typeof getDictionary>>["home"]; lp: (p: string) => string; isKo: boolean }) {
+  const a = d.about;
+  return (
+    <Section className="bg-navy-50/60">
+      <Container>
+        <SectionHeader eyebrow={a.eyebrow} title={a.title} isKo={isKo} />
+
+        <div className={`mx-auto mt-8 max-w-3xl space-y-4 text-base leading-7 text-navy-700${isKo ? " font-ko" : ""}`}>
+          {a.paragraphs.map((p) => (
+            <p key={p}>{p}</p>
+          ))}
+        </div>
+
+        <div className="mx-auto mt-10 grid max-w-3xl gap-4 sm:grid-cols-2">
+          <div className="rounded-xl border border-navy-100 bg-white p-5 shadow-sm">
+            <div className="flex items-center gap-2 text-navy-700">
+              <MapPin className="h-4 w-4" />
+              <h3 className={`text-[11px] font-semibold uppercase tracking-wider text-navy-500${isKo ? " font-ko" : ""}`}>
+                {a.areasLabel}
+              </h3>
+            </div>
+            <p className="mt-3 text-sm font-semibold leading-6 text-navy-900">
+              {siteConfig.serviceAreas.join(" · ")}
+            </p>
+            <p className={`mt-2 text-xs text-navy-600${isKo ? " font-ko" : ""}`}>{a.areasNote}</p>
+          </div>
+
+          <div className="rounded-xl border border-navy-100 bg-white p-5 shadow-sm">
+            <div className="flex items-center gap-2 text-navy-700">
+              <BookOpen className="h-4 w-4" />
+              <h3 className={`text-[11px] font-semibold uppercase tracking-wider text-navy-500${isKo ? " font-ko" : ""}`}>
+                {a.linksLabel}
+              </h3>
+            </div>
+            <ul className={`mt-3 space-y-1.5 text-sm${isKo ? " font-ko" : ""}`}>
+              {a.links.map((l) => (
+                <li key={l.href}>
+                  <Link
+                    href={lp(l.href)}
+                    className="font-medium text-navy-700 underline underline-offset-2 transition-colors hover:text-navy-900"
+                  >
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </Container>
+    </Section>
+  );
+}
+
+function Faq({ d, isKo }: { d: Awaited<ReturnType<typeof getDictionary>>["home"]; isKo: boolean }) {
+  return (
+    <Section className="bg-white">
+      <Container>
+        <SectionHeader eyebrow={d.faq.eyebrow} title={d.faq.title} isKo={isKo} />
+        <FaqAccordion items={d.faq.items} isKo={isKo} />
       </Container>
     </Section>
   );

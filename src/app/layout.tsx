@@ -3,6 +3,7 @@ import { Inter, Noto_Sans_KR } from "next/font/google";
 import Script from "next/script";
 import { headers } from "next/headers";
 import { siteConfig } from "@/lib/site-config";
+import { ogImages } from "@/lib/seo";
 import "./globals.css";
 import "katex/dist/katex.min.css";
 
@@ -27,25 +28,31 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   keywords: [
+    "Daniel Math",
     "Daniel Math Academy",
     "다니엘 수학",
-    "AAP",
+    "다니엘 수학 아카데미",
+    "수학 아카데미",
+    "버지니아 수학",
+    "버지니아 수학학원",
+    "버지니아 수학과외",
+    "버지니아 수학 공부방",
+    "북버지니아 수학 학원",
+    "한인 초등수학",
+    "한인 수학 아카데미",
+    "페어팩스 초등수학",
+    "페어팩스 맞춤수학",
+    "Fairfax 수학 학원",
+    "FCPS 초등수학",
+    "AAP 수학",
     "Fairfax AAP",
-    "CogAT",
-    "NNAT",
-    "Common Core math",
+    "MOEMS",
+    "AMC 8",
+    "AMC8",
+    "NGAT",
     "Korean math academy",
     "Northern Virginia",
     "3rd-6th grade math tutor",
-    "영재 수학",
-    "한인 수학 아카데미",
-    "버지니아 수학",
-    "버지니아 수학 학원",
-    "버지니아 수학 공부방",
-    "북버지니아 수학 학원",
-    "Fairfax 수학 학원",
-    "Vienna 수학 공부방",
-    "Oakton 수학 학원",
     "Virginia math tutoring",
     "Virginia math academy",
   ],
@@ -57,7 +64,7 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     title: `${siteConfig.name} · ${siteConfig.nameKo}`,
     description: siteConfig.description,
-    images: [{ url: `${siteConfig.url}${siteConfig.ogImage}`, width: 1200, height: 630, alt: siteConfig.name }],
+    images: ogImages,
   },
   twitter: {
     card: "summary_large_image",

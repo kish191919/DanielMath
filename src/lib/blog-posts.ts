@@ -1538,6 +1538,263 @@ export const blogPosts: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "fcps-math-pathways",
+    publishedAt: "2026-10-08",
+    readingMins: 7,
+    category: "수학 패스웨이",
+    categoryEn: "Math Pathways",
+    titleKo: "FCPS 수학 패스웨이 총정리: Algebra 1, 몇 학년에 듣게 될까요?",
+    titleEn: "FCPS Math Pathways Explained: When Will Your Child Take Algebra 1?",
+    descKo: "FCPS는 6학년에서 수학 과목이 세 갈래로 나뉘고, 그에 따라 Algebra 1을 6·7·8학년 중 언제 듣는지가 달라집니다. 6학년 Algebra 1 확대와 IAAT 기준 변경 등 최근 바뀐 내용을 반영해, 초등 학부모가 알아야 할 수학 경로를 정리했습니다.",
+    descEn: "In FCPS, math splits into three course options in 6th grade, and that choice decides whether a student takes Algebra 1 in 6th, 7th, or 8th grade. Here is the current pathway for elementary parents, including the expansion of 6th-grade Algebra 1 and the end of the IAAT requirement.",
+    bodyKo: [
+      {
+        heading: "수학 패스웨이란 무엇인가요?",
+        paragraphs: [
+          "수학 패스웨이(Math Pathway)는 학생이 어느 학년에 어떤 수학 과목을 듣는지를 순서대로 이어 놓은 경로입니다. FCPS에서 이 경로를 가르는 기준은 Algebra 1을 몇 학년에 듣느냐입니다. Algebra 1은 고등학교 수학의 출발점이 되는 과목이어서, 이 과목을 듣는 시점에 따라 졸업 전까지 들을 수 있는 수학 과목의 범위가 달라집니다.",
+          "FCPS는 전략 계획(Strategic Plan)에 따라 모든 학생이 8학년까지 Algebra 1을 마치는 것을 목표로 하고 있습니다. 여기에 더해 최근 두 학년도 사이에 6학년 Algebra 1 확대, 7학년 배치 기준 변경, 새 교재 도입이 이어졌습니다. 몇 해 전에 자녀를 중학교에 보낸 선배 학부모의 경험담이 지금은 맞지 않을 수 있습니다. 이 글은 2026년 10월 기준 FCPS 공개 자료를 바탕으로 정리했습니다.",
+        ],
+      },
+      {
+        heading: "6학년에서 길이 세 갈래로 나뉩니다",
+        paragraphs: [
+          "2026-27학년도 FCPS 과목 안내를 보면 6학년 수학은 Math 6, Advanced Math 6(Math 6 Advanced), Algebra 1 Honors 세 가지입니다. Math 6는 6학년 학년 수준 과정이고, Advanced Math 6는 7학년 내용과 8학년 내용 일부를 미리 배우는 과정입니다. Algebra 1 Honors는 고등학교 과목을 6학년에 듣는 가장 빠른 길입니다.",
+          "7학년 과목인 Prealgebra는 7학년과 8학년 수학을 1년으로 압축한 과정입니다. Prealgebra Honors는 누구나 신청할 수 있는 오픈 등록(open enrollment) 과목이고, 8학년 Algebra 1 Honors도 마찬가지입니다. 그래서 6학년에 Math 6를 들은 학생도 8학년에는 Algebra 1 Honors까지 갈 수 있습니다. 과목 구성은 학교마다 조금씩 다를 수 있으니 진학할 중학교의 안내를 함께 확인하세요.",
+        ],
+        visual: {
+          type: "table",
+          headers: ["6학년 과목", "7학년", "8학년"],
+          rows: [
+            { label: "Math 6", values: ["Prealgebra 또는 Prealgebra Honors", "Algebra 1 또는 Algebra 1 Honors"] },
+            { label: "Advanced Math 6", values: ["Prealgebra Honors 또는 Algebra 1 Honors", "Algebra 1 Honors 또는 Geometry Honors"] },
+            { label: "Algebra 1 Honors", values: ["Geometry Honors", "Algebra 2 Honors (고등학교에서 수강)"] },
+          ],
+        },
+      },
+      {
+        heading: "6학년 Algebra 1, 이제 모든 초등학교로 확대됩니다",
+        paragraphs: [
+          "예전에는 6학년에 Algebra 1을 듣는 학생이 FCPS 전체 초등학교를 합쳐 한 해 30명 정도였습니다. FCPS는 2025년 가을 초등학교 142곳 중 3분의 1 이상이 참여하는 파일럿을 시작했고, 그해 700명이 넘는 6학년 학생이 Algebra 1을 수강했습니다. 2026-27학년도에는 대상을 모든 초등학교로 넓혔습니다. 수강생이 15명 미만이거나 교사 배정이 어려운 학교는 매일 온라인 수업으로 운영할 수 있습니다.",
+          "파일럿 첫해의 자격 기준은 두 가지였습니다. 5학년 때 6학년 수학 SOL을 치러 Pass Advanced(500점 이상)를 받고, 다른 수학 평가에서도 기준 점수를 넘어야 했습니다. 올해 기준은 달라졌을 수 있으므로 5학년 자녀를 둔 가정은 학교 수학 담당 교사에게 직접 확인하는 것이 좋습니다. 같은 시기에 Math 6부터 Algebra 2까지의 과목에는 새 교재도 도입되었습니다.",
+        ],
+        visual: {
+          type: "stat",
+          value: "30명 → 700명+",
+          label: "6학년에 Algebra 1을 듣는 FCPS 학생 수 (파일럿 이전 → 2025-26 파일럿 첫해)",
+          source: "FCPS, 2025년 10월",
+        },
+      },
+      {
+        heading: "7학년 Algebra 1, IAAT는 더 이상 조건이 아닙니다",
+        paragraphs: [
+          "7학년에 Algebra 1 Honors를 들으려면 오랫동안 세 가지 조건을 모두 채워야 했습니다. Advanced Math 6 이수, IAAT(Iowa Algebra Aptitude Test) 백분위 91 이상, 7학년 수학 SOL 500점 이상입니다. 지금도 여러 학교 웹페이지와 학부모 커뮤니티 글에는 이 기준이 그대로 남아 있습니다.",
+          "FCPS는 2025-26학년도부터 Algebra 1 Honors 배치에 IAAT 결과를 사용하지 않는다고 안내하고 있습니다. 현재 FCPS 안내에 적힌 조건은 Math 6 Advanced 이수입니다. IAAT 자체는 Advanced Math 6 학생을 대상으로 1~3월에 계속 시행되며, 점수는 가정에서 7학년 과목을 고를 때 참고 자료로 쓸 수 있습니다. 점수로 걸러 내던 방식에서 가정의 판단 비중이 커진 방식으로 바뀐 것입니다.",
+        ],
+        visual: {
+          type: "comparison",
+          columns: [
+            { label: "예전 기준", tone: "standard", points: ["Advanced Math 6 이수", "IAAT 백분위 91 이상", "7학년 수학 SOL 500점 이상"] },
+            { label: "2025-26학년도부터", tone: "advanced", points: ["Math 6 Advanced 이수", "IAAT 결과는 배치에 쓰지 않고 가정의 참고 자료로만 활용"] },
+          ],
+        },
+      },
+      {
+        heading: "초등 3~5학년에는 무엇이 정해지나요?",
+        paragraphs: [
+          "FCPS는 3학년부터 6학년까지 Advanced Math 과정을 운영합니다. 6학년에 Algebra 1을 들으려면 5학년에 이미 6학년 수학 SOL을 치를 만큼 앞서 있어야 하고, 7학년에 들으려면 6학년에 Advanced Math 6를 마쳐야 합니다. 빠른 경로일수록 초등 3~5학년의 배치가 직접 영향을 줍니다.",
+          "그렇다고 한 번의 배치로 경로가 굳어지는 것은 아닙니다. FCPS는 일반 과정에서도 상위 학년 내용을 확장해 가르치고, 3~6학년 동안 해마다 Advanced Math로 옮겨 갈 수 있게 하겠다고 밝혔습니다. 현재 초등 저학년 학생부터는 6학년을 마칠 때까지 모든 학생이 7학년 기준의 절반 이상을 배우게 한다는 계획도 있습니다. 자녀가 지금 어느 과정에 있는지 확인하는 방법은 아래 글에 정리해 두었습니다.",
+        ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "info",
+          title: "함께 읽으면 좋은 글",
+          text: "Standard 수학과 Advanced(AAP) 수학의 차이, 그리고 자녀의 현재 트랙을 확인하는 방법을 설명합니다.",
+          linkHref: "/blog/fcps-aap-math-guide",
+          linkLabel: "FCPS AAP 수학, 제대로 이해하기",
+        },
+      },
+      {
+        heading: "고등학교에서는 어떻게 이어지나요?",
+        paragraphs: [
+          "Algebra 1 다음에는 보통 Geometry, Algebra 2, Precalculus, AP Calculus 순서로 과목이 이어집니다. 한 해에 한 과목씩 듣는다고 보면 8학년에 Algebra 1을 들은 학생은 12학년에, 7학년에 들은 학생은 11학년에, 6학년에 들은 학생은 10학년에 AP Calculus에 도달합니다.",
+          "FCPS가 목표로 삼는 '8학년 Algebra 1'만으로도 고등학교 졸업 전에 AP Calculus까지 갈 수 있습니다. 더 일찍 시작한 학생은 그 뒤에 AP Statistics나 다변수 미적분 같은 과목을 들을 시간이 생깁니다. 실제 과목 구성은 고등학교와 학생의 선택에 따라 달라집니다. FCPS 웹사이트의 Math Course Explorer에서 6학년 과목부터 차례로 골라 보면 가능한 경로를 직접 확인할 수 있습니다.",
+        ],
+        visual: {
+          type: "pathway",
+          steps: [
+            { label: "Algebra 1" },
+            { label: "Geometry" },
+            { label: "Algebra 2" },
+            { label: "Precalculus" },
+          ],
+          finalLabel: "AP Calculus",
+        },
+      },
+      {
+        heading: "빨리 가는 것이 항상 유리할까요?",
+        paragraphs: [
+          "FCPS는 Math 6 Advanced와 Algebra 1 Honors 사이에서 신중하게 선택하라고 가정에 권합니다. Algebra 1 Honors는 고등학교 학점이 부여되는 과목이어서 성적이 고등학교 성적증명서(transcript)에 남고, 0.5의 가중치가 붙습니다. 이 과목을 고르면 7·8학년 수학 기준을 수업으로 배우지 않고 건너뛰게 되며, 진도도 매우 빠릅니다.",
+          "FCPS는 MAP 평가 리포트(RIT 점수, 백분위, 성장도), 지금까지의 수학 SOL 점수, 교실 평가 결과, 그리고 아이가 그 속도를 따라가는 데 필요한 시간과 노력을 함께 보라고 안내합니다. 점수가 기준을 넘는지 보기 전에, 아이가 비율이나 퍼센트 응용 같은 중간 단계 개념을 자기 말로 설명할 수 있는지 먼저 확인해 보세요.",
+        ],
+        visual: {
+          type: "callout",
+          variant: "mythFact",
+          pairs: [
+            {
+              myth: "Algebra 1은 빨리 들을수록 무조건 유리하다",
+              fact: "Algebra 1 Honors 성적은 고등학교 성적증명서에 남고, 7·8학년 내용을 건너뜁니다. 준비가 덜 된 학생은 한 해 뒤에 듣는 편이 더 좋은 결과로 이어질 수 있습니다.",
+            },
+            {
+              myth: "6학년에 Algebra 1을 못 들으면 이미 늦은 것이다",
+              fact: "FCPS의 목표는 8학년까지 Algebra 1을 마치는 것이며, 그 경로로도 12학년에 AP Calculus를 들을 수 있습니다.",
+            },
+          ],
+        },
+      },
+      {
+        heading: "지금 학부모가 확인할 것",
+        paragraphs: [
+          "배치 기준과 과목 이름은 학년도마다 바뀌고, 학교 웹페이지가 최신 내용을 반영하지 못한 경우도 있습니다. 내년 과목 선택이 다가오기 전에 아래 항목을 미리 확인해 두면 설명회나 상담에서 필요한 질문을 정확히 할 수 있습니다.",
+        ],
+        visual: {
+          type: "checklist",
+          title: "과목 선택 전 체크리스트",
+          items: [
+            { text: "ParentVUE에서 자녀의 현재 수학 과목명 확인", note: "Advanced Math 과정인지 확인" },
+            { text: "수학 교사에게 내년 과목 배치 기준 문의", note: "6학년 Algebra 1 기준은 5학년 때 미리 확인" },
+            { text: "MAP 리포트와 수학 SOL 점수 모아 두기", note: "RIT 점수, 백분위, 성장도" },
+            { text: "FCPS Math Course Explorer로 고등학교까지의 경로 살펴보기" },
+            { text: "진학할 중학교의 과목 설명회(Curriculum Night) 참석" },
+          ],
+        },
+      },
+    ],
+    bodyEn: [
+      {
+        heading: "What Is a Math Pathway?",
+        paragraphs: [
+          "A math pathway is the sequence of math courses a student takes from one grade to the next. In FCPS, one question separates the pathways: the grade in which a student takes Algebra 1. Algebra 1 is the first high school math course, so the year a student takes it sets how far they can go in math before graduation.",
+          "Under its Strategic Plan, FCPS expects every student to complete Algebra 1 by the end of 8th grade. In the last two school years the district has also expanded Algebra 1 in 6th grade, changed the placement rules for 7th grade, and adopted new instructional materials. Advice from parents whose children went through middle school a few years ago may no longer apply. This post reflects FCPS's public information as of October 2026.",
+        ],
+      },
+      {
+        heading: "Three Options in 6th Grade",
+        paragraphs: [
+          "For the 2026-27 school year, FCPS lists three 6th-grade math courses: Math 6, Advanced Math 6 (also written Math 6 Advanced), and Algebra 1 Honors. Math 6 is the grade-level course. Advanced Math 6 covers 7th-grade content and some 8th-grade content. Algebra 1 Honors is a high school course taken in 6th grade, and it is the fastest route.",
+          "Prealgebra, the 7th-grade course, condenses 7th- and 8th-grade math into one year. Prealgebra Honors is open enrollment, meaning any student can sign up, and so is Algebra 1 Honors in 8th grade. A student who takes Math 6 can still reach Algebra 1 Honors by 8th grade. Course offerings vary somewhat by school, so check with the middle school your child will attend.",
+        ],
+        visual: {
+          type: "table",
+          headers: ["6th-grade course", "7th grade", "8th grade"],
+          rows: [
+            { label: "Math 6", values: ["Prealgebra or Prealgebra Honors", "Algebra 1 or Algebra 1 Honors"] },
+            { label: "Advanced Math 6", values: ["Prealgebra Honors or Algebra 1 Honors", "Algebra 1 Honors or Geometry Honors"] },
+            { label: "Algebra 1 Honors", values: ["Geometry Honors", "Algebra 2 Honors (taken at the high school)"] },
+          ],
+        },
+      },
+      {
+        heading: "Algebra 1 in 6th Grade Now Reaches Every Elementary School",
+        paragraphs: [
+          "Until recently, only about 30 sixth graders across all FCPS elementary schools took Algebra 1 in a given year. In fall 2025 FCPS started a pilot in more than one-third of its 142 elementary schools, and more than 700 sixth graders enrolled. For 2026-27 the district extended access to every elementary school. Schools with fewer than 15 students in the course, or with staffing constraints, may teach it through daily virtual instruction.",
+          "In the pilot year, eligibility rested on two measures. Students had to take the 6th-grade math SOL as 5th graders and score Pass Advanced (500 or higher), and they had to reach a threshold score on other math assessments. The criteria may have changed for this year, so families with a 5th grader should ask the school's math staff directly. Courses from Math 6 through Algebra 2 also received new instructional materials this year.",
+        ],
+        visual: {
+          type: "stat",
+          value: "30 → 700+",
+          label: "FCPS sixth graders taking Algebra 1 (before the pilot → first pilot year, 2025-26)",
+          source: "FCPS, October 2025",
+        },
+      },
+      {
+        heading: "Algebra 1 in 7th Grade No Longer Depends on the IAAT",
+        paragraphs: [
+          "For years, a student needed all three of the following to take Algebra 1 Honors in 7th grade: completion of Advanced Math 6, a score at or above the 91st percentile on the Iowa Algebra Aptitude Test (IAAT), and 500 or higher on the 7th-grade math SOL. Many school web pages and parent forum posts still list these requirements.",
+          "FCPS states that starting with the 2025-26 school year, Algebra 1 Honors placement no longer includes IAAT results. The requirement FCPS lists now is completion of Math 6 Advanced. Advanced Math 6 students still take the IAAT in a January-to-March window, and families can use the score as one piece of information when choosing a 7th-grade course. The decision now rests more on a family's judgment than on a cutoff score.",
+        ],
+        visual: {
+          type: "comparison",
+          columns: [
+            { label: "Previous criteria", tone: "standard", points: ["Completed Advanced Math 6", "IAAT at or above the 91st percentile", "500+ on the 7th-grade math SOL"] },
+            { label: "Since 2025-26", tone: "advanced", points: ["Completed Math 6 Advanced", "IAAT results not used for placement, only as a reference for families"] },
+          ],
+        },
+      },
+      {
+        heading: "What Gets Decided in Grades 3-5?",
+        paragraphs: [
+          "FCPS offers Advanced Math courses in grades 3 through 6. To take Algebra 1 in 6th grade, a student has to be far enough ahead to take the 6th-grade math SOL in 5th grade. To take it in 7th grade, a student has to complete Advanced Math 6. The faster the pathway, the more it depends on placement in grades 3-5.",
+          "A single placement decision does not lock in the pathway, though. FCPS says grade-level classes will include extensions into higher-grade content, and that students will be able to move into Advanced Math each year in grades 3-6. For students now in the early elementary grades, the district also plans for every student to have covered at least half of the 7th-grade standards by the end of 6th grade. The post linked below explains how to check which course your child is in now.",
+        ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "info",
+          title: "Related reading",
+          text: "Explains the difference between Standard and Advanced (AAP) math and how to confirm your child's current track.",
+          linkHref: "/en/blog/fcps-aap-math-guide",
+          linkLabel: "Understanding FCPS AAP Math",
+        },
+      },
+      {
+        heading: "How Does This Continue in High School?",
+        paragraphs: [
+          "After Algebra 1, the usual order is Geometry, Algebra 2, Precalculus, and then AP Calculus. At one course per year, a student who takes Algebra 1 in 8th grade reaches AP Calculus in 12th grade. Taking it in 7th grade leads to AP Calculus in 11th, and taking it in 6th grade leads to AP Calculus in 10th.",
+          "The district's target of Algebra 1 in 8th grade is enough to reach AP Calculus before graduation. Students who start earlier have room afterward for courses such as AP Statistics or multivariable calculus. Actual course options depend on the high school and the student's choices. The Math Course Explorer on the FCPS website lets you pick courses year by year, starting in 6th grade, to see the possible pathways.",
+        ],
+        visual: {
+          type: "pathway",
+          steps: [
+            { label: "Algebra 1" },
+            { label: "Geometry" },
+            { label: "Algebra 2" },
+            { label: "Precalculus" },
+          ],
+          finalLabel: "AP Calculus",
+        },
+      },
+      {
+        heading: "Is Faster Always Better?",
+        paragraphs: [
+          "FCPS encourages families to consider their options carefully when choosing between Math 6 Advanced and Algebra 1 Honors. Algebra 1 Honors is a high school credit course. The grade appears on the student's high school transcript and carries an additional 0.5 weight. Choosing it means skipping classroom instruction in the 7th- and 8th-grade math standards, and the course moves at a rapid pace.",
+          "FCPS suggests weighing MAP assessment reports (RIT score, percentile, and growth), past math SOL scores, classroom assessments, and the time and effort your child would need to keep up. Before looking at whether the scores clear a bar, check whether your child can explain the in-between concepts, such as ratios and percent applications, in their own words.",
+        ],
+        visual: {
+          type: "callout",
+          variant: "mythFact",
+          pairs: [
+            {
+              myth: "The earlier a student takes Algebra 1, the better",
+              fact: "The Algebra 1 Honors grade stays on the high school transcript, and the course skips 7th- and 8th-grade content. A student who isn't ready may do better taking it a year later.",
+            },
+            {
+              myth: "A child who doesn't take Algebra 1 in 6th grade is already behind",
+              fact: "FCPS's goal is Algebra 1 by the end of 8th grade, and that pathway still reaches AP Calculus in 12th grade.",
+            },
+          ],
+        },
+      },
+      {
+        heading: "What Parents Should Check Now",
+        paragraphs: [
+          "Placement criteria and course names change from year to year, and school web pages don't always reflect the latest version. Checking the items below before course selection begins will help you ask the right questions at curriculum nights and conferences.",
+        ],
+        visual: {
+          type: "checklist",
+          title: "Before course selection",
+          items: [
+            { text: "Check your child's current math course name in ParentVUE", note: "Confirm whether it is an Advanced Math course" },
+            { text: "Ask the math teacher about next year's placement criteria", note: "For Algebra 1 in 6th grade, ask during 5th grade" },
+            { text: "Gather MAP reports and math SOL scores", note: "RIT score, percentile, and growth" },
+            { text: "Explore pathways through high school with the FCPS Math Course Explorer" },
+            { text: "Attend the curriculum night at the middle school your child will attend" },
+          ],
+        },
+      },
+    ],
+  },
 ];
 
 export function getBlogPost(slug: string): BlogPost | undefined {

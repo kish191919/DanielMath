@@ -1,7 +1,7 @@
 const ko = {
   meta: {
     description:
-      "페어팩스 3-6학년 대상 4명 소수정예 맞춤수학 아카데미. 진단부터 수준별 학습, 오답 관리, 사고력 확장까지 — AAP 수준의 심화 사고력을 기르는 한인 수학 공부방.",
+      "버지니아 페어팩스(Fairfax) 한인 초등수학 학원. 3-6학년 4명 소수정예 맞춤수학으로 FCPS 초등수학·AAP 수학 심화부터 MOEMS·AMC 8 경시대회 준비까지, 과외처럼 꼼꼼하게 진도와 오답을 관리합니다.",
   },
   nav: {
     programs: "프로그램",
@@ -13,15 +13,15 @@ const ko = {
   },
   home: {
     meta: {
-      title: "페어팩스 소수정예 맞춤수학 | Daniel Math",
+      title: "버지니아 페어팩스 초등 맞춤수학 학원 | 다니엘 수학 아카데미 Daniel Math",
     },
     hero: {
-      badge: "FAIRFAX, VA · 초등 3–6학년 수학",
-      h1line1: "4명 소수정예",
-      h1highlight: "맞춤형",
-      h1line2: "초등 수학 아카데미.",
+      badge: "버지니아 페어팩스 · 한인 초등수학 3–6학년",
+      h1line1: "페어팩스 초등 맞춤수학",
+      h1highlight: "4명 소수정예",
+      h1line2: "수학 아카데미.",
       subtitle: "진단 → 개념 학습 → 오답 관리 → 사고력 확장",
-      desc: "배치 진단을 바탕으로 학생별 수준과 학습 속도에 맞춰 개념·연산·문제해결력을 체계적으로 지도합니다.",
+      desc: "다니엘 수학 아카데미(Daniel Math)는 버지니아 페어팩스의 한인 초등 수학 학원입니다. 배치 진단을 바탕으로 학생별 수준과 학습 속도에 맞춰 개념·연산·문제해결력을 체계적으로 지도합니다.",
       ctaInquire: "상담 신청",
       ctaPrograms: "프로그램 보기",
     },
@@ -38,7 +38,7 @@ const ko = {
       desc: "배치 진단으로 실력을 파악한 뒤 학생 개인의 실력에 맞춘 학습지로 진행하고, 오답을 기록해 다시 확인합니다.",
       h3en: "Leveled to each student's ability.",
       h3ko: "실력에 맞춘 눈높이 학습",
-      body: "처음 등록 시 배치 진단으로 실력을 파악한 뒤, 학생 개인의 실력에 맞춘 학습지와 문제집으로 진행합니다. 매 수업은 지난 시간 오답·약점 복습 및 수학 올림피아드 문제 풀이(20분) → 수준에 맞는 정규 문제집(40분) → 수학 교구·보드게임 또는 보충(10분) 순으로 70분간 진행됩니다.",
+      body: "처음 등록 시 배치 진단으로 실력을 파악한 뒤, 학생 개인의 실력에 맞춘 학습지와 문제집으로 진행합니다. 매 수업은 지난 시간 오답·약점 복습 및 수학 올림피아드 문제 풀이(20분) → 수준에 맞는 정규 문제집(50분) 순으로 70분간 진행됩니다.",
       classSize: { label: "정원", value: "회당 최대 4명", sublabel: "" },
       time: { label: "요일", value: "월·화·목·금", sublabel: "주 1~4회 중 선택" },
       schedule: {
@@ -89,11 +89,10 @@ const ko = {
       eyebrow: "수업 방식",
       title: "70분, 오답 관리부터 개념 체화까지",
       titleKo: "",
-      desc: "매 수업은 오답 복습·올림피아드(20분) → 수준별 문제풀이(40분) → 교구·보드게임(10분) 순으로 진행됩니다.",
+      desc: "매 수업은 오답 복습·올림피아드(20분) → 수준별 문제풀이(50분) 순으로 진행됩니다.",
       steps: [
         { title: "Mistake Review", titleKo: "오답 복습·올림피아드 (20분)", desc: "지난 오답을 재확인하고 수학 올림피아드 문제 2~3문제로 사고력을 확장" },
-        { title: "Leveled Practice", titleKo: "수준별 문제풀이 (40분)", desc: "실력에 맞춘 정규 문제집으로 개념 완성" },
-        { title: "Hands-on Learning", titleKo: "교구·보드게임 (10분)", desc: "교구·보드게임으로 재미있게 체화" },
+        { title: "Leveled Practice", titleKo: "수준별 문제풀이 (50분)", desc: "실력에 맞춘 정규 문제집으로 개념 완성" },
       ],
     },
     curriculum: {
@@ -109,6 +108,54 @@ const ko = {
         { label: "Common Core", sublabel: "학년별 진도" },
       ],
     },
+    about: {
+      eyebrow: "다니엘 수학 아카데미 소개",
+      title: "버지니아 페어팩스 한인 초등수학 학원",
+      paragraphs: [
+        "다니엘 수학 아카데미(Daniel Math Academy)는 버지니아 페어팩스(Fairfax, VA)에서 한인 가정의 초등 3–6학년 학생을 가르치는 수학 학원입니다. 한 반 최대 4명의 소수정예로 운영해, 수학 과외처럼 학생마다 다른 교재와 진도로 수업하는 맞춤수학을 지향합니다.",
+        "학교 수업(FCPS 초등수학)과 AAP 수학 심화 과정을 탄탄하게 따라갈 수 있도록 개념을 다지고, 매 수업 수학 올림피아드 문제로 사고력을 넓힙니다. MOEMS·AMC 8 같은 수학 경시대회를 준비하는 학생도 수준에 맞춰 지도합니다.",
+      ],
+      areasLabel: "페어팩스 인근 지역",
+      areasNote: "북버지니아(Northern Virginia) 일대 · 정확한 주소는 상담 시 안내",
+      linksLabel: "학부모 가이드",
+      links: [
+        { href: "/resources/curriculum", label: "FCPS 초등수학 커리큘럼" },
+        { href: "/blog/fcps-aap-math-guide", label: "FCPS AAP 수학 가이드" },
+        { href: "/resources/sol", label: "버지니아 수학 기준 (Virginia SOL)" },
+        { href: "/resources/testing/moems", label: "MOEMS 수학 올림피아드" },
+        { href: "/resources/testing/amc-8", label: "AMC 8 수학 경시대회" },
+      ],
+    },
+    faq: {
+      eyebrow: "FAQ",
+      title: "자주 묻는 질문",
+      items: [
+        {
+          q: "다니엘 수학 아카데미는 어디에 있나요?",
+          a: "버지니아 페어팩스(Fairfax, VA 22030)에 있습니다. Oakton, Vienna, Fairfax Station, Annandale, Centreville, Chantilly 등 북버지니아 인근 지역 학생도 등록할 수 있으며, 정확한 주소는 상담 시 안내해 드립니다.",
+        },
+        {
+          q: "몇 학년이 대상이고, 한 반은 몇 명인가요?",
+          a: "초등 3–6학년이 대상이며 한 반 정원은 최대 4명입니다. 월·화·목·금 오후 5:00–6:10, 6:30–7:40 두 교시 중에서 요일과 횟수(주 1~4회)를 선택할 수 있고, 수업은 1회 70분입니다.",
+        },
+        {
+          q: "버지니아에서 수학 과외를 알아보고 있는데, 과외와 무엇이 다른가요?",
+          a: "1:1 수학 과외는 아니지만, 최대 4명의 소수정예 수업이라 과외처럼 학생마다 다른 교재와 진도로 진행합니다. 처음에 배치 진단으로 실력을 파악하고, 매 수업 오답을 기록해 다시 확인하며, 선생님이 직접 확인한 학습 리포트를 학부모님께 전달합니다.",
+        },
+        {
+          q: "FCPS AAP 수학(심화)을 따라가는 데 도움이 되나요?",
+          a: "AAP 수학은 한 학년 높은 Virginia SOL 내용을 배우기 때문에 개념 이해와 사고력이 함께 필요합니다. 학생 수준에 맞춘 교재(IXL Math·Singapore Math·Beast Academy)로 개념을 다지고 수학 올림피아드 문제로 사고력을 넓혀, AAP 진입과 유지를 모두 지원합니다.",
+        },
+        {
+          q: "MOEMS나 AMC 8 같은 수학 경시대회도 준비할 수 있나요?",
+          a: "매 수업의 첫 20분은 지난 오답 복습과 수학 올림피아드 문제 2~3문제 풀이에 사용합니다. MOEMS·AMC 8을 준비하는 학생은 문제 풀이 전략부터 실전 감각까지 수준에 맞춰 지도합니다.",
+        },
+        {
+          q: "상담과 배치 진단은 어떻게 신청하나요?",
+          a: "상담 신청 페이지에 자녀의 학년과 현재 수준을 남겨주시면 24시간 내 회신드립니다. 상담과 배치 진단은 무료입니다.",
+        },
+      ],
+    },
     cta: {
       titleEn: "Ready to start?",
       titleKo: "지금 바로 상담 신청하세요.",
@@ -120,7 +167,7 @@ const ko = {
   },
   schoolCalendar: {
     meta: {
-      title: "학교 캘린더",
+      title: "FCPS 학교 캘린더 | 학사 일정",
       description: "Fairfax County 공립학교(FCPS) 학사 일정을 한국어로 확인하세요. 방학·공휴일·분기 마감일 등 주요 날짜를 한눈에 볼 수 있습니다.",
     },
     eyebrow: "FCPS 학사 일정",
@@ -139,8 +186,8 @@ const ko = {
   },
   programs: {
     meta: {
-      title: "프로그램",
-      description: "3-6학년 학생을 위한 4명 소수정예 맞춤수학 수업. 배치 진단으로 실력을 파악해 눈높이에 맞춘 교재와 학습지로 진행합니다.",
+      title: "초등 맞춤수학 프로그램 | 3-6학년 4명 소수정예",
+      description: "버지니아 페어팩스 초등 3-6학년 학생을 위한 4명 소수정예 맞춤수학 수업. 배치 진단으로 실력을 파악해 눈높이에 맞춘 교재와 학습지로 진행합니다.",
     },
     header: {
       eyebrow: "프로그램",
@@ -205,8 +252,8 @@ const ko = {
   },
   inquire: {
     meta: {
-      title: "상담 신청",
-      description: "Daniel Math Academy 무료 상담 신청. 자녀의 학년과 현재 수준을 알려주시면 24시간 내 회신드립니다.",
+      title: "무료 상담·진단 신청",
+      description: "다니엘 수학 아카데미(Daniel Math Academy) 무료 상담 신청. 자녀의 학년과 현재 수준을 알려주시면 24시간 내 회신드립니다.",
     },
     eyebrow: "상담 신청",
     title: "자녀에 대해 알려주세요",
@@ -250,8 +297,8 @@ const ko = {
   resources: {
     hub: {
       meta: {
-        title: "버지니아 수학 교육과정 | FCPS AAP 커리큘럼",
-        description: "버지니아 수학 커리큘럼 안내: Fairfax County (FCPS) 초등 수학, 학년별 일반·심화(AAP) 비교, Virginia SOL 기준, 시험 일정을 한국어로 정리했습니다.",
+        title: "버지니아 수학 교육과정 | FCPS 초등수학·AAP 수학",
+        description: "버지니아 수학 커리큘럼 안내: Fairfax County(FCPS) 초등수학, 학년별 일반·AAP 수학(심화) 비교, Virginia SOL 기준, 시험·경시대회 일정을 한국어로 정리했습니다.",
       },
       badge: "버지니아 수학 자료",
       title: "수학 교육과정",
@@ -307,8 +354,8 @@ const ko = {
   },
   blog: {
     meta: {
-      title: "블로그",
-      description: "Fairfax 지역 학부모를 위한 수학 교육 정보 블로그. AAP, CogAT/NNAT, 교재, 경시대회, 가정 학습 전략을 쉽게 풀어드립니다.",
+      title: "수학 교육 블로그 | FCPS 초등수학·AAP 수학",
+      description: "버지니아 Fairfax 지역 학부모를 위한 수학 교육 블로그. FCPS 초등수학, AAP 수학, NGAT(구 CogAT·NNAT), 교재, 수학 경시대회, 가정 학습 전략을 쉽게 풀어드립니다.",
     },
     eyebrow: "블로그",
     title: "수학 교육 이야기",

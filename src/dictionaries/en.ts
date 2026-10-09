@@ -3,7 +3,7 @@ import type { Dictionary } from './ko'
 const en: Dictionary = {
   meta: {
     description:
-      "A small-group, personalized math enrichment academy in Fairfax, VA for grades 3–6 — only 4 students per class. From diagnostic assessment to leveled practice and mistake tracking, building the depth of thinking AAP-level math requires. Mon/Tue/Thu/Fri.",
+      "Daniel Math Academy is a small-group elementary math academy in Fairfax, VA for grades 3–6 — only 4 students per class. Personalized, leveled practice for FCPS and AAP math, plus MOEMS and AMC 8 problem solving.",
   },
   nav: {
     programs: "Programs",
@@ -15,7 +15,7 @@ const en: Dictionary = {
   },
   home: {
     meta: {
-      title: "Small-Group Math Enrichment in Fairfax, VA | Daniel Math",
+      title: "Daniel Math Academy | Small-Group Elementary Math in Fairfax, VA",
     },
     hero: {
       badge: "Fairfax, VA · Elementary Math, Grades 3–6",
@@ -23,7 +23,7 @@ const en: Dictionary = {
       h1highlight: "Personalized",
       h1line2: "Elementary Math Academy.",
       subtitle: "Diagnostic → Concept Learning → Mistake Management → Deeper Reasoning",
-      desc: "Based on a placement diagnostic, we systematically build each student's concepts, computation, and problem-solving at their own level and pace.",
+      desc: "Daniel Math Academy is a Korean-American elementary math academy in Fairfax, Virginia. Based on a placement diagnostic, we systematically build each student's concepts, computation, and problem-solving at their own level and pace.",
       ctaInquire: "Schedule a Consult",
       ctaPrograms: "View Program",
     },
@@ -40,7 +40,7 @@ const en: Dictionary = {
       desc: "Each student's worksheets are matched to their own ability, and we track mistakes to revisit them.",
       h3en: "Leveled to each student's ability.",
       h3ko: "",
-      body: "A one-time placement diagnostic determines each student's ability level. Every 70-minute session runs at each student's own pace with materials matched to their level: mistake review and 2–3 math olympiad problems (20 min) → leveled practice with regular workbooks (40 min) → math manipulatives, board games, or reinforcement (10 min).",
+      body: "A one-time placement diagnostic determines each student's ability level. Every 70-minute session runs at each student's own pace with materials matched to their level: mistake review and 2–3 math olympiad problems (20 min) → leveled practice with regular workbooks (50 min).",
       classSize: { label: "Class Size", value: "Up to 4 students", sublabel: "" },
       time: { label: "Days", value: "Mon/Tue/Thu/Fri", sublabel: "1–4 sessions/week" },
       schedule: {
@@ -89,13 +89,12 @@ const en: Dictionary = {
     },
     how: {
       eyebrow: "How It Works",
-      title: "70 minutes: from mistake review to hands-on learning.",
+      title: "70 minutes: from mistake review to concept mastery.",
       titleKo: "",
-      desc: "Every session runs mistake review & olympiad problems (20 min) → leveled practice (40 min) → manipulatives & board games (10 min).",
+      desc: "Every session runs mistake review & olympiad problems (20 min) → leveled practice (50 min).",
       steps: [
         { title: "Mistake Review", titleKo: "", desc: "Revisit past mistakes and solve 2–3 math olympiad problems" },
         { title: "Leveled Practice", titleKo: "", desc: "Master concepts at each student's level" },
-        { title: "Hands-on Learning", titleKo: "", desc: "Manipulatives and board games" },
       ],
     },
     curriculum: {
@@ -111,6 +110,54 @@ const en: Dictionary = {
         { label: "Common Core", sublabel: "Grade-level standards" },
       ],
     },
+    about: {
+      eyebrow: "About Daniel Math Academy",
+      title: "An elementary math academy in Fairfax, Virginia",
+      paragraphs: [
+        "Daniel Math Academy teaches math to students in grades 3–6 from Korean-American families in Fairfax, VA. Classes are capped at 4 students, so each child works with their own materials at their own pace — the attention of a private math tutor in a small-group setting.",
+        "We build the foundations students need for FCPS elementary math and Advanced (AAP) math, and stretch their reasoning with math olympiad problems every session. Students preparing for competitions such as MOEMS and AMC 8 are coached at their own level.",
+      ],
+      areasLabel: "Nearby areas",
+      areasNote: "Northern Virginia · exact location shared upon inquiry",
+      linksLabel: "Parent guides",
+      links: [
+        { href: "/resources/curriculum", label: "FCPS Elementary Math Curriculum" },
+        { href: "/blog/fcps-aap-math-guide", label: "FCPS AAP Math Guide" },
+        { href: "/resources/sol", label: "Virginia SOL Math Standards" },
+        { href: "/resources/testing/moems", label: "MOEMS Math Olympiad" },
+        { href: "/resources/testing/amc-8", label: "AMC 8 Math Competition" },
+      ],
+    },
+    faq: {
+      eyebrow: "FAQ",
+      title: "Frequently Asked Questions",
+      items: [
+        {
+          q: "Where is Daniel Math Academy located?",
+          a: "We are in Fairfax, VA 22030. Students from nearby Northern Virginia communities — Oakton, Vienna, Fairfax Station, Annandale, Centreville, and Chantilly — are welcome to enroll. The exact address is shared when you inquire.",
+        },
+        {
+          q: "Which grades do you teach, and how large are the classes?",
+          a: "We teach grades 3–6, with at most 4 students per class. Sessions run Monday, Tuesday, Thursday, and Friday at 5:00–6:10 PM and 6:30–7:40 PM. You choose the days and how often to attend (1–4 sessions a week); each session is 70 minutes.",
+        },
+        {
+          q: "How is this different from a private math tutor?",
+          a: "It is not one-on-one tutoring, but with at most 4 students per class, each student still works through their own textbooks at their own pace. We start with a placement diagnostic, record mistakes every session and revisit them, and send parents a teacher-reviewed progress report.",
+        },
+        {
+          q: "Will this help my child keep up with FCPS Advanced (AAP) math?",
+          a: "AAP math covers Virginia SOL content one grade level ahead, so it takes both solid concepts and strong reasoning. We build concepts with materials matched to each student (IXL Math, Singapore Math, Beast Academy) and stretch reasoning with math olympiad problems, supporting both AAP placement and retention.",
+        },
+        {
+          q: "Do you prepare students for math competitions like MOEMS and AMC 8?",
+          a: "The first 20 minutes of every session go to reviewing past mistakes and solving 2–3 math olympiad problems. Students preparing for MOEMS or AMC 8 are coached at their own level, from problem-solving strategies to contest-day readiness.",
+        },
+        {
+          q: "How do I schedule a consultation and placement diagnostic?",
+          a: "Share your child's grade and current level on the inquiry page and we will reply within 24 hours. The consultation and placement diagnostic are free.",
+        },
+      ],
+    },
     cta: {
       titleEn: "Ready to start?",
       titleKo: "Schedule your consult today.",
@@ -122,7 +169,7 @@ const en: Dictionary = {
   },
   schoolCalendar: {
     meta: {
-      title: "School Calendar",
+      title: "FCPS School Calendar",
       description: "FCPS school year calendar — key dates for Fairfax County Public Schools including breaks, holidays, and quarter end dates.",
     },
     eyebrow: "FCPS School Year",
@@ -141,8 +188,8 @@ const en: Dictionary = {
   },
   programs: {
     meta: {
-      title: "Program",
-      description: "Small-group math classes for grades 3–6 — only 4 students per class. Each student works through textbooks and worksheets matched to their own ability level.",
+      title: "Math Program for Grades 3–6 | Small Groups of 4",
+      description: "Small-group math classes in Fairfax, VA for grades 3–6 — only 4 students per class. Each student works through textbooks and worksheets matched to their own ability level.",
     },
     header: {
       eyebrow: "Program",
@@ -309,8 +356,8 @@ const en: Dictionary = {
   },
   blog: {
     meta: {
-      title: "Blog",
-      description: "Math education resources for parents in the Fairfax area — AAP, CogAT/NNAT, curriculum, competitions, and home learning strategies explained clearly.",
+      title: "Math Education Blog for Fairfax Parents",
+      description: "Math education resources for parents in the Fairfax area — FCPS elementary math, AAP math, the NGAT (formerly CogAT/NNAT), curriculum, competitions, and home learning strategies explained clearly.",
     },
     eyebrow: "Blog",
     title: "Math Education Insights",
