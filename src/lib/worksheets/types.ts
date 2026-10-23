@@ -70,7 +70,10 @@ export type WorksheetDef = {
   conceptCode: string;
   /** FCPS Standard-track quarter in which the topic is taught. */
   quarter?: Quarter;
-  /** Allowed problem counts, ascending; the middle one is the default. */
+  /**
+   * Allowed problem counts, ascending; the middle one is the default. Each is a
+   * multiple of `columns` and was measured to print on a single Letter page.
+   */
   counts: readonly number[];
   columns: 2 | 3 | 4;
   generate: (rng: Rng, level: Level) => WorksheetProblem;

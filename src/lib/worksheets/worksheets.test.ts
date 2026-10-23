@@ -206,6 +206,14 @@ describe("worksheet catalog", () => {
     expect(new Set(keys).size).toBe(keys.length);
   });
 
+  it("offers three ascending counts that fill whole rows", () => {
+    for (const def of WORKSHEETS) {
+      expect(def.counts, def.slug).toHaveLength(3);
+      expect([...def.counts].sort((a, b) => a - b), def.slug).toEqual([...def.counts]);
+      for (const c of def.counts) expect(c % def.columns, `${def.slug} ${c}`).toBe(0);
+    }
+  });
+
   it("resolves grade slugs strictly", () => {
     expect(parseGradeSlug("grade-4")).toBe(4);
     expect(parseGradeSlug("grade-2")).toBeNull();

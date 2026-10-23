@@ -16,7 +16,7 @@ const PROBLEM_GRID: Record<WorksheetDef["columns"], string> = {
 
 function SheetFooter({ seed }: { seed: string }) {
   return (
-    <p className="mt-10 text-center text-[10px] text-navy-400">
+    <p className="mt-10 text-center text-[10px] text-navy-400 print:mt-6">
       {siteConfig.name} · {siteConfig.url.replace(/^https?:\/\//, "")} · Worksheet #{seed}
     </p>
   );
@@ -81,7 +81,7 @@ export async function WorksheetSheet({
 
       <p className="mt-4 text-sm font-medium text-navy-800">{def.instructions}</p>
 
-      <ol className={cn("mt-6 grid gap-x-6 gap-y-10", PROBLEM_GRID[def.columns])}>
+      <ol className={cn("mt-6 grid gap-x-6 gap-y-10 print:gap-y-8", PROBLEM_GRID[def.columns])}>
         {problems.map((p, i) => (
           <li key={i} className="flex min-w-0 break-inside-avoid gap-2 [page-break-inside:avoid]">
             <span className="w-6 shrink-0 pt-1 text-right text-sm font-semibold text-navy-500">{i + 1}.</span>

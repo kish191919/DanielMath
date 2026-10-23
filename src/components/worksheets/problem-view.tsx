@@ -69,7 +69,7 @@ export function ProblemView({ body }: { body: ProblemBody }) {
             <span className="pr-1.5 pt-1">{body.divisor}</span>
             <span className="rounded-tl-xl border-l-2 border-t-2 border-navy-900 pl-2 pr-2 pt-1">{body.dividend}</span>
           </div>
-          <div className="h-24" />
+          <div className="h-20" />
         </div>
       );
 

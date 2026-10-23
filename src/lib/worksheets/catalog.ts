@@ -98,7 +98,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "수·연산",
     conceptCode: "ops-mult-facts",
     quarter: "Q2",
-    counts: [20, 30, 40],
+    counts: [16, 24, 32],
     columns: 4,
     generator: facts,
     levels: {
@@ -119,7 +119,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "수·연산",
     conceptCode: "ops-division-basic",
     quarter: "Q2",
-    counts: [20, 30, 40],
+    counts: [16, 24, 32],
     columns: 4,
     generator: facts,
     levels: {
@@ -140,7 +140,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "분수",
     conceptCode: "frac-basic-concept",
     quarter: "Q3",
-    counts: [9, 12, 15],
+    counts: [6, 9, 12],
     columns: 3,
     generator: fractionModel,
     levels: {
@@ -182,7 +182,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "측정",
     conceptCode: "meas-time-elapsed",
     quarter: "Q4",
-    counts: [9, 12, 15],
+    counts: [6, 9, 12],
     columns: 3,
     generator: tellingTime,
     levels: { 1: { minuteStep: 30 }, 2: { minuteStep: 5 }, 3: { minuteStep: 1 } },
@@ -201,7 +201,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "수·연산",
     conceptCode: "ns-place-value",
     quarter: "Q1",
-    counts: [10, 16, 20],
+    counts: [6, 8, 10],
     columns: 2,
     generator: rounding,
     levels: {
@@ -222,7 +222,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "수·연산",
     conceptCode: "ops-mult-facts",
     quarter: "Q2",
-    counts: [20, 30, 40],
+    counts: [16, 24, 32],
     columns: 4,
     generator: facts,
     levels: {
@@ -264,7 +264,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "수·연산",
     conceptCode: "ops-division-long",
     quarter: "Q2",
-    counts: [9, 12, 15],
+    counts: [6, 9, 12],
     columns: 3,
     generator: longDivision,
     levels: {
@@ -285,7 +285,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "수·연산",
     conceptCode: "ns-factors-gcf",
     quarter: "Q2",
-    counts: [8, 10, 12],
+    counts: [6, 8, 10],
     columns: 2,
     generator: factorsGcf,
     levels: {
@@ -434,7 +434,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "수·연산",
     conceptCode: "ns-prime-composite",
     quarter: "Q1",
-    counts: [10, 14, 20],
+    counts: [8, 12, 14],
     columns: 2,
     generator: primeFactorization,
     levels: {
@@ -476,7 +476,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "소수",
     conceptCode: "dec-mult",
     quarter: "Q2",
-    counts: [12, 16, 20],
+    counts: [8, 12, 16],
     columns: 4,
     generator: multiplyDecimals,
     levels: {
@@ -497,7 +497,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "소수",
     conceptCode: "dec-div",
     quarter: "Q2",
-    counts: [9, 12, 15],
+    counts: [6, 9, 12],
     columns: 3,
     generator: divideDecimals,
     levels: {
@@ -541,7 +541,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "수·연산",
     conceptCode: "ns-lcm-lcd",
     quarter: "Q1",
-    counts: [10, 14, 20],
+    counts: [6, 8, 10],
     columns: 2,
     generator: gcfLcm,
     levels: {
@@ -562,7 +562,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "수·연산",
     conceptCode: "ops-negative-numbers",
     quarter: "Q3",
-    counts: [15, 21, 30],
+    counts: [12, 18, 24],
     columns: 3,
     generator: integerOperations,
     levels: {
@@ -625,7 +625,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "대수·패턴",
     conceptCode: "alg-equations-basic",
     quarter: "Q3",
-    counts: [12, 18, 24],
+    counts: [12, 18, 21],
     columns: 3,
     generator: oneStepEquations,
     levels: {

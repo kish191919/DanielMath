@@ -64,6 +64,11 @@ export function SiteHeader({ locale }: { locale: Locale }) {
     ? `/en${pathname === "/" ? "" : pathname}`
     : pathname.replace(/^\/en/, "") || "/";
 
+  // The English labels are wider: the full nav fits on one line from 1024px in
+  // Korean but needs 1280px in English, so the hamburger menu covers the gap.
+  const desktopNav = isKo ? "lg:flex" : "xl:flex";
+  const mobileOnly = isKo ? "lg:hidden" : "xl:hidden";
+
   return (
     <header className="sticky top-0 z-40 w-full border-b border-navy-100 bg-white/85 backdrop-blur supports-[backdrop-filter]:bg-white/70 print:hidden">
       <Container>
@@ -82,12 +87,12 @@ export function SiteHeader({ locale }: { locale: Locale }) {
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-1 md:flex">
+          <nav className={cn("hidden items-center gap-1", desktopNav)}>
             {siteConfig.nav.map((item) => (
               <Link
                 key={item.href}
                 href={lp(item.href)}
-                className="rounded-md px-3 py-2 text-sm font-medium text-navy-700 hover:bg-navy-50 hover:text-navy-900"
+                className="whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-navy-700 hover:bg-navy-50 hover:text-navy-900"
                 lang={isKo ? "ko" : undefined}
               >
                 {isKo ? item.labelKo : item.label}
@@ -104,7 +109,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
             </div>
           </nav>
 
-          <div className="flex items-center gap-1 md:hidden">
+          <div className={cn("flex items-center gap-1", mobileOnly)}>
             <LocaleToggle isKo={isKo} altHref={altHref} />
             <button
               type="button"
@@ -121,7 +126,8 @@ export function SiteHeader({ locale }: { locale: Locale }) {
 
       <div
         className={cn(
-          "border-t border-navy-100 bg-white md:hidden",
+          "border-t border-navy-100 bg-white",
+          mobileOnly,
           open ? "block" : "hidden",
         )}
       >
