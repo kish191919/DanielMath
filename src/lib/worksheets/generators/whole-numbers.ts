@@ -1,6 +1,6 @@
 import { pick, randDigits, randInt } from "../rng";
-import { formatNumber, latexNumber } from "../math";
-import type { Generator } from "../types";
+import { formatNumber, latexNumber, numberToWords } from "../math";
+import type { Generator, NumberForm } from "../types";
 
 export const placeValue: Generator<{ digits: readonly [number, number] }> = (rng, { digits }) => {
   const len = randInt(rng, digits[0], digits[1]);
@@ -80,4 +80,81 @@ export const compareWhole: Generator<{ digits: number; close: boolean }> = (rng,
     answer: symbol,
     meta: { type: "compare", left: [a, 1], right: [b, 1], symbol },
   };
+};
+
+/** Nonzero place values of n, largest first: 4305 → [4000, 300, 5]. */
+function expandedParts(n: number): number[] {
+  const digits = [...String(n)];
+  return digits.map((d, i) => Number(d) * 10 ** (digits.length - 1 - i)).filter((v) => v > 0);
+}
+
+// Each term is its own `$...$` span, so a long expansion wraps between terms
+// instead of running out of the cell.
+function expandedLatex(n: number): string {
+  const parts = expandedParts(n);
+  return parts.map((p, i) => `$${latexNumber(p)}${i < parts.length - 1 ? " +" : ""}$`).join(" ");
+}
+
+type NumberFormTask = "to-expanded" | "to-standard" | "word-to-standard" | "to-word";
+
+const FORM_TASKS: Record<NumberFormTask, { from: NumberForm; to: NumberForm }> = {
+  "to-expanded": { from: "standard", to: "expanded" },
+  "to-standard": { from: "expanded", to: "standard" },
+  "word-to-standard": { from: "word", to: "standard" },
+  "to-word": { from: "standard", to: "word" },
+};
+
+export const numberForms: Generator<{ tasks: readonly NumberFormTask[]; digits: readonly [number, number] }> = (
+  rng,
+  { tasks, digits },
+) => {
+  const task = pick(rng, tasks);
+  let n: number;
+  do {
+    const s = [...String(randDigits(rng, randInt(rng, digits[0], digits[1])))];
+    // Half the numbers get a zero digit — the place that drops out of the
+    // expanded form is the point of the exercise.
+    if (rng() < 0.5) s[randInt(rng, 1, s.length - 1)] = "0";
+    n = Number(s.join(""));
+  } while (expandedParts(n).length < 2);
+
+  const standard = `$${latexNumber(n)}$`;
+  const shown = { standard, expanded: expandedLatex(n), word: numberToWords(n) };
+  const { from, to } = FORM_TASKS[task];
+
+  return {
+    body: { kind: "text", text: `Write in ${to} form: ${shown[from]}`, blank: "line" },
+    answer: shown[to],
+    meta: { type: "number-form", n, from, to },
+  };
+};
+
+export const estimate: Generator<{
+  cases: readonly { digits: number; place: number; op: "+" | "-" | "*" }[];
+}> = (rng, { cases }) => {
+  const { digits, place, op } = pick(rng, cases);
+  const roundTo = (n: number) => Math.round(n / place) * place;
+  for (;;) {
+    let a = randDigits(rng, digits);
+    // Products round only the big factor: 48 × 7 → 50 × 7.
+    let b = op === "*" ? randInt(rng, 3, 9) : randDigits(rng, digits);
+    // A number that is already round skips the step being practiced.
+    if (a % place === 0 || (op !== "*" && b % place === 0)) continue;
+    if (op === "-" && a < b) [a, b] = [b, a];
+    const ra = roundTo(a);
+    const rb = op === "*" ? b : roundTo(b);
+    if (op === "-" && ra <= rb) continue;
+    const result = op === "+" ? ra + rb : op === "-" ? ra - rb : ra * rb;
+    const sym = op === "*" ? "\\times" : op;
+
+    return {
+      body: {
+        kind: "text",
+        text: `Nearest ${PLACE_NAMES[place]}: $${latexNumber(a)} ${sym} ${latexNumber(b)}$`,
+        blank: "line",
+      },
+      answer: `$${latexNumber(ra)} ${sym} ${latexNumber(rb)} = ${latexNumber(result)}$`,
+      meta: { type: "estimate", op, a, b, place, result },
+    };
+  }
 };

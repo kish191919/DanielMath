@@ -30,6 +30,40 @@ export function latexNumber(n: number): string {
   return formatNumber(n).replace(/,/g, "{,}");
 }
 
+/**
+ * A dollar amount for use inside `$...$`. A bare `$` can't appear in sheet
+ * text — MathText would pair it up as a math delimiter.
+ */
+export function moneyLatex(cents: number): string {
+  return `\\text{\\textdollar}${Math.floor(cents / 100)}.${String(cents % 100).padStart(2, "0")}`;
+}
+
+const ONES = [
+  "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+  "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen",
+];
+const TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+
+function wordsBelowThousand(n: number): string {
+  const words: string[] = [];
+  if (n >= 100) words.push(`${ONES[Math.floor(n / 100)]} hundred`);
+  const rest = n % 100;
+  if (rest >= 20) words.push(TENS[Math.floor(rest / 10)] + (rest % 10 ? `-${ONES[rest % 10]}` : ""));
+  else if (rest > 0) words.push(ONES[rest]);
+  return words.join(" ");
+}
+
+/** US word form, no "and": 42605 → "forty-two thousand, six hundred five". Up to 999,999. */
+export function numberToWords(n: number): string {
+  if (n === 0) return "zero";
+  const thousands = Math.floor(n / 1000);
+  const rest = n % 1000;
+  const parts: string[] = [];
+  if (thousands) parts.push(`${wordsBelowThousand(thousands)} thousand`);
+  if (rest) parts.push(wordsBelowThousand(rest));
+  return parts.join(", ");
+}
+
 // ── Fractions ────────────────────────────────────────────────────────────────
 
 export function simplify([n, d]: Rational): Rational {

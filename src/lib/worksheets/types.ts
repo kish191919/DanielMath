@@ -47,7 +47,57 @@ export type ProblemMeta =
   // it equal `rhs`.
   | { type: "equation"; variable: string; lhs: string; rhs: number; solution: number }
   | { type: "stats"; data: number[]; mean: number; median: number; mode: number; range: number }
-  | { type: "clock"; hour: number; minute: number };
+  | { type: "clock"; hour: number; minute: number }
+  | { type: "number-form"; n: number; from: NumberForm; to: NumberForm }
+  // Times are minutes after midnight.
+  | { type: "elapsed-time"; start: number; end: number; unknown: "elapsed" | "start" | "end" }
+  // `items` are [value in cents, how many]; with `paid`, the answer is the change.
+  | { type: "money"; items: [number, number][]; paid: number | null; result: number }
+  | { type: "estimate"; op: "+" | "-" | "*"; a: number; b: number; place: number; result: number }
+  // `values` in the order printed on the sheet.
+  | { type: "order"; values: Rational[]; direction: "asc" | "desc" }
+  | { type: "pattern"; terms: number[]; rule: PatternRule; missing: number[] }
+  | { type: "function-table"; inputs: number[]; outputs: number[]; rule: PatternRule; missing: number[] }
+  | { type: "convert"; value: Rational; to: "mixed" | "improper" | "decimal" | "fraction" | "percent" }
+  // Decimal strings, each with its unit; `from` and `result` describe the same amount.
+  | { type: "unit-convert"; from: [string, string][]; result: [string, string][] }
+  | {
+      type: "probability";
+      outcomes: (number | string)[];
+      event: { kind: ProbabilityEvent; k?: number; colors?: string[] };
+      result: Rational;
+    }
+  | { type: "decimal-rounding"; n: string; places: 0 | 1 | 2; result: string }
+  | {
+      type: "triangle";
+      angles: number[] | null;
+      sides: number[] | null;
+      /** Index into `angles` of the angle the student finds. */
+      unknown: number | null;
+      classify: "angles" | "sides" | null;
+    }
+  | { type: "ratio"; a: number; b: number; result: [number, number] }
+  // Money rates are in cents.
+  | { type: "unit-rate"; total: number; count: number; rate: number; money: boolean }
+  // `expr` is a JS expression in the variables of `vars`.
+  | { type: "evaluate"; expr: string; vars: Record<string, number>; result: number }
+  | { type: "circle"; given: "r" | "d"; value: number; find: "r" | "d" | "C" | "A"; result: string };
+
+export type NumberForm = "standard" | "expanded" | "word";
+
+export type PatternRule = { op: "+" | "-" | "*" | "/"; k: number };
+
+export type ProbabilityEvent =
+  | "even"
+  | "odd"
+  | "prime"
+  | "multiple"
+  | "greater"
+  | "less"
+  | "equal"
+  | "color"
+  | "not-color"
+  | "either-color";
 
 export type WorksheetProblem = {
   body: ProblemBody;

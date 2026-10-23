@@ -35,9 +35,9 @@ export const siteConfig = {
   },
   ogImage: "/og.png",
   nav: [
+    { href: "/worksheets", label: "Free Worksheets", labelKo: "무료 학습지" },
     { href: "/programs", label: "Programs", labelKo: "프로그램" },
     { href: "/resources", label: "FCPS Math Curriculum", labelKo: "수학 교육과정" },
-    { href: "/worksheets", label: "Worksheets", labelKo: "학습지" },
     { href: "/school-calendar", label: "School Calendar", labelKo: "학교 캘린더" },
     { href: "/blog", label: "Blog", labelKo: "블로그" },
   ],

@@ -24,6 +24,7 @@ const ko = {
       desc: "다니엘 수학 아카데미(Daniel Math)는 버지니아 페어팩스의 한인 초등 수학 학원입니다. 배치 진단을 바탕으로 학생별 수준과 학습 속도에 맞춰 개념·연산·문제해결력을 체계적으로 지도합니다.",
       ctaInquire: "상담 신청",
       ctaPrograms: "프로그램 보기",
+      ctaWorksheets: "학습지 다운로드",
     },
     stats: [
       { value: "3-6학년", label: "대상 학년", sublabel: "초등 중·고학년" },

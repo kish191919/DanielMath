@@ -26,12 +26,13 @@ const en: Dictionary = {
       desc: "Daniel Math Academy is a Korean-American elementary math academy in Fairfax, Virginia. Based on a placement diagnostic, we systematically build each student's concepts, computation, and problem-solving at their own level and pace.",
       ctaInquire: "Schedule a Consult",
       ctaPrograms: "View Program",
+      ctaWorksheets: "Download Worksheets",
     },
     stats: [
-      { value: "Grades 3–6", label: "Who we serve", sublabel: "Elementary, upper grades" },
-      { value: "4", label: "Per class", sublabel: "Students per class" },
-      { value: "1–4×/wk", label: "Flexible days & sessions", sublabel: "Mon/Tue/Thu/Fri" },
-      { value: "70 min", label: "Session length", sublabel: "Per session" },
+      { value: "3–6", label: "Grade levels", sublabel: "Upper elementary" },
+      { value: "4", label: "Students per class", sublabel: "Small-group maximum" },
+      { value: "1–4", label: "Classes per week", sublabel: "Mon · Tue · Thu · Fri" },
+      { value: "70", label: "Minutes per class", sublabel: "Review + leveled practice" },
     ],
     programs: {
       eyebrow: "Program",

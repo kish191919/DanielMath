@@ -1,8 +1,9 @@
+import { Fragment } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Sparkles, Clock, Users, CalendarDays, BarChart2, BookOpen, MapPin } from "lucide-react";
+import { Sparkles, Clock, Users, CalendarDays, BarChart2, BookOpen, MapPin, Download } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
 import { HeroBackground } from "@/components/site/hero-background";
@@ -84,8 +85,17 @@ function HeroSection({ d, lp, isKo }: { d: Awaited<ReturnType<typeof getDictiona
               <span className="text-gold-300">{h.h1highlight}</span> {h.h1line2}
             </h1>
           )}
-          <p className={`mx-auto mt-5 max-w-xl text-lg font-medium text-navy-100 sm:text-xl${isKo ? " font-ko" : ""}`}>
-            {h.subtitle}
+          <p className={`mx-auto mt-5 max-w-xl text-balance text-lg font-medium text-navy-100 sm:text-xl${isKo ? " font-ko" : ""}`}>
+            {/* Keep each step (and its trailing arrow) on one line so wraps only fall between steps. */}
+            {h.subtitle.split(" → ").map((step, i, steps) => (
+              <Fragment key={step}>
+                <span className="whitespace-nowrap">
+                  {step}
+                  {i < steps.length - 1 && " →"}
+                </span>
+                {i < steps.length - 1 && " "}
+              </Fragment>
+            ))}
           </p>
           <p className={`mx-auto mt-4 max-w-xl text-sm leading-6 text-navy-200/70 sm:text-base${isKo ? " font-ko" : ""}`}>
             {h.desc}
@@ -101,6 +111,15 @@ function HeroSection({ d, lp, isKo }: { d: Awaited<ReturnType<typeof getDictiona
             </Button>
             <Button href={lp("/programs")} size="lg" variant="secondary" className="min-w-[10rem]">
               {h.ctaPrograms}
+            </Button>
+            <Button
+              href={lp("/worksheets")}
+              size="lg"
+              variant="secondary"
+              className="min-w-[10rem] border-white/60 bg-white/10 text-white backdrop-blur hover:border-white hover:bg-white/20"
+            >
+              <Download className="h-4 w-4" />
+              {h.ctaWorksheets}
             </Button>
           </div>
         </div>
