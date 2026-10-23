@@ -66,7 +66,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "수·연산",
     conceptCode: "ns-compare-order-whole",
     quarter: "Q1",
-    counts: [12, 18, 24],
+    counts: [12, 18, 21],
     columns: 3,
     generator: compareWhole,
     levels: {
@@ -97,7 +97,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "수·연산",
     conceptCode: "ops-add-sub-multi-digit",
     quarter: "Q1",
-    counts: [12, 16, 20],
+    counts: [8, 12, 16],
     columns: 4,
     generator: addSubtract,
     levels: {
@@ -132,7 +132,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "수·연산",
     conceptCode: "ops-mult-facts",
     quarter: "Q2",
-    counts: [15, 24, 30],
+    counts: [12, 18, 24],
     columns: 3,
     generator: facts,
     levels: {
@@ -167,7 +167,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "수·연산",
     conceptCode: "ops-division-basic",
     quarter: "Q2",
-    counts: [15, 24, 30],
+    counts: [12, 18, 24],
     columns: 3,
     generator: facts,
     levels: {
@@ -243,7 +243,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "분수",
     conceptCode: "frac-compare-order",
     quarter: "Q4",
-    counts: [12, 18, 24],
+    counts: [12, 18, 21],
     columns: 3,
     generator: compareFractions,
     levels: {
@@ -307,7 +307,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "수·연산",
     conceptCode: "ns-place-value",
     quarter: "Q1",
-    counts: [6, 8, 10],
+    counts: [4, 6, 8],
     columns: 2,
     generator: rounding,
     levels: {
@@ -342,7 +342,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "수·연산",
     conceptCode: "ops-mult-facts",
     quarter: "Q2",
-    counts: [15, 24, 30],
+    counts: [12, 18, 24],
     columns: 3,
     generator: facts,
     levels: {
@@ -377,7 +377,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "수·연산",
     conceptCode: "ops-mult-multi-digit",
     quarter: "Q2",
-    counts: [12, 16, 20],
+    counts: [8, 12, 16],
     columns: 4,
     generator: multiply,
     levels: {
@@ -447,7 +447,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "수·연산",
     conceptCode: "ns-factors-gcf",
     quarter: "Q2",
-    counts: [6, 8, 10],
+    counts: [4, 6, 8],
     columns: 2,
     generator: factorsGcf,
     levels: {
@@ -513,7 +513,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "수·연산",
     conceptCode: "ops-mult-multi-digit",
     quarter: "Q3",
-    counts: [8, 12],
+    counts: [4, 8],
     columns: 4,
     generator: multiply,
     levels: {
@@ -548,7 +548,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "소수",
     conceptCode: "dec-compare-order",
     quarter: "Q3",
-    counts: [12, 18, 24],
+    counts: [12, 18, 21],
     columns: 3,
     generator: compareDecimalNumbers,
     levels: {
@@ -583,7 +583,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "소수",
     conceptCode: "dec-add-sub",
     quarter: "Q3",
-    counts: [12, 16, 20],
+    counts: [8, 12, 16],
     columns: 4,
     generator: addSubtractDecimals,
     levels: {
@@ -618,8 +618,8 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "분수",
     conceptCode: "frac-add-sub-like",
     quarter: "Q4",
-    counts: [12, 18, 24],
-    columns: 3,
+    counts: [8, 12, 14],
+    columns: 2,
     generator: addSubtractFractions,
     levels: {
       1: { denominators: [3, 4, 5, 6, 8, 10, 12], like: true, mixed: false, op: "mixed", properResult: true },
@@ -655,7 +655,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "대수·패턴",
     conceptCode: "ops-order-of-operations",
     quarter: "Q1",
-    counts: [10, 14, 20],
+    counts: [8, 12, 14],
     columns: 2,
     generator: orderOfOperations,
     levels: {
@@ -686,7 +686,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "수·연산",
     conceptCode: "ns-prime-composite",
     quarter: "Q1",
-    counts: [8, 12, 14],
+    counts: [6, 8, 10],
     columns: 2,
     generator: primeFactorization,
     levels: {
@@ -717,7 +717,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "확률·자료",
     conceptCode: "meas-mean-median",
     quarter: "Q1",
-    counts: [4, 6, 8],
+    counts: [4, 6],
     columns: 2,
     generator: meanMedianModeRange,
     levels: {
@@ -818,8 +818,8 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "분수",
     conceptCode: "frac-add-sub-unlike",
     quarter: "Q3",
-    counts: [12, 18, 24],
-    columns: 3,
+    counts: [8, 12, 14],
+    columns: 2,
     generator: addSubtractFractions,
     levels: {
       1: { denominators: [2, 3, 4, 6, 8, 12], like: false, relatedOnly: true, mixed: false, op: "mixed" },
@@ -858,7 +858,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "수·연산",
     conceptCode: "ns-lcm-lcd",
     quarter: "Q1",
-    counts: [6, 8, 10],
+    counts: [4, 6, 8],
     columns: 2,
     generator: gcfLcm,
     levels: {
@@ -893,7 +893,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "수·연산",
     conceptCode: "ops-negative-numbers",
     quarter: "Q3",
-    counts: [12, 16, 20],
+    counts: [8, 12, 16],
     columns: 2,
     generator: integerOperations,
     levels: {
@@ -928,7 +928,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "수·연산",
     conceptCode: "ops-exponents",
     quarter: "Q3",
-    counts: [15, 21, 30],
+    counts: [12, 18, 24],
     columns: 3,
     generator: exponents,
     levels: {
@@ -963,8 +963,8 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "분수",
     conceptCode: "frac-mult",
     quarter: "Q3",
-    counts: [12, 18, 24],
-    columns: 3,
+    counts: [8, 12, 16],
+    columns: 2,
     generator: multiplyDivideFractions,
     levels: {
       1: { ops: ["*"], denominators: FRACTION_DENS, mixed: false },
@@ -1004,7 +1004,7 @@ export const WORKSHEETS: WorksheetDef[] = [
     category: "대수·패턴",
     conceptCode: "alg-equations-basic",
     quarter: "Q3",
-    counts: [12, 18, 21],
+    counts: [9, 12, 15],
     columns: 3,
     generator: oneStepEquations,
     levels: {

@@ -62,9 +62,14 @@ function SheetFooter({ seed, page }: { seed: string; page: string }) {
   );
 }
 
-function NumberBadge({ n }: { n: number }) {
+function NumberBadge({ n, className }: { n: number; className?: string }) {
   return (
-    <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-navy-900 text-[11px] font-bold leading-none text-white">
+    <span
+      className={cn(
+        "flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-navy-900 text-[11px] font-bold leading-none text-white",
+        className,
+      )}
+    >
       {n}
     </span>
   );
@@ -143,7 +148,15 @@ export async function WorksheetSheet({
 
         <ol className={cn("mt-3 grid border-l border-t border-navy-200", PROBLEM_GRID[def.columns])}>
           {problems.map((p, i) => (
-            <li key={i} className="flex min-w-0 break-inside-avoid gap-2.5 border-b border-r border-navy-200 p-3">
+            // The badge sits on the problem's first line of text; figures have
+            // none, so theirs stays at the top of the cell.
+            <li
+              key={i}
+              className={cn(
+                "flex min-w-0 break-inside-avoid gap-3 border-b border-r border-navy-200 p-4",
+                p.body.kind === "figure" ? "items-start" : "items-baseline",
+              )}
+            >
               <NumberBadge n={i + 1} />
               <div className="min-w-0 flex-1">
                 <ProblemView body={p.body} />
@@ -169,7 +182,7 @@ export async function WorksheetSheet({
           <ol className={cn("mt-4 grid border-l border-t border-navy-200 text-sm text-navy-800", KEY_GRID[keyColumns])}>
             {problems.map((p, i) => (
               <li key={i} className="flex min-w-0 items-start gap-2 border-b border-r border-navy-200 px-3 py-2">
-                <NumberBadge n={i + 1} />
+                <NumberBadge n={i + 1} className="mt-0.5" />
                 <span className="mt-0.5 min-w-0">
                   <MathText text={p.answer} />
                 </span>

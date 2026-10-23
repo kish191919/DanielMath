@@ -76,7 +76,7 @@ export function VerticalProblem({
   const render = (v: string) => (decimal ? <DecimalAligned value={v} fracWidth={fracWidth} /> : v);
   // Multi-digit multiplication needs room for partial products.
   const digitsBelow = body.bottom.replace(".", "").length;
-  const workSpace = body.operator === "×" && digitsBelow > 1 ? "h-24" : "h-8";
+  const workSpace = body.operator === "×" && digitsBelow > 1 ? "h-28" : "h-12";
 
   return (
     <div className="inline-grid font-math text-xl leading-snug tabular-nums text-navy-900">
@@ -185,7 +185,7 @@ export function CompareView({ left, right, symbol }: { left: string; right: stri
       <MathText text={left} />
       <span
         className={cn(
-          "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-navy-500",
+          "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-navy-500",
           symbol && SOLVED,
         )}
       >
@@ -217,7 +217,7 @@ export function FigureView({
       )}
       <div className="flex items-end gap-2 text-sm text-navy-700">
         <span>{prompt}</span>
-        <Blank className={cn("min-w-20 px-1", answer && cn("text-base", SOLVED))}>
+        <Blank className={cn("px-1", answer ? cn("min-w-20 text-base", SOLVED) : "h-9 min-w-24")}>
           {answer && <MathText text={answer} />}
         </Blank>
       </div>
@@ -228,17 +228,18 @@ export function FigureView({
 export function ProblemView({ body }: { body: ProblemBody }) {
   switch (body.kind) {
     case "text":
-      // An inline blank takes whatever room the cell has left; if a long
-      // expression leaves too little, it drops below instead of overflowing.
+      // The answer line runs to the edge of the cell (or drops below a long
+      // expression instead of overflowing), with headroom above it for big
+      // handwriting.
       return body.blank === "inline" ? (
-        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-lg text-navy-900">
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-3 pt-4 text-lg text-navy-900">
           <MathText text={body.text} />
-          <Blank className="min-w-10 max-w-32 flex-1" />
+          <Blank className="min-w-12 flex-1" />
         </div>
       ) : (
         <div className="text-lg text-navy-900">
           <MathText text={body.text} />
-          {body.blank === "line" && <div className="mt-9 border-b border-navy-500" />}
+          {body.blank === "line" && <div className="mt-12 border-b border-navy-500" />}
         </div>
       );
 
@@ -248,10 +249,10 @@ export function ProblemView({ body }: { body: ProblemBody }) {
     case "longdiv":
       return (
         <div className="font-math text-xl tabular-nums text-navy-900">
-          <div className="mt-7">
+          <div className="mt-8">
             <LongDivisionBracket divisor={body.divisor} dividend={body.dividend} />
           </div>
-          <div className="h-20" />
+          <div className="h-22" />
         </div>
       );
 
@@ -265,11 +266,11 @@ export function ProblemView({ body }: { body: ProblemBody }) {
       return (
         <div className="text-navy-900">
           <p className="text-lg font-medium tracking-wide">{body.text}</p>
-          <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-4 text-sm">
+          <dl className="mt-3 grid grid-cols-2 gap-x-5 gap-y-3 text-sm">
             {body.fields.map((f) => (
               <div key={f} className="flex items-end gap-2">
                 <dt className="text-navy-700">{f}</dt>
-                <dd className="flex-1 border-b border-navy-500">&nbsp;</dd>
+                <dd className="h-9 flex-1 border-b border-navy-500">&nbsp;</dd>
               </div>
             ))}
           </dl>
