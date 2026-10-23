@@ -166,3 +166,46 @@ export const multiplyDivideFractions: Generator<{
     meta: { type: "fraction-op", op, a: x.value, b: y.value, result },
   };
 };
+
+export const convertMixed: Generator<{
+  to: readonly ("mixed" | "improper")[];
+  denominators: readonly number[];
+  wholeMax: number;
+}> = (rng, { to: directions, denominators, wholeMax }) => {
+  const to = pick(rng, directions);
+  const d = pick(rng, denominators);
+  const whole = randInt(rng, 1, wholeMax);
+  // Now and then an improper fraction that is a whole number (12/4 = 3).
+  const n = to === "mixed" && rng() < 0.1 ? 0 : properNumerator(rng, d, true);
+  const value: Rational = [whole * d + n, d];
+  const improper = `\\frac{${value[0]}}{${d}}`;
+  const mixed = n === 0 ? String(whole) : mixedLatex(whole, n, d);
+  const [from, answer] = to === "mixed" ? [improper, mixed] : [mixed, improper];
+
+  return {
+    body: { kind: "text", text: `$${from} =$`, blank: "inline" },
+    answer: `$${answer}$`,
+    meta: { type: "convert", value, to },
+  };
+};
+
+export const multiplyFractionWhole: Generator<{
+  fraction: "unit" | "proper" | "mixed";
+  denominators: readonly number[];
+  wholeMax: number;
+}> = (rng, { fraction, denominators, wholeMax }) => {
+  const d = pick(rng, denominators);
+  const x: Operand =
+    fraction === "unit" ? { latex: `\\frac{1}{${d}}`, value: [1, d] } : fractionOperand(rng, d, fraction === "mixed", true);
+  const w = randInt(rng, 2, wholeMax);
+  const whole: Operand = { latex: String(w), value: [w, 1] };
+  // Both orders are common on worksheets: 6 × 1/3 and 1/3 × 6.
+  const [a, b] = rng() < 0.5 ? [whole, x] : [x, whole];
+  const result = mulR(a.value, b.value);
+
+  return {
+    body: { kind: "text", text: `$${a.latex} \\times ${b.latex} =$`, blank: "inline" },
+    answer: `$${fractionLatex(result)}$`,
+    meta: { type: "fraction-op", op: "*", a: a.value, b: b.value, result },
+  };
+};

@@ -64,9 +64,14 @@ export type BlogSection = {
 
 export type BlogImage = { src: string; altKo: string; altEn: string };
 
+/** Rendered at the end of the post and emitted as FAQPage JSON-LD. */
+export type BlogFaq = { q: string; a: string };
+
 export type BlogPost = {
   slug: string;
   publishedAt: string;
+  /** Last substantive revision; feeds dateModified and the sitemap. */
+  updatedAt?: string;
   readingMins: number;
   category: string;
   categoryEn: string;
@@ -77,18 +82,21 @@ export type BlogPost = {
   heroImage?: BlogImage;
   bodyKo: BlogSection[];
   bodyEn: BlogSection[];
+  faqKo?: BlogFaq[];
+  faqEn?: BlogFaq[];
 };
 
 export const blogPosts: BlogPost[] = [
   {
     slug: "fcps-report-card-guide",
     publishedAt: "2026-08-01",
-    readingMins: 6,
+    updatedAt: "2026-10-23",
+    readingMins: 7,
     category: "성적표",
     categoryEn: "Report Cards",
-    titleKo: "FCPS 초등학교 성적표 제대로 읽는 법",
+    titleKo: "FCPS 초등학교 성적표 보는 법: 1~4점의 뜻과 SOL 점수 차이",
     titleEn: "How to Read Your Child's FCPS Elementary Report Card",
-    descKo: "버지니아 초등학교 성적표는 A·B·C가 아니라 1~4점 기준중심평가를 사용합니다. FCPS 성적표의 채점 방식, SOL 시험과의 차이, 그리고 학부모가 눈여겨봐야 할 부분을 정리했습니다.",
+    descKo: "미국 초등학교 성적표에는 A·B·C 대신 1~4 숫자가 적혀 있습니다. 버지니아 페어팩스 카운티(FCPS) 성적표에서 3점이 무슨 뜻인지, 학습 태도 항목과 SOL 시험 점수는 어떻게 다른지 미국 학교가 처음인 학부모님 눈높이로 정리했습니다.",
     descEn: "Virginia elementary report cards don't use A-B-C grades — FCPS scores students on a 1-4 standards-based scale. Here's how the scoring works, how it differs from the state SOL test, and what parents should actually look for.",
     heroImage: {
       src: "/blog/fcps-report-card-guide-hero.jpg",
@@ -97,17 +105,30 @@ export const blogPosts: BlogPost[] = [
     },
     bodyKo: [
       {
-        heading: "성적표는 카운티마다 다릅니다",
+        heading: "결론부터: 3점이면 잘하고 있는 것입니다",
         paragraphs: [
-          "버지니아주는 학년별로 무엇을 배워야 하는지 정하는 SOL(Standards of Learning)이라는 공통 기준을 두고 있지만, 성적표를 어떻게 채점하고 표시할지는 각 카운티 교육청이 결정합니다. 따라서 다른 주나 다른 카운티에서 전학 온 가정이라면 FCPS 성적표가 낯설게 느껴질 수 있습니다.",
-          "FCPS 초등학교(K-6)는 A·B·C 등급이 아니라 기준중심평가(Standards-Based Grading)라는 방식을 사용하며, 각 학습 영역을 1부터 4까지의 숫자로 표시합니다. 이 숫자 체계를 제대로 이해하는 것이 성적표를 읽는 첫걸음입니다.",
+          "한국에서 오신 학부모님이 FCPS 성적표를 처음 받으면 가장 먼저 당황하는 부분이 있습니다. 과목마다 A·B·C나 100점 만점 점수 대신 1, 2, 3, 4라는 숫자가 적혀 있기 때문입니다.",
+          "이 숫자는 등수도, 시험 점수도 아닙니다. 아이가 그 학년에 배워야 할 내용을 얼마나 해낼 수 있는지를 네 단계로 표시한 것입니다. 이런 방식을 기준중심평가(Standards-Based Grading)라고 부릅니다.",
+          "딱 한 가지만 기억하세요. 3점은 '학년 수준을 잘 따라가고 있다'는 뜻이고, 대부분의 학생이 받는 점수입니다. 3점을 B로, 4점을 A로 바꿔 읽으면 안 됩니다.",
         ],
+        visual: {
+          type: "checklist",
+          title: "이 글의 핵심 요약",
+          items: [
+            { text: "FCPS 초등학교(K~6학년)는 A·B·C 대신 1~4점으로 평가합니다" },
+            { text: "3점은 학년 수준을 잘 따라간다는 뜻입니다", note: "대부분의 학생이 받는 점수" },
+            { text: "수학 한 과목도 여러 세부 항목으로 나뉘어 따로 점수가 나옵니다" },
+            { text: "학습 태도는 학업 점수와 따로 평가합니다" },
+            { text: "SOL은 성적표와 별개인 버지니아주 시험입니다", note: "읽기·수학은 3학년부터" },
+          ],
+        },
       },
       {
-        heading: "1~4점은 A·B·C와 다릅니다",
+        heading: "1·2·3·4점은 각각 무슨 뜻인가요?",
         paragraphs: [
-          "4점은 배운 내용을 거의 항상 정확하고 독립적으로 수행한다는 뜻이고, 3점은 대부분 이해하며 약간의 도움만 필요하다는 뜻입니다. 2점은 부분적으로 이해하며 어느 정도 도움이 필요하다는 의미이고, 1점은 이해가 부족해 상당한 도움이 필요하다는 뜻입니다. 아직 배우지 않은 내용은 NT(Not Taught)로 표시됩니다.",
-          "학부모가 가장 많이 착각하는 부분은 이 숫자를 \"4=A, 3=B\" 식으로 바꿔 읽는 것입니다. 3점은 나쁜 성적이 아니라 대부분의 학생이 받는, 학년 수준을 잘 따라가고 있다는 점수입니다. 4점은 매우 안정적이고 독립적인 수행을 의미할 뿐, 모든 항목에서 4점을 받아야 한다는 뜻은 아닙니다.",
+          "점수는 아이가 배운 내용을 혼자서 얼마나 정확하게 해내는지를 기준으로 매깁니다. 4점은 거의 항상 정확하게, 스스로 해낸다는 뜻입니다. 3점은 대부분 이해하고 있고 약간의 도움만 필요하다는 뜻입니다.",
+          "2점은 부분적으로 이해하고 있어 어느 정도 도움이 필요하다는 뜻이고, 1점은 이해가 부족해 많은 도움이 필요하다는 뜻입니다. 그 분기에 아직 배우지 않은 내용은 숫자 대신 NT(Not Taught, 아직 배우지 않음)로 표시됩니다.",
+          "'4점이 아니면 부족한 것'이라고 생각하실 필요는 없습니다. 4점은 매우 안정적으로 혼자 해내는 수준이라 모든 항목에서 받기는 어렵습니다. 성적표 대부분이 3점이라면 아이는 학년 수준을 잘 따라가고 있는 것입니다.",
         ],
         visual: {
           type: "scale",
@@ -120,46 +141,96 @@ export const blogPosts: BlogPost[] = [
           ],
           note: {
             tone: "myth",
-            text: "가장 흔한 오해: \"4=A, 3=B\"로 바꿔 읽는 것. 3점은 나쁜 성적이 아니라 대다수 학생이 받는, 학년 수준을 잘 따라가는 점수입니다.",
+            text: "가장 흔한 오해: '4점=A, 3점=B'로 바꿔 읽는 것. 3점은 나쁜 성적이 아니라 대다수 학생이 받는, 학년 수준을 잘 따라가는 점수입니다.",
           },
         },
       },
       {
-        heading: "과목 하나에 점수 하나가 아닙니다",
+        heading: "수학 점수가 왜 여러 개인가요?",
         paragraphs: [
-          "FCPS 성적표는 수학을 하나의 점수로 요약하지 않고, 수 개념·계산 능력·문장제 문제 해결·수학적 설명과 추론처럼 여러 세부 학습기준으로 나누어 각각 점수를 매깁니다. 언어 과목도 읽기 이해력, 어휘, 쓰기 등으로 나뉘어 표시됩니다.",
-          "이 방식 덕분에 학부모는 아이가 어느 영역은 잘하고 어느 영역에서 도움이 필요한지 구체적으로 파악할 수 있습니다. 전체 평균이 아니라 각 줄의 점수를 개별적으로 살펴보는 것이 성적표를 제대로 읽는 방법입니다.",
+          "한국 성적표는 과목마다 점수가 하나씩 나오지만, FCPS 성적표는 한 과목을 여러 세부 학습기준으로 나눠 따로 점수를 매깁니다. 수학이라면 수 개념, 계산, 문장제 문제 해결, 수학적 설명과 추론이 각각 다른 줄에 표시됩니다. 언어(English Language Arts)도 읽기 이해, 어휘, 쓰기로 나뉩니다.",
+          "그래서 평균을 내기보다 한 줄씩 읽는 것이 맞습니다. 예를 들어 계산은 3점인데 문장제 문제가 2점이라면, 수학 실력보다 영어로 된 문제를 읽고 이해하는 데서 어려움을 겪고 있을 수 있습니다. 미국에 온 지 얼마 안 된 아이에게 흔히 보이는 모습입니다.",
+        ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "tip",
+          title: "미국에 온 지 얼마 안 됐다면",
+          text: "계산 점수에 비해 문장제(Word Problem) 점수가 낮은 것은 자연스러운 일입니다. 문장제에 자주 나오는 영어 표현을 익히면 빠르게 좋아지는 경우가 많습니다.",
+          linkHref: "/blog/math-practice-at-home",
+          linkLabel: "수학 문장제 영어 표현 보기",
+        },
+      },
+      {
+        heading: "시험 점수를 평균 내서 성적을 매기나요?",
+        paragraphs: [
+          "아닙니다. 한국처럼 시험 점수를 합산하거나 평균 내는 방식이 아닙니다. 선생님은 수업 중 관찰, 과제와 프로젝트, 퀴즈와 단원평가, 아이가 말로 풀이를 설명하는 모습까지 여러 자료를 함께 보고 판단합니다.",
+          "특히 최근에 보여 준 실력을 더 비중 있게 보는 경우가 많습니다. 분기 초에 어려워했던 내용도 분기 말에 잘 해내면 그 향상이 점수에 반영될 수 있습니다. 학년 말 성적도 네 분기의 평균이 아니라, 학년이 끝날 때의 이해 수준을 중심으로 정해집니다.",
         ],
       },
       {
-        heading: "숙제 점수를 그냥 평균 내지 않습니다",
+        heading: "학습 태도 점수는 따로 봐야 하나요?",
         paragraphs: [
-          "FCPS 성적표는 숙제·퀴즈·단원평가 점수를 모두 더해 평균 내는 방식이 아닙니다. 교사는 교실 활동과 관찰, 과제와 프로젝트, 퀴즈와 단원평가, 구두 설명 능력 등 여러 자료를 종합해 판단하며, 특히 최근에 보여준 학습 수준을 더 비중 있게 반영하는 경우가 많습니다.",
-          "즉 학기 초에 어려워했던 개념도 학기 말에 충분히 이해했다면 그 향상이 최종 성적에 반영될 수 있습니다. 학년 말 성적 역시 네 분기 점수의 단순 평균이 아니라, 학년이 끝나는 시점의 이해 수준을 중심으로 결정됩니다.",
+          "네. FCPS 성적표에는 학업 점수와 별도로 학습 태도 항목이 있습니다. 지시를 잘 따르는지, 과제를 제때 끝내는지, 시간을 잘 쓰는지, 수업에 적극적으로 참여하는지를 평가합니다.",
+          "두 영역은 따로 채점됩니다. 학업은 3점인데 학습 태도는 개선이 필요하다고 나올 수 있고, 그 반대도 가능합니다. 같은 학습 태도 항목이 두 분기 이상 낮게 나오면 학업 점수와 별개로 담임 선생님과 이야기해 보세요. 미국 학교에서는 학부모가 먼저 이메일로 상담을 요청하는 것이 자연스러운 일입니다.",
         ],
       },
       {
-        heading: "학업 점수와 학습 태도는 따로 봅니다",
+        heading: "SOL 시험 점수는 성적표와 어떻게 다른가요?",
         paragraphs: [
-          "FCPS 성적표는 학업 성취도 옆에 지시를 잘 따르는지, 과제를 제때 완료하는지, 시간을 잘 관리하는지, 수업에 적극적으로 참여하는지 같은 학습 습관도 별도 항목으로 평가합니다. 두 영역은 독립적으로 채점되므로, 학업이 3점이라도 학습 태도는 개선이 필요하다고 표시될 수 있고 그 반대도 가능합니다.",
-          "성적표를 볼 때는 학업 점수만 보지 말고 학습 태도 항목도 함께 확인하는 것이 좋습니다. 같은 학습 태도 항목이 여러 분기 연속으로 낮게 나온다면, 학업 점수와는 별개로 담임교사와 상담해볼 필요가 있습니다.",
-        ],
-      },
-      {
-        heading: "SOL 시험과는 어떻게 다르고, 무엇을 확인해야 할까요?",
-        paragraphs: [
-          "성적표의 1~4점과 별개로, FCPS는 대부분 3~8학년 학생을 대상으로 매년 봄 SOL(Standards of Learning) 시험을 치릅니다. 읽기와 수학은 3학년부터, 과학은 5학년부터 응시하며, 그 학년에서 배운 주 전체 공통 기준을 얼마나 이해했는지 확인하는 주정부 공식 평가입니다. 400점 이상이면 Pass, 500점 이상이면 Pass/Advanced로 표시되며, 채점 기준과 시행 주체 모두 분기 성적표와 다릅니다.",
-          "전체 점수가 몇 개인지보다 중요한 것은 어떤 세부 학습기준에서 2점이나 1점이 나왔는지, 그리고 지난 분기보다 나아지고 있는지입니다. 같은 영역에서 2점이 두 분기 이상 이어지거나 1점이 나온다면 담임교사에게 구체적으로 어떤 기술을 보완해야 하는지, 집에서 어떻게 도와줄 수 있는지 물어보세요. 성적표와 SOL 점수는 모두 ParentVUE에서 분기마다 확인할 수 있습니다. AAP 학생도 동일한 1~4점 기준중심평가 체계를 사용하지만, 실제로 배우는 학습 내용과 기대 수준은 트랙에 따라 다르다는 점을 함께 기억해 두면 성적표를 더 정확하게 해석할 수 있습니다.",
+          "SOL(Standards of Learning)은 버지니아주가 학년별로 정한 학습 기준이자, 그 기준을 얼마나 이해했는지 확인하는 주 정부 시험의 이름입니다. 성적표의 1~4점은 담임 선생님이 분기마다 매기지만, SOL 시험은 버지니아주가 매년 봄에 한 번 치릅니다.",
+          "FCPS에서는 읽기와 수학은 3학년부터, 과학은 5학년부터 SOL 시험을 봅니다. 점수는 600점 만점으로, 400점 이상이면 합격(Pass), 500점 이상이면 우수(Pass/Advanced)입니다.",
+          "AAP(심화반) 학생도 같은 1~4점 체계로 평가받습니다. 다만 배우는 내용과 기대 수준이 일반반과 다르므로, 같은 3점이라도 의미가 조금 다르다는 점을 기억해 두세요.",
         ],
         visual: {
           type: "table",
           headers: ["", "성적표 (Report Card)", "SOL 시험"],
           rows: [
-            { label: "채점 방식", values: ["1~4점 기준중심평가", "400점 이상 Pass, 500점 이상 Pass/Advanced"] },
-            { label: "시행 주체", values: ["담임교사, 분기별 평가", "버지니아주, 연 1회 봄 시행"] },
-            { label: "대상 학년", values: ["K-6 전 학년", "읽기·수학 3학년+, 과학 5학년+"] },
+            { label: "채점 방식", values: ["1~4점 기준중심평가", "600점 만점, 400점 이상 Pass, 500점 이상 Pass/Advanced"] },
+            { label: "누가, 언제", values: ["담임교사, 분기마다", "버지니아주, 매년 봄 1회"] },
+            { label: "대상 학년", values: ["K~6학년 전체", "읽기·수학 3학년부터, 과학 5학년부터"] },
           ],
         },
+      },
+      {
+        heading: "성적표를 받으면 이것만 확인하세요",
+        paragraphs: [
+          "3점이 몇 개인지 세는 것보다 2점이나 1점이 나온 세부 항목이 무엇인지, 그리고 지난 분기보다 나아지고 있는지가 더 중요합니다.",
+          "같은 항목에서 2점이 두 분기 이상 이어지거나 1점이 나오면 담임 선생님께 '어떤 기술이 부족한지', '집에서 무엇을 도와주면 좋은지' 구체적으로 물어보세요. 영어로 상담하기가 부담스럽다면 학교에 한국어 통역을 요청할 수 있습니다.",
+        ],
+        visual: {
+          type: "checklist",
+          title: "성적표 확인 체크리스트",
+          items: [
+            { text: "ParentVUE에서 성적표 열기", note: "분기마다 올라옵니다" },
+            { text: "2점·1점이 나온 세부 항목 표시하기" },
+            { text: "지난 분기와 비교하기", note: "나아지고 있는지가 핵심" },
+            { text: "학습 태도 항목 따로 확인하기" },
+            { text: "궁금한 점은 담임 선생님께 이메일로 묻기", note: "한국어 통역 요청 가능" },
+          ],
+        },
+      },
+    ],
+    faqKo: [
+      {
+        q: "FCPS 성적표의 3점은 B와 같은 뜻인가요?",
+        a: "아닙니다. 1~4점은 A·B·C로 바꿔 읽는 점수가 아닙니다. 3점은 그 학년에 배워야 할 내용을 대부분 이해하고 있다는 뜻이며, 대부분의 학생이 받는 점수입니다.",
+      },
+      {
+        q: "성적표에 적힌 NT는 무슨 뜻인가요?",
+        a: "Not Taught의 줄임말로, 그 분기에 아직 배우지 않은 내용이라는 뜻입니다. 낮은 점수가 아닙니다.",
+      },
+      {
+        q: "FCPS 성적표는 어디서 볼 수 있나요?",
+        a: "FCPS 학부모용 웹사이트인 ParentVUE에서 분기마다 확인할 수 있습니다. 계정이 없다면 학교 사무실에 활성화 코드(Activation Key)를 요청하세요.",
+      },
+      {
+        q: "SOL 시험은 몇 학년부터 보나요?",
+        a: "FCPS에서는 읽기와 수학은 3학년부터, 과학은 5학년부터 매년 봄에 봅니다. 400점 이상이면 합격(Pass), 500점 이상이면 Pass/Advanced입니다.",
+      },
+      {
+        q: "담임 선생님과 한국어로 상담할 수 있나요?",
+        a: "FCPS는 학부모 상담에 통역을 지원합니다. 상담을 요청할 때 한국어 통역이 필요하다고 미리 알려 주세요.",
       },
     ],
     bodyEn: [
@@ -216,7 +287,7 @@ export const blogPosts: BlogPost[] = [
         heading: "How Does This Differ From the SOL Test, and What Should Parents Actually Check?",
         paragraphs: [
           "Separate from the 1-4 quarterly scores, FCPS students in most grades 3-8 take the SOL (Standards of Learning) test each spring — reading and math starting in 3rd grade, science starting in 5th. This is the official state assessment of how well a student has mastered that grade's statewide standards. A score of 400 or above is a Pass, and 500 or above is Pass/Advanced; both the scoring method and the administering body differ from the quarterly report card.",
-          "What matters more than the total number of scores is which specific standards show a 2 or a 1, and whether those areas are improving quarter over quarter. If the same area shows a 2 for two or more quarters in a row, or a 1 appears, ask the teacher specifically which skills need work and how you can help at home. Both report card scores and SOL results are available each quarter through ParentVUE. AAP students use the same 1-4 standards-based system, but the actual content taught and expectations differ by track — worth keeping in mind when interpreting the report card.",
+          "What matters more than the total number of scores is which specific standards show a 2 or a 1, and whether those areas are improving quarter over quarter. If the same area shows a 2 for two or more quarters in a row, or a 1 appears, ask the teacher specifically which skills need work and how you can help at home. Report cards are posted to ParentVUE each quarter. AAP students use the same 1-4 standards-based system, but the actual content taught and expectations differ by track — worth keeping in mind when interpreting the report card.",
         ],
         visual: {
           type: "table",
@@ -233,12 +304,13 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "fcps-aap-math-guide",
     publishedAt: "2026-07-27",
-    readingMins: 6,
+    updatedAt: "2026-10-23",
+    readingMins: 7,
     category: "AAP",
     categoryEn: "AAP",
-    titleKo: "FCPS AAP 수학, 제대로 이해하기",
+    titleKo: "FCPS AAP 총정리: Level III·IV 차이, 선발 과정, 심화 수학",
     titleEn: "Understanding FCPS AAP Math",
-    descKo: "Fairfax County 초등학교의 Standard 수학과 AAP(심화) 수학의 차이, 배치 기준, 그리고 중학교·고등학교까지 이어지는 수학 경로를 정리했습니다.",
+    descKo: "FCPS AAP는 한국의 영재반·심화반과 비슷한 페어팩스 카운티의 심화 프로그램입니다. Level I~IV의 차이, 파트타임과 풀타임(AAP 센터)의 구분, 2학년 때 이뤄지는 선발 과정, 초등 심화 수학이 중학교 Algebra 1까지 어떻게 이어지는지 정리했습니다.",
     descEn: "A clear breakdown of Standard vs. Advanced (AAP) math in FCPS, covering placement criteria and the long-term pathway through middle and high school.",
     heroImage: {
       src: "/blog/fcps-aap-math-guide-hero.jpg",
@@ -247,65 +319,127 @@ export const blogPosts: BlogPost[] = [
     },
     bodyKo: [
       {
-        heading: "FCPS 수학에는 두 가지 트랙이 있습니다",
+        heading: "결론부터: AAP는 'FCPS의 심화반'입니다",
         paragraphs: [
-          "Fairfax County 공립학교(FCPS)는 초등학교 전 학년(K–6)에 두 가지 수학 트랙을 운영합니다. 하나는 해당 학년의 Virginia Standards of Learning(SOL)을 따르는 일반 수학(Standard), 다른 하나는 한 학년 높은 내용을 배우는 심화 수학(Advanced/AAP)입니다.",
-          "예를 들어 4학년 일반반 학생이 4학년 SOL을 공부할 때, 4학년 AAP반 학생은 5학년 SOL 내용을 배웁니다. 이 한 학년의 차이는 시간이 지날수록 누적되어 중학교 이후 학습 경로에 큰 영향을 줍니다.",
+          "FCPS 학부모 모임에서 가장 자주 들리는 단어 중 하나가 AAP입니다. AAP(Advanced Academic Programs)는 페어팩스 카운티 공립학교(FCPS)가 운영하는 심화 학습 프로그램입니다. 한국으로 치면 학교 안의 영재반이나 심화반에 가깝고, 공립학교 프로그램이라 따로 내는 학비가 없습니다.",
+          "AAP는 수학만이 아니라 언어, 과학, 사회까지 더 깊고 빠르게 배우는 프로그램입니다. 특히 수학은 학년보다 앞선 내용을 배우기 때문에, 초등학교 때의 배치가 중학교에서 듣는 수학 과목까지 영향을 줍니다.",
+        ],
+        visual: {
+          type: "checklist",
+          title: "이 글의 핵심 요약",
+          items: [
+            { text: "AAP는 Level I~IV 네 단계로 나뉩니다" },
+            { text: "Level III는 다니던 학교에서 받는 파트타임 심화 수업입니다", note: "3~6학년" },
+            { text: "Level IV는 모든 핵심 과목을 심화반에서 배우는 풀타임 과정입니다", note: "3학년부터, 신청은 2학년 때" },
+            { text: "선발은 시험 점수 하나가 아니라 여러 자료를 함께 봅니다" },
+            { text: "선발되지 않아도 다음 해에 다시 지원할 수 있습니다" },
+          ],
+        },
+      },
+      {
+        heading: "AAP Level I~IV는 어떻게 다른가요?",
+        paragraphs: [
+          "AAP는 네 단계로 나뉩니다. Level I은 모든 학생이 받는 사고력 수업이고, Level II는 특정 과목에 강점이 있는 학생에게 학교가 수업 안에서 제공하는 심화 활동입니다. 두 단계는 학교 안에서 이뤄지므로 학부모가 따로 신청할 일은 많지 않습니다.",
+          "학부모들이 보통 'AAP'라고 할 때는 Level III와 Level IV를 가리킵니다. Level III(파트타임)는 다니던 학교에 그대로 다니면서 일부 과목만 심화 수업을 받는 방식으로, 3~6학년이 대상입니다. Level IV(풀타임)는 모든 핵심 과목을 심화반에서 배우는 방식으로, 3학년부터 시작합니다.",
+          "Level IV는 지정된 AAP 센터 학교로 옮겨 다니는 경우가 많지만, 다니던 학교 안에 Level IV 반이 있는 곳(Local Level IV)도 있습니다. 우리 학교가 어느 쪽인지는 학교의 AART(Advanced Academic Resource Teacher, AAP 담당 교사)에게 물어보면 됩니다.",
+        ],
+        visual: {
+          type: "table",
+          headers: ["단계", "대상", "방식"],
+          rows: [
+            { label: "Level I", values: ["K~6학년 전체", "모든 학생이 받는 사고력 수업"] },
+            { label: "Level II", values: ["K~6학년", "강점 과목에서 학교가 제공하는 심화 활동"] },
+            { label: "Level III", values: ["3~6학년", "다니던 학교에서 일부 과목만 심화 (파트타임)"] },
+            { label: "Level IV", values: ["3~8학년", "모든 핵심 과목을 심화반에서 (풀타임)"] },
+          ],
+        },
+      },
+      {
+        heading: "일반 수학과 심화 수학은 무엇이 다른가요?",
+        paragraphs: [
+          "FCPS 초등학교 수학은 크게 일반 과정(Standard)과 심화 과정(Advanced)으로 나뉩니다. 일반 과정은 그 학년의 버지니아 학습 기준(SOL)을 배우고, 심화 과정은 한 학년 앞선 내용을 배웁니다.",
+          "예를 들어 4학년 일반반이 4학년 내용을 배울 때, 4학년 심화반은 5학년 내용을 배웁니다. 이 한 학년의 차이가 해마다 쌓여, 중학교에서 Algebra 1(대수 1)을 듣는 학년이 달라집니다.",
         ],
         visual: {
           type: "comparison",
           columns: [
-            { label: "일반(Standard)", tone: "standard", points: ["학년 수준의 Virginia SOL을 따라감", "예: 4학년 → 4학년 SOL"] },
-            { label: "AAP(심화)", tone: "advanced", points: ["한 학년 높은 내용을 학습", "예: 4학년 AAP → 5학년 SOL"] },
+            { label: "일반(Standard)", tone: "standard", points: ["학년 수준의 Virginia SOL을 따라감", "예: 4학년 → 4학년 내용"] },
+            { label: "심화(Advanced)", tone: "advanced", points: ["한 학년 앞선 내용을 학습", "예: 4학년 → 5학년 내용"] },
           ],
         },
       },
       {
-        heading: "AAP(Advanced Academic Programs)란?",
+        heading: "AAP 선발은 어떻게 이뤄지나요?",
         paragraphs: [
-          "AAP는 FCPS가 운영하는 심화 학습 프로그램으로, 학문적으로 뛰어난 학생들이 더 높은 수준의 교육을 받을 수 있도록 설계되어 있습니다. 수학 외에도 언어, 과학, 사회 등 전 과목에 걸쳐 심화 내용을 다룹니다.",
-          "AAP에는 두 가지 형태가 있습니다. 파트타임(Level III)은 학생이 현재 다니는 학교에서 수학·언어 시간만 심화 수업을 받는 방식이고, 풀타임(Level IV)은 지정된 AAP 센터 학교로 전학을 가서 모든 과목을 심화로 배우는 방식입니다. 풀타임은 3학년부터 지원이 가능합니다.",
-        ],
-      },
-      {
-        heading: "배치는 어떻게 이루어지나요?",
-        paragraphs: [
-          "FCPS AAP 배치는 여러 요소를 종합적으로 평가합니다. NGAT(Naglieri General Ability Test) 점수, 학업 성적(GPA), 교사 평가서, 학부모 추천서가 모두 반영됩니다. NGAT는 2025-2026학년도부터 기존 CogAT·NNAT를 대체한 단일 능력검사입니다.",
-          "중요한 점은 AAP 배치가 한 번에 영구적으로 결정되지 않는다는 것입니다. FCPS는 매년 학업 수행 능력을 다시 평가하며, 심화반을 유지하려면 꾸준한 학습이 필요합니다. 지원 신청은 일반적으로 전년도 12월 중순에 마감됩니다.",
+          "Level IV(풀타임) 선발은 FCPS 교육청의 중앙 선발위원회가 결정합니다. 2학년 학생은 학교에서 단체로 보는 능력검사 결과에 따라 자동으로 심사 대상이 되기도 하고, 학부모나 교사가 추천서(Referral)를 내서 심사를 신청할 수도 있습니다.",
+          "심사 때는 여러 자료를 함께 봅니다. NGAT 같은 능력검사 점수, 성적표와 학력평가 결과, 교사 의견, 학생 작품(Work Samples), 학부모 의견이 모두 반영됩니다. FCPS는 시험 점수 하나로 결정하지 않고 종합적으로 판단한다고 안내합니다.",
+          "Level IV 추천서는 보통 학년 초부터 12월 중순까지 받습니다. 선발되지 않았더라도 다음 해에 다시 지원할 수 있습니다. Level III(파트타임)는 각 학교의 심사위원회가 결정합니다.",
         ],
         visual: {
           type: "checklist",
-          title: "배치 평가 요소",
+          title: "Level IV 심사에서 보는 자료",
           items: [
-            { text: "NGAT(Naglieri General Ability Test) 점수" },
-            { text: "학업 성적(GPA)" },
-            { text: "교사 평가서" },
-            { text: "학부모 추천서", note: "지원 마감: 전년도 12월 중순" },
+            { text: "능력검사 점수", note: "NGAT (2025-26학년도부터 CogAT·NNAT 대체)" },
+            { text: "성적표와 학력평가 결과" },
+            { text: "교사 의견" },
+            { text: "학생 작품(Work Samples)" },
+            { text: "학부모 의견", note: "추천서 마감: 보통 12월 중순" },
           ],
         },
       },
       {
-        heading: "초등 AAP 수학이 중학교 이후 경로에 미치는 영향",
+        heading: "초등 심화 수학은 중학교에서 어떻게 이어지나요?",
         paragraphs: [
-          "초등 AAP 수학을 꾸준히 이수한 학생은 중학교에서 더 빠른 수학 경로를 밟을 수 있습니다. FCPS 기준으로, 6학년에 7학년 수준의 수학을 이수한 학생은 7학년에 Pre-Algebra, 8학년에 Algebra I를 수강하게 됩니다.",
-          "이 경로를 따라가면 고등학교에서 AP Calculus AB 또는 BC를 수강할 수 있는 기반이 마련됩니다. 많은 대학에서 AP Calculus 이수 여부를 이공계 전공 지원 시 중요하게 봅니다. 초등학교의 수학 배치가 결국 대학 입시까지 영향을 미칠 수 있다는 점에서 조기에 준비하는 것이 중요합니다.",
+          "초등 심화 수학의 가장 큰 의미는 Algebra 1을 듣는 학년이 앞당겨진다는 점입니다. FCPS는 모든 학생이 8학년까지 Algebra 1을 마치는 것을 목표로 합니다. 6학년에 Advanced Math 6를 마친 학생은 한 해 빠른 7학년에 Algebra 1 Honors를 들을 수 있습니다.",
+          "Algebra 1을 한 해 일찍 들으면 고등학교 수학 과목도 한 해씩 앞당겨져, 11학년에 AP Calculus(대학 수준 미적분)를 들을 수 있습니다. 8학년에 Algebra 1을 듣는 기본 경로로도 12학년에 AP Calculus까지 갈 수 있으니, 심화반에 들어가지 못했다고 너무 걱정하지 않으셔도 됩니다.",
         ],
         visual: {
           type: "pathway",
           steps: [
-            { label: "6학년", sublabel: "7학년 수학 이수" },
-            { label: "7학년", sublabel: "Pre-Algebra" },
-            { label: "8학년", sublabel: "Algebra I" },
+            { label: "3~5학년", sublabel: "Advanced Math" },
+            { label: "6학년", sublabel: "Advanced Math 6" },
+            { label: "7학년", sublabel: "Algebra 1 Honors" },
           ],
-          finalLabel: "AP Calculus",
+          finalLabel: "11학년 AP Calculus",
         },
       },
       {
-        heading: "학부모가 할 수 있는 것",
+        heading: "학부모가 지금 할 수 있는 것",
         paragraphs: [
-          "먼저 자녀가 현재 어느 트랙에 있는지 확인하세요. ParentVUE(학교 포털)의 수강 과목을 보거나 담임선생님에게 직접 물어볼 수 있습니다. 과목명에 'Advanced Math' 또는 학년보다 높은 숫자(예: 3학년인데 'Math 4')가 있으면 심화반입니다.",
-          "AAP 진입을 목표로 한다면, CogAT·NNAT 시험 유형을 미리 익히고 수학 개념을 탄탄히 다지는 것이 핵심입니다. 이미 AAP에 있다면, 심화 내용을 소화하면서 학업을 유지하는 것이 중요합니다.",
+          "먼저 자녀가 지금 어느 과정에 있는지 확인하세요. ParentVUE의 수강 과목에서 과목 이름에 'Advanced'가 붙어 있거나, 학년보다 높은 숫자(예: 3학년인데 Math 4)가 보이면 심화 과정입니다. 잘 모르겠다면 담임 선생님께 이메일로 물어보셔도 됩니다.",
+          "AAP 지원을 생각한다면 시험 대비보다 평소의 사고력을 키우는 것이 중요합니다. 능력검사는 배운 지식보다 추론력을 보기 때문입니다. 미국에 온 지 얼마 안 된 아이라면 영어 때문에 실력이 덜 드러날 수 있으니, 아이가 한국에서 어디까지 배웠는지 선생님께 미리 알려 두는 것도 도움이 됩니다.",
         ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "info",
+          title: "함께 읽으면 좋은 글",
+          text: "6학년부터 갈라지는 FCPS 수학 과목과, Algebra 1을 몇 학년에 듣게 되는지 자세히 정리했습니다.",
+          linkHref: "/blog/fcps-math-pathways",
+          linkLabel: "FCPS 수학 패스웨이 총정리 보기",
+        },
+      },
+    ],
+    faqKo: [
+      {
+        q: "AAP는 한국의 영재반과 같은 건가요?",
+        a: "비슷하지만 같지는 않습니다. AAP는 FCPS 공립학교 안에서 운영되는 심화 프로그램이라 따로 내는 학비가 없고, 수학뿐 아니라 언어·과학·사회도 더 깊게 배웁니다.",
+      },
+      {
+        q: "AAP 센터(Level IV)는 몇 학년부터 다니나요?",
+        a: "풀타임 Level IV는 3학년부터 시작합니다. 그래서 신청과 심사는 보통 2학년 때 이뤄집니다.",
+      },
+      {
+        q: "AAP 신청 마감은 언제인가요?",
+        a: "Level IV 추천서는 보통 학년 초부터 12월 중순까지 받습니다. 정확한 날짜는 학년도마다 다르므로 학교 AART 선생님이나 FCPS 웹사이트에서 확인하세요.",
+      },
+      {
+        q: "AAP에 선발되지 않으면 다시 지원할 수 있나요?",
+        a: "네. 다음 해에 다시 추천서를 낼 수 있습니다. FCPS는 일반 과정 학생도 3~6학년 동안 해마다 Advanced Math로 옮겨 갈 수 있게 하겠다고 밝혔습니다.",
+      },
+      {
+        q: "영어가 서툴러도 AAP에 지원할 수 있나요?",
+        a: "지원할 수 있습니다. FCPS가 쓰는 NGAT는 Verbal 영역도 글 대신 그림으로 문제를 내서 영어 실력의 영향을 줄이도록 만든 시험입니다. 다만 다른 심사 자료에는 영어가 영향을 줄 수 있으니 담임 선생님과 미리 상의해 보세요.",
       },
     ],
     bodyEn: [
@@ -327,47 +461,48 @@ export const blogPosts: BlogPost[] = [
         heading: "What Is AAP?",
         paragraphs: [
           "AAP (Advanced Academic Programs) is FCPS's enrichment program designed for academically advanced students. It covers all core subjects at an accelerated level, not just math.",
-          "There are two forms of AAP placement. Part-time (Level III) means the student stays at their home school but receives advanced instruction during math and language arts. Full-time (Level IV) means the student transfers to a designated AAP center school for all subjects. Full-time AAP is available starting in 3rd grade.",
+          "AAP services run on four levels. Levels I and II happen inside every elementary classroom, so families rarely need to apply for them. When parents say \"AAP,\" they usually mean Level III or Level IV. Part-time (Level III, grades 3-6) means the student stays at their home school and receives advanced instruction in some subjects. Full-time (Level IV) covers all core subjects in an advanced class starting in 3rd grade, either at a designated AAP center school or at a home school that offers Local Level IV.",
         ],
       },
       {
         heading: "How Is Placement Determined?",
         paragraphs: [
-          "FCPS evaluates several factors together: NGAT (Naglieri General Ability Test) scores, academic grades, teacher evaluations, and a parent recommendation. No single score determines placement. The NGAT replaced the former CogAT and NNAT tests starting in the 2025-2026 school year.",
-          "Critically, AAP placement is not permanent. FCPS re-evaluates students annually, and maintaining the advanced track requires consistent academic performance. Application windows typically close in mid-December for the following school year.",
+          "For full-time (Level IV) placement, a central FCPS selection committee looks at several sources together: ability test scores such as the NGAT (Naglieri General Ability Test), report cards and achievement data, teacher input, student work samples, and parent input. No single score determines placement. The NGAT replaced the former CogAT and NNAT tests starting in the 2025-2026 school year.",
+          "Full-time referrals typically close in mid-December for the following school year. Students who aren't selected can be referred again the next year. Level III placement is decided by a committee at each local school.",
         ],
         visual: {
           type: "checklist",
-          title: "What Placement Considers",
+          title: "What Level IV Screening Considers",
           items: [
-            { text: "NGAT (Naglieri General Ability Test) score" },
-            { text: "Academic grades (GPA)" },
-            { text: "Teacher evaluation" },
-            { text: "Parent recommendation", note: "Application deadline: mid-December" },
+            { text: "Ability test score", note: "NGAT, replacing CogAT and NNAT from 2025-26" },
+            { text: "Report cards and achievement data" },
+            { text: "Teacher input" },
+            { text: "Student work samples" },
+            { text: "Parent input", note: "Referral deadline: usually mid-December" },
           ],
         },
       },
       {
         heading: "Why AAP Math Matters for the Long-Term Pathway",
         paragraphs: [
-          "Students who complete the elementary AAP math track consistently enter a faster math sequence in middle school. Under the FCPS pathway, a student who completes 7th-grade-level math in 6th grade proceeds to Pre-Algebra in 7th grade and Algebra I in 8th grade.",
-          "This trajectory makes AP Calculus AB or BC achievable in high school, a credential that carries weight for STEM college admissions. Elementary math placement has compounding effects that reach well beyond elementary school.",
+          "The biggest effect of elementary advanced math is on when a student takes Algebra 1. FCPS expects every student to complete Algebra 1 by the end of 8th grade, and a student who completes Advanced Math 6 can take Algebra 1 Honors a year earlier, in 7th grade.",
+          "Taking Algebra 1 a year early moves every high school math course up a year, so the student reaches AP Calculus in 11th grade. The standard 8th-grade Algebra 1 path still reaches AP Calculus by 12th grade, so missing the advanced track is not the end of the road.",
         ],
         visual: {
           type: "pathway",
           steps: [
-            { label: "6th Grade", sublabel: "7th-grade math" },
-            { label: "7th Grade", sublabel: "Pre-Algebra" },
-            { label: "8th Grade", sublabel: "Algebra I" },
+            { label: "Grades 3-5", sublabel: "Advanced Math" },
+            { label: "6th Grade", sublabel: "Advanced Math 6" },
+            { label: "7th Grade", sublabel: "Algebra 1 Honors" },
           ],
-          finalLabel: "AP Calculus",
+          finalLabel: "AP Calculus in 11th",
         },
       },
       {
         heading: "What Parents Can Do",
         paragraphs: [
           "Start by confirming which track your child is currently in. Check their course list in ParentVUE or ask their teacher directly. If the course name says 'Advanced Math' or shows a grade level higher than your child's current grade, they are in the advanced track.",
-          "If you're targeting AAP placement, focus on familiarizing your child with CogAT and NNAT question formats, and building solid math concept foundations. If your child is already in AAP, the priority is sustaining performance and keeping pace with accelerated content.",
+          "If you're targeting AAP placement, focus on familiarizing your child with NGAT question formats, and building solid math concept foundations. If your child is already in AAP, the priority is sustaining performance and keeping pace with accelerated content.",
         ],
       },
     ],
@@ -375,12 +510,13 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "cogat-nnat-guide",
     publishedAt: "2026-07-27",
+    updatedAt: "2026-10-23",
     readingMins: 7,
     category: "시험",
     categoryEn: "Testing",
-    titleKo: "NGAT(구 CogAT·NNAT) 시험 완전 가이드",
+    titleKo: "NGAT 시험 총정리: FCPS AAP 선발 시험 (구 CogAT·NNAT)",
     titleEn: "A Complete Guide to the NGAT (formerly CogAT & NNAT)",
-    descKo: "FCPS AAP 배치에 사용되는 NGAT 시험의 구조, 점수 방식, 시험 시기, 그리고 준비 방법을 학부모 눈높이에서 정리했습니다. 2025-2026학년도부터 기존 CogAT·NNAT를 대체했습니다.",
+    descKo: "FCPS는 2025-26학년도부터 CogAT·NNAT 대신 NGAT로 AAP 선발 검사를 합니다. 2학년 단체 시험, Verbal·Nonverbal·Quantitative 세 영역, NAI 점수와 백분위 읽는 법, 집에서 준비하는 방법을 한국 학부모님 눈높이로 정리했습니다.",
     descEn: "Everything parents need to know about the NGAT, the ability test now used for FCPS AAP placement, including structure, scoring, timing, and preparation strategies. It replaced CogAT and NNAT starting in the 2025-2026 school year.",
     heroImage: {
       src: "/blog/cogat-nnat-guide-hero.jpg",
@@ -389,24 +525,25 @@ export const blogPosts: BlogPost[] = [
     },
     bodyKo: [
       {
-        heading: "NGAT란 무엇인가요?",
+        heading: "결론부터: 2학년 때 학교에서 보는 AAP 선발 시험입니다",
         paragraphs: [
-          "FCPS는 2025-2026학년도부터 AAP(심화학급) 선발을 위한 능력검사 체계를 바꿨습니다. 과거에는 2학년 전체 학생에게 CogAT(Cognitive Abilities Test)를, 1학년 전체 학생에게 NNAT(Naglieri Nonverbal Ability Test)를 각각 실시했지만, 현재는 이 두 시험을 대체하는 단일 검사인 NGAT(Naglieri General Ability Test)를 2~7학년 스크리닝에 활용합니다.",
-          "NGAT는 NNAT를 개발한 심리학자 Jack Naglieri가 만든 검사로, 학생이 배운 지식이 아니라 추론 능력과 문제 해결 잠재력을 측정한다는 철학은 이전과 동일합니다. 검사는 Verbal(언어 개념), Nonverbal(도형·공간 패턴), Quantitative(수량 추론) 세 영역으로 구성되어 있어, 기존 CogAT의 세 배터리 구조를 하나의 시험 안에 통합한 형태라고 볼 수 있습니다.",
+          "NGAT(Naglieri General Ability Test)는 FCPS가 AAP(심화반) 선발에 쓰는 능력검사입니다. 국어·수학처럼 배운 내용을 묻는 시험이 아니라, 처음 보는 문제를 논리적으로 푸는 추론 능력을 봅니다. 한국으로 치면 학교 시험보다 사고력·적성 검사에 가깝습니다.",
+          "예전에는 1학년이 NNAT, 2학년이 CogAT를 봤지만, 2025-26학년도부터 두 시험이 NGAT 하나로 바뀌었습니다. 학부모 커뮤니티에 아직 CogAT·NNAT라는 이름이 많이 보이는 것은 이 변화 전에 쓴 글이 많기 때문입니다.",
         ],
         visual: {
           type: "comparison",
           columns: [
-            { label: "이전 (CogAT·NNAT)", tone: "standard", points: ["2학년 전체 CogAT 실시", "1학년 전체 NNAT 실시", "영역별 별개 시험"] },
-            { label: "현재 (NGAT)", tone: "advanced", points: ["2~7학년 스크리닝에 단일 시험 활용", "Verbal·Nonverbal·Quantitative 통합"] },
+            { label: "이전 (CogAT·NNAT)", tone: "standard", points: ["2학년 전체 CogAT 실시", "1학년 전체 NNAT 실시", "학년별로 다른 시험"] },
+            { label: "현재 (NGAT)", tone: "advanced", points: ["2~7학년 심사에 시험 하나로 통일", "Verbal·Nonverbal·Quantitative 통합"] },
           ],
         },
       },
       {
-        heading: "세 가지 영역: Verbal·Nonverbal·Quantitative",
+        heading: "NGAT에는 어떤 문제가 나오나요?",
         paragraphs: [
-          "Verbal(언어) 영역은 여섯 개의 그림 중 다섯 개가 공유하는 개념을 찾아내는 방식으로 언어적 개념을 측정하며, 문장이 아닌 그림으로 제시되어 언어 배경에 관계없이 공정하게 평가할 수 있도록 설계되었습니다. Nonverbal(비언어) 영역은 도형, 색상, 순서, 방향 등 시각적 패턴 사이의 논리적 관계를 파악하는 능력을 측정합니다.",
-          "Quantitative(수량) 영역은 숫자와 기호 사이의 관계를 다루며, 단순 연산 실력이 아니라 수학적으로 사고하는 방식을 평가합니다. 세 영역 모두 학교에서 배운 교과 지식보다는 순수한 추론 능력에 초점을 맞춘다는 점은 이전 CogAT·NNAT 체계와 같습니다.",
+          "NGAT는 Verbal(언어), Nonverbal(비언어), Quantitative(수량) 세 영역으로 이뤄져 있습니다. NNAT를 만든 심리학자 Jack Naglieri가 개발한 시험으로, 기존 CogAT의 세 영역을 시험 하나에 담은 형태라고 보면 됩니다.",
+          "Verbal 영역도 글이 아니라 그림으로 문제를 냅니다. 여섯 개의 그림 가운데 다섯 개에 공통으로 해당하는 개념을 찾는 방식이라, 영어가 서툰 아이도 문제 형식 때문에 불리하지 않도록 만들어졌습니다.",
+          "Nonverbal 영역은 도형·색·순서·방향 사이의 규칙을 찾는 문제이고, Quantitative 영역은 숫자와 기호 사이의 관계를 추론하는 문제입니다. 세 영역 모두 계산 속도보다 생각하는 방식을 봅니다.",
         ],
         visual: {
           type: "table",
@@ -419,32 +556,77 @@ export const blogPosts: BlogPost[] = [
         },
       },
       {
-        heading: "점수는 어떻게 계산되나요?",
+        heading: "NGAT 점수는 어떻게 읽나요?",
         paragraphs: [
-          "NGAT 결과는 NAI(Naglieri Ability Index)라는 표준화 점수와 백분위(Percentile Rank)로 제공됩니다. NAI는 같은 연령대 학생들과 비교한 점수로, 평균이 100이며 대다수 학생은 85~115 사이에 분포합니다. 백분위 99는 동일 연령대 100명 중 상위 1등이라는 의미입니다.",
-          "FCPS에서 풀타임 AAP(Level IV) 배치는 일반적으로 상위 3~5% 이내의 점수가 요구되지만, 점수만으로 결정되지 않고 교사 평가, 학업 성취도 등을 종합적으로 반영합니다.",
+          "NGAT 결과는 NAI(Naglieri Ability Index)라는 점수와 백분위(Percentile Rank)로 나옵니다. NAI는 같은 나이 학생들과 비교한 점수로, 평균이 100이고 대부분의 학생이 85~115 사이에 있습니다.",
+          "백분위는 같은 나이 학생 100명 중 몇 명보다 높은지를 뜻합니다. 백분위 99라면 100명 중 99명보다 높다는 뜻으로, 상위 1%에 해당합니다. 한국의 석차 백분율과는 방향이 반대라서 숫자가 클수록 좋은 점수입니다.",
+          "풀타임 AAP(Level IV)는 학부모들 사이에서 상위 3~5% 정도가 기준이라고 흔히 이야기됩니다. 하지만 FCPS는 공식 커트라인을 발표하지 않으며, 시험 점수만으로 결정하지 않고 교사 의견과 학업 자료를 함께 봅니다.",
         ],
         visual: {
           type: "stat",
           value: "상위 3~5%",
-          label: "FCPS 풀타임 AAP(Level IV) 배치 기준",
-          source: "NAI 평균 100, 대다수 85~115 분포 (백분위 99 = 상위 1%)",
+          label: "풀타임 AAP(Level IV)에서 흔히 거론되는 점수대 (공식 커트라인 아님)",
+          source: "NAI 평균 100, 대부분 85~115 분포 (백분위 99 = 상위 1%)",
         },
         visualPosition: "before",
       },
       {
-        heading: "시험은 언제, 어떻게 치르나요?",
+        heading: "NGAT는 언제, 어떻게 보나요?",
         paragraphs: [
-          "FCPS는 2학년 학생 전원을 대상으로 NGAT 스크리닝을 실시하며, 3학년 풀타임 AAP 배치를 위한 첫 관문이 됩니다. 학교에서 단체로 실시하며 별도 등록 없이 자동으로 포함됩니다. 스크리닝을 원하는 다른 학년(2~7학년) 학생은 학부모가 학교에 추천서(Referral)를 제출해야 합니다.",
-          "풀타임 AAP 추천서 접수는 매년 8월 중순부터 12월 중순까지 진행되며, 정확한 마감일은 학년도마다 조금씩 달라질 수 있으므로 재학 중인 학교의 AART(Advanced Academic Resource Teacher)나 학교 홈페이지 공지를 확인하는 것이 가장 정확합니다. 스크리닝 이후 학교에서 학부모에게 결과를 통보하고, 필요 시 추가 평가(Portfolio Review)를 거쳐 최종 배치가 결정됩니다. 참고로 FCPS는 조지메이슨대학교 CEWS 프로그램 등에서 개별적으로 응시한 CogAT·NNAT-3 점수나 WISC-V 점수도 계속 인정하고 있습니다.",
+          "FCPS는 2학년 학생 전원에게 학교에서 단체로 NGAT를 실시합니다. 따로 신청하지 않아도 되며, 3학년부터 시작하는 풀타임 AAP 선발의 첫 단계가 됩니다.",
+          "다른 학년(2~7학년) 학생이 심사를 받으려면 학부모가 학교에 추천서(Referral)를 내야 합니다. 풀타임 AAP 추천서는 보통 8월 중순부터 12월 중순까지 받으며, 정확한 마감일은 해마다 조금씩 다르므로 학교의 AART(AAP 담당 교사)나 학교 홈페이지 공지를 확인하세요.",
+          "결과가 나오면 학교가 학부모에게 알려 주고, 이후 포트폴리오 심사를 거쳐 최종 배치가 정해집니다. FCPS는 조지메이슨대학교 CEWS 프로그램처럼 외부에서 개별로 본 CogAT·NNAT-3 점수나 WISC-V 점수도 인정합니다.",
         ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "info",
+          title: "NGAT 한 페이지 정리",
+          text: "NGAT 시험 구성과 AAP 선발 단계를 한 페이지에 정리해 두었습니다.",
+          linkHref: "/resources/testing/ngat",
+          linkLabel: "NGAT 안내 페이지 보기",
+        },
       },
       {
-        heading: "어떻게 준비할 수 있나요?",
+        heading: "집에서는 어떻게 준비하나요?",
         paragraphs: [
-          "NGAT는 교과 내용보다 추론 능력을 측정하기 때문에, 단순 암기나 공식 학습만으로는 준비가 어렵습니다. 가장 효과적인 준비는 세 영역(Verbal·Nonverbal·Quantitative)의 문제 유형에 익숙해지는 것입니다. 공식 연습 자료나 유사 문항을 통해 각 영역의 형식과 시간 배분을 미리 경험해보는 것이 도움이 됩니다.",
-          "Quantitative 영역은 수학적 사고력이 반영되기 때문에, 평소에 Singapore Math나 Beast Academy처럼 개념 중심의 사고력 수학을 훈련하면 실질적인 준비가 됩니다. 단, 시험 직전에 벼락치기식으로 준비하기보다는 꾸준한 추론력 훈련이 더 효과적입니다.",
+          "NGAT는 외워서 푸는 시험이 아니므로, 짧은 기간에 문제집을 많이 푸는 방식은 효과가 크지 않습니다. 가장 현실적인 준비는 세 영역의 문제 형식을 미리 경험해 보는 것입니다. 처음 보는 형식에 당황하지 않는 것만으로도 실력을 제대로 보여 줄 수 있습니다.",
+          "평소에는 퍼즐이나 패턴 놀이처럼 규칙을 찾는 활동이 도움이 됩니다. Quantitative 영역은 수학적 사고력과 이어지므로, Singapore Math나 Beast Academy처럼 개념을 깊이 다루는 교재로 꾸준히 생각하는 연습을 하면 실질적인 준비가 됩니다.",
+          "시험을 앞두고 아이에게 부담을 주는 것은 피하세요. 긴장하면 실력보다 낮은 결과가 나오기 쉽습니다. '재미있는 퍼즐을 푸는 날' 정도로 이야기해 주는 편이 좋습니다.",
         ],
+        visual: {
+          type: "checklist",
+          title: "집에서 해 볼 수 있는 활동",
+          items: [
+            { text: "도형 패턴·규칙 찾기 퍼즐" },
+            { text: "'공통점 찾기' 대화", note: "예: 사과·바나나·포도의 공통점은?" },
+            { text: "블록·탱그램 같은 공간 놀이" },
+            { text: "개념 중심 사고력 수학", note: "Singapore Math, Beast Academy" },
+            { text: "시험 형식 미리 경험하기", note: "벼락치기보다 익숙해지기" },
+          ],
+        },
+      },
+    ],
+    faqKo: [
+      {
+        q: "NGAT와 CogAT는 무엇이 다른가요?",
+        a: "둘 다 추론 능력을 보는 능력검사입니다. FCPS는 2025-26학년도부터 1학년 NNAT와 2학년 CogAT 대신 NGAT 하나를 쓰며, NGAT는 Verbal·Nonverbal·Quantitative 세 영역을 한 시험에 담았습니다.",
+      },
+      {
+        q: "NGAT는 따로 신청해야 하나요?",
+        a: "2학년은 학교에서 전원이 단체로 보므로 신청할 필요가 없습니다. 다른 학년이 심사를 받으려면 학부모가 학교에 추천서(Referral)를 내야 합니다.",
+      },
+      {
+        q: "NGAT 점수가 몇 점이면 AAP에 선발되나요?",
+        a: "FCPS는 공식 커트라인을 발표하지 않습니다. 흔히 상위 3~5% 수준이 이야기되지만, 교사 의견과 학업 자료를 함께 보는 종합 심사라서 점수만으로 결정되지 않습니다.",
+      },
+      {
+        q: "영어를 잘 못해도 NGAT를 볼 수 있나요?",
+        a: "네. NGAT는 Verbal 영역도 글이 아닌 그림으로 문제를 내서, 영어 실력이 결과에 미치는 영향을 줄이도록 만들어졌습니다.",
+      },
+      {
+        q: "NGAT 대비 학원을 꼭 다녀야 하나요?",
+        a: "꼭 그럴 필요는 없습니다. 추론 능력을 보는 시험이라 문제 형식에 익숙해지는 정도면 충분하고, 평소의 사고력 수학과 퍼즐 활동이 더 효과적인 준비입니다.",
       },
     ],
     bodyEn: [
@@ -482,12 +664,12 @@ export const blogPosts: BlogPost[] = [
         heading: "How Are Scores Calculated?",
         paragraphs: [
           "NGAT results are reported as a Naglieri Ability Index (NAI) and a Percentile Rank. The NAI compares a student to same-age peers, with an average of 100; most students score between 85 and 115. A 99th percentile means a student scored higher than 99 out of 100 same-age peers.",
-          "Full-time AAP (Level IV) placement in FCPS typically requires scores in roughly the top 3–5%, but scores are never the sole deciding factor. Teacher evaluations and academic performance are also weighed.",
+          "Parents often cite roughly the top 3–5% as the typical range for full-time AAP (Level IV), but FCPS does not publish an official cutoff, and scores are never the sole deciding factor. Teacher input and academic performance are also weighed.",
         ],
         visual: {
           type: "stat",
           value: "Top 3-5%",
-          label: "Typical threshold for full-time AAP (Level IV) placement",
+          label: "Range often cited for full-time AAP (Level IV), not an official cutoff",
           source: "NAI average is 100; most students score 85-115 (99th percentile = top 1%)",
         },
         visualPosition: "before",
@@ -511,12 +693,13 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "singapore-math-explained",
     publishedAt: "2025-05-08",
-    readingMins: 5,
+    updatedAt: "2026-10-23",
+    readingMins: 6,
     category: "교재",
     categoryEn: "Curriculum",
-    titleKo: "Singapore Math가 특별한 이유",
+    titleKo: "싱가포르 수학(Singapore Math)이란? 특징과 한국 수학과의 차이",
     titleEn: "Why Singapore Math Works",
-    descKo: "전 세계 영재 교육에서 주목받는 Singapore Math의 철학과 교육 방식, 그리고 미국의 전통적인 수학 교육과 어떻게 다른지 학부모 눈높이에서 설명합니다.",
+    descKo: "싱가폴 수학이라고도 부르는 Singapore Math는 미국 영재교육에서 많이 쓰는 수학 교육법입니다. CPA 접근법과 바 모델(Bar Model)이 무엇인지, 한국·미국 수학 수업과 어떻게 다른지, 대표 교재와 Beast Academy와의 관계까지 쉽게 설명합니다.",
     descEn: "An accessible explanation of what Singapore Math is, why it's widely adopted in gifted education programs, and how it differs from traditional US math instruction.",
     heroImage: {
       src: "/blog/singapore-math-explained-hero.jpg",
@@ -525,17 +708,28 @@ export const blogPosts: BlogPost[] = [
     },
     bodyKo: [
       {
-        heading: "Singapore Math란 무엇인가요?",
+        heading: "Singapore Math는 어떤 수학인가요?",
         paragraphs: [
-          "Singapore Math는 1980년대 싱가포르 교육부가 개발한 수학 교육 과정입니다. 싱가포르는 이 교육과정을 도입한 이후 국제 수학·과학 성취도 평가(TIMSS)에서 지속적으로 최상위권을 기록하고 있습니다. 이 성과에 주목한 미국의 여러 학군과 영재 교육 프로그램이 Singapore Math를 도입하기 시작했습니다.",
-          "핵심은 '더 적은 주제를 더 깊게'(Teach Less, Learn More)라는 철학입니다. 미국의 전통 수학 교과서가 많은 주제를 빠르게 훑고 지나가는 반면, Singapore Math는 핵심 개념을 깊이 탐구하고 완전히 이해한 뒤 다음 개념으로 넘어갑니다.",
+          "Singapore Math(싱가포르 수학, 흔히 '싱가폴 수학')는 1980년대 싱가포르 교육부가 만든 수학 교육과정에서 출발했습니다. 싱가포르는 이 방식을 도입한 뒤 국제 수학·과학 성취도 평가(TIMSS)에서 꾸준히 최상위권을 기록했고, 이를 본 미국의 여러 학군과 영재 교육 프로그램이 Singapore Math를 도입했습니다.",
+          "핵심 철학은 '적게 가르치고 더 깊이 배운다(Teach Less, Learn More)'입니다. 한 학년에 많은 단원을 빠르게 훑기보다, 핵심 개념을 충분히 이해한 뒤 다음 개념으로 넘어갑니다.",
         ],
+        visual: {
+          type: "checklist",
+          title: "이 글의 핵심 요약",
+          items: [
+            { text: "개념을 '왜'부터 깊이 이해하게 하는 수학입니다" },
+            { text: "실물 → 그림 → 숫자 순서로 배웁니다", note: "CPA 접근법" },
+            { text: "막대 그림(Bar Model)으로 문장제를 풉니다" },
+            { text: "교재는 아이의 실제 수준에 맞춰 고릅니다", note: "무료 배치고사 활용" },
+            { text: "Beast Academy와 함께 쓰면 효과가 큽니다" },
+          ],
+        },
       },
       {
-        heading: "CPA 접근법: 구체에서 그림을 거쳐 추상으로",
+        heading: "CPA 접근법이란 무엇인가요?",
         paragraphs: [
-          "Singapore Math의 핵심 교육 방식은 CPA(Concrete-Pictorial-Abstract) 접근법입니다. 학생이 수학 개념을 처음 접할 때는 실물(구체물)로 직접 만지며 이해하고, 그 다음엔 그림이나 도식으로 표현하며, 마지막으로 추상적인 숫자와 기호로 다룹니다.",
-          "예를 들어 분수를 배울 때, 먼저 피자나 블록 같은 실물을 반으로 나눠 보고, 이후 원이나 막대를 나눈 그림으로 표현하며, 마지막에 '1/2'이라는 기호를 사용합니다. 이 과정을 통해 학생들은 숫자 뒤에 있는 개념을 직관적으로 이해하게 됩니다.",
+          "Singapore Math의 대표적인 교수법은 CPA 접근법입니다. Concrete(구체물), Pictorial(그림), Abstract(추상)의 앞 글자를 딴 이름으로, 새 개념을 이 세 단계 순서로 배웁니다.",
+          "분수를 예로 들면, 먼저 블록이나 피자 모형을 직접 반으로 나눠 봅니다. 다음에는 원이나 막대를 나눈 그림으로 표현하고, 마지막에야 '1/2'이라는 기호를 씁니다. 이렇게 배우면 숫자 뒤에 있는 의미를 직관적으로 이해하게 됩니다.",
         ],
         visual: {
           type: "pathway",
@@ -547,32 +741,78 @@ export const blogPosts: BlogPost[] = [
         },
       },
       {
-        heading: "Bar Model로 워드 프로블럼 시각화하기",
+        heading: "바 모델(Bar Model)은 무엇인가요?",
         paragraphs: [
-          "Singapore Math의 또 다른 특징은 Bar Model(막대 모델)입니다. 복잡한 워드 프로블럼을 막대 그림으로 시각화하여 문제의 구조를 파악하는 방법입니다.",
-          "예를 들어 '민수는 영희보다 사탕을 12개 더 가지고 있고, 둘 합쳐서 48개다. 민수는 몇 개?'라는 문제를 막대로 그리면, 대수 방정식 없이도 초등학생이 논리적으로 풀 수 있습니다. 이 방법은 훗날 대수(Algebra)의 개념적 기초가 됩니다.",
+          "바 모델은 문장제 문제의 내용을 막대 그림으로 그려, 문제의 구조를 눈으로 보이게 하는 방법입니다. Singapore Math의 가장 큰 특징으로 꼽힙니다.",
+          "예를 들어 '민수는 영희보다 사탕이 12개 더 많고, 둘이 가진 사탕은 모두 48개입니다. 민수의 사탕은 몇 개일까요?'라는 문제가 있다고 해 봅시다. 영희의 막대 하나와, 그보다 12만큼 긴 민수의 막대를 그리면 48에서 12를 뺀 36을 똑같이 둘로 나누면 된다는 것이 보입니다. 영희는 18개, 민수는 30개입니다.",
+          "방정식을 배우기 전인 초등학생도 이 방법으로 논리적으로 풀 수 있고, 나중에 대수(Algebra)를 배울 때 그대로 기초가 됩니다. 영어로 된 문장제가 어려운 아이에게도 문제를 그림으로 정리하는 습관이 큰 도움이 됩니다.",
         ],
       },
       {
-        heading: "미국 수학 교육과 무엇이 다른가요?",
+        heading: "한국·미국 수학 수업과 무엇이 다른가요?",
         paragraphs: [
-          "전통적인 미국 수학 교육은 공식과 절차(Procedure)를 먼저 가르치고, 많은 문제를 반복해서 풀게 하는 방식입니다. 이렇게 하면 계산 속도는 빨라지지만 '왜(Why)' 그렇게 되는지 이해하지 못하는 경우가 많습니다.",
-          "Singapore Math는 반대로 '왜'를 먼저 이해시킵니다. 나눗셈이 무엇인지 개념을 완전히 이해한 학생은 공식을 잊어버려도 스스로 다시 유도할 수 있습니다. CogAT·NNAT 같은 추론 능력 시험이나 AMC 같은 수학 경시대회에서 Singapore Math 학생들이 강한 이유가 이 때문입니다.",
+          "전통적인 미국 수학 수업은 공식과 계산 절차를 먼저 가르치고 비슷한 문제를 반복해서 풀게 하는 경우가 많습니다. 계산은 빨라지지만 '왜 그렇게 되는지'는 이해하지 못한 채 넘어가기 쉽습니다.",
+          "Singapore Math는 반대로 '왜'를 먼저 이해시키고, 그 개념을 그림과 말로 설명하게 합니다. 나눗셈이 무엇인지 제대로 이해한 아이는 공식을 잊어도 스스로 다시 떠올릴 수 있습니다.",
+          "요즘 FCPS 수업도 답보다 풀이 과정을 설명하는 것을 중요하게 봅니다. 한국에서 계산을 잘하던 아이가 미국 학교에서 '생각을 설명하라(Explain your thinking)'는 문제에 당황하는 것도 이 때문입니다. NGAT(구 CogAT·NNAT) 같은 추론 시험이나 AMC 8 같은 경시대회에서 Singapore Math로 공부한 학생이 강한 이유이기도 합니다.",
         ],
         visual: {
           type: "comparison",
           columns: [
             { label: "전통적 미국 수학", tone: "standard", points: ["공식·절차를 먼저 학습", "반복 연산으로 계산 속도 향상", "'왜'는 이해 못하는 경우가 많음"] },
-            { label: "Singapore Math", tone: "advanced", points: ["'왜'를 먼저 완전히 이해", "개념을 잊어도 스스로 재유도 가능", "추론 시험·경시대회에 강함"] },
+            { label: "Singapore Math", tone: "advanced", points: ["'왜'를 먼저 완전히 이해", "개념을 잊어도 스스로 다시 떠올림", "추론 시험·경시대회에 강함"] },
           ],
         },
       },
       {
-        heading: "Beast Academy와의 관계",
+        heading: "Singapore Math 교재는 무엇이 있나요?",
         paragraphs: [
-          "Beast Academy는 수학 올림피아드 기관인 Art of Problem Solving(AoPS)이 Singapore Math 철학에 기반하여 개발한 미국용 영재 수학 교재 시리즈입니다. 만화책 형식으로 구성된 Guide와 문제집인 Practice로 이루어져 있으며, 2~5학년을 대상으로 합니다.",
-          "Singapore Math가 개념의 깊이를 다진다면, Beast Academy는 그 위에서 창의적 문제 해결과 수학적 토론 능력을 키웁니다. 두 교재가 함께 사용될 때 가장 효과적인 것도 이 때문입니다.",
+          "Singapore Math 교재는 여러 출판사에서 나옵니다. 가정에서 많이 쓰는 것은 Singapore Math Inc.의 Dimensions Math와 Primary Mathematics 시리즈이고, 미국 학교에서는 Math in Focus라는 교과서를 쓰기도 합니다.",
+          "교재는 학년보다 아이의 실제 수준에 맞춰 고르세요. 출판사 웹사이트에서 무료 배치고사(Placement Test)를 제공하므로, 먼저 풀어 보고 시작 단계를 정하는 것이 좋습니다. 한국에서 진도를 많이 나간 아이도 영어 문장제와 설명 문제에 익숙해질 때까지는 한 단계 아래에서 시작하는 편이 수월할 수 있습니다.",
         ],
+        visual: {
+          type: "table",
+          headers: ["교재", "특징"],
+          rows: [
+            { label: "Dimensions Math", values: ["Singapore Math Inc. 출판. 그림과 설명이 풍부한 가정·학교용 시리즈"] },
+            { label: "Primary Mathematics", values: ["싱가포르 원조 교과서를 바탕으로 한 시리즈"] },
+            { label: "Math in Focus", values: ["미국 학교용으로 만든 Singapore Math 교과서"] },
+            { label: "Beast Academy", values: ["AoPS 출판. 만화 형식의 초등 심화 사고력 교재"] },
+          ],
+        },
+      },
+      {
+        heading: "Beast Academy와는 어떤 관계인가요?",
+        paragraphs: [
+          "Beast Academy는 수학 올림피아드 교육으로 유명한 AoPS(Art of Problem Solving)가 Singapore Math의 철학을 바탕으로 만든 초등 심화 수학 교재입니다. 만화책 형식의 Guide와 문제집인 Practice로 구성되어 있고, 초등 1~5학년 수준을 다룹니다.",
+          "Singapore Math가 개념의 뿌리를 단단히 한다면, Beast Academy는 그 위에서 처음 보는 문제를 끈기 있게 푸는 힘을 키워 줍니다. 그래서 두 교재를 함께 쓰는 가정이 많습니다.",
+        ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "info",
+          title: "다음 단계가 궁금하다면",
+          text: "MOEMS, AMC 8, Math Kangaroo 등 초등학생이 참가할 수 있는 미국 수학 경시대회를 비교했습니다.",
+          linkHref: "/blog/math-competitions-fcps",
+          linkLabel: "미국 초등 수학 경시대회 정리 보기",
+        },
+      },
+    ],
+    faqKo: [
+      {
+        q: "싱가폴 수학과 싱가포르 수학은 같은 건가요?",
+        a: "네, 같은 Singapore Math를 가리킵니다. 싱가포르 교육부의 교육과정에서 출발한 개념 중심 수학 교육법과 그 교재를 통틀어 부르는 말입니다.",
+      },
+      {
+        q: "Singapore Math는 어느 단계부터 시작하면 되나요?",
+        a: "학년보다 아이의 실제 수준에 맞추는 것이 중요합니다. 출판사 웹사이트의 무료 배치고사(Placement Test)를 먼저 풀어 보고 시작 단계를 정하세요.",
+      },
+      {
+        q: "Beast Academy와 Singapore Math 중 무엇을 먼저 해야 하나요?",
+        a: "개념이 아직 탄탄하지 않다면 Singapore Math로 기초를 다지고, 사고력 문제에 흥미를 보이면 Beast Academy를 더하는 순서를 권합니다. 두 교재를 함께 써도 좋습니다.",
+      },
+      {
+        q: "바 모델은 집에서 어떻게 연습하나요?",
+        a: "문장제를 풀 때 바로 식을 세우지 말고, 문제에 나온 양을 먼저 막대로 그리게 해 보세요. 어느 부분이 같고 어느 부분이 더 긴지 보이면 식이 자연스럽게 나옵니다.",
       },
     ],
     bodyEn: [
@@ -609,7 +849,7 @@ export const blogPosts: BlogPost[] = [
         heading: "How It Differs from Traditional U.S. Math",
         paragraphs: [
           "Traditional U.S. math instruction often prioritizes procedure first, teaching formulas and having students drill many repetitions. Students can become fast calculators without understanding why the methods work.",
-          "Singapore Math inverts this. Students who deeply understand division can reconstruct the concept even if they forget a formula. This is why Singapore Math students tend to perform well on reasoning-based tests like CogAT and NNAT, and in competitions like AMC 8.",
+          "Singapore Math inverts this. Students who deeply understand division can reconstruct the concept even if they forget a formula. This is why Singapore Math students tend to perform well on reasoning-based tests like the NGAT (formerly CogAT and NNAT), and in competitions like AMC 8.",
         ],
         visual: {
           type: "comparison",
@@ -622,7 +862,7 @@ export const blogPosts: BlogPost[] = [
       {
         heading: "The Connection to Beast Academy",
         paragraphs: [
-          "Beast Academy is a gifted math series for grades 2–5 created by Art of Problem Solving (AoPS), built on Singapore Math's foundational philosophy. It consists of comic-book-style Guide books and companion Practice workbooks that develop creative problem solving and mathematical discussion.",
+          "Beast Academy is a gifted math series for grades 1–5 created by Art of Problem Solving (AoPS), built on Singapore Math's foundational philosophy. It consists of comic-book-style Guide books and companion Practice workbooks that develop creative problem solving and mathematical discussion.",
           "If Singapore Math builds deep conceptual roots, Beast Academy grows creative reasoning on top of them. The two programs complement each other, which is why using them together produces the strongest results.",
         ],
       },
@@ -631,12 +871,13 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "math-competitions-fcps",
     publishedAt: "2025-05-15",
+    updatedAt: "2026-10-23",
     readingMins: 6,
     category: "경시대회",
     categoryEn: "Competitions",
-    titleKo: "FCPS 학생이 참가할 수 있는 수학 경시대회",
+    titleKo: "미국 초등학생 수학 경시대회 정리: MOEMS·AMC 8·Math Kangaroo",
     titleEn: "Math Competitions Open to FCPS Students",
-    descKo: "MOEMS, AMC 8, Math Kangaroo 등 Fairfax 지역 초등학생이 참가할 수 있는 주요 수학 경시대회를 정리했습니다. 각 대회의 수준, 일정, 참가 방법을 확인하세요.",
+    descKo: "페어팩스(FCPS) 초등학생이 참가할 수 있는 대표적인 미국 수학 경시대회 3가지를 비교했습니다. 대상 학년, 시험 시기, 난이도, 신청 방법과 함께 몇 학년부터 준비를 시작하면 좋은지 정리했습니다.",
     descEn: "An overview of major math competitions available to FCPS elementary students, including MOEMS, AMC 8, Math League, and Math Kangaroo, with details on difficulty, timing, and how to participate.",
     heroImage: {
       src: "/blog/math-competitions-fcps-hero.jpg",
@@ -645,24 +886,51 @@ export const blogPosts: BlogPost[] = [
     },
     bodyKo: [
       {
-        heading: "왜 수학 경시대회에 참가하나요?",
+        heading: "결론부터: 처음이라면 MOEMS나 Math Kangaroo로 시작하세요",
         paragraphs: [
-          "수학 경시대회는 학교 성적과는 다른 방식으로 학생의 수학적 사고력을 자극합니다. 정해진 공식이 없는 문제를 만나고, 다양한 풀이 방법을 탐구하며, 틀려도 괜찮은 환경에서 도전하는 경험이 학생의 수학적 자신감을 키웁니다.",
-          "대회 결과 자체보다는 준비 과정에서 쌓이는 문제 해결 능력이 중요합니다. 많은 학교에서 MOEMS 성적을 AAP 심화 평가 포트폴리오에 포함하기도 합니다.",
+          "미국에는 초등학생이 참가할 수 있는 수학 경시대회가 여러 개 있습니다. 학교 성적에 들어가는 시험은 아니지만, 학교 수업보다 깊은 사고력 문제를 경험할 좋은 기회입니다.",
+          "페어팩스 지역 초등학생이 많이 참가하는 대회는 MOEMS, AMC 8, Math Kangaroo입니다. 처음이라면 문제 수가 적고 난이도가 적당한 MOEMS나 Math Kangaroo로 시작하고, 실력이 쌓이면 AMC 8에 도전하는 순서를 권합니다.",
+        ],
+        visual: {
+          type: "table",
+          headers: ["", "MOEMS", "AMC 8", "Math Kangaroo"],
+          rows: [
+            { label: "대상 학년", values: ["4~6학년(E) / 6~8학년(M)", "8학년 이하", "K~12학년 전체"] },
+            { label: "형식", values: ["5회 × 30분 × 5문제", "25문항, 40분 객관식", "학년별 문항 수, 75분"] },
+            { label: "시행 시기", values: ["11월~3월(5회)", "매년 1월", "매년 3월"] },
+            { label: "신청 방법", values: ["학교·학원 팀 단위", "시행 학교·시험장 통해", "개인 신청 가능"] },
+            { label: "난이도", values: ["창의적이나 접근 쉬움", "후반부 상당히 어려움", "학년별로 조정"] },
+          ],
+        },
+      },
+      {
+        heading: "수학 경시대회는 왜 참가하나요?",
+        paragraphs: [
+          "경시대회 문제는 공식을 대입해서 바로 풀리지 않는 경우가 많습니다. 처음 보는 문제를 여러 방법으로 시도해 보는 경험이 수학적 자신감을 키웁니다. 틀려도 학교 성적에 남지 않으므로 부담 없이 도전할 수 있습니다.",
+          "결과보다 준비 과정이 더 중요합니다. 경시대회를 준비하며 생긴 문제 해결력과 풀이를 설명하는 습관은 학교 수학과 이후의 더 어려운 대회까지 그대로 이어집니다.",
         ],
       },
       {
-        heading: "MOEMS, 초등학생에게 가장 접근하기 쉬운 경시대회",
+        heading: "MOEMS: 초등학생이 시작하기 가장 좋은 대회",
         paragraphs: [
-          "MOEMS(Math Olympiad for Elementary and Middle Schools)는 1977년 설립된 비영리 단체가 운영하는 경시대회로, 전 세계 170,000명 이상이 참가하는 대형 대회입니다. 4~6학년(Division E)과 4~8학년(Division M) 두 부문이 있습니다.",
-          "매년 11월부터 3월까지 5회에 걸쳐 각각 30분, 5문제씩 출제됩니다. 학교나 외부 팀 단위로 참가하며, 팀당 최대 35명이 등록 가능합니다. 문제 수준은 기발하고 창의적인 사고를 요구하지만 초등학생도 충분히 도전할 수 있는 수준입니다. MOEMS 공식 웹사이트(moems.org)에서 과거 기출문제를 무료로 내려받을 수 있습니다.",
+          "MOEMS(Math Olympiad for Elementary and Middle Schools)는 1977년에 세워진 비영리 단체가 운영하는 대회로, 전 세계에서 매년 17만 명 이상이 참가합니다. 초등부(Division E, 4~6학년)와 중등부(Division M, 6~8학년)가 있습니다.",
+          "11월부터 3월까지 한 달에 한 번씩 모두 5회 시험을 보고, 한 번에 30분 동안 5문제를 풉니다. 개인이 아니라 학교나 학원 같은 팀 단위로 등록하며, 한 팀은 최대 35명입니다. 문제는 창의적인 생각을 요구하지만 초등학생도 충분히 도전할 수 있는 수준입니다.",
         ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "info",
+          title: "MOEMS 자세히 보기",
+          text: "MOEMS 점수 계산 방법과 Division E·M 샘플 문제를 안내 페이지에 모아 두었습니다.",
+          linkHref: "/resources/testing/moems",
+          linkLabel: "MOEMS 안내 페이지 보기",
+        },
       },
       {
-        heading: "AMC 8, 미국수학협회 공인 수학 경시대회",
+        heading: "AMC 8: 미국수학협회가 여는 대표 대회",
         paragraphs: [
-          "AMC 8(American Mathematics Competition 8)은 미국수학협회(MAA)가 주관하는 대회로, 8학년 이하 학생 전원이 참가할 수 있습니다. 매년 1월에 시행되며, 25문항, 40분이 주어집니다. 주관식 없이 전부 5지선다 객관식입니다.",
-          "난이도는 MOEMS보다 높습니다. 특히 후반부 10문제는 상당한 수학적 창의성이 요구됩니다. 고득점자는 AMC 10/12 → AIME → USAMO로 이어지는 미국 수학 올림피아드 경로에 진입할 수 있어, 수학에 열정 있는 학생에게는 장기적인 목표가 됩니다.",
+          "AMC 8(American Mathematics Competition 8)은 미국수학협회(MAA)가 매년 1월에 여는 대회로, 8학년 이하라면 학년과 상관없이 응시할 수 있습니다. 25문항을 40분 동안 푸는 5지선다 객관식 시험입니다.",
+          "난이도는 MOEMS보다 높고, 특히 뒤쪽 10문제는 여러 개념을 엮어야 풀립니다. AMC 8은 미국 수학 올림피아드로 이어지는 AMC 시리즈의 첫 단계입니다. 다만 AMC 8 자체에는 다음 라운드가 없고, AMC 10·12에서 좋은 성적을 받아야 AIME와 USAMO로 올라갈 수 있습니다.",
         ],
         visual: {
           type: "pathway",
@@ -671,28 +939,45 @@ export const blogPosts: BlogPost[] = [
         },
       },
       {
-        heading: "Math Kangaroo로 경험하는 국제 수학 대회",
+        heading: "Math Kangaroo: 전 세계 학생과 겨루는 국제 대회",
         paragraphs: [
-          "Math Kangaroo는 1991년 프랑스에서 시작된 국제 수학 경시대회로, 현재 90개국 이상이 참가합니다. 매년 3월 셋째 목요일에 시행되며, K-12 전체 학년을 대상으로 학년별 난이도가 구분됩니다.",
-          "각 학년에 맞는 30문항을 75분 안에 풀며, 참가 신청은 kangaroo.org에서 개인 단위로 할 수 있습니다. 참가비는 소정의 금액이 있으며, 전 세계 학생들과 비교할 수 있다는 점에서 흥미로운 경험이 됩니다.",
+          "Math Kangaroo(수학 캥거루)는 1991년 프랑스에서 시작된 국제 수학 대회로, 지금은 90개가 넘는 나라에서 열립니다. 유치원부터 12학년까지 학년별로 난이도가 나뉘어 있어 저학년도 참가하기 좋습니다.",
+          "매년 3월(보통 셋째 목요일)에 시험을 보며, 시험 시간은 75분이고 문항 수는 학년에 따라 다릅니다. 참가 신청은 kangaroo.org에서 개인으로 할 수 있고, 소정의 참가비가 있습니다. 전 세계 같은 학년 학생들과 비교해 볼 수 있다는 점이 특징입니다.",
         ],
-        visual: {
-          type: "table",
-          headers: ["", "MOEMS", "AMC 8", "Math Kangaroo"],
-          rows: [
-            { label: "대상 학년", values: ["4-6학년(E) / 4-8학년(M)", "8학년 이하", "K-12 전 학년"] },
-            { label: "형식", values: ["5회 × 30분 × 5문제", "25문항, 40분 객관식", "30문항, 75분"] },
-            { label: "시행 시기", values: ["11월~3월(5회)", "매년 1월", "3월 셋째 목요일"] },
-            { label: "난이도", values: ["창의적이나 접근 용이", "후반부 상당한 창의성 요구", "학년별 난이도 조정"] },
-          ],
-        },
       },
       {
-        heading: "언제부터 준비를 시작할까요?",
+        heading: "몇 학년부터 준비하면 좋을까요?",
         paragraphs: [
-          "MOEMS는 4학년부터 참가할 수 있으므로, 3학년 말부터 기출문제를 가볍게 접해보는 것이 좋습니다. AMC 8은 6학년 이상부터 실전 준비를 시작하는 것이 일반적입니다.",
-          "어떤 대회든 벼락치기보다는 꾸준한 사고력 수학 훈련이 바탕이 되어야 합니다. Singapore Math와 Beast Academy로 개념 사고력을 키운 학생은 경시대회 준비에서도 확실한 유리함을 가져갑니다.",
+          "MOEMS는 4학년부터 참가할 수 있으므로, 3학년 겨울쯤 지난 문제를 가볍게 풀어 보며 시작하면 자연스럽습니다. Math Kangaroo는 1~2학년도 참가할 수 있어 경시대회를 처음 경험하기에 좋습니다. AMC 8은 보통 5~6학년부터 본격적으로 준비하는 경우가 많습니다.",
+          "어떤 대회든 벼락치기보다 평소의 사고력 수학이 바탕이 됩니다. 영어로 된 문제를 빠르게 읽는 것도 실력의 일부이므로, 미국에 온 지 얼마 안 된 아이라면 시간 제한 없이 문제를 읽고 이해하는 연습부터 시작하세요.",
         ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "info",
+          title: "AMC 8을 준비한다면",
+          text: "2027년 AMC 8 시험 일정, 등록 방법, 커트라인, 15주 준비 계획을 따로 정리했습니다.",
+          linkHref: "/blog/amc-8-2027-guide",
+          linkLabel: "2027 AMC 8 가이드 보기",
+        },
+      },
+    ],
+    faqKo: [
+      {
+        q: "초등학생이 참가할 수 있는 미국 수학 경시대회는 무엇이 있나요?",
+        a: "대표적으로 MOEMS(4~8학년), AMC 8(8학년 이하), Math Kangaroo(유치원~12학년)가 있습니다. 처음이라면 MOEMS나 Math Kangaroo로 시작하는 것을 권합니다.",
+      },
+      {
+        q: "MOEMS는 개인으로 신청할 수 있나요?",
+        a: "MOEMS는 학교나 학원 같은 팀 단위로 등록합니다. 자녀 학교가 참가하는지 먼저 물어보고, 참가하지 않는다면 MOEMS 팀을 운영하는 지역 학원이나 모임을 찾아보세요.",
+      },
+      {
+        q: "AMC 8에서 상을 받으면 다음 대회에 나갈 수 있나요?",
+        a: "아닙니다. AMC 8에는 다음 라운드가 없습니다. AIME 진출 자격은 AMC 10이나 AMC 12 성적으로 정해집니다.",
+      },
+      {
+        q: "경시대회 결과가 학교 성적에 들어가나요?",
+        a: "들어가지 않습니다. 경시대회는 학교 성적표와 별개이므로, 결과에 대한 부담 없이 사고력을 키우는 경험으로 활용하면 좋습니다.",
       },
     ],
     bodyEn: [
@@ -700,13 +985,13 @@ export const blogPosts: BlogPost[] = [
         heading: "Why Participate in Math Competitions?",
         paragraphs: [
           "Math competitions challenge students in ways that classroom assessments don't. Encountering unfamiliar problem types, exploring multiple solution paths, and taking risks in a low-stakes environment all build genuine mathematical confidence.",
-          "The preparation process matters more than the results. Many schools also accept MOEMS scores as part of AAP portfolio evidence.",
+          "The preparation process matters more than the results. The problem-solving skills and the habit of explaining a solution carry straight into schoolwork and harder contests later on.",
         ],
       },
       {
         heading: "MOEMS, the Most Accessible Competition for Elementary Students",
         paragraphs: [
-          "MOEMS (Math Olympiad for Elementary and Middle Schools) is run by a nonprofit founded in 1977, with over 170,000 participants worldwide. It has two divisions: Division E (grades 4–6) and Division M (grades 4–8).",
+          "MOEMS (Math Olympiad for Elementary and Middle Schools) is run by a nonprofit founded in 1977, with over 170,000 participants worldwide. It has two divisions: Division E (grades 4–6) and Division M (grades 6–8).",
           "Students take five contests from November through March, each 30 minutes with 5 questions. Teams of up to 35 students register together through a school or outside group. Problems require creative thinking but are accessible to prepared elementary students. Past contests are available free at moems.org.",
         ],
       },
@@ -714,7 +999,7 @@ export const blogPosts: BlogPost[] = [
         heading: "AMC 8, the Official National Math Competition",
         paragraphs: [
           "The AMC 8 (American Mathematics Competition 8), run by the Mathematical Association of America (MAA), is open to all students in 8th grade or below. Held each January, it consists of 25 multiple-choice questions in 40 minutes.",
-          "Difficulty is higher than MOEMS, especially in the last 10 questions, which demand substantial mathematical creativity. High scorers can advance through the AMC 10/12 → AIME → USAMO pathway, making AMC 8 a meaningful long-term goal for mathematically passionate students.",
+          "Difficulty is higher than MOEMS, especially in the last 10 questions, which demand substantial mathematical creativity. The AMC 8 is the first step in the AMC series. It has no next round of its own; students qualify for the AIME and USAMO through the AMC 10 and AMC 12.",
         ],
         visual: {
           type: "pathway",
@@ -726,14 +1011,14 @@ export const blogPosts: BlogPost[] = [
         heading: "Math Kangaroo as an International Competition Experience",
         paragraphs: [
           "Math Kangaroo began in France in 1991 and now runs in over 90 countries. Held annually on the third Thursday of March, it covers all grades K–12 with difficulty scaled by grade level.",
-          "Students solve 30 questions in 75 minutes. Individual registration is available at kangaroo.org with a small participation fee. It's a unique opportunity to compare performance against students internationally.",
+          "Students have 75 minutes, and the number of questions varies by grade level. Individual registration is available at kangaroo.org with a small participation fee. It's a unique opportunity to compare performance against students internationally.",
         ],
         visual: {
           type: "table",
           headers: ["", "MOEMS", "AMC 8", "Math Kangaroo"],
           rows: [
-            { label: "Grades", values: ["4-6 (Div E) / 4-8 (Div M)", "8th grade or below", "K-12, all grades"] },
-            { label: "Format", values: ["5 contests × 30 min × 5 questions", "25 questions, 40 min, multiple-choice", "30 questions, 75 min"] },
+            { label: "Grades", values: ["4-6 (Div E) / 6-8 (Div M)", "8th grade or below", "K-12, all grades"] },
+            { label: "Format", values: ["5 contests × 30 min × 5 questions", "25 questions, 40 min, multiple-choice", "Varies by grade, 75 min"] },
             { label: "Timing", values: ["Nov-Mar (5 contests)", "Every January", "3rd Thursday of March"] },
             { label: "Difficulty", values: ["Creative but accessible", "Last 10 questions demand real creativity", "Difficulty scaled by grade"] },
           ],
@@ -751,12 +1036,13 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "math-practice-at-home",
     publishedAt: "2025-05-15",
-    readingMins: 5,
+    updatedAt: "2026-10-23",
+    readingMins: 6,
     category: "학습전략",
     categoryEn: "Study Tips",
-    titleKo: "집에서 수학 실력을 쌓는 효과적인 방법 5가지",
+    titleKo: "집에서 하는 초등 수학 공부법 5가지: 하루 15분 엄마표·아빠표 수학",
     titleEn: "5 Evidence-Based Strategies for Building Math Skills at Home",
-    descKo: "학원을 다니지 않아도 집에서 수학 실력을 꾸준히 키울 수 있는 방법 5가지를 연구 근거와 함께 소개합니다. 학부모가 바로 실천할 수 있는 구체적인 팁입니다.",
+    descKo: "학원 없이도 집에서 할 수 있는 초등 수학 공부법 5가지를 연구 근거와 함께 소개합니다. 미국 학교의 영어 문장제(Word Problem)에 자주 나오는 표현까지, 한국에서 온 학부모님이 오늘 바로 해 볼 수 있는 방법만 골랐습니다.",
     descEn: "Five research-backed strategies parents can use at home to help their children build stronger math skills. No tutoring required to get started.",
     heroImage: {
       src: "/blog/math-practice-at-home-hero.jpg",
@@ -765,69 +1051,121 @@ export const blogPosts: BlogPost[] = [
     },
     bodyKo: [
       {
-        heading: "1. 짧게, 자주 반복하는 분산 학습의 힘",
+        heading: "결론부터: 길게 한 번보다 짧게 매일입니다",
         paragraphs: [
-          "인지과학 연구에서 반복적으로 확인된 '분산 학습(Spaced Practice)' 효과가 있습니다. 주말에 2시간 몰아서 공부하는 것보다 매일 15~20분씩 꾸준히 연습하는 것이 장기 기억과 실력 향상에 훨씬 효과적입니다.",
+          "집에서 아이 수학을 봐 주려고 하면 무엇부터 해야 할지 막막합니다. 미국 학교 수학은 한국과 교과서도, 용어도 달라서 더 그렇습니다.",
+          "하지만 집에서 할 일은 생각보다 단순합니다. 아래 다섯 가지는 모두 연구로 효과가 확인된 방법이고, 영어를 잘하지 못하는 부모님도 한국어로 함께 할 수 있습니다.",
         ],
         visual: {
-          type: "callout",
-          variant: "note",
-          tone: "tip",
-          title: "실천 방법",
-          text: "매일 저녁 식사 후 15분을 수학 연습 시간으로 고정하세요. IXL Math처럼 짧게 집중적으로 연습할 수 있는 도구를 활용하면 지속하기 쉽습니다.",
+          type: "checklist",
+          title: "이 글의 핵심 요약",
+          items: [
+            { text: "매일 15분, 같은 시간에 연습하기" },
+            { text: "이동 중에 암산 문제 내기" },
+            { text: "영어 문장제는 소리 내어 읽기", note: "자주 나오는 표현 익히기" },
+            { text: "틀린 문제는 원인을 찾고 다시 풀기" },
+            { text: "'못 한다' 대신 '아직'이라고 말해 주기" },
+          ],
         },
       },
       {
-        heading: "2. 암산 능력 키우기",
+        heading: "1. 매일 15분, 짧게 자주 하세요",
         paragraphs: [
-          "암산(Mental Math) 능력은 단순히 빠른 계산이 아닙니다. 수의 구조를 유연하게 다루는 능력을 키우며, 이는 대수(Algebra)와 문제 해결 능력의 기초가 됩니다. 여러 연구에서 암산 능력이 높은 학생이 복잡한 수학 문제에서도 더 높은 성취를 보인다는 결과가 있습니다.",
+          "인지과학 연구에서 반복해서 확인된 '분산 학습(Spaced Practice)' 효과가 있습니다. 주말에 2시간 몰아서 공부하는 것보다 매일 15~20분씩 꾸준히 하는 것이 오래 기억하고 실력을 늘리는 데 훨씬 효과적입니다.",
+          "한국에서 쓰던 연산 학습지나 문제집을 계속 써도 괜찮습니다. 다만 미국 학교와 단원 순서가 다를 수 있으니, 지금 학교에서 배우는 단원과 비슷한 내용을 골라 주세요.",
         ],
         visual: {
           type: "callout",
           variant: "note",
           tone: "tip",
           title: "실천 방법",
-          text: "차를 타고 이동할 때 가볍게 '235 + 78은 얼마일까?'처럼 물어보세요. 정답보다 어떻게 계산했는지 방법을 물어보는 것이 더 중요합니다.",
+          text: "저녁 식사 후 15분처럼 시간을 정해 두세요. 학년·단원별 무료 수학 학습지는 영어로 되어 있어 미국 학교 수학 용어에 익숙해지는 데도 도움이 됩니다.",
+          linkHref: "/worksheets",
+          linkLabel: "무료 수학 학습지 보기",
         },
       },
       {
-        heading: "3. 워드 프로블럼은 소리 내어 읽기",
+        heading: "2. 이동하면서 암산 문제를 내 보세요",
         paragraphs: [
-          "많은 학생들이 수학 연산은 잘 하면서도 워드 프로블럼에서 실수합니다. 이유는 대부분 수학 실력 부족이 아니라 독해 능력의 문제입니다. 문제를 소리 내어 읽으면 이해도가 높아지고, 중요한 정보와 불필요한 정보를 구분하는 능력이 자연스럽게 길러집니다.",
+          "암산(Mental Math)은 단순히 빨리 계산하는 능력이 아닙니다. 수를 쪼개고 합치며 유연하게 다루는 감각(Number Sense)을 길러 주고, 이것이 나중에 대수와 문제 해결의 기초가 됩니다. 여러 연구에서 암산을 잘하는 학생이 복잡한 문제에서도 더 좋은 결과를 보였습니다.",
+          "미국 학교는 '답이 몇이냐'만큼 '어떻게 계산했느냐'를 자주 묻습니다. 집에서도 방법을 말로 설명해 보게 하면 학교 수업 방식에 자연스럽게 익숙해집니다.",
         ],
         visual: {
           type: "callout",
           variant: "note",
           tone: "tip",
           title: "실천 방법",
-          text: "숙제를 풀 때 워드 프로블럼은 반드시 소리 내어 읽게 하고, 문제에서 구하는 것이 무엇인지 스스로 말로 설명하게 해보세요.",
+          text: "차로 이동할 때 '235 더하기 78은?'처럼 가볍게 물어보세요. 답을 맞혔는지보다 '어떻게 계산했어?'라고 방법을 묻는 것이 더 중요합니다.",
         },
       },
       {
-        heading: "4. 틀린 문제를 같이 분석하기",
+        heading: "3. 영어 문장제는 소리 내어 읽게 하세요",
         paragraphs: [
-          "오답이 실력 향상의 가장 좋은 재료입니다. 틀린 문제를 그냥 넘기지 말고, 왜 틀렸는지 함께 분석해보세요. 계산 실수인지, 개념 이해 부족인지, 문제를 잘못 읽은 것인지 원인을 파악하면 같은 실수가 반복되지 않습니다.",
+          "계산은 잘하는데 문장제(Word Problem)에서 자주 틀린다면, 수학보다 읽기의 문제인 경우가 많습니다. 미국에 온 지 얼마 안 된 아이라면 더욱 그렇습니다. 문제를 소리 내어 읽으면 이해도가 높아지고, 필요한 정보와 필요 없는 정보를 가려내는 힘이 생깁니다.",
+          "수학 문장제에는 자주 나오는 영어 표현이 정해져 있습니다. 아래 표현만 익혀도 문제를 이해하는 속도가 눈에 띄게 빨라집니다. 아이가 문제를 읽은 뒤 '무엇을 구하라는 문제인지' 한국어로 말해 보게 하세요.",
         ],
         visual: {
-          type: "callout",
-          variant: "note",
-          tone: "tip",
-          title: "실천 방법",
-          text: "시험지를 돌려받으면 틀린 문제만 다시 풀어보게 하세요. 그리고 어떤 부분에서 실수했는지 학생 스스로 말로 설명하게 하면 메타인지 능력도 함께 키워집니다.",
+          type: "table",
+          headers: ["영어 표현", "뜻", "주로 쓰는 계산"],
+          rows: [
+            { label: "in all / altogether / total", values: ["모두 합쳐서", "덧셈"] },
+            { label: "sum", values: ["합", "덧셈"] },
+            { label: "how many more / fewer", values: ["몇 개 더 많은지 / 적은지", "뺄셈"] },
+            { label: "difference", values: ["차", "뺄셈"] },
+            { label: "left / remain", values: ["남은 것", "뺄셈"] },
+            { label: "each / per", values: ["각각 / ~마다", "곱셈 또는 나눗셈"] },
+            { label: "product", values: ["곱", "곱셈"] },
+            { label: "quotient / remainder", values: ["몫 / 나머지", "나눗셈"] },
+            { label: "share equally", values: ["똑같이 나누다", "나눗셈"] },
+            { label: "numerator / denominator", values: ["분자 / 분모", "분수"] },
+          ],
         },
       },
       {
-        heading: "5. 성장 마인드셋으로 키우는 수학 자신감",
+        heading: "4. 틀린 문제는 원인을 찾고 다시 풀게 하세요",
         paragraphs: [
-          "Stanford 대학의 심리학자 Carol Dweck 박사의 연구에 따르면, '나는 수학을 못 해'처럼 능력을 고정된 것으로 보는 학생(Fixed Mindset)보다 '아직은 어렵지만 연습하면 할 수 있어'처럼 노력으로 성장한다고 믿는 학생(Growth Mindset)이 장기적으로 더 높은 수학 성취를 보입니다.",
+          "틀린 문제는 실력을 늘리는 가장 좋은 재료입니다. 그냥 넘어가지 말고 왜 틀렸는지 함께 살펴보세요. 계산 실수인지, 개념을 몰랐는지, 문제를 잘못 읽었는지 원인을 알면 같은 실수가 줄어듭니다.",
+          "미국에 온 지 얼마 안 된 아이는 영어를 잘못 읽어서 틀리는 경우가 많습니다. 이것은 수학 실력과는 다른 문제이므로, 원인을 나눠서 보면 아이도 덜 위축됩니다.",
         ],
         visual: {
           type: "callout",
           variant: "note",
           tone: "tip",
           title: "실천 방법",
-          text: "아이가 수학을 어려워할 때 '원래 이런 거야, 괜찮아'보다 '지금은 어렵지, 그런데 어떤 부분이 어려웠어?'라고 구체적으로 물어보세요. 어려움을 인정하되 포기하지 않는 태도를 함께 만들어가는 것이 중요합니다.",
+          text: "시험지를 돌려받으면 틀린 문제만 하루 뒤에 다시 풀게 하세요. 어디서 실수했는지 아이가 스스로 말로 설명하게 하면 자기 생각을 점검하는 힘(메타인지)도 함께 자랍니다.",
         },
+      },
+      {
+        heading: "5. '못 한다'가 아니라 '아직'이라고 말해 주세요",
+        paragraphs: [
+          "스탠퍼드 대학교 심리학자 Carol Dweck의 연구에 따르면, 능력은 노력으로 자란다고 믿는 학생(성장 마인드셋, Growth Mindset)이 '나는 원래 수학을 못해'라고 믿는 학생보다 장기적으로 더 높은 수학 성취를 보입니다.",
+          "새로운 나라, 새로운 언어로 수학을 배우는 아이는 한동안 자신감이 떨어질 수 있습니다. 이럴 때 '못하는 게 아니라 아직 익숙하지 않은 것뿐'이라는 말이 큰 힘이 됩니다.",
+        ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "tip",
+          title: "실천 방법",
+          text: "아이가 어려워할 때 '괜찮아, 원래 어려운 거야'보다 '지금은 어렵지. 어떤 부분이 제일 어려웠어?'라고 구체적으로 물어보세요. 어려움은 인정하되 포기하지 않는 태도를 함께 만들어 가는 것이 중요합니다.",
+        },
+      },
+    ],
+    faqKo: [
+      {
+        q: "초등학생은 집에서 수학을 하루에 얼마나 공부하면 되나요?",
+        a: "매일 15~20분이면 충분합니다. 주말에 몰아서 오래 하는 것보다 매일 짧게 꾸준히 하는 편이 기억에 오래 남습니다.",
+      },
+      {
+        q: "한국 수학 문제집을 미국에서 계속 써도 되나요?",
+        a: "써도 됩니다. 연산과 개념 연습에는 도움이 됩니다. 다만 학교와 단원 순서가 다르고 문장제가 영어로 나오므로, 학교에서 배우는 단원에 맞춰 고르고 영어 문장제 연습을 함께 해 주세요.",
+      },
+      {
+        q: "영어 문장제를 어려워하는 아이는 어떻게 도와주나요?",
+        a: "문제를 소리 내어 읽게 하고, 무엇을 구하는 문제인지 한국어로 말해 보게 하세요. in all, how many more, each처럼 자주 나오는 표현을 먼저 익히면 빠르게 좋아집니다.",
+      },
+      {
+        q: "부모가 영어를 잘 못해도 수학 공부를 봐 줄 수 있나요?",
+        a: "네. 수학 개념과 풀이 과정은 한국어로 이야기해도 충분합니다. 매일 공부하는 습관을 잡아 주고 '어떻게 풀었어?'라고 물어 주는 것만으로도 큰 도움이 됩니다.",
       },
     ],
     bodyEn: [
@@ -901,12 +1239,13 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "summer-math-slide",
     publishedAt: "2026-07-28",
+    updatedAt: "2026-10-23",
     readingMins: 6,
     category: "방학학습",
     categoryEn: "Summer Break",
-    titleKo: "여름방학 수학 학습공백, 개학 전에 막는 방법",
+    titleKo: "여름방학 수학 공부: 썸머 슬라이드(Summer Slide) 막는 법",
     titleEn: "Preventing the Summer Math Slide Before School Starts",
-    descKo: "여름방학 동안 수학 실력이 퇴보하는 'Summer Slide' 현상의 원인과 연구 근거, 그리고 개학 전 남은 몇 주 동안 학부모가 실천할 수 있는 구체적인 대비법을 정리했습니다.",
+    descKo: "미국 초등학교 여름방학은 약 10주로 깁니다. 방학 동안 수학 실력이 떨어지는 '썸머 슬라이드(서머 슬라이드)'가 왜 생기는지, 개학 전 2~4주 동안 하루 15분으로 막는 방법을 정리했습니다.",
     descEn: "Why math skills fade faster than reading over summer break, what the research says, and practical steps parents can take in the final weeks before school starts.",
     heroImage: {
       src: "/blog/summer-math-slide-hero.jpg",
@@ -915,10 +1254,11 @@ export const blogPosts: BlogPost[] = [
     },
     bodyKo: [
       {
-        heading: "여름 학습공백(Summer Slide)이란?",
+        heading: "썸머 슬라이드(Summer Slide)란 무엇인가요?",
         paragraphs: [
-          "Duke University의 심리학자 Harris Cooper가 1996년 발표한 메타분석 연구는 여름방학 동안 학생들이 평균적으로 약 한 달 분량의 학습 내용을 잊어버린다는 사실을 보여주었습니다. 이후 여러 후속 연구에서도 비슷한 패턴이 반복적으로 확인되었는데, 특히 수학 연산 능력의 퇴보 폭이 읽기 능력보다 크게 나타났습니다.",
-          "한 해의 손실은 크지 않아 보일 수 있지만, K-6 동안 매년 여름마다 조금씩 누적되면 학년이 올라갈수록 격차가 벌어집니다. 특히 전년도에 심화 내용을 다뤘던 학생이라면, 그 내용을 유지하지 못한 채 새 학년을 맞이하게 될 위험이 더 큽니다.",
+          "썸머 슬라이드(Summer Slide)는 여름방학 동안 배운 내용을 잊어버려 실력이 뒤로 미끄러지는 현상을 말합니다. 서머 슬라이드, 여름 학습 손실(Summer Learning Loss)이라고도 부릅니다.",
+          "미국 초등학교는 6월에 학년이 끝나고 8월 중순~말에 새 학년이 시작되므로, 여름방학이 약 10주로 한국보다 훨씬 깁니다. 의무 방학 숙제도 거의 없어서 집에서 챙기지 않으면 두 달 넘게 수학을 거의 하지 않게 됩니다.",
+          "듀크대학교 심리학자 Harris Cooper가 1996년 발표한 연구에 따르면 학생들은 여름방학 동안 평균 약 한 달 분량의 학습 내용을 잊어버리며, 특히 수학 계산 능력이 읽기보다 더 많이 떨어졌습니다. 한 해의 손실은 작아 보여도 매년 쌓이면 학년이 올라갈수록 차이가 벌어집니다.",
         ],
         visual: {
           type: "stat",
@@ -929,10 +1269,10 @@ export const blogPosts: BlogPost[] = [
         visualPosition: "before",
       },
       {
-        heading: "왜 수학이 유독 취약할까요?",
+        heading: "왜 수학이 특히 많이 떨어질까요?",
         paragraphs: [
-          "읽기는 방학 중에도 비교적 자연스럽게 이어지는 경우가 많습니다. 도서관에 가거나, 재미로 책을 읽거나, 여행 중 표지판과 메뉴판을 읽는 등 일상 속에서 저절로 노출됩니다. 반면 수학은 아이가 스스로 나눗셈이나 분수 문제를 찾아서 풀어보는 경우가 드뭅니다.",
-          "특히 연산이나 계산 절차처럼 '몸에 익혀야 하는' 스킬은 사용하지 않으면 상대적으로 빨리 무뎌집니다. 개념을 이해하는 것과 그 개념을 빠르고 정확하게 적용하는 것은 다른 문제이며, 후자는 꾸준한 연습이 없으면 특히 퇴보하기 쉽습니다.",
+          "읽기는 방학 중에도 자연스럽게 이어지는 경우가 많습니다. 도서관에 가거나, 재미로 책을 읽거나, 여행 중에 표지판과 메뉴판을 읽게 됩니다. 반면 아이가 스스로 나눗셈이나 분수 문제를 찾아서 푸는 일은 거의 없습니다.",
+          "특히 계산 절차처럼 손에 익혀야 하는 기술은 쓰지 않으면 빨리 무뎌집니다. 개념을 이해하는 것과 그 개념을 빠르고 정확하게 적용하는 것은 다른 문제이고, 뒤쪽은 꾸준히 연습하지 않으면 쉽게 떨어집니다.",
         ],
         visual: {
           type: "comparison",
@@ -943,36 +1283,63 @@ export const blogPosts: BlogPost[] = [
         },
       },
       {
-        heading: "개학 직후 교실에서는 무슨 일이 벌어질까요?",
+        heading: "개학하면 교실에서는 무슨 일이 생기나요?",
         paragraphs: [
-          "새 학년이 시작되면 교사들은 보통 몇 주간 전년도 핵심 내용을 복습하는 데 시간을 씁니다. 학급 전체가 이 복습 기간을 거치기 때문에, 여름 동안 감을 유지한 학생과 그렇지 못한 학생 사이의 체감 격차가 이 시기에 가장 크게 드러납니다.",
-          "AAP나 심화반처럼 진도가 빠른 반일수록 복습에 할애하는 시간이 상대적으로 짧고, 곧바로 새 단원으로 넘어가는 경향이 있습니다. 학습공백이 있는 상태로 새 학년 첫 단원을 맞이하면, 개념이 아직 정리되지 않은 채로 더 어려운 내용을 쌓아 올리게 되는 셈입니다.",
+          "새 학년이 시작되면 선생님들은 보통 처음 몇 주 동안 지난 학년의 핵심 내용을 복습합니다. 반 전체가 같은 복습 기간을 거치기 때문에, 여름 동안 감을 유지한 아이와 그렇지 못한 아이의 차이가 이때 가장 크게 드러납니다.",
+          "AAP나 심화반처럼 진도가 빠른 반일수록 복습 기간이 짧고 곧바로 새 단원으로 넘어가는 경향이 있습니다. 감이 떨어진 상태로 첫 단원을 맞이하면, 개념이 정리되지 않은 채로 더 어려운 내용을 쌓아 올리게 됩니다.",
         ],
       },
       {
-        heading: "남은 여름 동안 할 수 있는 구체적인 방법",
+        heading: "남은 여름 동안 집에서 할 수 있는 것",
         paragraphs: [
-          "가장 효과적인 방법은 거창한 계획이 아니라 하루 15분 정도의 짧은 복습을 매일 반복하는 것입니다. 전년도 워크북의 마지막 한두 단원을 다시 펼쳐 보거나, 틀렸던 문제만 골라 다시 풀어보는 것만으로도 충분한 효과가 있습니다.",
-          "마트에서 장을 보며 총 금액을 어림해보거나, 요리를 하며 계량 단위를 바꿔보는 등 일상 속에서 자연스럽게 수를 다루는 기회를 만들어 주는 것도 좋습니다. 여유가 있다면 새 학년 첫 단원 내용을 아주 가볍게 미리 살펴보는 것도 도움이 되지만, 이는 선행 학습이 아니라 '낯설지 않게 만드는' 예습 수준으로 접근하는 것이 중요합니다.",
+          "거창한 계획은 필요 없습니다. 하루 15분 정도의 짧은 복습을 매일 반복하는 것이 가장 효과적입니다. 지난 학년 워크북의 마지막 한두 단원을 다시 펼쳐 보거나, 틀렸던 문제만 골라 다시 풀어 보는 것만으로도 충분합니다.",
+          "장을 보며 총액을 어림해 보거나, 요리하며 계량 단위를 바꿔 보는 것처럼 일상에서 수를 다룰 기회를 만들어 주는 것도 좋습니다. 여유가 있다면 새 학년 첫 단원을 가볍게 훑어보는 것도 도움이 되지만, 선행 학습이 아니라 '낯설지 않게 만드는' 정도로 접근하세요.",
         ],
         visual: {
           type: "checklist",
           title: "개학까지 2~4주 남았다면",
           items: [
-            { text: "전년도 워크북 마지막 1~2단원 복습" },
-            { text: "틀렸던 문제만 골라 재풀이" },
+            { text: "지난 학년 워크북 마지막 1~2단원 복습" },
+            { text: "틀렸던 문제만 골라 다시 풀기" },
             { text: "장보기하며 총액 어림셈" },
-            { text: "요리하며 계량 단위 변환" },
-            { text: "(여유 있다면) 새 학년 첫 단원 가볍게 예습" },
+            { text: "요리하며 계량 단위 바꿔 보기" },
+            { text: "(여유가 있다면) 새 학년 첫 단원 가볍게 훑어보기" },
           ],
         },
       },
       {
-        heading: "언제부터, 어떻게 시작해야 할까요?",
+        heading: "언제부터, 얼마나 하면 될까요?",
         paragraphs: [
-          "개학까지 2~4주 정도 남은 지금이 학습 리듬을 되찾기에 가장 적절한 시점입니다. 개학 직전 며칠 동안 몰아서 복습하는 것보다, 지금부터 매일 조금씩 규칙적으로 연습하는 것이 실질적인 효과를 냅니다.",
-          "중요한 것은 분량이 아니라 꾸준함입니다. 두꺼운 복습 워크북 한 권을 새로 사는 것보다, 이미 풀었던 문제집을 다시 펼쳐 짧고 일정한 리듬을 만드는 것이 개학 후 첫 몇 주를 훨씬 수월하게 만들어 줍니다.",
+          "개학까지 2~4주 남았을 때가 공부 리듬을 되찾기에 가장 좋은 시기입니다. 개학 직전 며칠 동안 몰아서 복습하는 것보다, 지금부터 매일 조금씩 규칙적으로 하는 것이 실제 효과가 큽니다.",
+          "중요한 것은 분량이 아니라 꾸준함입니다. 두꺼운 복습 문제집을 새로 사기보다, 이미 풀었던 문제집을 다시 펼쳐 짧고 일정한 리듬을 만드는 편이 개학 후 첫 몇 주를 훨씬 수월하게 만들어 줍니다.",
         ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "info",
+          title: "복습 자료가 필요하다면",
+          text: "지난 학년 복습에 쓸 수 있는 수학 학습지를 학년·단원별로 무료로 인쇄할 수 있습니다.",
+          linkHref: "/worksheets",
+          linkLabel: "학년별 무료 수학 학습지 보기",
+        },
+      },
+    ],
+    faqKo: [
+      {
+        q: "썸머 슬라이드는 얼마나 심한가요?",
+        a: "연구에 따르면 여름방학 동안 평균 약 한 달 분량의 학습 내용이 줄어들며, 특히 수학 계산 능력이 읽기보다 더 많이 떨어집니다.",
+      },
+      {
+        q: "여름방학에 수학은 하루에 얼마나 하면 되나요?",
+        a: "하루 15분 정도면 충분합니다. 지난 학년 워크북의 마지막 단원을 다시 풀거나 틀렸던 문제만 다시 풀어 보는 것만으로도 효과가 있습니다.",
+      },
+      {
+        q: "여름방학에 다음 학년 선행을 해야 하나요?",
+        a: "선행보다 복습이 먼저입니다. 여유가 있다면 새 학년 첫 단원을 '낯설지 않을 정도'로만 가볍게 훑어보세요.",
+      },
+      {
+        q: "미국 초등학교 여름방학은 언제인가요?",
+        a: "FCPS 기준으로 보통 6월에 학년이 끝나고 8월 중순~말에 새 학년이 시작됩니다. 정확한 날짜는 학교 캘린더에서 확인하세요.",
       },
     ],
     bodyEn: [
@@ -1041,12 +1408,13 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "back-to-school-checklist",
     publishedAt: "2026-08-08",
-    readingMins: 6,
+    updatedAt: "2026-10-23",
+    readingMins: 8,
     category: "새학기 준비",
     categoryEn: "Back to School",
-    titleKo: "새 학년 개학 전, 학부모가 챙겨야 할 체크리스트",
+    titleKo: "미국 초등학교 개학 준비 체크리스트: FCPS 서류·예방접종·준비물",
     titleEn: "The Back-to-School Checklist Every Parent Should Run Through",
-    descKo: "개학까지 몇 주 남지 않은 지금, 담임교사 확인부터 수학 감 되찾기, 생활 리듬 재조정까지 학부모가 놓치기 쉬운 준비 사항을 체크리스트로 정리했습니다.",
+    descKo: "FCPS 개학 전 학부모가 챙길 것을 순서대로 정리했습니다. ParentVUE로 담임 확인하기, 한국 영문 예방접종증명서와 버지니아 건강검진 서류, 영어 지원(EL), 학용품, 생활 리듬과 아이 마음 준비까지 미국 학교가 처음인 가정도 따라 할 수 있게 썼습니다.",
     descEn: "With just a few weeks left before school starts, here's a practical checklist covering everything from confirming your child's teacher to resetting sleep schedules and brushing up on math.",
     heroImage: {
       src: "/blog/back-to-school-checklist-hero.jpg",
@@ -1055,72 +1423,123 @@ export const blogPosts: BlogPost[] = [
     },
     bodyKo: [
       {
-        heading: "개학까지 남은 시간, 지금부터 무엇을 챙겨야 할까",
+        heading: "개학 2~4주 전, 무엇부터 챙겨야 할까요?",
         paragraphs: [
-          "여름방학이 끝을 향해 갈수록 학부모들의 마음은 바빠집니다. 학용품을 사야 하는지, 담임교사는 누구인지, 생활 리듬은 언제부터 되돌려야 하는지 한꺼번에 떠오르지만 정작 무엇부터 시작해야 할지 막막할 때가 많습니다. 각 학교의 정확한 개학일과 학사일정은 학군 및 학교마다 다르므로, FCPS 학부모라면 재학 중인 학교 홈페이지나 ParentVUE 공지사항에서 먼저 확인하는 것이 순서입니다.",
-          "개학을 2~4주 앞둔 이 시기는 서두르지 않고도 하나씩 준비할 수 있는 여유가 남아 있는 골든타임입니다. 이 글에서는 학사 정보 확인부터 수학 감 되찾기, 생활 리듬 조정, 서류 준비, 아이의 마음 챙기기까지 학부모가 순서대로 점검하면 좋은 다섯 가지 항목을 정리했습니다.",
+          "여름방학이 끝나 갈수록 챙길 것이 한꺼번에 떠오릅니다. 담임 선생님은 누구인지, 학용품은 무엇을 사야 하는지, 서류는 다 냈는지. 미국 학교가 처음이라면 무엇을 모르는지조차 모르는 경우가 많습니다.",
+          "FCPS의 개학일과 학사 일정은 학교 캘린더와 학교 홈페이지에서 확인할 수 있습니다. 개학 2~4주 전은 서두르지 않고 하나씩 준비할 수 있는 시기입니다. 아래 다섯 가지를 순서대로 점검해 보세요.",
         ],
         visual: {
           type: "checklist",
           title: "다섯 가지 준비 영역",
           items: [
-            { text: "학사 정보 확인 (ParentVUE)" },
-            { text: "수학 감 되찾기" },
-            { text: "생활 리듬 재조정" },
-            { text: "학용품·서류 준비" },
-            { text: "아이의 마음 챙기기" },
+            { text: "ParentVUE에서 담임·학교 안내 확인" },
+            { text: "건강검진·예방접종 서류 제출", note: "버지니아 첫 입학이라면 필수" },
+            { text: "영어 지원(EL)과 수학 감 되찾기" },
+            { text: "생활 리듬·등하교·점심 준비" },
+            { text: "아이 마음 챙기기" },
           ],
         },
       },
       {
-        heading: "ParentVUE로 확인하는 새 학년 정보",
+        heading: "ParentVUE는 무엇이고, 무엇을 확인하나요?",
         paragraphs: [
-          "새 학년이 다가오면 FCPS는 보통 개학 1~2주 전 즈음 ParentVUE를 통해 담임교사 배정 정보를 공개합니다. 정확한 공개 시점은 학교마다 다를 수 있으므로, 개학이 가까워지면 며칠에 한 번씩 ParentVUE를 확인해보는 것이 좋습니다. 담임교사를 미리 알면 아이와 함께 이름을 불러보고 마음의 준비를 시키는 데 도움이 됩니다.",
-          "ParentVUE에는 담임교사 정보 외에도 새 학년 시간표, 학용품 목록(School Supply List), 방과후 프로그램 안내 등이 함께 올라오는 경우가 많습니다. 학교마다 요구하는 학용품 목록이 다르므로, 작년에 쓰던 목록을 그대로 참고하기보다는 반드시 올해 목록을 새로 확인하는 것이 안전합니다.",
+          "ParentVUE(페어런트뷰)는 FCPS의 학부모용 웹사이트이자 앱입니다. 담임 선생님, 시간표, 성적표, 출결, 학교 공지를 한곳에서 볼 수 있습니다. 처음에는 학교에서 받은 활성화 코드(Activation Key)로 계정을 만듭니다. 코드를 받지 못했다면 학교 사무실(Main Office)에 요청하세요.",
+          "FCPS는 보통 개학 1~2주 전쯤 ParentVUE에 담임 선생님 배정을 공개합니다. 학교마다 시점이 다를 수 있으니 개학이 가까워지면 며칠에 한 번씩 확인해 보세요. 담임 선생님 이름을 미리 알면 아이와 함께 이야기하며 마음의 준비를 할 수 있습니다.",
+          "학용품 목록(School Supply List)과 방과후 프로그램 안내도 학교 홈페이지나 ParentVUE에 올라옵니다. 학용품 목록은 학교와 학년마다, 해마다 다르므로 꼭 올해 목록을 확인하세요.",
         ],
       },
       {
-        heading: "수학 감 되찾기: 짧고 굵게",
+        heading: "한국에서 왔다면: 건강검진·예방접종 서류",
         paragraphs: [
-          "여름 동안 수학과 멀어졌다면, 개학 전 남은 몇 주를 활용해 감을 되찾아 두는 것이 좋습니다. 거창한 계획보다는 전년도 워크북의 마지막 한두 단원을 다시 펼쳐보거나, 틀렸던 문제만 골라 다시 풀어보는 정도로 충분합니다. 하루 15분씩이라도 매일 반복하면 개학 첫 주에 느끼는 부담이 눈에 띄게 줄어듭니다.",
-          "여유가 있다면 새 학년 첫 단원 내용을 아주 가볍게 미리 살펴보는 것도 도움이 됩니다. 이때 중요한 것은 선행 학습이 아니라 '낯설지 않게 만드는' 예습 수준으로 접근하는 것입니다. 여름방학 학습공백에 대해 더 자세히 알고 싶다면 저희 블로그의 '여름방학 수학 학습공백' 글을 함께 참고하세요.",
-        ],
-        visual: {
-          type: "callout",
-          variant: "note",
-          tone: "info",
-          text: "여름방학 동안 수학 실력이 왜, 얼마나 퇴보하는지 더 자세히 알고 싶다면 아래 글을 참고하세요.",
-          linkHref: "/blog/summer-math-slide",
-          linkLabel: "여름방학 수학 학습공백 자세히 보기",
-        },
-      },
-      {
-        heading: "생활 리듬 재조정하기",
-        paragraphs: [
-          "방학 동안 늦게 자고 늦게 일어나는 습관이 굳어졌다면, 개학 1~2주 전부터 서서히 되돌려 놓는 것이 좋습니다. 하루 만에 취침·기상 시간을 학기 중 스케줄로 바꾸려 하면 아이도 부모도 스트레스를 받기 쉽습니다. 며칠에 걸쳐 15~30분씩 앞당기는 방식이 훨씬 수월합니다.",
-          "아침 루틴도 함께 연습해두면 좋습니다. 등교 준비에 걸리는 시간, 아침 식사 시간을 미리 가늠해보고 알람 시간을 정해두면 개학 첫날 허둥대는 상황을 줄일 수 있습니다. 특히 스쿨버스를 이용하는 가정이라면 정류장까지 걸어가는 시간까지 미리 계산해두는 것이 안전합니다.",
-        ],
-      },
-      {
-        heading: "학용품·서류 체크리스트",
-        paragraphs: [
-          "학용품 외에도 개학 전 챙겨야 할 서류가 은근히 많습니다. 버지니아주는 K학년과 새로 전학 온 학생에게 예방접종 기록(Immunization Records) 제출을 요구하며, 미제출 시 등교가 제한될 수 있으므로 미리 확인해두는 것이 안전합니다. 소아과 예약이 밀릴 수 있는 시기이므로 서둘러 일정을 잡는 것이 좋습니다.",
-          "방과전후 돌봄 프로그램(Before/After School Care)을 이용할 계획이라면 신청 마감일을 놓치지 않는 것도 중요합니다. 인기 있는 프로그램은 개학 전에 정원이 마감되는 경우도 있으므로, 필요하다면 여름방학 중에 미리 신청해 두는 것이 좋습니다.",
+          "버지니아주는 공립 초등학교에 처음 입학하는 학생에게 건강검진 결과와 예방접종 기록을 요구합니다. 건강검진은 입학 전 12개월 안에 받은 것이어야 하며, 보통 버지니아주 학교 입학 건강 양식(MCH 213G)을 소아과에 가져가 작성을 부탁합니다. 서류가 빠지면 등교가 늦어질 수 있습니다.",
+          "한국에서 맞은 예방접종은 질병관리청 예방접종도우미 누리집(nip.kdca.go.kr)에서 영문 예방접종증명서를 발급받아 준비할 수 있습니다. 본인 인증이 필요하므로 출국 전에 미리 발급받아 오는 것이 가장 좋습니다.",
+          "버지니아 기준에 비해 빠진 접종이 있으면 미국 소아과에서 추가 접종을 받아야 할 수 있습니다. 개학 직전에는 소아과 예약이 밀리므로 일찍 예약하세요. 서류에 관한 질문은 학교 보건실(Health Room)이나 학교 사무실에 하면 됩니다.",
         ],
         visual: {
           type: "callout",
           variant: "note",
           tone: "warning",
-          title: "예방접종 기록 필수",
-          text: "버지니아주는 K학년과 새로 전학 온 학생에게 예방접종 기록 제출을 요구합니다. 미제출 시 등교가 제한될 수 있으니 미리 확인하세요.",
+          title: "등교 전 꼭 확인하세요",
+          text: "버지니아주 공립 초등학교에 처음 입학한다면 입학 전 12개월 안에 받은 건강검진 결과와 예방접종 기록이 필요합니다. 한국 접종 기록은 영문 예방접종증명서로 준비하세요.",
         },
       },
       {
-        heading: "새 학년 첫 주, 아이의 마음 다독이기",
+        heading: "영어가 서툰 아이는 어떤 도움을 받나요?",
         paragraphs: [
-          "준비물과 일정을 아무리 꼼꼼히 챙겨도, 아이 마음속에는 새 선생님과 새 친구에 대한 막연한 긴장감이 남아있을 수 있습니다. \"새 선생님은 어떤 분일까 궁금하다\", \"작년 친구랑 같은 반이 아닐 수도 있어\"처럼 있을 수 있는 상황을 미리 담담하게 이야기해두면, 아이가 실제로 그 상황을 마주했을 때 훨씬 덜 당황합니다.",
-          "첫 주에는 학업보다 적응이 우선입니다. 학교에서 돌아온 아이에게 \"오늘 뭐 배웠어?\"보다는 \"오늘 제일 재미있었던 순간이 뭐였어?\"처럼 구체적으로 물어보면 아이가 훨씬 편하게 이야기를 시작합니다. 며칠간 아이의 표정과 말수를 유심히 지켜보면서 적응 상태를 파악하는 것이, 그 어떤 준비물보다 중요한 개학 준비입니다.",
+          "등록할 때 집에서 영어 외의 언어를 쓴다고 적으면, 학교가 아이의 영어 실력을 진단합니다. 결과에 따라 영어 학습자(English Learner, EL)로 지정되어 일반 수업과 함께 영어 지원 수업을 받습니다.",
+          "수학 수업도 영어로 진행되므로 처음에는 아이가 실력보다 낮게 보일 수 있습니다. 담임 선생님께 아이가 한국에서 어디까지 배웠는지 간단히 적어 보내면 수업 배치와 지도에 도움이 됩니다. 상담이 필요하면 학교에 한국어 통역을 요청할 수 있습니다.",
         ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "info",
+          title: "첫 성적표를 받기 전에",
+          text: "FCPS 초등학교 성적표는 A·B·C 대신 1~4점으로 표시됩니다. 미리 읽는 법을 알아 두면 당황하지 않습니다.",
+          linkHref: "/blog/fcps-report-card-guide",
+          linkLabel: "FCPS 성적표 보는 법",
+        },
+      },
+      {
+        heading: "수학 감 되찾기: 하루 15분이면 됩니다",
+        paragraphs: [
+          "여름 동안 수학과 멀어졌다면 개학 전 남은 몇 주를 활용해 감을 되찾아 두세요. 거창한 계획보다 지난 학년 워크북의 마지막 한두 단원을 다시 펼쳐 보거나, 틀렸던 문제만 골라 다시 풀어 보는 정도로 충분합니다. 하루 15분씩이라도 매일 하면 개학 첫 주의 부담이 눈에 띄게 줄어듭니다.",
+          "여유가 있다면 새 학년 첫 단원을 가볍게 훑어보는 것도 좋습니다. 이때도 선행 학습이 아니라 '낯설지 않게 만드는' 정도면 됩니다.",
+        ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "info",
+          text: "여름방학 동안 수학 실력이 왜, 얼마나 떨어지는지 더 자세히 알고 싶다면 아래 글을 참고하세요.",
+          linkHref: "/blog/summer-math-slide",
+          linkLabel: "썸머 슬라이드 막는 법 보기",
+        },
+      },
+      {
+        heading: "생활 리듬과 등하교·점심 준비",
+        paragraphs: [
+          "방학 동안 늦게 자고 늦게 일어나는 습관이 생겼다면 개학 1~2주 전부터 조금씩 되돌려 놓으세요. 하루 만에 학기 중 시간으로 바꾸려 하면 아이도 부모도 지치기 쉽습니다. 며칠 간격으로 15~30분씩 앞당기는 방법이 훨씬 수월합니다.",
+          "스쿨버스를 탄다면 정류장 위치와 시간을 학교 안내로 미리 확인하고, 개학 전에 아이와 정류장까지 한 번 걸어가 보세요. 점심은 도시락을 싸 가거나 학교 급식을 사 먹을 수 있습니다. 급식비는 보통 온라인 계정에 미리 충전하는 방식이니 학교 안내를 확인하세요.",
+        ],
+        visual: {
+          type: "checklist",
+          title: "첫 주 전에 확인할 것",
+          items: [
+            { text: "취침·기상 시간을 며칠에 걸쳐 15~30분씩 앞당기기" },
+            { text: "아침 준비와 식사에 걸리는 시간 재 보기" },
+            { text: "버스 정류장과 시간 확인", note: "개학 전 한 번 걸어가 보기" },
+            { text: "점심 방식 정하기", note: "도시락 또는 학교 급식" },
+            { text: "방과후 돌봄 프로그램 신청 마감 확인", note: "인기 프로그램은 일찍 마감" },
+          ],
+        },
+      },
+      {
+        heading: "첫 주에는 아이 마음이 먼저입니다",
+        paragraphs: [
+          "준비물과 서류를 아무리 꼼꼼히 챙겨도, 아이 마음속에는 새 선생님과 새 친구에 대한 긴장이 남아 있을 수 있습니다. 영어가 서툰 아이에게 첫 주는 더욱 그렇습니다. '화장실 가도 될까요?(May I go to the restroom?)', '도와주실 수 있나요?(Can you help me?)'처럼 꼭 필요한 영어 몇 문장을 미리 연습해 두면 큰 힘이 됩니다.",
+          "첫 주에는 공부보다 적응이 먼저입니다. 학교에서 돌아온 아이에게 '오늘 뭐 배웠어?'보다 '오늘 제일 재미있었던 일이 뭐였어?'처럼 구체적으로 물어보면 훨씬 편하게 이야기를 시작합니다. 며칠 동안 아이의 표정과 말수를 살피는 것이 그 어떤 준비물보다 중요한 개학 준비입니다.",
+        ],
+      },
+    ],
+    faqKo: [
+      {
+        q: "미국 학교에 한국 예방접종 기록을 낼 수 있나요?",
+        a: "네. 질병관리청 예방접종도우미(nip.kdca.go.kr)에서 영문 예방접종증명서를 발급받아 준비할 수 있습니다. 본인 인증이 필요하므로 출국 전에 발급받아 오는 것이 좋고, 빠진 접종이 있으면 미국 소아과에서 추가 접종이 필요할 수 있습니다.",
+      },
+      {
+        q: "버지니아 학교 건강검진은 언제 받아야 하나요?",
+        a: "버지니아주 공립 초등학교에 처음 입학하는 학생은 입학 전 12개월 안에 받은 건강검진 결과가 필요합니다. 학교 입학 건강 양식(MCH 213G)을 소아과에 가져가 작성을 부탁하면 됩니다.",
+      },
+      {
+        q: "FCPS 담임 선생님은 언제 알 수 있나요?",
+        a: "보통 개학 1~2주 전쯤 ParentVUE에 공개됩니다. 학교마다 시점이 다르니 개학이 가까워지면 자주 확인하세요.",
+      },
+      {
+        q: "영어를 못하는 아이도 일반 수업을 듣나요?",
+        a: "네. 일반 수업을 들으면서 영어 실력에 따라 영어 학습자(EL) 지원 수업을 함께 받습니다. 등록 후 영어 실력 진단을 거쳐 지원 여부가 정해집니다.",
+      },
+      {
+        q: "ParentVUE 계정은 어떻게 만드나요?",
+        a: "학교에서 받은 활성화 코드(Activation Key)로 만듭니다. 코드를 받지 못했다면 학교 사무실에 요청하세요.",
       },
     ],
     bodyEn: [
@@ -1197,12 +1616,13 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "tjhsst-roadmap",
     publishedAt: "2026-08-08",
-    readingMins: 7,
+    updatedAt: "2026-10-23",
+    readingMins: 8,
     category: "진학 로드맵",
     categoryEn: "High School Pathway",
-    titleKo: "TJ(TJHSST) 진학, 초등 학부모가 알아야 할 로드맵",
+    titleKo: "TJ 과학고(TJHSST) 입학 로드맵: 지원 자격과 초등 때 준비할 것",
     titleEn: "The TJHSST Roadmap: What Elementary Parents Should Know",
-    descKo: "TJ(Thomas Jefferson High School for Science and Technology)가 정확히 어떤 학교인지, 한국의 과학고·영재고와 무엇이 다른지, 그리고 초등학교 때부터 무엇을 준비하면 좋은지 처음 듣는 학부모도 이해할 수 있도록 쉽게 정리했습니다.",
+    descKo: "미국 최상위권 공립고로 꼽히는 TJ(토머스 제퍼슨 과학고, TJHSST)는 한국 과학고와 무엇이 다를까요? 8학년 Algebra 1 Honors와 GPA 3.5 같은 지원 자격, 시험 없는 홀리스틱 리뷰 전형, 초등학교 때부터 준비할 것을 정리했습니다.",
     descEn: "A parent-friendly introduction to TJHSST — what it actually is, how it differs from Korea's science and gifted high schools, and what elementary-age preparation actually looks like.",
     heroImage: {
       src: "/blog/tjhsst-roadmap-hero.jpg",
@@ -1211,76 +1631,135 @@ export const blogPosts: BlogPost[] = [
     },
     bodyKo: [
       {
-        heading: "TJ가 무엇인가요?",
+        heading: "TJ는 어떤 학교인가요?",
         paragraphs: [
-          "Fairfax County(그리고 인근 몇 개 카운티)에 사는 학부모들 사이에서 \"TJ\"라는 이름을 한 번쯤 들어보셨을 겁니다. 정식 명칭은 Thomas Jefferson High School for Science and Technology로, Fairfax County Public Schools(FCPS)가 운영하는 공립 고등학교입니다. 미국의 여러 고교 평가에서 최상위권에 자주 이름을 올리는 학교이며, 수학·과학·컴퓨터공학 분야에 특화된 커리큘럼으로 잘 알려져 있습니다.",
-          "TJ는 미국식 표현으로 \"매그넷 스쿨(Magnet School)\"에 속합니다. 매그넷 스쿨이란 특정 분야(TJ의 경우 STEM: 과학·기술·공학·수학)에 집중된 커리큘럼을 제공하기 위해, 원래 정해진 학군 경계와 상관없이 여러 지역에서 학생을 모집하는 공립학교를 말합니다. 즉 우리 동네 배정 고등학교가 아니라, 관심 있는 학생이 별도로 지원해서 들어가는 '선택형 공립학교'라고 이해하면 쉽습니다.",
-        ],
-      },
-      {
-        heading: "한국의 과학고·영재고와 무엇이 다른가요?",
-        paragraphs: [
-          "한국에서 오신 학부모라면 TJ를 과학고나 영재고와 비슷하게 떠올리실 수 있습니다. STEM에 특화된 상위권 학생을 위한 학교라는 점은 비슷하지만, 운영 방식은 상당히 다릅니다. 가장 큰 차이는 TJ가 등록금 없는 완전 무료 공립학교라는 점입니다. 별도의 학비 체계가 있는 것이 아니라, 다른 공립 고등학교와 동일하게 세금으로 운영됩니다.",
-          "입학 전형 방식도 다릅니다. 과거 TJ는 별도의 입학시험을 치렀지만, 2021년부터는 시험 점수 없이 성적, 에세이, 학생이 제출하는 문제 해결 과정(Student Portrait Sheet 등)을 종합적으로 평가하는 '홀리스틱 리뷰(Holistic Review)' 방식으로 바뀌었습니다. 즉 단 하나의 시험 점수로 당락이 갈리는 구조가 아니라, 학생의 여러 면을 함께 살펴보는 방식입니다. 정확한 전형 요소와 비중은 매년 조정될 수 있으므로, 지원을 고려한다면 매년 가을 학교 공식 입학 안내(tjhsst.fcps.edu)를 확인하는 것이 가장 정확합니다.",
+          "페어팩스 카운티 학부모 사이에서 'TJ'라는 이름을 한 번쯤 들어 보셨을 겁니다. 정식 이름은 Thomas Jefferson High School for Science and Technology(토머스 제퍼슨 과학기술고등학교)이고, 줄여서 TJHSST 또는 TJ라고 부릅니다. FCPS가 운영하는 공립 고등학교로, 미국 고교 순위에서 자주 최상위권에 오르며 수학·과학·컴퓨터공학 교육으로 유명합니다.",
+          "TJ는 미국에서 매그넷 스쿨(Magnet School)이라고 부르는 학교입니다. 매그넷 스쿨은 특정 분야를 집중해서 가르치기 위해, 사는 지역과 상관없이 지원을 받아 학생을 뽑는 공립학교입니다. 즉 집 주소로 배정되는 동네 고등학교가 아니라 따로 지원해서 들어가는 '선택형 공립학교'입니다.",
         ],
         visual: {
-          type: "comparison",
-          columns: [
-            { label: "2021년 이전", tone: "standard", points: ["별도 입학시험 실시", "단일 시험 점수로 당락 결정"] },
-            { label: "현재 (Holistic Review)", tone: "advanced", points: ["시험 점수 없음", "성적·에세이·문제해결 과정 종합 평가"] },
+          type: "checklist",
+          title: "이 글의 핵심 요약",
+          items: [
+            { text: "TJ는 학비가 없는 공립 과학고입니다" },
+            { text: "8학년 가을에 지원해서 9학년으로 입학합니다" },
+            { text: "입학시험 없이 성적·에세이 등을 종합 평가합니다" },
+            { text: "8학년에 Algebra 1 Honors 이상을 들어야 지원할 수 있습니다" },
+            { text: "초등학교 때는 수학 개념과 읽기·쓰기 습관이 기초가 됩니다" },
           ],
         },
       },
       {
-        heading: "지원은 언제, 어떻게 하나요?",
+        heading: "한국 과학고·영재고와 무엇이 다른가요?",
         paragraphs: [
-          "TJ는 8학년(중학교 2학년에 해당) 학생이 9학년(고등학교 1학년) 입학을 목표로 지원합니다. Fairfax County뿐 아니라 협약을 맺은 몇 개 인근 카운티(Arlington, Fairfax City, Loudoun 등) 거주 학생도 지원할 수 있습니다. 지원은 대개 재학 중인 중학교를 통해 진행되며, 담당 카운슬러가 안내해주는 경우가 많습니다.",
-          "지원 절차와 정확한 마감일, 정원, 평가 기준의 세부 내용은 소송과 정책 변화로 인해 최근 몇 년간 계속 조정되어 왔습니다. 따라서 이 글에서 특정 연도의 마감일이나 정원 숫자를 단정적으로 안내하기보다는, 8학년 지원이라는 큰 틀만 기억해두시고 정확한 최신 정보는 반드시 tjhsst.fcps.edu의 공식 입학 안내나 재학 중학교의 카운슬러를 통해 확인하시길 권합니다.",
+          "STEM(과학·기술·공학·수학)에 강한 학생을 위한 학교라는 점은 한국의 과학고·영재고와 비슷합니다. 하지만 TJ는 등록금이 없는 공립학교로, 다른 공립 고등학교처럼 세금으로 운영됩니다. 기숙사 학교가 아니어서 학생들은 집에서 통학합니다.",
+          "입학 방식도 다릅니다. TJ는 예전에는 입학시험을 봤지만, 2021년부터 시험 없이 여러 자료를 함께 보는 홀리스틱 리뷰(Holistic Review)로 바뀌었습니다. 성적(GPA), 자신의 역량을 보여 주는 Student Portrait Sheet, 문제 해결 에세이(Problem-Solving Essay)를 평가합니다.",
+          "여기에 학생의 배경 요소(Experience Factors)도 함께 고려합니다. 영어 학습자(EL)인지, 경제적 지원이 필요한 가정인지 등이 여기에 해당합니다. 한국에서 와서 영어를 배우는 중인 학생이라면 알아 둘 만한 부분입니다.",
         ],
+        visual: {
+          type: "comparison",
+          columns: [
+            { label: "2021년 이전", tone: "standard", points: ["별도 입학시험 실시", "시험 점수 비중이 큼"] },
+            { label: "현재 (Holistic Review)", tone: "advanced", points: ["입학시험 없음", "GPA·Student Portrait Sheet·문제 해결 에세이 종합 평가"] },
+          ],
+        },
       },
       {
-        heading: "초등학교 때부터 무엇이 쌓여야 하나요?",
+        heading: "TJ 지원 자격과 시기는 어떻게 되나요?",
         paragraphs: [
-          "TJ 지원은 8학년에 이루어지지만, 그 밑바탕이 되는 학업 습관과 사고력은 초등학교 시기에 쌓입니다. 가장 직접적으로 연결되는 것은 FCPS의 AAP(Advanced Academic Programs) 심화 수학 트랙입니다. 초등학교에서 AAP 수학을 꾸준히 이수하면 중학교에서 더 빠른 수학 진도를 밟게 되고, 이는 8학년 시점의 수학 역량 전반에 영향을 줍니다. AAP와 수학 경로에 대한 자세한 내용은 저희 블로그의 'FCPS AAP 수학, 제대로 이해하기' 글을 참고하세요.",
-          "홀리스틱 리뷰는 에세이와 문제 해결 과정을 함께 평가하기 때문에, 수학 실력만큼이나 읽기·쓰기 습관도 중요합니다. 평소 책을 읽고 자기 생각을 글로 표현해보는 연습, 그리고 정답보다 풀이 과정을 설명해보는 습관이 장기적으로 큰 자산이 됩니다. MOEMS 같은 초등 수학 경시대회 경험도 문제 해결 과정을 글로 정리해보는 좋은 연습이 될 수 있습니다.",
+          "TJ는 8학년(한국 중학교 2학년 나이) 학생이 9학년 입학을 목표로 지원합니다. 페어팩스 카운티뿐 아니라 Arlington, Loudoun, Prince William 카운티와 Falls Church 시에 사는 학생도 지원할 수 있습니다. 2026년 가을 지원서 접수 기간은 10월 5일부터 30일까지입니다.",
+          "지원하려면 기본 조건을 갖춰야 합니다. 2026년 가을 기준으로 8학년에 Algebra 1 Honors 이상의 수학을 듣고, Honors 과학과 Honors 과목 하나를 더 듣고 있어야 하며, 핵심 과목 성적(GPA)이 3.5 이상이어야 합니다.",
+          "세부 조건과 일정은 해마다 바뀔 수 있습니다. 지원을 생각한다면 매년 가을 FCPS의 TJ 입학 안내 페이지와 중학교 카운슬러를 통해 최신 내용을 확인하세요.",
+        ],
+        visual: {
+          type: "checklist",
+          title: "지원 기본 조건 (2026년 가을 기준)",
+          items: [
+            { text: "8학년 재학, 참여 지역 거주", note: "Fairfax·Arlington·Loudoun·Prince William 카운티, Falls Church 시" },
+            { text: "8학년에 Algebra 1 Honors 이상 수강" },
+            { text: "Honors 과학 + Honors 과목 1개 더 수강" },
+            { text: "핵심 과목 GPA 3.5 이상", note: "가중치를 붙이지 않은 성적 기준" },
+          ],
+        },
+      },
+      {
+        heading: "초등학교 때부터 무엇을 쌓아야 하나요?",
+        paragraphs: [
+          "지원 조건에서 보듯 TJ는 수학 과목과 바로 연결됩니다. 8학년에 Algebra 1 Honors를 들으려면 7학년까지 Prealgebra 과정을 마쳐야 합니다. 다행히 7학년 Prealgebra Honors와 8학년 Algebra 1 Honors는 FCPS에서 원하는 학생 누구나 신청할 수 있는 과목입니다.",
+          "초등 심화 수학(Advanced Math)을 들으면 이 경로가 한두 해 앞당겨져, 8학년에 Geometry Honors처럼 더 높은 과목을 듣게 됩니다. 수학 경로에 대한 자세한 내용은 'FCPS 수학 패스웨이 총정리' 글을 참고하세요.",
+          "홀리스틱 리뷰는 에세이와 문제 해결 과정을 함께 보므로 읽기·쓰기 습관도 수학만큼 중요합니다. 책을 꾸준히 읽고, 정답보다 풀이 과정을 말과 글로 설명하는 습관이 장기적으로 큰 자산이 됩니다. MOEMS 같은 경시대회 경험도 문제 해결 과정을 정리해 보는 좋은 연습입니다.",
         ],
         visual: {
           type: "pathway",
           steps: [
-            { label: "초등 AAP", sublabel: "심화 수학 트랙" },
-            { label: "중학교", sublabel: "가속 수학 진입" },
-            { label: "8학년", sublabel: "TJ 지원 (Holistic Review)" },
+            { label: "초등 3~6학년", sublabel: "수학 개념·읽기·쓰기 습관" },
+            { label: "7학년", sublabel: "Prealgebra 또는 Algebra 1" },
+            { label: "8학년", sublabel: "Algebra 1 Honors 이상 + TJ 지원" },
           ],
-          finalLabel: "TJHSST 9학년 입학",
+          finalLabel: "TJ 9학년 입학",
         },
       },
       {
         heading: "학부모들이 흔히 하는 오해",
         paragraphs: [
-          "가장 흔한 오해는 '선행학습 학원을 많이 다니면 TJ에 갈 수 있다'는 생각입니다. 홀리스틱 리뷰 체제에서는 단순히 진도를 많이 나간 것보다, 개념을 얼마나 깊이 이해하고 스스로 문제를 풀어내는지, 그리고 그 과정을 얼마나 명확하게 설명할 수 있는지가 더 중요하게 평가됩니다. 진도만 빠르고 개념 이해가 얕은 경우, 오히려 에세이나 문제 해결 과정에서 어려움을 겪을 수 있습니다.",
-          "또 다른 오해는 '초등학교 때 AAP에 들어가지 못하면 TJ는 불가능하다'는 생각입니다. AAP는 분명 유리한 경로이지만, 매년 재평가되는 시스템이며 중학교 시기에도 심화 수학 트랙에 진입할 기회가 있습니다. 초등 시기에 다소 늦었다고 느끼더라도, 꾸준히 개념을 다지고 사고력을 키우는 것이 여전히 의미 있는 준비가 됩니다.",
+          "가장 흔한 오해는 '선행 학원을 많이 다니면 TJ에 갈 수 있다'는 생각입니다. 홀리스틱 리뷰에서는 진도를 얼마나 나갔는지보다 개념을 얼마나 깊이 이해하고, 스스로 문제를 풀고, 그 과정을 명확하게 설명할 수 있는지가 더 중요합니다. 진도만 빠르고 이해가 얕으면 오히려 에세이에서 어려움을 겪을 수 있습니다.",
+          "또 다른 오해는 '초등학교 때 AAP에 들어가지 못하면 TJ는 불가능하다'는 생각입니다. AAP는 유리한 경로이지만 필수 조건이 아닙니다. 8학년 Algebra 1 Honors는 원하는 학생 누구나 신청할 수 있고, 초등 심화 수학으로 옮겨 갈 기회도 해마다 있습니다.",
         ],
         visual: {
           type: "callout",
           variant: "mythFact",
           pairs: [
             {
-              myth: "선행학습 학원을 많이 다니면 TJ에 갈 수 있다",
-              fact: "Holistic Review는 진도보다 개념 이해 깊이·독립적 문제해결·설명력을 더 중요하게 봅니다",
+              myth: "선행 학원을 많이 다니면 TJ에 갈 수 있다",
+              fact: "홀리스틱 리뷰는 진도보다 개념 이해의 깊이, 스스로 문제를 푸는 힘, 설명하는 능력을 더 중요하게 봅니다.",
             },
             {
               myth: "초등학교 때 AAP에 들어가지 못하면 TJ는 불가능하다",
-              fact: "AAP는 매년 재평가되며, 중학교 시기에도 심화 수학 트랙에 진입할 기회가 있습니다",
+              fact: "AAP는 필수 조건이 아닙니다. 8학년 Algebra 1 Honors는 원하는 학생 누구나 신청할 수 있습니다.",
+            },
+            {
+              myth: "한국에서 온 지 얼마 안 돼 영어가 부족하면 지원할 수 없다",
+              fact: "TJ 전형은 영어 학습자(EL) 여부 같은 배경 요소도 함께 고려합니다. 다만 에세이는 영어로 쓰므로 꾸준한 읽기·쓰기 연습이 필요합니다.",
             },
           ],
         },
       },
       {
-        heading: "지금 초등 학부모가 실천할 수 있는 것",
+        heading: "지금 초등 학부모가 할 수 있는 것",
         paragraphs: [
-          "지금 자녀가 초등학생이라면, 8학년 지원까지는 아직 몇 년의 시간이 있습니다. 가장 먼저 할 수 있는 것은 현재 AAP 트랙 여부를 확인하고, 심화 수학의 개념을 탄탄히 다지도록 돕는 것입니다. 여기에 더해 꾸준한 독서와 글쓰기 습관, 그리고 MOEMS 같은 수학 경시대회 경험을 통해 사고 과정을 표현하는 연습을 함께 쌓아가는 것이 좋습니다.",
-          "마지막으로, 담임교사나 학교의 AART(Advanced Academic Resource Teacher)와 정기적으로 소통하며 자녀의 학업 상태를 파악해두는 것도 중요합니다. TJ 지원은 8학년이라는 먼 미래의 일처럼 느껴질 수 있지만, 초등학교 시기의 꾸준한 기초 다지기가 결국 그 시점의 선택지를 넓혀줍니다. 조급하게 서두르기보다, 지금 할 수 있는 것부터 차근차근 쌓아가는 것이 가장 확실한 로드맵입니다.",
+          "자녀가 지금 초등학생이라면 8학년 지원까지 아직 몇 년이 남아 있습니다. 먼저 지금 어느 수학 과정에 있는지 확인하고, 진도보다 개념을 탄탄히 다지도록 도와주세요. 꾸준한 독서와 글쓰기, 그리고 풀이 과정을 설명하는 연습을 함께 쌓아 가면 좋습니다.",
+          "담임 선생님이나 학교의 AART(AAP 담당 교사)와 정기적으로 소통하며 아이의 학업 상태를 파악해 두는 것도 중요합니다. 조급하게 서두르기보다 지금 할 수 있는 것부터 차근차근 쌓아 가는 것이 가장 확실한 로드맵입니다.",
         ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "info",
+          title: "함께 읽으면 좋은 글",
+          text: "6학년부터 갈라지는 FCPS 수학 과목과, Algebra 1을 몇 학년에 듣게 되는지 정리했습니다.",
+          linkHref: "/blog/fcps-math-pathways",
+          linkLabel: "FCPS 수학 패스웨이 총정리 보기",
+        },
+      },
+    ],
+    faqKo: [
+      {
+        q: "TJ는 학비가 있나요?",
+        a: "없습니다. TJ는 FCPS가 운영하는 공립학교라 등록금이 없습니다. 기숙사 학교가 아니므로 집에서 통학합니다.",
+      },
+      {
+        q: "TJ는 몇 학년에 지원하나요?",
+        a: "8학년 가을에 지원해서 9학년으로 입학합니다. 2026년 가을 지원서 접수 기간은 10월 5일부터 30일까지입니다.",
+      },
+      {
+        q: "TJ 입학시험이 있나요?",
+        a: "2021년부터 입학시험이 없습니다. 성적(GPA), Student Portrait Sheet, 문제 해결 에세이를 종합하는 홀리스틱 리뷰로 선발합니다.",
+      },
+      {
+        q: "TJ에 지원하려면 수학은 어디까지 들어야 하나요?",
+        a: "2026년 가을 기준으로 8학년에 Algebra 1 Honors 이상을 듣고 있어야 합니다. 이 과목은 FCPS에서 원하는 학생 누구나 신청할 수 있어, AAP 학생이 아니어도 도달할 수 있습니다.",
+      },
+      {
+        q: "AAP에 들어가지 못하면 TJ는 어렵나요?",
+        a: "그렇지 않습니다. AAP는 유리한 경로이지만 필수 조건은 아닙니다. 지원 조건을 갖추고 개념 이해와 글쓰기 능력을 꾸준히 키우는 것이 더 중요합니다.",
       },
     ],
     bodyEn: [
@@ -1295,7 +1774,7 @@ export const blogPosts: BlogPost[] = [
         heading: "How Is It Different From Korea's Science and Gifted High Schools?",
         paragraphs: [
           "Parents who grew up in Korea's education system might picture TJ as similar to a Korean science high school (과학고) or gifted academy (영재고). Both serve academically strong students with a STEM focus, but the two systems work quite differently. The biggest difference is that TJ is a fully free public school — there's no separate tuition structure. It's funded like any other public high school.",
-          "The admissions process is also different. TJ used to require a separate entrance exam, but since 2021 it has used a \"Holistic Review\" process instead — no test score, but a combined look at grades, a written essay, and a problem-solving submission (often called a Student Portrait Sheet). In other words, no single test score determines the outcome; several aspects of the student are considered together. The exact components and how they're weighted can shift from year to year, so families considering applying should check the school's official admissions page (tjhsst.fcps.edu) each fall for the current cycle's details.",
+          "The admissions process is also different. TJ used to require a separate entrance exam, but since 2021 it has used a \"Holistic Review\" process instead — no test score, but a combined look at GPA, a Student Portrait Sheet, and a problem-solving essay, along with experience factors such as whether a student is an English learner. In other words, no single test score determines the outcome; several aspects of the student are considered together. The exact components and how they're weighted can shift from year to year, so families considering applying should check the school's official admissions page (tjhsst.fcps.edu) each fall for the current cycle's details.",
         ],
         visual: {
           type: "comparison",
@@ -1308,7 +1787,7 @@ export const blogPosts: BlogPost[] = [
       {
         heading: "When and How Do Students Apply?",
         paragraphs: [
-          "Students apply to TJ in 8th grade for admission the following year, as 9th graders. Eligibility extends beyond Fairfax County to a handful of neighboring participating jurisdictions, such as Arlington, Fairfax City, and Loudoun. Applications are typically submitted through the student's current middle school, often with guidance from the school counselor.",
+          "Students apply to TJ in 8th grade for admission the following year, as 9th graders. Eligibility extends beyond Fairfax County to Arlington, Loudoun, and Prince William counties and the City of Falls Church. For the fall 2026 cycle, applications were open October 5-30, and applicants needed to be taking Algebra 1 Honors or higher, an honors science course, and one more honors course in 8th grade, with at least a 3.5 unweighted GPA in core classes.",
           "The exact application process, deadlines, class size, and evaluation criteria have shifted repeatedly over the past several years amid litigation and policy changes. Rather than stating specific numbers here that could be outdated by the time you read this, the key structural fact to remember is that students apply in 8th grade — and for the current cycle's exact details, always check the official admissions page at tjhsst.fcps.edu or ask your middle school counselor.",
         ],
       },
@@ -1332,7 +1811,7 @@ export const blogPosts: BlogPost[] = [
         heading: "Common Misconceptions Parents Have",
         paragraphs: [
           "The most common misconception is that enrolling in enough acceleration-focused tutoring guarantees TJ admission. Under Holistic Review, what matters more than how far ahead a student has covered material is how deeply they understand the concepts, how independently they can solve problems, and how clearly they can explain their reasoning. A student who has moved fast but understands shallowly can actually struggle more with the essay and problem-solving components.",
-          "Another misconception is that missing AAP placement in elementary school closes the door on TJ entirely. AAP is certainly an advantageous path, but placement is reassessed every year, and there are still opportunities to move into an advanced math track in middle school. Even if a family feels they started a bit later, consistently building conceptual understanding and reasoning skills is still meaningful preparation.",
+          "Another misconception is that missing AAP placement in elementary school closes the door on TJ entirely. AAP is certainly an advantageous path, but it isn't required: Algebra 1 Honors in 8th grade is open to any student who wants it, and students can move into Advanced Math in any year from 3rd through 6th grade. Even if a family feels they started a bit later, consistently building conceptual understanding and reasoning skills is still meaningful preparation.",
         ],
         visual: {
           type: "callout",
@@ -1344,7 +1823,7 @@ export const blogPosts: BlogPost[] = [
             },
             {
               myth: "Missing AAP placement in elementary school closes the door on TJ entirely",
-              fact: "AAP is reassessed every year, and there are still opportunities to move into an advanced math track in middle school",
+              fact: "AAP isn't required. Algebra 1 Honors in 8th grade is open to any student who wants it",
             },
           ],
         },
@@ -1361,12 +1840,13 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "math-anxiety-guide",
     publishedAt: "2026-08-27",
-    readingMins: 6,
+    updatedAt: "2026-10-23",
+    readingMins: 7,
     category: "학습심리",
     categoryEn: "Learning & Mindset",
-    titleKo: "수학 불안, 우리 아이도 겪고 있을까요?",
+    titleKo: "수학 불안 체크리스트: 아이가 수학만 보면 긴장한다면 (수포자 예방)",
     titleEn: "Does Your Child Have Math Anxiety?",
-    descKo: "숫자만 보면 얼어붙거나 \"난 수학머리가 없어\"라고 말하는 아이들, 단순한 싫증이 아닐 수 있습니다. 수학 불안의 신호와 원인, 그리고 집에서 부모가 할 수 있는 실질적인 도움을 정리했습니다.",
+    descKo: "“난 수학머리가 없어”라고 말하는 아이, 단순히 싫어하는 게 아닐 수 있습니다. 수학 불안의 신호 5가지와 원인, 부모가 무심코 하는 말, 집에서 해 볼 방법, 영어로 수업을 듣기 시작한 아이에게 필요한 도움까지 정리했습니다.",
     descEn: "Kids who freeze at word problems or say \"I'm just not a math person\" may be dealing with something more than dislike. Here's how to recognize math anxiety, what causes it, and what parents can actually do at home.",
     heroImage: {
       src: "/blog/math-anxiety-guide-hero.jpg",
@@ -1377,24 +1857,24 @@ export const blogPosts: BlogPost[] = [
       {
         heading: "수학 불안이란 무엇인가요?",
         paragraphs: [
-          "수학 불안(Math Anxiety)은 단순히 수학을 싫어하는 것과 다릅니다. 숫자나 수학 문제를 마주했을 때 긴장, 걱정, 심하면 두려움을 느끼는 정서적 반응으로, 실제 수학 실력과는 별개로 나타날 수 있습니다. 개념을 충분히 이해하고 있는 아이도 시험지를 받는 순간 머릿속이 하얘지는 경험을 할 수 있습니다.",
-          "연구에 따르면 수학 불안은 생각보다 이른 시기, 심지어 1학년 무렵부터 나타날 수 있습니다. 문제는 이 불안이 실제 수학 수행 능력을 떨어뜨린다는 점입니다. 불안한 상태에서는 작업기억(Working Memory)이 걱정하는 데 쓰이면서, 정작 문제를 푸는 데 쓸 수 있는 인지 자원이 줄어듭니다.",
+          "수학 불안(Math Anxiety)은 단순히 수학을 싫어하는 것과 다릅니다. 숫자나 수학 문제를 마주했을 때 긴장, 걱정, 심하면 두려움을 느끼는 정서적 반응으로, 실제 수학 실력과 상관없이 나타날 수 있습니다. 개념을 충분히 이해한 아이도 시험지를 받는 순간 머릿속이 하얘질 수 있습니다.",
+          "연구에 따르면 수학 불안은 1학년 무렵부터 나타날 수 있습니다. 문제는 불안이 실제 수학 실력 발휘를 방해한다는 점입니다. 불안한 상태에서는 작업기억(Working Memory)이 걱정하는 데 쓰여, 정작 문제를 푸는 데 쓸 머리가 줄어듭니다. 한국에서 말하는 '수포자(수학을 포기한 학생)'도 처음에는 이런 불안에서 시작되는 경우가 많습니다.",
         ],
       },
       {
-        heading: "우리 아이도 그런 걸까요? 흔한 신호들",
+        heading: "우리 아이도 그럴까요? 흔한 신호 5가지",
         paragraphs: [
-          "수학 불안은 겉으로 \"수학이 싫어\"라는 말로만 나타나지 않습니다. 배가 아프다, 숙제 시작을 자꾸 미룬다, 쉬운 문제도 지우개로 여러 번 지운다처럼 간접적인 형태로 드러나는 경우가 많아 부모가 알아차리기 어렵습니다.",
-          "특히 다른 과목에서는 자신감 있는 아이가 유독 수학 시간에만 위축된다면, 실력의 문제가 아니라 불안의 문제일 가능성이 큽니다.",
+          "수학 불안은 '수학이 싫어'라는 말로만 드러나지 않습니다. 배가 아프다고 하거나, 숙제를 자꾸 미루거나, 쉬운 문제도 지우개로 여러 번 지우는 것처럼 간접적으로 나타나는 경우가 많아 부모가 알아차리기 어렵습니다.",
+          "특히 다른 과목에서는 자신감 있는 아이가 유독 수학 시간에만 움츠러든다면, 실력이 아니라 불안의 문제일 가능성이 큽니다.",
         ],
         visual: {
           type: "checklist",
-          title: "이런 모습이 반복된다면 확인해보세요",
+          title: "이런 모습이 반복된다면 확인해 보세요",
           items: [
             { text: "수학 숙제 시작을 유난히 미루거나 피한다" },
             { text: "수학 시험 전날 배가 아프다, 잠을 설친다고 한다" },
             { text: "쉬운 문제도 여러 번 지우고 다시 쓴다", note: "완벽해야 한다는 부담" },
-            { text: "\"난 원래 수학머리가 없어\"라는 말을 자주 한다" },
+            { text: "'난 원래 수학머리가 없어'라는 말을 자주 한다" },
             { text: "다른 과목은 자신 있어 하면서 수학 시간에만 위축된다" },
           ],
         },
@@ -1402,57 +1882,91 @@ export const blogPosts: BlogPost[] = [
       {
         heading: "수학 불안은 어디서 시작될까요?",
         paragraphs: [
-          "가장 흔한 원인 중 하나는 시간 제한이 있는 연산 테스트입니다. 정해진 시간 안에 정확히 풀어야 한다는 압박은 실력과 무관하게 불안을 유발합니다. 실수를 허용하지 않는 분위기, 틀린 문제를 공개적으로 지적받는 경험도 누적되면 불안으로 이어집니다.",
-          "부모나 교사가 무심코 보이는 태도도 영향을 줍니다. 아이는 어른의 표정과 말투에서 수학이 '무서운 것' 또는 '타고난 재능이 있어야만 잘하는 것'이라는 메시지를 흡수합니다. 부모가 자신의 학창 시절 수학 경험을 부정적으로 이야기하는 것만으로도 아이에게 영향을 줄 수 있습니다.",
+          "가장 흔한 원인 중 하나는 시간 제한이 있는 연산 테스트(Timed Test)입니다. 정해진 시간 안에 정확히 풀어야 한다는 압박은 실력과 상관없이 불안을 만듭니다. 실수를 허용하지 않는 분위기, 틀린 문제를 여러 사람 앞에서 지적받은 경험도 쌓이면 불안으로 이어집니다.",
+          "어른의 태도도 영향을 줍니다. 아이는 어른의 표정과 말투에서 수학이 '무서운 것', '타고난 사람만 잘하는 것'이라는 메시지를 받아들입니다. 부모가 자신의 학창 시절 수학 경험을 부정적으로 이야기하는 것만으로도 아이에게 영향을 줄 수 있습니다.",
         ],
       },
       {
-        heading: "학부모가 무심코 하는 말들",
+        heading: "미국에 막 온 아이라면 특히 살펴보세요",
         paragraphs: [
-          "좋은 의도로 하는 말이 오히려 불안을 키우는 경우가 있습니다. 아래는 흔히 쓰이지만 다시 생각해볼 만한 표현들입니다.",
+          "한국에서 수학을 잘하던 아이가 미국 학교에 와서 갑자기 수학을 싫어하게 되는 경우가 있습니다. 대부분 실력이 아니라 영어 때문입니다. 문장제 문제를 다 읽지 못하거나, 선생님의 설명을 놓치거나, 풀이를 영어로 설명하라는 요구에 위축되는 것입니다.",
+          "이럴 때는 '수학'과 '영어'를 나눠서 봐 주세요. 집에서 같은 문제를 한국어로 설명해 보게 하면, 개념은 이미 알고 있는 경우가 많습니다. 그 사실을 아이에게 말해 주는 것만으로도 자신감이 돌아옵니다. 문장제에 자주 나오는 영어 표현을 익히는 것도 도움이 됩니다.",
+        ],
+        visual: {
+          type: "callout",
+          variant: "note",
+          tone: "info",
+          title: "영어 문장제가 어렵다면",
+          text: "in all, how many more처럼 수학 문장제에 자주 나오는 영어 표현을 정리해 두었습니다.",
+          linkHref: "/blog/math-practice-at-home",
+          linkLabel: "수학 문장제 영어 표현 보기",
+        },
+      },
+      {
+        heading: "부모가 무심코 하는 말",
+        paragraphs: [
+          "좋은 뜻으로 한 말이 오히려 불안을 키우기도 합니다. 흔히 쓰지만 다시 생각해 볼 만한 표현들입니다.",
         ],
         visual: {
           type: "callout",
           variant: "mythFact",
           pairs: [
             {
-              myth: "\"엄마도 수학 진짜 못했어, 너도 그럴 수 있어\"",
-              fact: "부모가 수학에 자신 없다는 말을 반복하면, 아이는 수학 실력이 물려받는 고정된 것이라 믿게 되기 쉽습니다. 대신 \"엄마도 처음엔 어려웠는데 연습하니까 늘더라\"처럼 노력과 성장에 초점을 맞춰 말해보세요.",
+              myth: "“엄마(아빠)도 수학 진짜 못했어, 너도 그럴 수 있어”",
+              fact: "부모가 수학에 자신 없다는 말을 반복하면, 아이는 수학 실력이 물려받는 것이라고 믿기 쉽습니다. 대신 '나도 처음엔 어려웠는데 연습하니까 늘더라'처럼 노력과 성장에 초점을 맞춰 말해 보세요.",
             },
             {
-              myth: "\"이렇게 쉬운 걸 왜 틀려?\"",
-              fact: "실수를 지적하는 말은 다음 문제를 풀 때 아이를 더 긴장하게 만듭니다. 틀린 답보다 어떤 풀이 과정을 거쳤는지 먼저 물어보는 것이 아이의 사고 과정을 이해하는 데 도움이 됩니다.",
+              myth: "“이렇게 쉬운 걸 왜 틀려?”",
+              fact: "실수를 지적하는 말은 다음 문제를 풀 때 아이를 더 긴장하게 만듭니다. 틀린 답보다 어떤 과정으로 풀었는지 먼저 물어보면 아이의 생각을 이해하는 데 도움이 됩니다.",
             },
             {
-              myth: "\"빨리 풀어야 잘하는 거야\"",
+              myth: "“빨리 풀어야 잘하는 거야”",
               fact: "속도와 이해는 다른 문제입니다. 천천히 정확하게 개념을 이해하는 아이가 결국 더 단단한 실력을 쌓습니다. 시간 압박을 강조할수록 불안은 커집니다.",
             },
           ],
         },
       },
       {
-        heading: "집에서 실천할 수 있는 것",
+        heading: "집에서 해 볼 수 있는 5가지",
         paragraphs: [
-          "거창한 프로그램보다 매일의 작은 습관이 수학 불안을 낮추는 데 더 효과적입니다. 아래 다섯 가지부터 시작해보세요.",
+          "거창한 프로그램보다 매일의 작은 습관이 수학 불안을 낮추는 데 더 효과적입니다. 아래 다섯 가지부터 시작해 보세요.",
         ],
         visual: {
           type: "checklist",
-          title: "집에서 시도해볼 수 있는 5가지",
+          title: "집에서 시도해 볼 수 있는 5가지",
           items: [
-            { text: "타이머를 없애고 정확성 먼저", note: "시간 압박 없이 문제를 풀 기회를 준다" },
-            { text: "틀린 답이 아니라 풀이 과정을 물어본다", note: "\"어떻게 그렇게 생각했어?\"" },
-            { text: "실수를 학습의 정상적인 과정으로 이야기한다", note: "실수하는 순간 뇌가 가장 활발히 성장한다고 알려져 있다" },
-            { text: "구체물이나 그림으로 다시 설명해본다", note: "Singapore Math의 CPA 접근법과도 통한다" },
-            { text: "매일 짧게, 꾸준히 반복한다", note: "몰아서 하는 학습보다 매일 10~15분이 더 효과적" },
+            { text: "타이머를 치우고 정확성 먼저", note: "시간 압박 없이 풀 기회를 준다" },
+            { text: "틀린 답이 아니라 풀이 과정을 물어본다", note: "'어떻게 그렇게 생각했어?'" },
+            { text: "실수를 배우는 과정의 일부로 이야기한다", note: "실수는 새로 배울 것을 알려 주는 신호" },
+            { text: "구체물이나 그림으로 다시 설명해 본다", note: "Singapore Math의 CPA 접근법과도 통한다" },
+            { text: "매일 짧게, 꾸준히 반복한다", note: "몰아서 하기보다 매일 10~15분" },
           ],
         },
       },
       {
-        heading: "학교와 협력하기 — 언제 도움을 요청해야 할까요?",
+        heading: "언제 학교에 도움을 요청해야 할까요?",
         paragraphs: [
-          "가정에서의 노력만으로 나아지지 않고, 수학과 관련된 불안이 등교 거부나 신체 증상으로까지 이어진다면 담임교사나 학교 상담사와 상담하는 것이 좋습니다. FCPS 담임교사는 교실에서 아이가 실제로 어떤 상황에서 위축되는지 구체적인 관찰 정보를 갖고 있는 경우가 많습니다.",
-          "수학 실력 자체가 걱정이라면, 불안 해소와 개념 이해를 함께 다루는 것이 중요합니다. 무작정 문제를 더 많이 풀리기보다, 아이가 이미 아는 것부터 시작해 작은 성공 경험을 쌓아가는 방식이 장기적으로 더 효과적입니다.",
+          "집에서 노력해도 나아지지 않고, 수학 때문에 학교에 가기 싫어하거나 몸이 아프다고 하는 일이 이어진다면 담임 선생님이나 학교 상담 교사(School Counselor)와 상담해 보세요. 담임 선생님은 교실에서 아이가 어떤 상황에서 움츠러드는지 구체적으로 관찰한 정보를 갖고 있는 경우가 많습니다. 상담할 때 한국어 통역을 요청할 수 있습니다.",
+          "수학 실력 자체도 걱정이라면 불안과 개념 이해를 함께 다루는 것이 중요합니다. 무작정 문제를 더 많이 풀리기보다, 아이가 이미 아는 것부터 시작해 작은 성공 경험을 쌓아 가는 방식이 장기적으로 더 효과적입니다.",
         ],
+      },
+    ],
+    faqKo: [
+      {
+        q: "수학 불안은 몇 살부터 생기나요?",
+        a: "연구에 따르면 1학년 무렵부터 나타날 수 있습니다. 초등 저학년부터 아이가 수학을 대하는 태도를 살펴보는 것이 좋습니다.",
+      },
+      {
+        q: "수학 불안과 수학을 싫어하는 것은 어떻게 다른가요?",
+        a: "싫어하는 것은 흥미의 문제이고, 수학 불안은 긴장과 두려움이라는 정서적 반응입니다. 수학 불안이 있으면 아는 문제도 시험에서 머리가 하얘져 실력보다 낮은 결과가 나올 수 있습니다.",
+      },
+      {
+        q: "미국에 와서 아이가 갑자기 수학을 싫어해요. 왜 그럴까요?",
+        a: "실력보다 영어 때문인 경우가 많습니다. 같은 문제를 한국어로 설명하게 해 보고, 개념을 알고 있다면 수학 영어 표현을 익히는 데 집중해 주세요.",
+      },
+      {
+        q: "시간 제한이 있는 연산 테스트가 수학 불안을 만드나요?",
+        a: "시간 제한이 있는 테스트는 수학 불안의 흔한 원인 중 하나입니다. 집에서는 타이머 없이 정확하게 푸는 연습부터 하는 것이 좋습니다.",
       },
     ],
     bodyEn: [
@@ -1541,12 +2055,13 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "fcps-math-pathways",
     publishedAt: "2026-10-08",
+    updatedAt: "2026-10-23",
     readingMins: 9,
     category: "수학 패스웨이",
     categoryEn: "Math Pathways",
-    titleKo: "FCPS 수학 패스웨이 총정리: Algebra 1, 몇 학년에 듣게 될까요?",
+    titleKo: "FCPS 수학 패스웨이 총정리: Algebra 1(알지브라 1)은 몇 학년에 들을까?",
     titleEn: "FCPS Math Pathways Explained: When Will Your Child Take Algebra 1?",
-    descKo: "한국에서 막 오신 학부모님을 위해 FCPS 수학 경로를 쉽게 풀었습니다. 미국 학제와 과목 이름부터, Algebra 1을 6·7·8학년 중 언제 듣게 되는지, 최근 바뀐 배치 기준까지 차례로 설명합니다.",
+    descKo: "한국에서 막 오신 학부모님을 위해 FCPS 수학 과정을 쉽게 정리했습니다. 미국 학제와 과목 이름, 6학년 수학 과목 3가지, Algebra 1을 6·7·8학년 중 언제 듣는지, 최근 바뀐 배치 기준(IAAT 폐지, 6학년 Algebra 1 확대)까지 차례로 설명합니다.",
     descEn: "In FCPS, math splits into three course options in 6th grade, and that choice decides whether a student takes Algebra 1 in 6th, 7th, or 8th grade. Here is the current pathway for elementary parents, including the expansion of 6th-grade Algebra 1 and the end of the IAAT requirement.",
     heroImage: {
       src: "/blog/fcps-math-pathways-hero.jpg",
@@ -1752,6 +2267,28 @@ export const blogPosts: BlogPost[] = [
         },
       },
     ],
+    faqKo: [
+      {
+        q: "FCPS에서 Algebra 1은 몇 학년에 듣나요?",
+        a: "기본은 8학년입니다. FCPS는 모든 학생이 8학년까지 Algebra 1을 마치는 것을 목표로 하며, 준비된 학생은 7학년이나 6학년에 먼저 들을 수 있습니다.",
+      },
+      {
+        q: "7학년 Algebra 1 Honors를 들으려면 IAAT 점수가 필요한가요?",
+        a: "2025-26학년도부터는 필요하지 않습니다. 지금 FCPS 안내에 적힌 조건은 Advanced Math 6를 마치는 것입니다. IAAT는 계속 보지만 과목을 고를 때 참고 자료로만 쓰입니다.",
+      },
+      {
+        q: "6학년에 Algebra 1을 들으려면 어떻게 해야 하나요?",
+        a: "시범 운영 첫해에는 5학년 때 6학년 수학 SOL에서 500점 이상을 받고, 다른 수학 평가에서도 기준 점수를 넘어야 했습니다. 올해 기준은 바뀌었을 수 있으니 5학년 때 학교 수학 선생님께 확인하세요.",
+      },
+      {
+        q: "6학년에 Math 6를 들으면 Algebra 1이 늦어지나요?",
+        a: "그렇지 않습니다. 7학년 Prealgebra Honors와 8학년 Algebra 1 Honors는 원하는 학생 누구나 신청할 수 있어서, Math 6로 시작해도 8학년에 Algebra 1 Honors를 들을 수 있습니다.",
+      },
+      {
+        q: "미국 6학년은 한국의 몇 학년인가요?",
+        a: "대략 한국의 초등학교 6학년에 해당합니다. FCPS는 대부분 6학년까지 초등학교이고, 7~8학년이 중학교, 9~12학년이 고등학교입니다.",
+      },
+    ],
     bodyEn: [
       {
         heading: "What Is a Math Pathway?",
@@ -1879,12 +2416,13 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "amc-8-2027-guide",
     publishedAt: "2026-10-08",
+    updatedAt: "2026-10-23",
     readingMins: 9,
     category: "경시대회",
     categoryEn: "Competitions",
-    titleKo: "2027 AMC 8 완전 가이드: 시험 일정, 등록, 준비 방법, 시상까지",
+    titleKo: "2027 AMC 8 총정리: 시험 일정, 등록 방법, 커트라인, 준비 계획",
     titleEn: "AMC 8 2027: Dates, Registration, Prep Plan, and Awards",
-    descKo: "2027년 AMC 8은 1월 21일부터 27일 사이에 치러집니다. 학부모가 MAA에 직접 등록할 수 없는 시험이라 일정을 미리 챙겨야 합니다. 시험 일정과 등록 방법, 남은 15주 준비 계획, 유용한 무료 사이트, 점수별 시상과 실제 혜택을 정리했습니다.",
+    descKo: "2027년 AMC 8은 1월 21일부터 27일 사이에 치러집니다. 학부모가 MAA에 직접 등록할 수 없어 학교나 시험장을 미리 찾아야 합니다. 시험 일정과 등록 방법, 점수별 시상과 최근 커트라인, 15주 준비 계획, 무료 기출문제 사이트를 정리했습니다.",
     descEn: "The 2027 AMC 8 runs January 21-27, and families can't register with the MAA directly, so the timeline matters. Here are the dates, how registration works, a 15-week prep plan, free practice sites, and what each award actually means.",
     heroImage: {
       src: "/blog/amc-8-2027-guide-hero.jpg",
@@ -2049,6 +2587,28 @@ export const blogPosts: BlogPost[] = [
             { label: "MATHCOUNTS", values: ["mathcounts.org", "지난 시즌 대회 문제와 풀이"] },
           ],
         },
+      },
+    ],
+    faqKo: [
+      {
+        q: "2027 AMC 8 시험은 언제인가요?",
+        a: "2027년 1월 21일(목)부터 27일(수) 사이입니다. 이 기간 중 실제 시험 날짜와 시간은 시험을 여는 학교나 기관이 정합니다.",
+      },
+      {
+        q: "AMC 8은 개인이 직접 신청할 수 있나요?",
+        a: "아닙니다. 학부모나 학생은 MAA에 직접 등록할 수 없고, AMC 8을 시행하는 학교나 외부 학생을 받는 공개 시험장을 통해 응시해야 합니다.",
+      },
+      {
+        q: "AMC 8 커트라인은 몇 점인가요?",
+        a: "2026년 기준 Honor Roll(상위 5%)은 21점, Distinguished Honor Roll(상위 1%)은 24점이었습니다. 6학년 이하 학생은 15점 이상이면 Achievement Roll에 오르며, 이 기준은 매년 같습니다.",
+      },
+      {
+        q: "초등학생도 AMC 8을 볼 수 있나요?",
+        a: "네. 최소 학년 제한이 없어서 8학년 이하이고 시험 당일 만 15.5세 미만이면 응시할 수 있습니다. 많은 4~6학년 학생이 도전합니다.",
+      },
+      {
+        q: "AMC 8에서 계산기를 쓸 수 있나요?",
+        a: "쓸 수 없습니다. 25문항을 40분 동안 푸는 객관식 시험이며, 오답 감점은 없습니다.",
       },
     ],
     bodyEn: [

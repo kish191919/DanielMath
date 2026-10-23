@@ -133,7 +133,7 @@ const ko = {
       items: [
         {
           q: "다니엘 수학 아카데미는 어디에 있나요?",
-          a: "버지니아 페어팩스(Fairfax, VA 22030)에 있습니다. Oakton, Vienna, Fairfax Station, Annandale, Centreville, Chantilly 등 북버지니아 인근 지역 학생도 등록할 수 있으며, 정확한 주소는 상담 시 안내해 드립니다.",
+          a: "버지니아 페어팩스(Fairfax, VA 22030)에 있습니다. Centreville, Chantilly 등 북버지니아 인근 지역 학생도 등록할 수 있으며, 정확한 주소는 상담 시 안내해 드립니다.",
         },
         {
           q: "몇 학년이 대상이고, 한 반은 몇 명인가요?",
@@ -365,6 +365,8 @@ const ko = {
     readMore: "자세히 읽기",
     minRead: "분",
     publishedAt: "작성일",
+    updatedAt: "업데이트",
+    faqTitle: "자주 묻는 질문",
     previousPost: "이전 글",
     nextPost: "다음 글",
   },

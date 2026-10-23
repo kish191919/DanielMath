@@ -261,3 +261,66 @@ export const oneStepEquations: Generator<{
     meta: { type: "equation", variable: v, lhs, rhs, solution },
   };
 };
+
+type EvalForm = "linear" | "parens" | "square" | "two-var";
+
+// One expression shape: its LaTeX, the same thing as JS (for the test suite),
+// and its value — or null when this draw doesn't fit (negative, inexact).
+type Shape = { latex: string; js: string; value: number | null };
+
+const VARIABLES = ["x", "y", "n", "m", "a", "b", "k", "p"] as const;
+
+export const evaluateExpressions: Generator<{ forms: readonly EvalForm[] }> = (rng, { forms }) => {
+  const form = pick(rng, forms);
+  for (;;) {
+    const v = pick(rng, VARIABLES);
+    let w: string;
+    do w = pick(rng, VARIABLES);
+    while (w === v);
+    const x = randInt(rng, 1, 12);
+    const y = randInt(rng, 1, 10);
+    const a = randInt(rng, 2, 9);
+    const b = randInt(rng, 1, 20);
+
+    const shapes: Record<EvalForm, Shape[]> = {
+      linear: [
+        { latex: `${a}${v} + ${b}`, js: `${a}*${v}+${b}`, value: a * x + b },
+        { latex: `${a}${v} - ${b}`, js: `${a}*${v}-${b}`, value: a * x - b },
+        { latex: `${b} + ${a}${v}`, js: `${b}+${a}*${v}`, value: b + a * x },
+        { latex: `\\frac{${v}}{${a}} + ${b}`, js: `${v}/${a}+${b}`, value: x % a ? null : x / a + b },
+      ],
+      parens: [
+        { latex: `${a}(${v} + ${b})`, js: `${a}*(${v}+${b})`, value: a * (x + b) },
+        { latex: `${a}(${v} - ${b})`, js: `${a}*(${v}-${b})`, value: a * (x - b) },
+        { latex: `(${v} + ${b}) \\div ${a}`, js: `(${v}+${b})/${a}`, value: (x + b) % a ? null : (x + b) / a },
+      ],
+      square: [
+        { latex: `${v}^{2} + ${b}`, js: `${v}**2+${b}`, value: x * x + b },
+        { latex: `${v}^{2} - ${b}`, js: `${v}**2-${b}`, value: x * x - b },
+        { latex: `${a}${v}^{2}`, js: `${a}*${v}**2`, value: a * x * x },
+      ],
+      "two-var": [
+        { latex: `${a}${v} + ${b}${w}`, js: `${a}*${v}+${b}*${w}`, value: a * x + b * y },
+        { latex: `${a}${v} - ${w}`, js: `${a}*${v}-${w}`, value: a * x - y },
+        { latex: `${v}${w} + ${b}`, js: `${v}*${w}+${b}`, value: x * y + b },
+        { latex: `${a}(${v} + ${w})`, js: `${a}*(${v}+${w})`, value: a * (x + y) },
+        { latex: `${v}^{2} - ${w}`, js: `${v}**2-${w}`, value: x * x - y },
+      ],
+    };
+    const shape = pick(rng, shapes[form]);
+    // Whole, positive answers only; a zero answer teaches nothing either.
+    if (shape.value === null || shape.value <= 0) continue;
+    const twoVars = form === "two-var";
+    const vars: Record<string, number> = twoVars ? { [v]: x, [w]: y } : { [v]: x };
+
+    return {
+      body: {
+        kind: "text",
+        text: `$${shape.latex}$ when ${Object.entries(vars).map(([name, val]) => `$${name} = ${val}$`).join(", ")}`,
+        blank: "line",
+      },
+      answer: `$${latexNumber(shape.value)}$`,
+      meta: { type: "evaluate", expr: shape.js, vars, result: shape.value },
+    };
+  }
+};

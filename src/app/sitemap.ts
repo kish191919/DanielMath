@@ -53,7 +53,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const blogKoEntries = blogPosts.map((p) => ({
     url: `${base}/blog/${p.slug}`,
-    lastModified: new Date(p.publishedAt),
+    lastModified: new Date(p.updatedAt ?? p.publishedAt),
     changeFrequency: "monthly" as const,
     priority: 0.7,
     alternates: alternates(`/blog/${p.slug}`),
@@ -61,7 +61,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const blogEnEntries = blogPosts.map((p) => ({
     url: `${base}/en/blog/${p.slug}`,
-    lastModified: new Date(p.publishedAt),
+    lastModified: new Date(p.updatedAt ?? p.publishedAt),
     changeFrequency: "monthly" as const,
     priority: 0.63,
     alternates: alternates(`/blog/${p.slug}`),

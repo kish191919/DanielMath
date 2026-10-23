@@ -135,7 +135,7 @@ const en: Dictionary = {
       items: [
         {
           q: "Where is Daniel Math Academy located?",
-          a: "We are in Fairfax, VA 22030. Students from nearby Northern Virginia communities — Oakton, Vienna, Fairfax Station, Annandale, Centreville, and Chantilly — are welcome to enroll. The exact address is shared when you inquire.",
+          a: "We are in Fairfax, VA 22030. Students from nearby Northern Virginia communities — Centreville and Chantilly — are welcome to enroll. The exact address is shared when you inquire.",
         },
         {
           q: "Which grades do you teach, and how large are the classes?",
@@ -367,6 +367,8 @@ const en: Dictionary = {
     readMore: "Read More",
     minRead: "min read",
     publishedAt: "Published",
+    updatedAt: "Updated",
+    faqTitle: "Frequently Asked Questions",
     previousPost: "Previous",
     nextPost: "Next",
   },

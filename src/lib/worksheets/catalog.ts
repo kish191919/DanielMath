@@ -1,16 +1,39 @@
-import { compareDecimalNumbers, addSubtractDecimals, multiplyDecimals, divideDecimals } from "./generators/decimals";
-import { exponents, integerOperations, oneStepEquations, orderOfOperations } from "./generators/expressions";
+import {
+  compareDecimalNumbers,
+  addSubtractDecimals,
+  compareRationals,
+  divideDecimals,
+  fractionsDecimals,
+  multiplyDecimals,
+  roundDecimals,
+} from "./generators/decimals";
+import {
+  evaluateExpressions,
+  exponents,
+  integerOperations,
+  oneStepEquations,
+  orderOfOperations,
+} from "./generators/expressions";
 import { factorsGcf, gcfLcm, primeFactorization } from "./generators/factors";
 import {
   addSubtractFractions,
   compareFractions,
+  convertMixed,
   equivalentFractions,
   fractionModel,
   multiplyDivideFractions,
+  multiplyFractionWhole,
 } from "./generators/fractions";
+import { triangleAngles } from "./generators/geometry";
+import { circles, convertUnits } from "./generators/measurement";
+import { countMoney } from "./generators/money";
+import { orderValues } from "./generators/ordering";
+import { numberPatterns } from "./generators/patterns";
+import { probability } from "./generators/probability";
+import { percents, ratiosRates } from "./generators/ratios";
 import { meanMedianModeRange } from "./generators/statistics";
-import { tellingTime } from "./generators/time";
-import { compareWhole, placeValue, rounding } from "./generators/whole-numbers";
+import { elapsedTime, tellingTime } from "./generators/time";
+import { compareWhole, estimate, numberForms, placeValue, rounding } from "./generators/whole-numbers";
 import { addSubtract, facts, longDivision, multiply } from "./generators/whole-ops";
 import type { Generator, GradeNum, Level, WorksheetDef } from "./types";
 
@@ -51,6 +74,41 @@ export const WORKSHEETS: WorksheetDef[] = [
       2: {
         show: { kind: "math", lines: ["$3\\underline{5}{,}218 \\rightarrow 50{,}000$"] },
         think: "The 5 is in the ten thousands place, so it is worth $5 \\times 10{,}000 = 50{,}000$.",
+      },
+    },
+  }),
+  defineWorksheet({
+    grade: 3,
+    slug: "number-forms",
+    title: { en: "Standard, Expanded & Word Form", ko: "수의 세 가지 표현 (표준형·전개형·단어형)" },
+    description: {
+      en: "Write numbers up to six digits in standard, expanded, and word form.",
+      ko: "여섯 자리까지의 수를 표준형·전개형(자릿값의 합)·영어 단어로 나타내기",
+    },
+    instructions: "Write each number in the form asked for.",
+    category: "수·연산",
+    conceptCode: "ns-place-value",
+    quarter: "Q1",
+    counts: [4, 6, 8],
+    columns: 2,
+    generator: numberForms,
+    levels: {
+      1: { tasks: ["to-expanded"], digits: [3, 4] },
+      2: { tasks: ["to-expanded", "to-standard"], digits: [5, 6] },
+      3: { tasks: ["word-to-standard", "to-word"], digits: [4, 6] },
+    },
+    examples: {
+      1: {
+        show: { kind: "math", lines: ["$4{,}305 = 4{,}000 + 300 + 5$"] },
+        think: "Write the value of each digit. The 0 in the tens place is worth 0, so leave it out.",
+      },
+      2: {
+        show: { kind: "math", lines: ["$60{,}000 + 2{,}000 + 40 + 7 = 62{,}047$"] },
+        think: "There are no hundreds, so write a 0 in the hundreds place.",
+      },
+      3: {
+        show: { kind: "math", lines: ["$35{,}612$ = thirty-five thousand, six hundred twelve"] },
+        think: "Read the digits before the comma and say thousand, then read the last three digits.",
       },
     },
   }),
@@ -293,6 +351,76 @@ export const WORKSHEETS: WorksheetDef[] = [
       },
     },
   }),
+  defineWorksheet({
+    grade: 3,
+    slug: "elapsed-time",
+    title: { en: "Elapsed Time", ko: "걸린 시간 구하기" },
+    description: {
+      en: "Find the elapsed time, start time, or end time within a.m. or within p.m.",
+      ko: "오전 또는 오후 안에서 걸린 시간, 시작 시각, 끝난 시각 구하기",
+    },
+    instructions: "Find the elapsed time, or the missing start or end time.",
+    category: "측정",
+    conceptCode: "meas-time-elapsed",
+    quarter: "Q4",
+    counts: [4, 6, 8],
+    columns: 2,
+    generator: elapsedTime,
+    levels: {
+      1: { unknowns: ["elapsed"], wholeHours: true, step: 15 },
+      2: { unknowns: ["elapsed"], wholeHours: false, step: 5 },
+      3: { unknowns: ["start", "end"], wholeHours: false, step: 5 },
+    },
+    examples: {
+      1: {
+        show: { kind: "math", lines: ["From 2:15 p.m. to 5:15 p.m. → 3 hours"] },
+        think: "Count the hours: 3:15, 4:15, 5:15. That is 3 hours.",
+      },
+      2: {
+        show: { kind: "math", lines: ["From 9:20 a.m. to 11:45 a.m. → 2 hours 25 minutes"] },
+        think: "Count whole hours up to 11:20 (2 hours), then the minutes from 11:20 to 11:45 (25 minutes).",
+      },
+      3: {
+        show: { kind: "math", lines: ["Starts at 1:35 p.m. and lasts 2 hours 40 minutes → ends at 4:15 p.m."] },
+        think: "Add the hours first: 3:35 p.m. Then add the minutes: 25 minutes gets to 4:00, and 15 more makes 4:15.",
+      },
+    },
+  }),
+  defineWorksheet({
+    grade: 3,
+    slug: "counting-money",
+    title: { en: "Counting Money & Making Change", ko: "돈 세기와 거스름돈" },
+    description: {
+      en: "Count coins and bills up to five dollars, and make change from one, five, or ten dollars.",
+      ko: "5달러까지 동전·지폐 세기, 1·5·10달러를 냈을 때 거스름돈 구하기",
+    },
+    instructions: "Find the total value, or the change.",
+    category: "측정",
+    conceptCode: "meas-money",
+    quarter: "Q4",
+    counts: [4, 6, 8],
+    columns: 2,
+    generator: countMoney,
+    levels: { 1: { mode: "coins" }, 2: { mode: "bills" }, 3: { mode: "change" } },
+    examples: {
+      1: {
+        show: { kind: "math", lines: ["2 quarters, 1 dime, 3 pennies → 63¢"] },
+        think: "Start with the coins worth the most and count on: 25, 50, then 60, then 61, 62, 63.",
+      },
+      2: {
+        show: { kind: "math", lines: ["2 one-dollar bills, 3 quarters, 1 nickel → $\\text{\\textdollar}2.80$"] },
+        think: "The bills make 2 dollars. The coins make 80¢ (25, 50, 75, 80). Together: $\\text{\\textdollar}2.80$.",
+      },
+      3: {
+        show: {
+          kind: "math",
+          lines: ["Pay $\\text{\\textdollar}5.00$ for something that costs $\\text{\\textdollar}3.47$. Change: $\\text{\\textdollar}1.53$"],
+        },
+        think:
+          "Count up from the price: 3¢ makes $\\text{\\textdollar}3.50$, 50¢ makes $\\text{\\textdollar}4.00$, and 1 dollar makes $\\text{\\textdollar}5.00$.",
+      },
+    },
+  }),
 
   // ── Grade 4 ────────────────────────────────────────────────────────────────
   defineWorksheet({
@@ -327,6 +455,136 @@ export const WORKSHEETS: WorksheetDef[] = [
       3: {
         show: { kind: "math", lines: ["Round $274{,}516$ to the nearest ten thousand: $274{,}516 \\rightarrow 270{,}000$"] },
         think: "Look at the thousands digit: $4 < 5$, so the ten thousands digit stays 7.",
+      },
+    },
+  }),
+  defineWorksheet({
+    grade: 4,
+    slug: "order-numbers",
+    title: { en: "Ordering Whole Numbers", ko: "큰 수의 순서 정하기" },
+    description: {
+      en: "Put four whole numbers up to seven digits in order, least to greatest or greatest to least.",
+      ko: "일곱 자리까지의 수 네 개를 작은 수부터 또는 큰 수부터 차례로 쓰기",
+    },
+    instructions: "Write the numbers in the order shown.",
+    category: "수·연산",
+    conceptCode: "ns-compare-order-whole",
+    quarter: "Q1",
+    counts: [4, 6, 8],
+    columns: 2,
+    generator: orderValues,
+    levels: {
+      1: { values: { kind: "whole", digits: [4, 4], close: false }, direction: "asc" },
+      2: { values: { kind: "whole", digits: [5, 6], close: true }, direction: "asc" },
+      3: { values: { kind: "whole", digits: [6, 7], close: true, mixedLengths: true }, direction: "either" },
+    },
+    examples: {
+      1: {
+        show: { kind: "math", lines: ["$3{,}452 < 3{,}524 < 4{,}235 < 4{,}352$"] },
+        think: "Compare the thousands first: $3 < 4$. When the thousands match, compare the hundreds.",
+      },
+      2: {
+        show: { kind: "math", lines: ["$45{,}213 < 45{,}312 < 45{,}321 < 46{,}123$"] },
+        think: "All four start with 4 ten thousands. Compare the thousands, then the hundreds, then the tens.",
+      },
+      3: {
+        show: { kind: "math", lines: ["$1{,}204{,}516 > 1{,}042{,}516 > 998{,}760 > 989{,}760$"] },
+        think: "A 7-digit number is greater than any 6-digit number. Then compare place by place from the left.",
+      },
+    },
+  }),
+  defineWorksheet({
+    grade: 4,
+    slug: "estimation",
+    title: { en: "Estimating Sums, Differences & Products", ko: "어림셈 (반올림하여 계산하기)" },
+    description: {
+      en: "Round each number to the place shown, then add, subtract, or multiply to estimate.",
+      ko: "주어진 자리에서 반올림한 뒤 더하고 빼고 곱해 어림하기",
+    },
+    instructions: "Round each number to the place shown, then estimate.",
+    category: "수·연산",
+    conceptCode: "ops-add-sub-multi-digit",
+    quarter: "Q1",
+    counts: [6, 8, 10],
+    columns: 2,
+    generator: estimate,
+    levels: {
+      1: {
+        cases: [
+          { digits: 2, place: 10, op: "+" },
+          { digits: 2, place: 10, op: "-" },
+        ],
+      },
+      2: {
+        cases: [
+          { digits: 3, place: 100, op: "+" },
+          { digits: 3, place: 100, op: "-" },
+        ],
+      },
+      3: {
+        cases: [
+          { digits: 4, place: 1000, op: "+" },
+          { digits: 4, place: 1000, op: "-" },
+          { digits: 2, place: 10, op: "*" },
+          { digits: 3, place: 100, op: "*" },
+        ],
+      },
+    },
+    examples: {
+      1: {
+        show: { kind: "math", lines: ["$47 + 32$ → $50 + 30 = 80$"] },
+        think: "47 rounds up to 50 because $7 \\ge 5$. 32 rounds down to 30 because $2 < 5$.",
+      },
+      2: {
+        show: { kind: "math", lines: ["$487 - 213$ → $500 - 200 = 300$"] },
+        think: "Look at the tens digits: 487 rounds up to 500 ($8 \\ge 5$), and 213 rounds down to 200 ($1 < 5$).",
+      },
+      3: {
+        show: {
+          kind: "math",
+          lines: ["$4{,}618 + 2{,}375$ → $5{,}000 + 2{,}000 = 7{,}000$", "$48 \\times 7$ → $50 \\times 7 = 350$"],
+        },
+        think: "Round, then use a basic fact: $5 + 2 = 7$ thousands, and $5 \\times 7 = 35$ tens.",
+      },
+    },
+  }),
+  defineWorksheet({
+    grade: 4,
+    slug: "number-patterns",
+    title: { en: "Number Patterns & Input/Output Tables", ko: "수의 규칙과 입출력표" },
+    description: {
+      en: "Find the rule to extend number patterns and complete input/output tables.",
+      ko: "규칙을 찾아 수의 배열과 입출력표의 빈칸 채우기",
+    },
+    instructions: "Find the rule and fill in the missing numbers.",
+    category: "대수·패턴",
+    conceptCode: "alg-patterns",
+    quarter: "Q1",
+    counts: [4, 6, 8],
+    columns: 2,
+    generator: numberPatterns,
+    levels: {
+      1: { kind: "sequence", ops: ["+", "-"], length: 6, gaps: "end" },
+      2: { kind: "sequence", ops: ["+", "-", "*"], length: 6, gaps: "inside" },
+      3: { kind: "table", ops: ["+", "-", "*", "/"], maxK: 9, cells: 5 },
+    },
+    examples: {
+      1: {
+        show: { kind: "math", lines: ["$5,\\ 9,\\ 13,\\ 17,\\ \\boxed{21},\\ \\boxed{25}$"] },
+        think: "Each number is 4 more than the one before, so the rule is add 4: $17 + 4 = 21$ and $21 + 4 = 25$.",
+      },
+      2: {
+        show: { kind: "math", lines: ["$3,\\ 6,\\ 12,\\ \\boxed{24},\\ 48,\\ \\boxed{96}$"] },
+        think: "Each number is double the one before, so the rule is multiply by 2: $12 \\times 2 = 24$ and $48 \\times 2 = 96$.",
+      },
+      3: {
+        show: {
+          kind: "math",
+          lines: [
+            "$\\begin{array}{|c|c|c|c|c|}\\hline \\text{In} & 2 & 4 & 6 & 8 \\\\ \\hline \\text{Out} & 6 & 12 & \\mathbf{18} & \\mathbf{24} \\\\ \\hline \\end{array}$",
+          ],
+        },
+        think: "$2 \\times 3 = 6$ and $4 \\times 3 = 12$, so the rule is multiply by 3: $6 \\times 3 = 18$ and $8 \\times 3 = 24$.",
       },
     },
   }),
@@ -503,6 +761,41 @@ export const WORKSHEETS: WorksheetDef[] = [
   }),
   defineWorksheet({
     grade: 4,
+    slug: "mixed-numbers",
+    title: { en: "Improper Fractions & Mixed Numbers", ko: "가분수와 대분수" },
+    description: {
+      en: "Rename improper fractions as mixed numbers, and mixed numbers as improper fractions.",
+      ko: "가분수를 대분수로, 대분수를 가분수로 바꾸기",
+    },
+    instructions: "Write each as a mixed number or an improper fraction.",
+    category: "분수",
+    conceptCode: "frac-mixed-numbers",
+    quarter: "Q2",
+    counts: [12, 18, 24],
+    columns: 3,
+    generator: convertMixed,
+    levels: {
+      1: { to: ["mixed"], denominators: [2, 3, 4, 5, 6], wholeMax: 4 },
+      2: { to: ["improper"], denominators: [2, 3, 4, 5, 6, 8, 10], wholeMax: 6 },
+      3: { to: ["mixed", "improper"], denominators: [2, 3, 4, 5, 6, 8, 10, 12], wholeMax: 9 },
+    },
+    examples: {
+      1: {
+        show: { kind: "math", lines: ["$\\frac{11}{4} = 2\\frac{3}{4}$"] },
+        think: "How many 4s are in 11? $4 \\times 2 = 8$ and $11 - 8 = 3$, so that is 2 wholes and 3 fourths.",
+      },
+      2: {
+        show: { kind: "math", lines: ["$3\\frac{2}{5} = \\frac{17}{5}$"] },
+        think: "Multiply the whole number by the denominator, then add the numerator: $3 \\times 5 + 2 = 17$.",
+      },
+      3: {
+        show: { kind: "math", lines: ["$\\frac{29}{8} = 3\\frac{5}{8}$", "$4\\frac{1}{6} = \\frac{25}{6}$"] },
+        think: "To a mixed number, divide: $8 \\times 3 = 24$, with 5 left over. To an improper fraction: $4 \\times 6 + 1 = 25$.",
+      },
+    },
+  }),
+  defineWorksheet({
+    grade: 4,
     slug: "multiply-2-digit",
     title: { en: "Multiplying 2-Digit Numbers", ko: "(두 자리 수) × (두 자리 수)" },
     description: {
@@ -573,6 +866,41 @@ export const WORKSHEETS: WorksheetDef[] = [
   }),
   defineWorksheet({
     grade: 4,
+    slug: "fractions-decimals",
+    title: { en: "Fractions & Decimals", ko: "분수와 소수의 관계" },
+    description: {
+      en: "Write fractions as decimals, and decimals as fractions in simplest form.",
+      ko: "분수를 소수로, 소수를 기약분수로 나타내기",
+    },
+    instructions: "Write each fraction as a decimal, or each decimal as a fraction in simplest form.",
+    category: "소수",
+    conceptCode: "dec-frac-convert",
+    quarter: "Q3",
+    counts: [12, 18, 24],
+    columns: 3,
+    generator: fractionsDecimals,
+    levels: {
+      1: { to: ["decimal"], denominators: [10, 100], wholeMax: 0 },
+      2: { to: ["fraction"], denominators: [2, 4, 5, 10, 20, 25, 50, 100], wholeMax: 0 },
+      3: { to: ["decimal", "fraction"], denominators: [2, 4, 5, 8, 10, 20, 25, 100], wholeMax: 3 },
+    },
+    examples: {
+      1: {
+        show: { kind: "math", lines: ["$\\frac{7}{10} = 0.7$", "$\\frac{43}{100} = 0.43$"] },
+        think: "Tenths fill one decimal place, and hundredths fill two.",
+      },
+      2: {
+        show: { kind: "math", lines: ["$0.25 = \\frac{25}{100} = \\frac{1}{4}$"] },
+        think: "Two decimal places means hundredths: write 25 over 100, then divide the top and bottom by 25.",
+      },
+      3: {
+        show: { kind: "math", lines: ["$1\\frac{3}{8} = 1.375$", "$2.6 = 2\\frac{3}{5}$"] },
+        think: "$\\frac{3}{8} = 3 \\div 8 = 0.375$, and $0.6 = \\frac{6}{10} = \\frac{3}{5}$.",
+      },
+    },
+  }),
+  defineWorksheet({
+    grade: 4,
     slug: "add-subtract-decimals",
     title: { en: "Adding & Subtracting Decimals", ko: "소수의 덧셈과 뺄셈" },
     description: {
@@ -638,6 +966,72 @@ export const WORKSHEETS: WorksheetDef[] = [
       3: {
         show: { kind: "math", lines: ["$2\\frac{3}{4} + 1\\frac{3}{4} = 3\\frac{6}{4} = 4\\frac{1}{2}$"] },
         think: "Add the wholes and the fractions, then regroup: $\\frac{6}{4} = 1\\frac{2}{4} = 1\\frac{1}{2}$.",
+      },
+    },
+  }),
+  defineWorksheet({
+    grade: 4,
+    slug: "customary-units",
+    title: { en: "Customary Unit Conversions", ko: "미국 단위 환산 (길이·들이·무게)" },
+    description: {
+      en: "Convert among inches, feet, yards, cups, pints, quarts, gallons, ounces, and pounds.",
+      ko: "인치·피트·야드, 컵·파인트·쿼트·갤런, 온스·파운드 사이의 단위 바꾸기",
+    },
+    instructions: "Fill in each box. 1 ft = 12 in · 1 yd = 3 ft · 1 gal = 4 qt · 1 qt = 2 pt · 1 pt = 2 c · 1 lb = 16 oz",
+    category: "측정",
+    conceptCode: "meas-unit-conversion",
+    quarter: "Q4",
+    counts: [12, 18, 24],
+    columns: 3,
+    generator: convertUnits,
+    levels: {
+      1: { system: "customary", tasks: ["big-to-small"] },
+      2: { system: "customary", tasks: ["mixed-to-small"] },
+      3: { system: "customary", tasks: ["small-to-mixed", "small-to-big"] },
+    },
+    examples: {
+      1: {
+        show: { kind: "math", lines: ["$3\\text{ ft} = 36\\text{ in}$"] },
+        think: "1 foot is 12 inches, so 3 feet is $3 \\times 12 = 36$ inches.",
+      },
+      2: {
+        show: { kind: "math", lines: ["$2\\text{ ft}\\ 5\\text{ in} = 29\\text{ in}$"] },
+        think: "$2 \\times 12 = 24$ inches, plus 5 more: $24 + 5 = 29$.",
+      },
+      3: {
+        show: { kind: "math", lines: ["$50\\text{ in} = 4\\text{ ft}\\ 2\\text{ in}$"] },
+        think: "How many 12s are in 50? $4 \\times 12 = 48$, and $50 - 48 = 2$ inches are left over.",
+      },
+    },
+  }),
+  defineWorksheet({
+    grade: 4,
+    slug: "probability",
+    title: { en: "Probability", ko: "확률" },
+    description: {
+      en: "Write the probability of simple events with number cubes, marbles, and number cards.",
+      ko: "주사위·구슬·숫자 카드에서 사건이 일어날 확률을 0~1 사이의 분수로 나타내기",
+    },
+    instructions: "Write each probability as a fraction in simplest form, or as 0 or 1.",
+    category: "확률·자료",
+    conceptCode: "ps-probability-basic",
+    quarter: "Q4",
+    counts: [4, 6],
+    columns: 2,
+    generator: probability,
+    levels: { 1: { mode: "cube" }, 2: { mode: "bag" }, 3: { mode: "cards" } },
+    examples: {
+      1: {
+        show: { kind: "math", lines: ["$P(\\text{even}) = \\frac{3}{6} = \\frac{1}{2}$"] },
+        think: "A number cube has 6 equally likely outcomes, and 3 of them (2, 4, 6) are even.",
+      },
+      2: {
+        show: { kind: "math", lines: ["3 red, 5 blue, 2 green: $P(\\text{blue}) = \\frac{5}{10} = \\frac{1}{2}$"] },
+        think: "There are $3 + 5 + 2 = 10$ marbles in all, and 5 of them are blue.",
+      },
+      3: {
+        show: { kind: "math", lines: ["Cards 1 to 20: $P(\\text{prime}) = \\frac{8}{20} = \\frac{2}{5}$"] },
+        think: "The primes up to 20 are 2, 3, 5, 7, 11, 13, 17, and 19, so 8 of the 20 cards are prime.",
       },
     },
   }),
@@ -733,6 +1127,76 @@ export const WORKSHEETS: WorksheetDef[] = [
       2: {
         show: { kind: "stats", data: [3, 8, 5, 8, 6, 12] },
         think: "Order the data: 3, 5, 6, 8, 8, 12. With an even count, the median is $(6 + 8) \\div 2 = 7$.",
+      },
+    },
+  }),
+  defineWorksheet({
+    grade: 5,
+    slug: "rounding-decimals",
+    title: { en: "Rounding Decimals", ko: "소수의 반올림" },
+    description: {
+      en: "Round decimals to the nearest whole number, tenth, or hundredth.",
+      ko: "소수를 일의 자리, 소수 첫째 자리, 소수 둘째 자리까지 반올림하기",
+    },
+    instructions: "Round each number.",
+    category: "소수",
+    conceptCode: "dec-place-value",
+    quarter: "Q2",
+    counts: [4, 6, 8],
+    columns: 2,
+    generator: roundDecimals,
+    levels: {
+      1: { places: [0], maxScale: 2, wholeMax: 99, carry: false },
+      2: { places: [1], maxScale: 3, wholeMax: 50, carry: false },
+      3: { places: [0, 1, 2], maxScale: 3, wholeMax: 99, carry: true },
+    },
+    examples: {
+      1: {
+        show: { kind: "math", lines: ["Round $7.63$ to the nearest whole number: $7.63 \\rightarrow 8$"] },
+        think: "Look at the tenths digit: $6 \\ge 5$, so round up to 8.",
+      },
+      2: {
+        show: { kind: "math", lines: ["Round $3.248$ to the nearest tenth: $3.248 \\rightarrow 3.2$"] },
+        think: "Look at the hundredths digit: $4 < 5$, so the tenths digit stays 2.",
+      },
+      3: {
+        show: { kind: "math", lines: ["Round $4.97$ to the nearest tenth: $4.97 \\rightarrow 5.0$"] },
+        think: "The hundredths digit is 7, so round up: 9 tenths and 1 more tenth make 10 tenths. Keep the 0 to show tenths.",
+      },
+    },
+  }),
+  defineWorksheet({
+    grade: 5,
+    slug: "order-fractions-decimals",
+    title: { en: "Ordering Fractions & Decimals", ko: "분수와 소수의 크기 순서" },
+    description: {
+      en: "Order decimals, fractions with unlike denominators, and lists that mix both.",
+      ko: "소수, 분모가 다른 분수, 분수·소수가 섞인 수를 크기 순서대로 쓰기",
+    },
+    instructions: "Write the numbers in the order shown.",
+    category: "분수",
+    conceptCode: "frac-compare-order",
+    quarter: "Q2",
+    counts: [4, 6, 8],
+    columns: 2,
+    generator: orderValues,
+    levels: {
+      1: { values: { kind: "decimal", wholeMax: 3 }, direction: "asc" },
+      2: { values: { kind: "fraction", denominators: [2, 3, 4, 5, 6, 8, 10, 12] }, direction: "asc" },
+      3: { values: { kind: "mixed-forms" }, direction: "either" },
+    },
+    examples: {
+      1: {
+        show: { kind: "math", lines: ["$0.405 < 0.45 < 0.5 < 0.54$"] },
+        think: "Give every number three decimal places (0.405, 0.450, 0.500, 0.540), then compare them like whole numbers.",
+      },
+      2: {
+        show: { kind: "math", lines: ["$\\frac{1}{3} < \\frac{5}{12} < \\frac{1}{2} < \\frac{3}{4}$"] },
+        think: "Rename with the common denominator 12: $\\frac{4}{12}$, $\\frac{5}{12}$, $\\frac{6}{12}$, $\\frac{9}{12}$.",
+      },
+      3: {
+        show: { kind: "math", lines: ["$1.2 < 1\\frac{1}{4} < 1.3 < 1\\frac{2}{5}$"] },
+        think: "Write every number as a decimal: $1\\frac{1}{4} = 1.25$ and $1\\frac{2}{5} = 1.4$.",
       },
     },
   }),
@@ -844,6 +1308,114 @@ export const WORKSHEETS: WorksheetDef[] = [
       },
     },
   }),
+  defineWorksheet({
+    grade: 5,
+    slug: "multiply-fraction-whole",
+    title: { en: "Multiplying Fractions by Whole Numbers", ko: "(분수) × (자연수)" },
+    description: {
+      en: "Multiply whole numbers by unit fractions, fractions, and mixed numbers; simplify.",
+      ko: "자연수와 단위분수·진분수·대분수의 곱셈 (기약분수로)",
+    },
+    instructions: "Multiply. Write each answer in simplest form.",
+    category: "분수",
+    conceptCode: "frac-mult",
+    quarter: "Q3",
+    counts: [12, 18, 21],
+    columns: 3,
+    generator: multiplyFractionWhole,
+    levels: {
+      1: { fraction: "unit", denominators: [2, 3, 4, 5, 6, 8, 10, 12], wholeMax: 12 },
+      2: { fraction: "proper", denominators: [3, 4, 5, 6, 8, 10, 12], wholeMax: 10 },
+      3: { fraction: "mixed", denominators: [2, 3, 4, 5, 6, 8], wholeMax: 6 },
+    },
+    examples: {
+      1: {
+        show: { kind: "math", lines: ["$6 \\times \\frac{1}{3} = \\frac{6}{3} = 2$"] },
+        think: "6 groups of one third is 6 thirds, and 6 thirds make 2 wholes.",
+      },
+      2: {
+        show: { kind: "math", lines: ["$4 \\times \\frac{2}{3} = \\frac{8}{3} = 2\\frac{2}{3}$"] },
+        think: "Multiply the whole number by the numerator ($4 \\times 2 = 8$ thirds), then write it as a mixed number.",
+      },
+      3: {
+        show: { kind: "math", lines: ["$2\\frac{1}{2} \\times 3 = \\frac{5}{2} \\times 3 = \\frac{15}{2} = 7\\frac{1}{2}$"] },
+        think: "Change the mixed number to an improper fraction first, then multiply the numerator by the whole number.",
+      },
+    },
+  }),
+  defineWorksheet({
+    grade: 5,
+    slug: "metric-units",
+    title: { en: "Metric Unit Conversions", ko: "미터법 단위 환산" },
+    description: {
+      en: "Convert among kilometers, meters, centimeters, millimeters, kilograms, grams, liters, and milliliters.",
+      ko: "km·m·cm·mm, kg·g, L·mL 사이의 단위 바꾸기 (소수 포함)",
+    },
+    instructions: "Fill in each box. 1 km = 1,000 m · 1 m = 100 cm · 1 cm = 10 mm · 1 kg = 1,000 g · 1 L = 1,000 mL",
+    category: "측정",
+    conceptCode: "meas-unit-conversion",
+    quarter: "Q3",
+    counts: [12, 18, 24],
+    columns: 3,
+    generator: convertUnits,
+    levels: {
+      1: { system: "metric", tasks: ["big-to-small"] },
+      2: { system: "metric", tasks: ["decimal-to-small"] },
+      3: { system: "metric", tasks: ["decimal-to-small", "small-to-big"] },
+    },
+    examples: {
+      1: {
+        show: { kind: "math", lines: ["$4\\text{ km} = 4{,}000\\text{ m}$"] },
+        think: "1 kilometer is 1,000 meters, so multiply: $4 \\times 1{,}000 = 4{,}000$.",
+      },
+      2: {
+        show: { kind: "math", lines: ["$2.75\\text{ km} = 2{,}750\\text{ m}$"] },
+        think: "To change to a smaller unit, multiply: $2.75 \\times 1{,}000 = 2{,}750$.",
+      },
+      3: {
+        show: { kind: "math", lines: ["$850\\text{ cm} = 8.5\\text{ m}$"] },
+        think: "To change to a bigger unit, divide: $850 \\div 100 = 8.5$.",
+      },
+    },
+  }),
+  defineWorksheet({
+    grade: 5,
+    slug: "triangle-angles",
+    title: { en: "Triangle Angles & Classification", ko: "삼각형의 각과 분류" },
+    description: {
+      en: "Use the 180° angle sum to find missing angles, and classify triangles by angles and sides.",
+      ko: "세 각의 합 180°로 모르는 각 구하기, 각과 변의 길이로 삼각형 분류하기",
+    },
+    instructions: "The angles of a triangle add up to 180°. Answer each question.",
+    category: "도형",
+    conceptCode: "geo-angle-triangle-classify",
+    quarter: "Q4",
+    counts: [4, 6],
+    columns: 2,
+    generator: triangleAngles,
+    levels: {
+      1: { tasks: ["missing"] },
+      2: { tasks: ["missing-classify"] },
+      3: { tasks: ["sides", "right-missing", "isosceles-base"] },
+    },
+    examples: {
+      1: {
+        show: { kind: "math", lines: ["$180^\\circ - 48^\\circ - 75^\\circ = 57^\\circ$"] },
+        think: "The three angles of any triangle add up to $180^\\circ$, so subtract the two you know.",
+      },
+      2: {
+        show: { kind: "math", lines: ["$180^\\circ - 35^\\circ - 55^\\circ = 90^\\circ$ → right triangle"] },
+        think: "A $90^\\circ$ angle makes it right, an angle over $90^\\circ$ makes it obtuse, and three angles under $90^\\circ$ make it acute.",
+      },
+      3: {
+        show: {
+          kind: "math",
+          lines: ["Sides 6 cm, 6 cm, 9 cm → isosceles", "Vertex angle $40^\\circ$: $(180^\\circ - 40^\\circ) \\div 2 = 70^\\circ$"],
+        },
+        think: "Equilateral: 3 equal sides. Isosceles: 2 equal sides, and its two base angles are equal. Scalene: no equal sides.",
+      },
+    },
+  }),
 
   // ── Grade 6 ────────────────────────────────────────────────────────────────
   defineWorksheet({
@@ -878,6 +1450,107 @@ export const WORKSHEETS: WorksheetDef[] = [
       3: {
         show: { kind: "math", lines: ["$\\text{GCF}(24, 36) = 12$", "$\\text{LCM}(6, 8) = 24$"] },
         think: "GCF: the greatest factor both numbers share. LCM: the smallest multiple both numbers share.",
+      },
+    },
+  }),
+  defineWorksheet({
+    grade: 6,
+    slug: "ratios-rates",
+    title: { en: "Ratios & Unit Rates", ko: "비와 단위비율" },
+    description: {
+      en: "Simplify ratios, find equivalent ratios, and work out unit rates.",
+      ko: "비를 간단히 하기, 같은 비의 빈칸 채우기, 단위비율 구하기",
+    },
+    instructions: "Answer each question. Write ratios in simplest form.",
+    category: "수·연산",
+    conceptCode: "word-ratio-rate",
+    quarter: "Q2",
+    counts: [4, 6, 8],
+    columns: 2,
+    generator: ratiosRates,
+    levels: { 1: { tasks: ["simplify"] }, 2: { tasks: ["equivalent"] }, 3: { tasks: ["unit-rate"] } },
+    examples: {
+      1: {
+        show: { kind: "math", lines: ["$12 : 18 = 2 : 3$"] },
+        think: "The GCF of 12 and 18 is 6. Divide both terms by 6: $12 \\div 6 = 2$ and $18 \\div 6 = 3$.",
+      },
+      2: {
+        show: { kind: "math", lines: ["$3 : 4 = 15 : 20$"] },
+        think: "$4 \\times 5 = 20$, so multiply the first term by 5 too: $3 \\times 5 = 15$.",
+      },
+      3: {
+        show: { kind: "math", lines: ["150 miles in 3 hours: $150 \\div 3 = 50$ miles per hour"] },
+        think: "A unit rate is the amount for 1 unit. Divide the total by the number of units.",
+      },
+    },
+  }),
+  defineWorksheet({
+    grade: 6,
+    slug: "percents",
+    title: { en: "Fractions, Decimals & Percents", ko: "분수·소수·백분율" },
+    description: {
+      en: "Convert among percents, decimals, and fractions, and find a percent of a number.",
+      ko: "백분율·소수·분수 사이의 변환, 어떤 수의 몇 % 구하기",
+    },
+    instructions: "Write each number in the form asked for. Write fractions in simplest form.",
+    category: "수·연산",
+    conceptCode: "percent-basic",
+    quarter: "Q2",
+    counts: [9, 12, 15],
+    columns: 3,
+    generator: percents,
+    levels: {
+      1: { tasks: ["percent-to-decimal", "decimal-to-percent"] },
+      2: { tasks: ["fraction-to-percent", "percent-to-fraction"] },
+      3: { tasks: ["percent-of"] },
+    },
+    examples: {
+      1: {
+        show: { kind: "math", lines: ["$45\\% = 0.45$", "$0.7 = 70\\%$"] },
+        think: "Percent means out of 100, so $45\\% = \\frac{45}{100}$. Move the decimal point two places.",
+      },
+      2: {
+        show: { kind: "math", lines: ["$\\frac{3}{5} = \\frac{60}{100} = 60\\%$", "$35\\% = \\frac{35}{100} = \\frac{7}{20}$"] },
+        think: "Rename the fraction with a denominator of 100, or write the percent over 100 and simplify.",
+      },
+      3: {
+        show: { kind: "math", lines: ["$25\\%$ of $80$: $\\frac{1}{4} \\times 80 = 20$"] },
+        think: "$25\\% = \\frac{1}{4}$, so find one fourth of 80: $80 \\div 4 = 20$.",
+      },
+    },
+  }),
+  defineWorksheet({
+    grade: 6,
+    slug: "compare-rational-numbers",
+    title: { en: "Comparing Rational Numbers", ko: "유리수의 크기 비교" },
+    description: {
+      en: "Compare fractions, mixed numbers, and decimals, including negative numbers.",
+      ko: "분수·대분수·소수의 크기 비교 (음수 포함)",
+    },
+    instructions: "Write >, <, or = in each circle.",
+    category: "수·연산",
+    conceptCode: "ns-compare-rationals-signed",
+    quarter: "Q2",
+    counts: [12, 18, 21],
+    columns: 3,
+    generator: compareRationals,
+    levels: {
+      1: { denominators: [2, 3, 4, 5, 6, 8, 10, 12], wholeMax: 0, negatives: false },
+      2: { denominators: [2, 3, 4, 5, 6, 8], wholeMax: 3, negatives: false },
+      3: { denominators: [2, 3, 4, 5, 6, 8, 10], wholeMax: 2, negatives: true },
+    },
+    examples: {
+      1: {
+        show: { kind: "compare", left: "$\\frac{3}{5}$", right: "$0.62$", symbol: "<" },
+        think: "Write the fraction as a decimal: $\\frac{3}{5} = 0.6$, and $0.60 < 0.62$.",
+      },
+      2: {
+        show: { kind: "compare", left: "$2\\frac{3}{8}$", right: "$2.4$", symbol: "<" },
+        think: "$\\frac{3}{8} = 0.375$, so $2\\frac{3}{8} = 2.375$, and $2.375 < 2.4$.",
+      },
+      3: {
+        show: { kind: "compare", left: "$-\\frac{1}{2}$", right: "$-0.45$", symbol: "<" },
+        think: "$-\\frac{1}{2} = -0.5$, which is farther left on the number line than $-0.45$, so it is less.",
       },
     },
   }),
@@ -994,6 +1667,37 @@ export const WORKSHEETS: WorksheetDef[] = [
   }),
   defineWorksheet({
     grade: 6,
+    slug: "evaluate-expressions",
+    title: { en: "Evaluating Expressions", ko: "식의 값 구하기" },
+    description: {
+      en: "Substitute values for one or two variables and simplify.",
+      ko: "문자에 수를 넣어 식의 값 구하기 (문자 1~2개)",
+    },
+    instructions: "Evaluate each expression for the given value.",
+    category: "대수·패턴",
+    conceptCode: "alg-expressions",
+    quarter: "Q3",
+    counts: [6, 8, 10],
+    columns: 2,
+    generator: evaluateExpressions,
+    levels: { 1: { forms: ["linear"] }, 2: { forms: ["parens", "square"] }, 3: { forms: ["two-var"] } },
+    examples: {
+      1: {
+        show: { kind: "math", lines: ["$3x + 5$ when $x = 4$: $3 \\times 4 + 5 = 17$"] },
+        think: "Replace the variable with its value. $3x$ means 3 times $x$.",
+      },
+      2: {
+        show: { kind: "math", lines: ["$3(n + 4)$ when $n = 5$: $3 \\times (5 + 4) = 27$"] },
+        think: "Substitute, then follow the order of operations: parentheses first.",
+      },
+      3: {
+        show: { kind: "math", lines: ["$4a - b^{2}$ when $a = 6$, $b = 3$: $4 \\times 6 - 3^{2} = 24 - 9 = 15$"] },
+        think: "Substitute both values. Exponents come before multiplication and subtraction.",
+      },
+    },
+  }),
+  defineWorksheet({
+    grade: 6,
     slug: "one-step-equations",
     title: { en: "One-Step Equations", ko: "한 단계 일차방정식" },
     description: {
@@ -1024,6 +1728,41 @@ export const WORKSHEETS: WorksheetDef[] = [
       3: {
         show: { kind: "math", lines: ["$\\frac{m}{-3} = 4$", "$m = 4 \\times (-3) = -12$"] },
         think: "Undo dividing by −3: multiply both sides by −3. Check: $-12 \\div (-3) = 4$.",
+      },
+    },
+  }),
+  defineWorksheet({
+    grade: 6,
+    slug: "circles",
+    title: { en: "Circumference & Area of Circles", ko: "원의 둘레와 넓이" },
+    description: {
+      en: "Find the radius, diameter, circumference, and area of circles using π ≈ 3.14.",
+      ko: "π ≈ 3.14를 이용해 원의 반지름·지름·둘레·넓이 구하기",
+    },
+    instructions: "Use π ≈ 3.14. Include units in your answers.",
+    category: "측정",
+    conceptCode: "geo-circles",
+    quarter: "Q4",
+    counts: [4, 6, 8],
+    columns: 2,
+    generator: circles,
+    levels: {
+      1: { finds: ["r", "d"], maxRadius: 25 },
+      2: { finds: ["C"], maxRadius: 20 },
+      3: { finds: ["A"], maxRadius: 12 },
+    },
+    examples: {
+      1: {
+        show: { kind: "math", lines: ["$r = 7$ cm", "$d = 2 \\times 7 = 14$ cm"] },
+        think: "The diameter goes all the way across the circle, so it is twice the radius.",
+      },
+      2: {
+        show: { kind: "math", lines: ["$d = 10$ cm", "$C = \\pi \\times d$", "$3.14 \\times 10 = 31.4$ cm"] },
+        think: "The circumference is π times the diameter. If you are given the radius, double it first.",
+      },
+      3: {
+        show: { kind: "math", lines: ["$r = 5$ m", "$A = \\pi \\times r^{2}$", "$3.14 \\times 5^{2} = 3.14 \\times 25 = 78.5$ m²"] },
+        think: "Square the radius first, then multiply by 3.14. Area is measured in square units.",
       },
     },
   }),

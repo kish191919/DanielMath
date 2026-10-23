@@ -3,7 +3,7 @@ import { buildWorksheet, exampleFor, parseWorksheetParams } from "./build";
 import { getWorksheet, parseGradeSlug, WORKSHEETS } from "./catalog";
 import { describeData, longDivisionSteps, verticalWork } from "./math";
 import { createRng, randInt } from "./rng";
-import type { ExampleShow, Level, ProblemMeta, Rational, WorksheetProblem } from "./types";
+import type { ExampleShow, Level, NumberForm, PatternRule, ProblemMeta, Rational, WorksheetProblem } from "./types";
 
 const LEVELS: Level[] = [1, 2, 3];
 const SEEDS = Array.from({ length: 30 }, (_, i) => `seed${i}`);
@@ -43,6 +43,96 @@ function decimal(s: string): [number, number] {
 // and + - * / ** Math.abs — never user input.
 const evalJs = (expr: string, vars: Record<string, number> = {}): number =>
   new Function(...Object.keys(vars), `return (${expr});`)(...Object.values(vars));
+
+/** The contents of every `$...$` span, in order. */
+const spans = (text: string) => [...text.matchAll(/\$([^$]+)\$/g)].map((m) => m[1]);
+
+const bodyText = (p: WorksheetProblem) => (p.body.kind === "text" ? p.body.text : "");
+
+/** Any printed number — integer, decimal, fraction, mixed number or percent — exactly; simplest form not required. */
+function parseValue(latex: string): Rational {
+  const s = latex.replace(/\$|\{,\}|,/g, "").trim();
+  if (s.endsWith("\\%")) {
+    const [n, d] = parseValue(s.slice(0, -2));
+    return [n, d * 100];
+  }
+  if (/^-?\d+(\.\d+)?$/.test(s)) return decimal(s);
+  const m = s.match(/^(-)?(\d+)?\\frac\{(\d+)\}\{(\d+)\}$/);
+  if (!m) throw new Error(`unparseable value: ${latex}`);
+  const whole = m[2] ? Number(m[2]) : 0;
+  return [(m[1] ? -1 : 1) * (whole * Number(m[4]) + Number(m[3])), Number(m[4])];
+}
+
+const WORD_VALUES: Record<string, number> = Object.fromEntries(
+  [
+    ..."zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen"
+      .split(" ")
+      .map((w, i) => [w, i]),
+    ..."twenty thirty forty fifty sixty seventy eighty ninety".split(" ").map((w, i) => [w, (i + 2) * 10]),
+  ],
+);
+
+/** "forty-two thousand, six hundred five" → 42605. */
+function wordsToNumber(words: string): number {
+  // Compound tens are hyphenated ("forty-two"), never spaced.
+  expect(words).not.toMatch(/(ty) (one|two|three|four|five|six|seven|eight|nine)\b/);
+  let total = 0;
+  let current = 0;
+  for (const w of words.replace(/,/g, "").split(/[\s-]+/)) {
+    if (w === "hundred") current *= 100;
+    else if (w === "thousand") {
+      total += current * 1000;
+      current = 0;
+    } else {
+      expect(WORD_VALUES, `unknown number word "${w}"`).toHaveProperty(w);
+      current += WORD_VALUES[w];
+    }
+  }
+  return total + current;
+}
+
+function applyRule({ op, k }: PatternRule, x: number): number {
+  return op === "+" ? x + k : op === "-" ? x - k : op === "*" ? x * k : x / k;
+}
+
+/** Answers like "$21,\ 25$ (add 4)" or "$28,\ 36$ (rule: multiply by 4)". */
+function checkRuleAnswer(answer: string, rule: PatternRule, missing: number[]) {
+  const m = answer.match(/^\$(.+)\$ \((?:rule: )?(add|subtract|multiply by|divide by) (\d+)\)$/);
+  expect(m, answer).not.toBeNull();
+  expect(m![1].split(",").map((s) => num(s.replace(/\\ /g, "")))).toEqual(missing);
+  expect({ add: "+", subtract: "-", "multiply by": "*", "divide by": "/" }[m![2]]).toBe(rule.op);
+  expect(Number(m![3])).toBe(rule.k);
+}
+
+/** Answers like "89¢" or "$\text{\textdollar}1.53$". */
+function cents(s: string): number {
+  const c = s.match(/^(\d+)¢$/);
+  if (c) return Number(c[1]);
+  const d = s.match(/\\textdollar\}(\d+)\.(\d{2})/);
+  if (!d) throw new Error(`unparseable money: ${s}`);
+  return Number(d[1]) * 100 + Number(d[2]);
+}
+
+// Every unit in terms of the smallest one of its kind.
+const UNIT_BASE: Record<string, [string, number]> = {
+  in: ["us-length", 1],
+  ft: ["us-length", 12],
+  yd: ["us-length", 36],
+  c: ["us-volume", 1],
+  pt: ["us-volume", 2],
+  qt: ["us-volume", 4],
+  gal: ["us-volume", 16],
+  oz: ["us-weight", 1],
+  lb: ["us-weight", 16],
+  mm: ["length", 1],
+  cm: ["length", 10],
+  m: ["length", 1000],
+  km: ["length", 1_000_000],
+  g: ["mass", 1],
+  kg: ["mass", 1000],
+  mL: ["volume", 1],
+  L: ["volume", 1000],
+};
 
 function checkMeta(meta: ProblemMeta, p: WorksheetProblem) {
   switch (meta.type) {
@@ -199,6 +289,305 @@ function checkMeta(meta: ProblemMeta, p: WorksheetProblem) {
       expect(p.answer).toBe(`${meta.hour}:${String(meta.minute).padStart(2, "0")}`);
       break;
     }
+    case "number-form": {
+      const read = (text: string, form: NumberForm): number => {
+        if (form === "word") return wordsToNumber(text.trim());
+        if (form === "standard") {
+          expect(spans(text)).toHaveLength(1);
+          return num(spans(text)[0]);
+        }
+        // Each term is one nonzero digit times a power of ten, largest first.
+        const terms = spans(text).join(" ").split("+").map(num);
+        for (const t of terms) expect(String(t)).toMatch(/^[1-9]0*$/);
+        expect(terms).toEqual([...new Set(terms)].sort((a, b) => b - a));
+        return terms.reduce((s, t) => s + t, 0);
+      };
+      const text = bodyText(p);
+      const prompt = `Write in ${meta.to} form: `;
+      expect(text.startsWith(prompt)).toBe(true);
+      expect(read(text.slice(prompt.length), meta.from)).toBe(meta.n);
+      expect(read(p.answer, meta.to)).toBe(meta.n);
+      break;
+    }
+    case "elapsed-time": {
+      const { start, end, unknown } = meta;
+      expect(end).toBeGreaterThan(start);
+      // One a.m. or p.m. stretch, from 1:00 on.
+      expect(Math.floor(start / 720)).toBe(Math.floor(end / 720));
+      expect(start % 720).toBeGreaterThanOrEqual(60);
+      const clock = (t: number) =>
+        `${Math.floor(t / 60) % 12 || 12}:${String(t % 60).padStart(2, "0")} ${t < 720 ? "a.m." : "p.m."}`;
+      if (unknown === "elapsed") {
+        const m = p.answer.match(/^(?:(\d+) hours?)? ?(?:(\d+) minutes?)?$/);
+        expect(m, p.answer).not.toBeNull();
+        expect(Number(m![1] ?? 0) * 60 + Number(m![2] ?? 0)).toBe(end - start);
+      } else {
+        expect(p.answer).toBe(clock(unknown === "start" ? start : end));
+      }
+      if (unknown !== "start") expect(bodyText(p)).toContain(clock(start));
+      if (unknown !== "end") expect(bodyText(p)).toContain(clock(end));
+      break;
+    }
+    case "money": {
+      const total = meta.items.reduce((s, [c, n]) => s + c * n, 0);
+      const expected = meta.paid === null ? total : meta.paid - total;
+      expect(expected).toBeGreaterThan(0);
+      expect(meta.result).toBe(expected);
+      expect(cents(p.answer)).toBe(expected);
+      const text = bodyText(p);
+      if (meta.paid === null) {
+        const value: Record<string, number> = {
+          quarter: 25,
+          dime: 10,
+          nickel: 5,
+          penny: 1,
+          "one-dollar bill": 100,
+        };
+        const counted = [...text.matchAll(/(\d+) (quarters?|dimes?|nickels?|penny|pennies|one-dollar bills?)/g)].reduce(
+          (s, [, n, name]) => s + Number(n) * value[name.replace(/ies$/, "y").replace(/s$/, "")],
+          0,
+        );
+        expect(counted).toBe(total);
+      } else {
+        const amounts = [...text.matchAll(/\\textdollar\}(\d+)\.(\d{2})/g)].map(([, d, c]) => Number(d) * 100 + Number(c));
+        expect(amounts).toEqual([meta.paid, total]);
+      }
+      break;
+    }
+    case "estimate": {
+      const round = (n: number) => {
+        const lower = Math.floor(n / meta.place) * meta.place;
+        return n - lower >= meta.place / 2 ? lower + meta.place : lower;
+      };
+      const ra = round(meta.a);
+      const rb = meta.op === "*" ? meta.b : round(meta.b);
+      const expected = meta.op === "+" ? ra + rb : meta.op === "-" ? ra - rb : ra * rb;
+      expect(expected).toBeGreaterThan(0);
+      expect(meta.result).toBe(expected);
+      const numbers = (s: string) => s.replace(/\{,\}/g, "").match(/\d+/g)!.map(Number);
+      expect(numbers(p.answer)).toEqual([ra, rb, expected]);
+      expect(numbers(spans(bodyText(p))[0])).toEqual([meta.a, meta.b]);
+      break;
+    }
+    case "order": {
+      const sign = meta.direction === "asc" ? 1 : -1;
+      const cmp = (x: Rational, y: Rational) => x[0] * y[1] - y[0] * x[1];
+      const text = bodyText(p);
+      expect(text.startsWith(meta.direction === "asc" ? "Least to greatest: " : "Greatest to least: ")).toBe(true);
+      const shown = spans(text).map(parseValue);
+      expect(shown).toHaveLength(4);
+      shown.forEach((v, i) => expect(sameValue(v, meta.values[i])).toBe(true));
+      // Printed out of order, in both directions.
+      const sortedIn = (s: number) => shown.every((v, i) => i === 0 || s * cmp(shown[i - 1], v) < 0);
+      expect(sortedIn(1) || sortedIn(-1)).toBe(false);
+      const answered = p.answer.split(meta.direction === "asc" ? " < " : " > ").map(parseValue);
+      const expected = [...meta.values].sort((x, y) => sign * cmp(x, y));
+      expect(answered).toHaveLength(4);
+      answered.forEach((v, i) => expect(sameValue(v, expected[i])).toBe(true));
+      for (let i = 1; i < 4; i++) expect(sign * cmp(answered[i - 1], answered[i])).toBeLessThan(0);
+      break;
+    }
+    case "pattern": {
+      const { terms, rule, missing } = meta;
+      terms.forEach((t, i) => {
+        expect(Number.isInteger(t) && t > 0).toBe(true);
+        if (i > 0) expect(t).toBe(applyRule(rule, terms[i - 1]));
+      });
+      // The first two terms always show, so the rule can be found.
+      expect(missing.every((i) => i >= 2)).toBe(true);
+      const shown = spans(bodyText(p))[0].split(",").map((s) => s.replace(/\\ /g, "").trim());
+      expect(shown).toHaveLength(terms.length);
+      shown.forEach((s, i) => expect(s).toBe(missing.includes(i) ? "\\square" : String(terms[i])));
+      checkRuleAnswer(
+        p.answer,
+        rule,
+        missing.map((i) => terms[i]),
+      );
+      break;
+    }
+    case "function-table": {
+      const { inputs, outputs, rule, missing } = meta;
+      outputs.forEach((y, i) => {
+        expect(Number.isInteger(y) && y > 0).toBe(true);
+        expect(y).toBe(applyRule(rule, inputs[i]));
+      });
+      expect(missing).not.toContain(0);
+      const row = (label: string) =>
+        bodyText(p).split(`\\text{${label}}`)[1].split("\\\\")[0].split("&").slice(1).map((s) => s.trim());
+      expect(row("In").map(num)).toEqual(inputs);
+      row("Out").forEach((s, i) => expect(s).toBe(missing.includes(i) ? "\\square" : String(outputs[i])));
+      checkRuleAnswer(
+        p.answer,
+        rule,
+        missing.map((i) => outputs[i]),
+      );
+      break;
+    }
+    case "convert": {
+      const text = bodyText(p);
+      expect(sameValue(parseValue(spans(text)[0].replace(/=\s*$/, "")), meta.value)).toBe(true);
+      if (text.includes(" as a ")) expect(text).toContain(` as a ${meta.to}:`);
+      const shapes: Record<typeof meta.to, RegExp> = {
+        mixed: /^\$\d+(\\frac\{\d+\}\{\d+\})?\$$/,
+        improper: /^\$\\frac\{\d+\}\{\d+\}\$$/,
+        decimal: /^\$\d+(\.\d*[1-9])?\$$/,
+        fraction: /^\$(\d+)?(\\frac\{\d+\}\{\d+\})?\$$/,
+        percent: /^\$\d+\\%\$$/,
+      };
+      expect(p.answer).toMatch(shapes[meta.to]);
+      // Fractions and mixed numbers in simplest form; improper ones really improper.
+      const value = meta.to === "mixed" || meta.to === "fraction" ? parseFractionAnswer(p.answer) : parseValue(p.answer);
+      if (meta.to === "improper") expect(value[0]).toBeGreaterThan(value[1]);
+      expect(sameValue(value, meta.value)).toBe(true);
+      break;
+    }
+    case "unit-convert": {
+      const kinds = new Set([...meta.from, ...meta.result].map(([, u]) => UNIT_BASE[u][0]));
+      expect(kinds.size).toBe(1);
+      // In thousandths of the smallest unit, so decimal amounts stay whole.
+      const total = (amounts: [string, string][]) =>
+        amounts.reduce((s, [v, u]) => {
+          const [units, scale] = decimal(v);
+          return s + (units * UNIT_BASE[u][1] * 1000) / scale;
+        }, 0);
+      expect(total(meta.result)).toBe(total(meta.from));
+      // "4 ft 2 in": the smaller unit is less than one of the bigger.
+      if (meta.result.length === 2) {
+        const [[, big], [rest, small]] = meta.result;
+        expect(Number(rest)).toBeLessThan(UNIT_BASE[big][1] / UNIT_BASE[small][1]);
+      }
+      const plain = (v: string) => (v.includes(".") ? v : Number(v).toLocaleString("en-US"));
+      expect(p.answer).toBe(meta.result.map(([v, u]) => `${plain(v)} ${u}`).join(" "));
+      const [lhs, rhs] = spans(bodyText(p))[0].split("=");
+      expect(lhs.replace(/\{,\}/g, "").match(/\d+(\.\d+)?/g)).toEqual(meta.from.map(([v]) => v));
+      expect(rhs.match(/\\square/g)).toHaveLength(meta.result.length);
+      break;
+    }
+    case "probability": {
+      const { outcomes, event } = meta;
+      const isPrimeI = (n: number) => n > 1 && Array.from({ length: n - 2 }, (_, i) => i + 2).every((d) => n % d);
+      const holds = (x: number | string): boolean => {
+        if (typeof x === "string") {
+          const colors = event.colors!;
+          return event.kind === "not-color" ? x !== colors[0] : colors.includes(x);
+        }
+        const k = event.k!;
+        return {
+          even: x % 2 === 0,
+          odd: x % 2 === 1,
+          prime: isPrimeI(x),
+          multiple: x % k === 0,
+          greater: x > k,
+          less: x < k,
+          equal: x === k,
+        }[event.kind as "even"];
+      };
+      const expected: Rational = [outcomes.filter(holds).length, outcomes.length];
+      expect(sameValue(meta.result, expected)).toBe(true);
+      expect(sameValue(parseFractionAnswer(p.answer), expected)).toBe(true);
+      const text = bodyText(p);
+      if (typeof outcomes[0] === "number") {
+        expect(outcomes).toEqual(Array.from({ length: outcomes.length }, (_, i) => i + 1));
+        expect(text).toContain(`1 to ${outcomes.length}`);
+      } else {
+        for (const color of new Set(outcomes)) {
+          expect(text).toContain(`${outcomes.filter((c) => c === color).length} ${color}`);
+        }
+      }
+      break;
+    }
+    case "decimal-rounding": {
+      const places = meta.places;
+      const fracLength = meta.n.split(".")[1]?.length ?? 0;
+      expect(fracLength).toBeGreaterThan(places);
+      const [units] = decimal(meta.n);
+      const factor = 10 ** (fracLength - places);
+      const rounded = Math.floor(units / factor) + ((units % factor) * 2 >= factor ? 1 : 0);
+      const expected = (rounded / 10 ** places).toFixed(places);
+      expect(meta.result).toBe(expected);
+      expect(p.answer).toBe(expected);
+      expect(bodyText(p)).toContain(`$${meta.n}$`);
+      break;
+    }
+    case "triangle": {
+      const text = bodyText(p);
+      if (meta.angles) {
+        expect(meta.angles.reduce((s, a) => s + a, 0)).toBe(180);
+        meta.angles.forEach((a) => expect(Number.isInteger(a) && a > 0).toBe(true));
+        // Every angle printed is one the student is given, never the answer.
+        const known = meta.angles.filter((_, i) => i !== meta.unknown);
+        const shown = [...text.matchAll(/(\d+)\^\\circ/g)].map((m) => Number(m[1]));
+        expect(shown.length).toBeGreaterThan(0);
+        shown.forEach((a) => expect(known).toContain(a));
+      }
+      if (meta.unknown !== null) expect(p.answer.startsWith(`$${meta.angles![meta.unknown]}^\\circ$`)).toBe(true);
+      if (meta.classify === "angles") {
+        const largest = Math.max(...meta.angles!);
+        expect(p.answer.endsWith(`, ${largest === 90 ? "right" : largest > 90 ? "obtuse" : "acute"}`)).toBe(true);
+      }
+      if (meta.classify === "sides") {
+        const [a, b, c] = [...meta.sides!].sort((x, y) => x - y);
+        expect(a + b).toBeGreaterThan(c);
+        expect(p.answer).toBe({ 1: "equilateral", 2: "isosceles", 3: "scalene" }[new Set(meta.sides).size]);
+        meta.sides!.forEach((s) => expect(text).toContain(`${s} `));
+      }
+      break;
+    }
+    case "ratio": {
+      const [x, y] = meta.result;
+      expect(gcdI(x, y)).toBe(1);
+      expect(x * meta.b).toBe(y * meta.a);
+      expect(meta.a).toBeGreaterThan(x);
+      expect(p.answer.match(/\d+/g)!.map(Number)).toEqual([x, y]);
+      expect(bodyText(p).match(/\d+/g)!.map(Number)).toEqual([meta.a, meta.b]);
+      break;
+    }
+    case "unit-rate": {
+      expect(meta.rate * meta.count).toBe(meta.total);
+      const text = bodyText(p);
+      if (meta.money) {
+        expect(p.answer).toMatch(/^\$\\text\{\\textdollar\}\d+\.\d{2}\$ per [a-z]+$/);
+        expect(cents(p.answer)).toBe(meta.rate);
+        expect(cents(text)).toBe(meta.total);
+      } else {
+        const m = p.answer.match(/^(\d+) ([a-z]+) per ([a-z]+)$/);
+        expect(m, p.answer).not.toBeNull();
+        expect(Number(m![1])).toBe(meta.rate);
+        expect(text.replace(/\{,\}/g, "").match(/\d+/g)!.map(Number)).toEqual([meta.total, meta.count]);
+      }
+      expect(text).toContain(` ${meta.count} `);
+      break;
+    }
+    case "evaluate": {
+      const value = evalJs(meta.expr, meta.vars);
+      expect(value).toBe(meta.result);
+      expect(Number.isInteger(value) && value > 0).toBe(true);
+      expect(num(p.answer)).toBe(value);
+      // The printed LaTeX is the same expression: rebuild it as JS and evaluate.
+      const text = bodyText(p);
+      const js = spans(text)[0]
+        .replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, "(($1)/($2))")
+        .replace(/\^\{(\d+)\}/g, "**$1")
+        .replace(/\\div/g, "/")
+        .replace(/(\d)([a-z])/g, "$1*$2")
+        .replace(/([a-z])([a-z])/g, "$1*$2")
+        .replace(/(\d|\))\(/g, "$1*(");
+      expect(evalJs(js, meta.vars)).toBe(value);
+      for (const [name, v] of Object.entries(meta.vars)) expect(text).toContain(`$${name} = ${v}$`);
+      break;
+    }
+    case "circle": {
+      const r = meta.given === "r" ? meta.value : meta.value / 2;
+      expect(Number.isInteger(r) && r > 0).toBe(true);
+      // In hundredths, with π as 3.14.
+      const hundredths = { r: r * 100, d: 2 * r * 100, C: 314 * 2 * r, A: 314 * r * r }[meta.find];
+      const [units, scale] = decimal(meta.result);
+      expect(units * 100).toBe(hundredths * scale);
+      expect(meta.result).not.toMatch(/\.\d*0$/);
+      expect(p.answer).toMatch(new RegExp(`^${meta.result.replace(".", "\\.")} (cm|m|mm|in|ft)${meta.find === "A" ? "²" : ""}$`));
+      expect(bodyText(p)).toContain(`$${meta.given} = ${meta.value}\\text{`);
+      break;
+    }
   }
 }
 
@@ -301,6 +690,10 @@ function latexToJs(latex: string): string | null {
     .replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, "(($1)/($2))")
     .replace(/\\lvert/g, "Math.abs(")
     .replace(/\\rvert/g, ")")
+    .replace(/\^\\circ/g, "")
+    .replace(/\\%/g, "/100")
+    // A ratio a : b compares like the fraction a/b.
+    .replace(/:/g, "/")
     .replace(/\^\{([^{}]+)\}/g, "**($1)")
     .replace(/\\times/g, "*")
     .replace(/\\div/g, "/")
@@ -315,7 +708,7 @@ const evalLatex = (latex: string): number | null => {
   return js === null ? null : new Function("gcd", "lcm", `return (${js});`)(gcdN, lcmN);
 };
 
-/** Every `$…$` span: all computable sides of an `=` chain agree, and `<`/`>`/`\ge` claims hold. */
+/** Every `$…$` span: all computable sides of an `=` chain agree, and each step of a `<`/`>`/`\ge` chain holds. */
 function checkMathSpans(text: string) {
   for (const [, span] of text.matchAll(/\$([^$]+)\$/g)) {
     if (span.includes("=")) {
@@ -326,12 +719,14 @@ function checkMathSpans(text: string) {
       for (const v of values) expect(v, span).toBeCloseTo(values[0], 9);
       continue;
     }
-    const ineq = span.match(/^(.*?)(<|>|\\ge|\\le)(.*)$/);
-    if (!ineq) continue;
-    const [left, right] = [evalLatex(ineq[1]), evalLatex(ineq[3])];
-    if (left === null || right === null) continue;
-    const holds = { "<": left < right, ">": left > right, "\\ge": left >= right, "\\le": left <= right }[ineq[2]];
-    expect(holds, span).toBe(true);
+    // [term, symbol, term, symbol, term, …]
+    const parts = span.split(/(<|>|\\ge|\\le)/);
+    for (let i = 0; i + 2 < parts.length; i += 2) {
+      const [left, right] = [evalLatex(parts[i]), evalLatex(parts[i + 2])];
+      if (left === null || right === null) continue;
+      const holds = { "<": left < right, ">": left > right, "\\ge": left >= right, "\\le": left <= right }[parts[i + 1]];
+      expect(holds, span).toBe(true);
+    }
   }
 }
 
@@ -413,6 +808,11 @@ describe("worked examples", () => {
     expect(evalLatex("x + 7")).toBeNull();
     expect(() => checkMathSpans("$7 \\times 8 = 54$")).toThrow();
     expect(() => checkMathSpans("$3 > 5$")).toThrow();
+    expect(evalLatex("45\\%")).toBeCloseTo(0.45, 9);
+    expect(evalLatex("180^\\circ - 48^\\circ")).toBe(132);
+    expect(evalLatex("12 : 18")).toBeCloseTo(2 / 3, 9);
+    expect(() => checkMathSpans("$1 < 3 < 2$")).toThrow();
+    expect(() => checkMathSpans("$12 : 18 = 3 : 4$")).toThrow();
   });
 });
 

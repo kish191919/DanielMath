@@ -122,6 +122,7 @@ export function BlogPostingJsonLd({
     url,
     image: post.heroImage ? `${siteConfig.url}${post.heroImage.src}` : undefined,
     datePublished: post.publishedAt,
+    dateModified: post.updatedAt ?? post.publishedAt,
     inLanguage: isKo ? "ko" : "en",
     author: {
       "@type": "Organization",

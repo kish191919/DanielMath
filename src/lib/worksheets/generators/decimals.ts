@@ -1,6 +1,6 @@
 import { pick, randInt, type Rng } from "../rng";
-import { compareDecimals, decimalToString, rescale, type Decimal } from "../math";
-import type { Generator } from "../types";
+import { compareDecimals, compareR, decimalToString, fractionLatex, gcd, rescale, simplify, type Decimal } from "../math";
+import type { Generator, Rational } from "../types";
 
 function randomDecimal(rng: Rng, scale: number, wholeMin: number, wholeMax: number): Decimal {
   const whole = randInt(rng, wholeMin, wholeMax);
@@ -116,4 +116,109 @@ export const divideDecimals: Generator<{
       result: decimalToString(quotient),
     },
   };
+};
+
+export const fractionsDecimals: Generator<{
+  to: readonly ("decimal" | "fraction")[];
+  /** Each divides 1,000, so every value has an exact decimal of at most three places. */
+  denominators: readonly number[];
+  /** 0 = proper fractions only. */
+  wholeMax: number;
+}> = (rng, { to: directions, denominators, wholeMax }) => {
+  const to = pick(rng, directions);
+  for (;;) {
+    const d = pick(rng, denominators);
+    const n = randInt(rng, 1, d - 1);
+    // Tenths and hundredths are shown as written (43/100); other fractions
+    // start in simplest form, and 40/100 is really just tenths.
+    if (to === "decimal" && (d === 100 ? n % 10 === 0 : d !== 10 && gcd(n, d) !== 1)) continue;
+    const whole = randInt(rng, 0, wholeMax);
+    const value: Rational = [whole * d + n, d];
+    const decimal = decimalToString({ units: (value[0] * 1000) / d, scale: 3 });
+    const fraction = whole ? `${whole}\\frac{${n}}{${d}}` : `\\frac{${n}}{${d}}`;
+    const [from, answer] = to === "decimal" ? [fraction, decimal] : [decimal, fractionLatex(value)];
+
+    return {
+      body: { kind: "text", text: `$${from} =$`, blank: "inline" },
+      answer: `$${answer}$`,
+      meta: { type: "convert", value: simplify(value), to },
+    };
+  }
+};
+
+const DECIMAL_PLACES = ["whole number", "tenth", "hundredth"] as const;
+
+export const roundDecimals: Generator<{
+  places: readonly (0 | 1 | 2)[];
+  maxScale: number;
+  wholeMax: number;
+  /** Sometimes force a 9 before a round-up digit (4.97 → 5.0). */
+  carry: boolean;
+}> = (rng, { places, maxScale, wholeMax, carry }) => {
+  const place = pick(rng, places);
+  const scale = randInt(rng, place + 1, Math.max(place + 1, maxScale));
+  let n = decimalToString(randomDecimal(rng, scale, 0, wholeMax), false);
+  if (carry && rng() < 0.3) {
+    const s = [...n];
+    const kept = n.indexOf(".") + place - (place === 0 ? 1 : 0);
+    const next = kept + (place === 0 ? 2 : 1);
+    s[kept] = "9";
+    s[next] = String(randInt(rng, 5, 9));
+    n = s.join("");
+  }
+  const units = Number(n.replace(".", ""));
+  const factor = 10 ** (scale - place);
+  const r = units % factor;
+  const rounded = (units - r + (r * 2 >= factor ? factor : 0)) / factor;
+  const result = decimalToString({ units: rounded, scale: place }, false);
+
+  return {
+    body: { kind: "text", text: `Round $${n}$ to the nearest ${DECIMAL_PLACES[place]}.`, blank: "line" },
+    answer: result,
+    meta: { type: "decimal-rounding", n, places: place, result },
+  };
+};
+
+export const compareRationals: Generator<{
+  denominators: readonly number[];
+  /** 0 = proper fractions only; otherwise mixed numbers or improper fractions. */
+  wholeMax: number;
+  negatives: boolean;
+}> = (rng, { denominators, wholeMax, negatives }) => {
+  for (;;) {
+    const d = pick(rng, denominators);
+    let n: number;
+    do n = randInt(rng, 1, d - 1);
+    while (gcd(n, d) !== 1);
+    const whole = randInt(rng, 0, wholeMax);
+    const fraction: Rational = [whole * d + n, d];
+    // A decimal within a few hundredths of the fraction, so it takes a real
+    // conversion to decide (sometimes exactly equal: 1/4 = 0.25).
+    const scale = randInt(rng, 1, 2);
+    const units = Math.round((fraction[0] * 10 ** scale) / d) + randInt(rng, -2, 2);
+    if (units <= 0 || units % 10 === 0) continue;
+
+    const items = [
+      {
+        value: fraction,
+        latex: whole && rng() < 0.5 ? `\\frac{${fraction[0]}}{${d}}` : fractionLatex(fraction),
+      },
+      { value: [units, 10 ** scale] as Rational, latex: decimalToString({ units, scale }) },
+    ];
+    if (negatives) {
+      // Mostly both negative — one negative side is a giveaway.
+      const r = rng();
+      const flip = r < 0.7 ? [0, 1] : r < 0.85 ? [randInt(rng, 0, 1)] : [];
+      for (const i of flip) items[i] = { value: [-items[i].value[0], items[i].value[1]], latex: `-${items[i].latex}` };
+    }
+    const [left, right] = rng() < 0.5 ? items : [items[1], items[0]];
+    const c = compareR(left.value, right.value);
+    const symbol = c < 0 ? "<" : c > 0 ? ">" : "=";
+
+    return {
+      body: { kind: "compare", left: `$${left.latex}$`, right: `$${right.latex}$` },
+      answer: symbol,
+      meta: { type: "compare", left: left.value, right: right.value, symbol },
+    };
+  }
 };

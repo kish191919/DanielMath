@@ -6,9 +6,10 @@ import { ArrowLeft, ArrowRight, Clock } from "lucide-react";
 import { getDictionary } from "@/dictionaries";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
 import { ogImages, pageAlternates } from "@/lib/seo";
+import { siteConfig } from "@/lib/site-config";
 import { Container } from "@/components/site/container";
 import { getBlogPost, getAllSlugs, getAdjacentPosts } from "@/lib/blog-posts";
-import { BlogPostingJsonLd } from "@/components/seo/json-ld";
+import { BlogPostingJsonLd, BreadcrumbJsonLd, FaqJsonLd } from "@/components/seo/json-ld";
 import { BlogVisualBlock } from "@/components/site/blog-visuals";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
@@ -25,14 +26,30 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = getBlogPost(slug);
   if (!post) return {};
   const isKo = locale === "ko";
+  const title = isKo ? post.titleKo : post.titleEn;
+  const description = isKo ? post.descKo : post.descEn;
+  const alternates = pageAlternates(locale, `/blog/${slug}`);
   return {
-    title: isKo ? post.titleKo : post.titleEn,
-    description: isKo ? post.descKo : post.descEn,
-    alternates: pageAlternates(locale, `/blog/${slug}`),
+    title,
+    description,
+    alternates,
+    // Replaces the root layout's openGraph/twitter, so url, locale and
+    // siteName must be repeated here or link previews lose them.
     openGraph: {
       type: "article",
+      url: alternates.canonical,
+      siteName: siteConfig.name,
+      locale: isKo ? "ko_KR" : "en_US",
       publishedTime: post.publishedAt,
+      modifiedTime: post.updatedAt ?? post.publishedAt,
+      section: isKo ? post.category : post.categoryEn,
       images: ogImages,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ogImages.map((img) => img.url),
     },
   };
 }
@@ -52,15 +69,29 @@ export default async function BlogPostPage({ params }: Props) {
   const title = isKo ? post.titleKo : post.titleEn;
   const category = isKo ? post.category : post.categoryEn;
   const body = isKo ? post.bodyKo : post.bodyEn;
+  const faq = isKo ? post.faqKo : post.faqEn;
 
-  const date = new Date(post.publishedAt).toLocaleDateString(
-    isKo ? "ko-KR" : "en-US",
-    { year: "numeric", month: "long", day: "numeric" }
-  );
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleDateString(isKo ? "ko-KR" : "en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  const date = formatDate(post.publishedAt);
+  const updated = post.updatedAt ? formatDate(post.updatedAt) : null;
+  const siteBase = isKo ? siteConfig.url : `${siteConfig.url}/en`;
 
   return (
     <>
       <BlogPostingJsonLd post={post} locale={locale} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: isKo ? siteConfig.nameKo : siteConfig.name, url: siteBase },
+          { name: isKo ? "블로그" : "Blog", url: `${siteBase}/blog` },
+          { name: title, url: `${siteBase}/blog/${post.slug}` },
+        ]}
+      />
+      {faq && faq.length > 0 && <FaqJsonLd items={faq} />}
       <div className="border-b border-navy-100 bg-white py-4">
         <Container>
           <Link
@@ -86,6 +117,11 @@ export default async function BlogPostPage({ params }: Props) {
                   {post.readingMins} {d.blog.minRead}
                 </span>
                 <span className="text-xs text-navy-400">{date}</span>
+                {updated && (
+                  <span className="text-xs text-navy-400">
+                    {d.blog.updatedAt} {updated}
+                  </span>
+                )}
               </div>
 
               <h1 className="text-3xl font-bold leading-tight tracking-tight text-navy-900 sm:text-4xl">
@@ -135,6 +171,24 @@ export default async function BlogPostPage({ params }: Props) {
                   )}
                 </div>
               ))}
+
+              {faq && faq.length > 0 && (
+                <div>
+                  <h2 className="mb-4 text-xl font-bold text-navy-900">
+                    {d.blog.faqTitle}
+                  </h2>
+                  <dl className="divide-y divide-navy-100 rounded-2xl border border-navy-100 bg-white">
+                    {faq.map((item) => (
+                      <div key={item.q} className="p-5">
+                        <dt className="font-bold leading-snug text-navy-900">
+                          Q. {item.q}
+                        </dt>
+                        <dd className="mt-2 leading-7 text-navy-700">{item.a}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              )}
             </div>
 
             {/* Prev / next post nav */}
