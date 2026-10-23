@@ -80,38 +80,29 @@ export default async function WorksheetsHubPage({ params }: Props) {
         </Container>
       </section>
 
-      <Section className="bg-navy-50/50">
+      <Section className="bg-navy-50/50 py-10 sm:py-24">
         <Container>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
             {WORKSHEET_GRADES.map((grade) => {
-              const sheets = worksheetsForGrade(grade);
+              const count = worksheetsForGrade(grade).length;
               return (
                 <Link
                   key={grade}
                   href={lp(`/worksheets/${gradeSlug(grade)}`)}
-                  className="group flex flex-col rounded-2xl border border-navy-100 bg-white p-6 shadow-sm transition hover:border-navy-300 hover:shadow-md"
+                  className="group flex flex-col rounded-2xl border border-navy-100 bg-white p-4 shadow-sm transition hover:border-navy-300 hover:shadow-md sm:p-6"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-navy-900 text-2xl font-bold text-white">
+                  <div className="flex items-start justify-between">
+                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-navy-900 text-xl font-bold text-white sm:h-12 sm:w-12 sm:text-2xl">
                       {grade}
                     </span>
-                    <span className={`rounded-full border border-navy-200 px-2.5 py-0.5 text-xs font-semibold text-navy-600${ko}`}>
-                      {isKo ? `${sheets.length}개 주제` : `${sheets.length} topics`}
-                    </span>
+                    <ArrowRight className="h-5 w-5 text-navy-300 transition group-hover:translate-x-0.5 group-hover:text-navy-900" />
                   </div>
-                  <h2 className={`mt-5 text-xl font-bold text-navy-900${ko}`}>{isKo ? `${grade}학년` : `Grade ${grade}`}</h2>
-                  <ul className={`mt-3 flex-1 space-y-1 text-sm text-navy-700${ko}`}>
-                    {sheets.slice(0, 4).map((s) => (
-                      <li key={s.slug}>· {isKo ? s.title.ko : s.title.en}</li>
-                    ))}
-                    {sheets.length > 4 && (
-                      <li className="text-navy-500">{isKo ? `외 ${sheets.length - 4}개` : `+${sheets.length - 4} more`}</li>
-                    )}
-                  </ul>
-                  <span className={`mt-5 inline-flex items-center gap-1 text-sm font-semibold text-navy-900 group-hover:text-navy-600${ko}`}>
-                    {isKo ? "학습지 보기" : "Browse worksheets"}
-                    <ArrowRight className="h-4 w-4" />
-                  </span>
+                  <h2 className={`mt-4 text-lg font-bold text-navy-900 sm:mt-5 sm:text-xl${ko}`}>
+                    {isKo ? `${grade}학년` : `Grade ${grade}`}
+                  </h2>
+                  <p className={`mt-0.5 text-sm text-navy-500${ko}`}>
+                    {isKo ? `${count}개 주제` : `${count} topics`}
+                  </p>
                 </Link>
               );
             })}

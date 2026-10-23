@@ -11,7 +11,21 @@ export type Rational = readonly [number, number];
 export type FigureSpec =
   | { type: "clock"; hour: number; minute: number }
   // One entry per whole drawn; each value is how many of `parts` are shaded.
-  | { type: "fraction-model"; shape: "circle" | "bar"; parts: number; shaded: number[] };
+  | { type: "fraction-model"; shape: "circle" | "bar"; parts: number; shaded: number[] }
+  // Drawn to scale from the interior angles at vertices A, B, C; side i is the
+  // one opposite vertex i. Labels are plain text ("48°", "?", "8 ft").
+  | {
+      type: "triangle";
+      angles: [number, number, number];
+      angleLabels: [string | null, string | null, string | null];
+      sideLabels?: [string, string, string];
+      /** Vertex marked with a right-angle square instead of a label. */
+      right?: number;
+      /** Tick marks per side; sides with the same count are equal. */
+      ticks?: [number, number, number];
+      /** Mirror left to right. */
+      flip?: boolean;
+    };
 
 // Everything a printed problem shows. Text fields may contain `$...$` LaTeX
 // spans (rendered by MathText — same convention as src/lib/ai/math-notation.ts).

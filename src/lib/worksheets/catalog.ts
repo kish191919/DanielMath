@@ -1386,7 +1386,7 @@ export const WORKSHEETS: WorksheetDef[] = [
       en: "Use the 180° angle sum to find missing angles, and classify triangles by angles and sides.",
       ko: "세 각의 합 180°로 모르는 각 구하기, 각과 변의 길이로 삼각형 분류하기",
     },
-    instructions: "The angles of a triangle add up to 180°. Answer each question.",
+    instructions: "A triangle's angles add up to 180°. A square marks a 90° angle; ticks mark equal sides.",
     category: "도형",
     conceptCode: "geo-angle-triangle-classify",
     quarter: "Q4",
@@ -1400,19 +1400,31 @@ export const WORKSHEETS: WorksheetDef[] = [
     },
     examples: {
       1: {
-        show: { kind: "math", lines: ["$180^\\circ - 48^\\circ - 75^\\circ = 57^\\circ$"] },
-        think: "The three angles of any triangle add up to $180^\\circ$, so subtract the two you know.",
+        show: {
+          kind: "figure",
+          figure: { type: "triangle", angles: [75, 57, 48], angleLabels: ["75°", "?", "48°"] },
+          prompt: "? =",
+          answer: "$57^\\circ$",
+        },
+        think: "The three angles of any triangle add up to $180^\\circ$, so subtract the two you know: $180^\\circ - 48^\\circ - 75^\\circ = 57^\\circ$.",
       },
       2: {
-        show: { kind: "math", lines: ["$180^\\circ - 35^\\circ - 55^\\circ = 90^\\circ$ → right triangle"] },
-        think: "A $90^\\circ$ angle makes it right, an angle over $90^\\circ$ makes it obtuse, and three angles under $90^\\circ$ make it acute.",
+        show: {
+          kind: "figure",
+          figure: { type: "triangle", angles: [35, 90, 55], angleLabels: ["35°", "?", "55°"] },
+          prompt: "? =",
+          answer: "$90^\\circ$, right",
+        },
+        think: "$180^\\circ - 35^\\circ - 55^\\circ = 90^\\circ$. A $90^\\circ$ angle makes it right, an angle over $90^\\circ$ makes it obtuse, and three angles under $90^\\circ$ make it acute.",
       },
       3: {
         show: {
-          kind: "math",
-          lines: ["Sides 6 cm, 6 cm, 9 cm → isosceles", "Vertex angle $40^\\circ$: $(180^\\circ - 40^\\circ) \\div 2 = 70^\\circ$"],
+          kind: "figure",
+          figure: { type: "triangle", angles: [40, 70, 70], angleLabels: ["40°", "?", "?"], ticks: [0, 1, 1] },
+          prompt: "? =",
+          answer: "$70^\\circ$",
         },
-        think: "Equilateral: 3 equal sides. Isosceles: 2 equal sides, and its two base angles are equal. Scalene: no equal sides.",
+        think: "Isosceles: 2 equal sides, so the base angles are equal: $(180^\\circ - 40^\\circ) \\div 2 = 70^\\circ$. Equilateral: 3 equal sides. Scalene: no equal sides.",
       },
     },
   }),

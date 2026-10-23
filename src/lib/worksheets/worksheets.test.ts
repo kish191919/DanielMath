@@ -3,7 +3,7 @@ import { buildWorksheet, exampleFor, parseWorksheetParams } from "./build";
 import { getWorksheet, parseGradeSlug, WORKSHEETS } from "./catalog";
 import { describeData, longDivisionSteps, verticalWork } from "./math";
 import { createRng, randInt } from "./rng";
-import type { ExampleShow, Level, NumberForm, PatternRule, ProblemMeta, Rational, WorksheetProblem } from "./types";
+import type { ExampleShow, FigureSpec, Level, NumberForm, PatternRule, ProblemMeta, Rational, WorksheetProblem } from "./types";
 
 const LEVELS: Level[] = [1, 2, 3];
 const SEEDS = Array.from({ length: 30 }, (_, i) => `seed${i}`);
@@ -133,6 +133,25 @@ const UNIT_BASE: Record<string, [string, number]> = {
   mL: ["volume", 1],
   L: ["volume", 1000],
 };
+
+/** A triangle figure is a real triangle whose marks agree with its angles. */
+function checkTriangleFigure(fig: Extract<FigureSpec, { type: "triangle" }>) {
+  expect(fig.angles.reduce((s, a) => s + a, 0)).toBeCloseTo(180, 0);
+  fig.angles.forEach((a) => expect(a).toBeGreaterThan(0));
+  fig.angleLabels.forEach((label, i) => {
+    if (label !== null && label !== "?") expect(label).toBe(`${fig.angles[i]}°`);
+  });
+  if (fig.right !== undefined) {
+    expect(fig.angles[fig.right]).toBe(90);
+    expect(fig.angleLabels[fig.right]).toBeNull();
+  }
+  // Sides with the same number of ticks are equal, so their opposite angles are too.
+  fig.ticks?.forEach((t, i) =>
+    fig.ticks!.forEach((u, j) => {
+      if (t > 0 && t === u) expect(fig.angles[i]).toBe(fig.angles[j]);
+    }),
+  );
+}
 
 function checkMeta(meta: ProblemMeta, p: WorksheetProblem) {
   switch (meta.type) {
@@ -510,15 +529,24 @@ function checkMeta(meta: ProblemMeta, p: WorksheetProblem) {
       break;
     }
     case "triangle": {
-      const text = bodyText(p);
+      expect(p.body.kind).toBe("figure");
+      if (p.body.kind !== "figure" || p.body.figure.type !== "triangle") break;
+      const fig = p.body.figure;
+      checkTriangleFigure(fig);
       if (meta.angles) {
         expect(meta.angles.reduce((s, a) => s + a, 0)).toBe(180);
         meta.angles.forEach((a) => expect(Number.isInteger(a) && a > 0).toBe(true));
-        // Every angle printed is one the student is given, never the answer.
-        const known = meta.angles.filter((_, i) => i !== meta.unknown);
-        const shown = [...text.matchAll(/(\d+)\^\\circ/g)].map((m) => Number(m[1]));
-        expect(shown.length).toBeGreaterThan(0);
-        shown.forEach((a) => expect(known).toContain(a));
+        expect([...fig.angles].sort((x, y) => x - y)).toEqual([...meta.angles].sort((x, y) => x - y));
+        const answer = meta.angles[meta.unknown!];
+        // Every vertex is either given (a label, or a square for 90°) or asked
+        // for with "?", and no label gives the answer away.
+        fig.angleLabels.forEach((label, i) => {
+          if (label === "?") expect(fig.angles[i]).toBe(answer);
+          else if (label === null) expect(fig.right).toBe(i);
+        });
+        expect(fig.angleLabels.filter((l) => l === "?").length).toBe(meta.classify === null && fig.ticks ? 2 : 1);
+        // An isosceles figure's base angles are found from the vertex angle alone.
+        if (fig.ticks) expect(fig.angleLabels.filter((l) => l !== "?" && l !== null)).toHaveLength(1);
       }
       if (meta.unknown !== null) expect(p.answer.startsWith(`$${meta.angles![meta.unknown]}^\\circ$`)).toBe(true);
       if (meta.classify === "angles") {
@@ -529,7 +557,15 @@ function checkMeta(meta: ProblemMeta, p: WorksheetProblem) {
         const [a, b, c] = [...meta.sides!].sort((x, y) => x - y);
         expect(a + b).toBeGreaterThan(c);
         expect(p.answer).toBe({ 1: "equilateral", 2: "isosceles", 3: "scalene" }[new Set(meta.sides).size]);
-        meta.sides!.forEach((s) => expect(text).toContain(`${s} `));
+        const labels = fig.sideLabels!.map((l) => l.match(/^(\d+) (cm|in|m|ft)$/));
+        labels.forEach((m) => expect(m).not.toBeNull());
+        expect(new Set(labels.map((m) => m![2])).size).toBe(1);
+        expect(labels.map((m) => Number(m![1]))).toEqual(meta.sides);
+        // Drawn to scale: each side over the sine of its opposite angle is the same (law of sines).
+        const ratios = meta.sides!.map((side, i) => side / Math.sin((fig.angles[i] * Math.PI) / 180));
+        ratios.forEach((r) => expect(r / ratios[0]).toBeCloseTo(1, 2));
+        expect(fig.angleLabels).toEqual([null, null, null]);
+        expect(fig.ticks).toBeUndefined();
       }
       break;
     }
@@ -767,6 +803,11 @@ function checkExampleShow(show: ExampleShow) {
       const f = show.figure;
       if (f.type === "clock") {
         expect(show.answer).toBe(`${f.hour}:${String(f.minute).padStart(2, "0")}`);
+      } else if (f.type === "triangle") {
+        checkTriangleFigure(f);
+        const asked = f.angles.filter((_, i) => f.angleLabels[i] === "?");
+        expect(asked.length).toBeGreaterThan(0);
+        asked.forEach((a) => expect(show.answer.startsWith(`$${a}^\\circ$`)).toBe(true));
       } else {
         const total = f.shaded.reduce((s, x) => s + x, 0);
         expect(show.answer.startsWith(`$\\frac{${total}}{${f.parts}}$`)).toBe(true);

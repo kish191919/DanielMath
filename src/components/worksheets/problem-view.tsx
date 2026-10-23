@@ -3,7 +3,7 @@ import { MathText } from "@/components/math-text";
 import { cn } from "@/lib/utils";
 import { longDivisionSteps, type VerticalWork } from "@/lib/worksheets/math";
 import type { FigureSpec, ProblemBody } from "@/lib/worksheets/types";
-import { AnalogClock, FractionModel } from "./figures";
+import { AnalogClock, FractionModel, TriangleFigure } from "./figures";
 
 // Filled-in answers in worked examples use this accent so they read as
 // "the teacher's answer" next to the printed problem.
@@ -208,16 +208,20 @@ export function FigureView({
   /** Smaller figure with the answer beside it — for the example box. */
   compact?: boolean;
 }) {
+  // Longer prompts (triangles) get an answer line that runs to the cell edge.
+  const wide = !compact && figure.type === "triangle";
   return (
     <div className={compact ? "flex items-center gap-4" : "flex flex-col items-start gap-3"}>
       {figure.type === "clock" ? (
         <AnalogClock hour={figure.hour} minute={figure.minute} className={compact ? "h-20 w-20" : undefined} />
-      ) : (
+      ) : figure.type === "fraction-model" ? (
         <FractionModel shape={figure.shape} parts={figure.parts} shaded={figure.shaded} />
+      ) : (
+        <TriangleFigure {...figure} compact={compact} />
       )}
-      <div className="flex items-end gap-2 text-sm text-navy-700">
+      <div className={cn("flex items-end gap-2 text-sm text-navy-700", wide && "self-stretch")}>
         <span>{prompt}</span>
-        <Blank className={cn("px-1", answer ? cn("min-w-20 text-base", SOLVED) : "h-9 min-w-24")}>
+        <Blank className={cn("px-1", answer ? cn("min-w-20 text-base", SOLVED) : cn("h-9 min-w-24", wide && "flex-1"))}>
           {answer && <MathText text={answer} />}
         </Blank>
       </div>
