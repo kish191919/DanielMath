@@ -10,6 +10,8 @@ export const LEVEL_LABELS: Record<Level, { en: string; ko: string }> = {
   3: { en: "Hard", ko: "어려움" },
 };
 
+export const LEVEL_STARS: Record<Level, string> = { 1: "★☆☆", 2: "★★☆", 3: "★★★" };
+
 // Display order and English names for the curriculum categories reused from
 // curriculum-data.ts.
 export const CATEGORY_LABELS: { key: TopicCategory; en: string }[] = [

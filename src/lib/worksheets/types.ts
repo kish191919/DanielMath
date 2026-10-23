@@ -58,6 +58,24 @@ export type WorksheetProblem = {
 
 export type Generator<P> = (rng: Rng, params: P) => WorksheetProblem;
 
+// The worked example printed above the problems. Vertical, long-division and
+// stats examples are solved at render time from the numbers given here, so
+// only `math` lines and `think` text are hand-written — and the test suite
+// checks every `=` chain in those.
+export type ExampleShow =
+  | { kind: "math"; lines: string[] }
+  | { kind: "vertical"; operator: "+" | "−" | "×"; top: string; bottom: string; align: "right" | "decimal" }
+  | { kind: "longdiv"; divisor: number; dividend: number }
+  | { kind: "compare"; left: string; right: string; symbol: "<" | ">" | "=" }
+  | { kind: "figure"; figure: FigureSpec; prompt: string; answer: string }
+  | { kind: "stats"; data: number[] };
+
+export type WorksheetExample = {
+  show: ExampleShow;
+  /** One-line explanation after "Think:"; may contain `$...$`. */
+  think: string;
+};
+
 export type WorksheetDef = {
   grade: GradeNum;
   slug: string;
@@ -71,10 +89,13 @@ export type WorksheetDef = {
   /** FCPS Standard-track quarter in which the topic is taught. */
   quarter?: Quarter;
   /**
-   * Allowed problem counts, ascending; the middle one is the default. Each is a
-   * multiple of `columns` and was measured to print on a single Letter page.
+   * Allowed problem counts (2–3), ascending; the middle one — or the larger of
+   * two — is the default. Each is a multiple of `columns` and was measured to
+   * print on a single Letter page with the example box shown.
    */
   counts: readonly number[];
   columns: 2 | 3 | 4;
+  /** A level without its own example uses the nearest lower level's (see exampleFor). */
+  examples: { 1: WorksheetExample; 2?: WorksheetExample; 3?: WorksheetExample };
   generate: (rng: Rng, level: Level) => WorksheetProblem;
 };

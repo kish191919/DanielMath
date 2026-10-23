@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { buildWorksheet, parseWorksheetParams } from "./build";
+import { buildWorksheet, exampleFor, parseWorksheetParams } from "./build";
 import { getWorksheet, parseGradeSlug, WORKSHEETS } from "./catalog";
-import type { Level, ProblemMeta, Rational, WorksheetProblem } from "./types";
+import { describeData, longDivisionSteps, verticalWork } from "./math";
+import { createRng, randInt } from "./rng";
+import type { ExampleShow, Level, ProblemMeta, Rational, WorksheetProblem } from "./types";
 
 const LEVELS: Level[] = [1, 2, 3];
 const SEEDS = Array.from({ length: 30 }, (_, i) => `seed${i}`);
@@ -206,9 +208,9 @@ describe("worksheet catalog", () => {
     expect(new Set(keys).size).toBe(keys.length);
   });
 
-  it("offers three ascending counts that fill whole rows", () => {
+  it("offers two or three ascending counts that fill whole rows", () => {
     for (const def of WORKSHEETS) {
-      expect(def.counts, def.slug).toHaveLength(3);
+      expect([2, 3], def.slug).toContain(def.counts.length);
       expect([...def.counts].sort((a, b) => a - b), def.slug).toEqual([...def.counts]);
       for (const c of def.counts) expect(c % def.columns, `${def.slug} ${c}`).toBe(0);
     }
@@ -229,12 +231,24 @@ describe("worksheet catalog", () => {
     expect(p.level).toBe(1);
     expect(p.seed).toBeNull();
     expect(p.showKey).toBe(true);
-    expect(parseWorksheetParams({ n: String(def.counts[2]), level: "3", seed: "abc123", key: "0" }, def)).toEqual({
+    expect(p.showExample).toBe(true);
+    expect(
+      parseWorksheetParams({ n: String(def.counts[2]), level: "3", seed: "abc123", key: "0", ex: "0" }, def),
+    ).toEqual({
       count: def.counts[2],
       level: 3,
       seed: "abc123",
       showKey: false,
+      showExample: false,
     });
+  });
+
+  it("lets answer pages take any count so older QR codes keep working", () => {
+    const def = WORKSHEETS[0];
+    expect(parseWorksheetParams({ n: "30" }, def).count).toBe(def.counts[1]);
+    expect(parseWorksheetParams({ n: "30" }, def, { anyCount: true }).count).toBe(30);
+    expect(parseWorksheetParams({ n: "41" }, def, { anyCount: true }).count).toBe(def.counts[1]);
+    expect(parseWorksheetParams({ n: "0" }, def, { anyCount: true }).count).toBe(def.counts[1]);
   });
 });
 
@@ -264,5 +278,207 @@ describe.each(WORKSHEETS.map((w) => [`grade ${w.grade} · ${w.slug}`, w] as cons
     const problems = buildWorksheet(def, { count: def.counts[0], level: 2, seed: "uniq" });
     const unique = new Set(problems.map((p) => JSON.stringify(p.body)));
     expect(unique.size).toBeGreaterThanOrEqual(Math.ceil(problems.length * 0.8));
+  });
+});
+
+// ── Worked examples ──────────────────────────────────────────────────────────
+
+const gcdN = (...xs: number[]) => xs.reduce((a, b) => gcdI(a, b));
+const lcmN = (...xs: number[]) => xs.reduce((a, b) => (a * b) / gcdI(a, b));
+
+/**
+ * The hand-written LaTeX we use in examples, as a JS expression — or null
+ * when the piece isn't plain arithmetic (a variable, a word, an arrow).
+ */
+function latexToJs(latex: string): string | null {
+  const js = latex
+    .replace(/\\boxed\{([^{}]*)\}/g, "$1")
+    .replace(/\\underline\{([^{}]*)\}/g, "$1")
+    .replace(/\{,\}/g, "")
+    .replace(/\\text\{GCF\}/g, "gcd")
+    .replace(/\\text\{LCM\}/g, "lcm")
+    .replace(/(\d+)\\frac\{([^{}]+)\}\{([^{}]+)\}/g, "($1+($2)/($3))")
+    .replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, "(($1)/($2))")
+    .replace(/\\lvert/g, "Math.abs(")
+    .replace(/\\rvert/g, ")")
+    .replace(/\^\{([^{}]+)\}/g, "**($1)")
+    .replace(/\\times/g, "*")
+    .replace(/\\div/g, "/")
+    .replace(/−/g, "-")
+    .trim();
+  if (js === "" || /[a-zA-Z\\<>]/.test(js.replace(/Math\.abs|gcd|lcm/g, ""))) return null;
+  return js;
+}
+
+const evalLatex = (latex: string): number | null => {
+  const js = latexToJs(latex);
+  return js === null ? null : new Function("gcd", "lcm", `return (${js});`)(gcdN, lcmN);
+};
+
+/** Every `$…$` span: all computable sides of an `=` chain agree, and `<`/`>`/`\ge` claims hold. */
+function checkMathSpans(text: string) {
+  for (const [, span] of text.matchAll(/\$([^$]+)\$/g)) {
+    if (span.includes("=")) {
+      const values = span
+        .split("=")
+        .map(evalLatex)
+        .filter((v): v is number => v !== null);
+      for (const v of values) expect(v, span).toBeCloseTo(values[0], 9);
+      continue;
+    }
+    const ineq = span.match(/^(.*?)(<|>|\\ge|\\le)(.*)$/);
+    if (!ineq) continue;
+    const [left, right] = [evalLatex(ineq[1]), evalLatex(ineq[3])];
+    if (left === null || right === null) continue;
+    const holds = { "<": left < right, ">": left > right, "\\ge": left >= right, "\\le": left <= right }[ineq[2]];
+    expect(holds, span).toBe(true);
+  }
+}
+
+function checkExampleShow(show: ExampleShow) {
+  switch (show.kind) {
+    case "math":
+      show.lines.forEach(checkMathSpans);
+      break;
+    case "vertical": {
+      const work = verticalWork(show.operator, show.top, show.bottom);
+      if (show.operator === "×") {
+        expect(Number(work.result)).toBe(Number(show.top) * Number(show.bottom));
+        if (work.partials.length) expect(work.partials.reduce((s, p) => s + Number(p), 0)).toBe(Number(work.result));
+      } else {
+        const [a, as] = decimal(show.top);
+        const [b, bs] = decimal(show.bottom);
+        const [r, rs] = decimal(work.result);
+        const sign = show.operator === "+" ? 1 : -1;
+        expect(r * as * bs).toBe((a * bs + sign * b * as) * rs);
+        expect(r).toBeGreaterThan(0);
+      }
+      break;
+    }
+    case "longdiv": {
+      const { quotient, remainder } = longDivisionSteps(show.dividend, show.divisor);
+      expect(quotient * show.divisor + remainder).toBe(show.dividend);
+      expect(remainder).toBeLessThan(show.divisor);
+      break;
+    }
+    case "compare": {
+      const [l, r] = [evalLatex(show.left.replace(/\$/g, "")), evalLatex(show.right.replace(/\$/g, ""))];
+      expect(l).not.toBeNull();
+      expect(r).not.toBeNull();
+      expect(show.symbol).toBe(l! < r! ? "<" : l! > r! ? ">" : "=");
+      break;
+    }
+    case "figure": {
+      const f = show.figure;
+      if (f.type === "clock") {
+        expect(show.answer).toBe(`${f.hour}:${String(f.minute).padStart(2, "0")}`);
+      } else {
+        const total = f.shaded.reduce((s, x) => s + x, 0);
+        expect(show.answer.startsWith(`$\\frac{${total}}{${f.parts}}$`)).toBe(true);
+        checkMathSpans(`$${show.answer.replace(/\$/g, "")}$`);
+      }
+      break;
+    }
+    case "stats": {
+      const counts = new Map<number, number>();
+      show.data.forEach((v) => counts.set(v, (counts.get(v) ?? 0) + 1));
+      const top = Math.max(...counts.values());
+      expect([...counts.values()].filter((c) => c === top)).toHaveLength(1);
+      expect(Number.isInteger(describeData(show.data).mean)).toBe(true);
+      break;
+    }
+  }
+}
+
+describe("worked examples", () => {
+  it.each(WORKSHEETS.map((w) => [`grade ${w.grade} · ${w.slug}`, w] as const))("%s", (_, def) => {
+    for (const level of LEVELS) {
+      const example = exampleFor(def, level);
+      expect(example.think.trim()).not.toBe("");
+      checkMathSpans(example.think);
+      checkExampleShow(example.show);
+    }
+  });
+
+  it("falls back to the nearest lower level", () => {
+    const def = getWorksheet("grade-3", "place-value")!;
+    expect(exampleFor(def, 3)).toBe(def.examples[2]);
+    expect(exampleFor(def, 1)).toBe(def.examples[1]);
+  });
+
+  it("checks the chain checker itself", () => {
+    expect(evalLatex("2\\frac{3}{4} + 1\\frac{3}{4}")).toBeCloseTo(4.5, 9);
+    expect(evalLatex("\\lvert -8 \\rvert + (-3) \\times 2")).toBe(2);
+    expect(evalLatex("\\text{GCF}(24, 36)")).toBe(12);
+    expect(evalLatex("x + 7")).toBeNull();
+    expect(() => checkMathSpans("$7 \\times 8 = 54$")).toThrow();
+    expect(() => checkMathSpans("$3 > 5$")).toThrow();
+  });
+});
+
+describe("worked-example helpers", () => {
+  const rng = createRng("worked-example-helpers");
+  const digitsOf = (n: number) => String(n).length;
+
+  it("verticalWork: carries, partial products and results match plain arithmetic", () => {
+    for (let i = 0; i < 200; i++) {
+      const a = randInt(rng, 10, 99999);
+      const b = randInt(rng, 1, 9999);
+      const add = verticalWork("+", String(a), String(b));
+      expect(Number(add.result)).toBe(a + b);
+      // The carry into column k is the overflow of the k lower columns.
+      add.carries.forEach((c, k) => {
+        const expected = k === 0 ? 0 : Math.floor(((a % 10 ** k) + (b % 10 ** k)) / 10 ** k);
+        expect(c ?? 0).toBe(expected);
+      });
+
+      const big = Math.max(a, b);
+      const small = Math.min(a, b);
+      expect(Number(verticalWork("−", String(big), String(small)).result)).toBe(big - small);
+
+      const m = randInt(rng, 2, 9);
+      const times = verticalWork("×", String(a), String(m));
+      expect(Number(times.result)).toBe(a * m);
+      times.carries.forEach((c, k) => {
+        const expected = k === 0 ? 0 : Math.floor(((a % 10 ** k) * m) / 10 ** k);
+        expect(c ?? 0).toBe(expected);
+      });
+
+      const long = verticalWork("×", String(a), String(b));
+      expect(Number(long.result)).toBe(a * b);
+      const nonzero = [...String(b)].filter((d) => d !== "0").length;
+      expect(long.partials).toHaveLength(nonzero > 1 ? nonzero : 0);
+      if (long.partials.length) expect(long.partials.reduce((s, p) => s + Number(p), 0)).toBe(a * b);
+      expect(digitsOf(a)).toBe(times.carries.length);
+    }
+  });
+
+  it("verticalWork keeps decimals exact and aligned", () => {
+    expect(verticalWork("+", "7.5", "2.36").result).toBe("9.86");
+    expect(verticalWork("+", "12.4", "5.8")).toEqual({ carries: [null, 1, null], partials: [], result: "18.2" });
+    expect(verticalWork("−", "23.45", "8.17").result).toBe("15.28");
+    expect(verticalWork("+", "2.35", "1.65").result).toBe("4.00");
+  });
+
+  it("longDivisionSteps writes out a correct division", () => {
+    for (let i = 0; i < 200; i++) {
+      const divisor = randInt(rng, 2, 9);
+      const dividend = randInt(rng, divisor, 99999);
+      const { quotient, remainder, firstCol, steps } = longDivisionSteps(dividend, divisor);
+      expect(quotient).toBe(Math.floor(dividend / divisor));
+      expect(remainder).toBe(dividend % divisor);
+      expect(digitsOf(quotient)).toBe(digitsOf(dividend) - firstCol);
+      expect(steps).toHaveLength(digitsOf(quotient));
+      for (const s of steps) {
+        expect(s.product % divisor).toBe(0);
+        expect(s.difference).toBeGreaterThanOrEqual(0);
+        expect(s.difference).toBeLessThan(divisor);
+      }
+    }
+  });
+
+  it("describeData matches a direct calculation", () => {
+    expect(describeData([4, 7, 2, 7, 10])).toMatchObject({ mean: 6, median: 7, mode: 7, range: 8 });
+    expect(describeData([3, 8, 5, 8, 6, 12])).toMatchObject({ mean: 7, median: 7, mode: 8, range: 9 });
   });
 });

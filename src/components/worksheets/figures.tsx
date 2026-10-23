@@ -11,14 +11,22 @@ function polar(cx: number, cy: number, r: number, deg: number): [number, number]
   return [r2(cx + r * Math.sin(rad)), r2(cy - r * Math.cos(rad))];
 }
 
-export function AnalogClock({ hour, minute }: { hour: number; minute: number }) {
+export function AnalogClock({
+  hour,
+  minute,
+  className = "h-28 w-28",
+}: {
+  hour: number;
+  minute: number;
+  className?: string;
+}) {
   const hourAngle = ((hour % 12) + minute / 60) * 30;
   const minuteAngle = minute * 6;
   const [hx, hy] = polar(60, 60, 27, hourAngle);
   const [mx, my] = polar(60, 60, 41, minuteAngle);
 
   return (
-    <svg viewBox="0 0 120 120" className="h-28 w-28 text-navy-900" role="img" aria-label="Analog clock">
+    <svg viewBox="0 0 120 120" className={`${className} text-navy-900`} role="img" aria-label="Analog clock">
       <circle cx="60" cy="60" r="55" fill="white" stroke="currentColor" strokeWidth="2.5" />
       {Array.from({ length: 60 }, (_, i) => {
         const major = i % 5 === 0;

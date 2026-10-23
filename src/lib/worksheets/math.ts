@@ -96,3 +96,111 @@ export function decimalToString({ units, scale }: Decimal, trim = true): string 
   if (trim && s.includes(".")) s = s.replace(/0+$/, "").replace(/\.$/, "");
   return (units < 0 ? "-" : "") + s;
 }
+
+// ── Worked examples ──────────────────────────────────────────────────────────
+// The example box solves the numbers it shows, so the printed working can't
+// drift from the arithmetic.
+
+export type VerticalWork = {
+  /** Carry written above each digit column of the top number, ones column first; null = none. */
+  carries: (number | null)[];
+  /** Shifted partial products, ones row first — only when the multiplier has 2+ nonzero digits. */
+  partials: string[];
+  /** Unformatted (no commas), keeping the operands' decimal places so columns line up. */
+  result: string;
+};
+
+/** Digits of `s` with the decimal point removed and zeros appended up to `scale` places, ones column first. */
+function columnDigits(s: string, scale: number): number[] {
+  const frac = s.split(".")[1]?.length ?? 0;
+  return [...(s.replace(".", "") + "0".repeat(scale - frac))].reverse().map(Number);
+}
+
+export function verticalWork(op: "+" | "−" | "×", top: string, bottom: string): VerticalWork {
+  if (op === "×") {
+    if (top.includes(".") || bottom.includes(".")) throw new Error("verticalWork: × takes whole numbers");
+    const a = Number(top);
+    const result = String(a * Number(bottom));
+    const multiplier = columnDigits(bottom, 0);
+    if (multiplier.length > 1) {
+      const rows = multiplier.flatMap((d, j) => (d === 0 ? [] : [String(a * d * 10 ** j)]));
+      return { carries: [], partials: rows.length > 1 ? rows : [], result };
+    }
+    const digits = columnDigits(top, 0);
+    const carries: (number | null)[] = digits.map(() => null);
+    let carry = 0;
+    digits.forEach((d, k) => {
+      carry = Math.floor((d * multiplier[0] + carry) / 10);
+      if (carry && k + 1 < digits.length) carries[k + 1] = carry;
+    });
+    return { carries, partials: [], result };
+  }
+
+  const scale = Math.max(...[top, bottom].map((s) => s.split(".")[1]?.length ?? 0));
+  const toUnits = (s: string) => Number(s.replace(".", "")) * 10 ** (scale - (s.split(".")[1]?.length ?? 0));
+  const units = op === "+" ? toUnits(top) + toUnits(bottom) : toUnits(top) - toUnits(bottom);
+  const result = decimalToString({ units, scale }, false);
+  if (op === "−") return { carries: [], partials: [], result };
+
+  const a = columnDigits(top, scale);
+  const b = columnDigits(bottom, scale);
+  const carries: (number | null)[] = a.map(() => null);
+  let carry = 0;
+  for (let k = 0; k < Math.max(a.length, b.length); k++) {
+    carry = Math.floor(((a[k] ?? 0) + (b[k] ?? 0) + carry) / 10);
+    if (carry && k + 1 < a.length) carries[k + 1] = carry;
+  }
+  return { carries, partials: [], result };
+}
+
+export type LongDivisionStep = {
+  /** Dividend digit column (0 = leftmost) the product ends under. */
+  col: number;
+  product: number;
+  /** Left after subtracting; the next dividend digit is brought down beside it. */
+  difference: number;
+};
+
+export type LongDivisionWork = {
+  quotient: number;
+  remainder: number;
+  /** Column of the quotient's first digit (no leading zeros). */
+  firstCol: number;
+  steps: LongDivisionStep[];
+};
+
+export function longDivisionSteps(dividend: number, divisor: number): LongDivisionWork {
+  const digits = [...String(dividend)].map(Number);
+  const steps: LongDivisionStep[] = [];
+  let current = 0;
+  let quotient = 0;
+  let firstCol = -1;
+  digits.forEach((d, col) => {
+    current = current * 10 + d;
+    // Wait until the divisor fits before writing the first quotient digit.
+    if (firstCol < 0 && current < divisor && col < digits.length - 1) return;
+    if (firstCol < 0) firstCol = col;
+    const q = Math.floor(current / divisor);
+    quotient = quotient * 10 + q;
+    current -= q * divisor;
+    steps.push({ col, product: q * divisor, difference: current });
+  });
+  return { quotient, remainder: current, firstCol, steps };
+}
+
+/** Mean, median, mode and range; the mode is the first most-frequent value in sorted order. */
+export function describeData(data: readonly number[]) {
+  const sorted = [...data].sort((a, b) => a - b);
+  const n = sorted.length;
+  const mid = Math.floor(n / 2);
+  const counts = new Map<number, number>();
+  for (const v of sorted) counts.set(v, (counts.get(v) ?? 0) + 1);
+  const [mode] = [...counts].reduce((best, cur) => (cur[1] > best[1] ? cur : best));
+  return {
+    sorted,
+    mean: sorted.reduce((s, v) => s + v, 0) / n,
+    median: n % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2,
+    mode,
+    range: sorted[n - 1] - sorted[0],
+  };
+}

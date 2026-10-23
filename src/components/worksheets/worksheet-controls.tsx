@@ -17,7 +17,7 @@ function pillClass(active: boolean) {
   );
 }
 
-type State = { count: number; level: Level; seed: string; showKey: boolean };
+type State = { count: number; level: Level; seed: string; showKey: boolean; showExample: boolean };
 
 // Options live in the URL (not component state) so the printed QR code and a
 // shared link both reproduce exactly what's on screen.
@@ -65,15 +65,26 @@ export function WorksheetControls({
             ))}
           </div>
         </div>
-        <label className={cn("flex items-center gap-2 text-sm text-navy-700", ko)}>
-          <input
-            type="checkbox"
-            checked={state.showKey}
-            onChange={(e) => go({ showKey: e.target.checked })}
-            className="h-4 w-4 rounded border-navy-300"
-          />
-          {isKo ? "답안지 포함" : "Include answer key"}
-        </label>
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+          <label className={cn("flex items-center gap-2 text-sm text-navy-700", ko)}>
+            <input
+              type="checkbox"
+              checked={state.showExample}
+              onChange={(e) => go({ showExample: e.target.checked })}
+              className="h-4 w-4 rounded border-navy-300"
+            />
+            {isKo ? "예제 포함" : "Show example"}
+          </label>
+          <label className={cn("flex items-center gap-2 text-sm text-navy-700", ko)}>
+            <input
+              type="checkbox"
+              checked={state.showKey}
+              onChange={(e) => go({ showKey: e.target.checked })}
+              className="h-4 w-4 rounded border-navy-300"
+            />
+            {isKo ? "답안지 포함" : "Include answer key"}
+          </label>
+        </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">

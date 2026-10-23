@@ -9,7 +9,7 @@ import { QUARTER_LABELS_EN, QUARTER_LABELS_KO } from "@/lib/curriculum-quarter";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
 import { pageAlternates } from "@/lib/seo";
 import { siteConfig } from "@/lib/site-config";
-import { buildWorksheet, parseWorksheetParams, worksheetQuery } from "@/lib/worksheets/build";
+import { buildWorksheet, exampleFor, parseWorksheetParams, worksheetQuery } from "@/lib/worksheets/build";
 import { getWorksheet, gradeSlug, worksheetPath, worksheetsForGrade } from "@/lib/worksheets/catalog";
 import { newSeed } from "@/lib/worksheets/rng";
 
@@ -88,6 +88,7 @@ export default async function WorksheetPage({ params, searchParams }: Props) {
               level={options.level}
               seed={seed}
               showKey={options.showKey}
+              showExample={options.showExample}
               isKo={isKo}
             />
           </div>
@@ -101,6 +102,7 @@ export default async function WorksheetPage({ params, searchParams }: Props) {
             seed={seed}
             answersUrl={answersUrl}
             showKey={options.showKey}
+            example={options.showExample ? exampleFor(def, options.level) : null}
           />
         </div>
 

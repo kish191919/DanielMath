@@ -32,7 +32,8 @@ export default async function WorksheetAnswersPage({ params, searchParams }: Pro
   const ko = isKo ? " font-ko" : "";
   const path = localePath(locale as Locale, worksheetPath(def));
 
-  const options = parseWorksheetParams(await searchParams, def);
+  // Any count, not just today's options: the QR on an older printout still works.
+  const options = parseWorksheetParams(await searchParams, def, { anyCount: true });
   const seed = options.seed;
 
   return (

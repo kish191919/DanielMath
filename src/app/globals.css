@@ -20,6 +20,9 @@
 
   --font-sans: var(--font-inter), var(--font-noto-kr), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-inter), var(--font-noto-kr), ui-sans-serif, system-ui, sans-serif;
+  /* KaTeX's own face (loaded with katex.min.css): worksheet numbers outside
+     $...$ match the fractions, and its digits are equal-width for columns. */
+  --font-math: KaTeX_Main, "Times New Roman", serif;
 }
 
 :root {
