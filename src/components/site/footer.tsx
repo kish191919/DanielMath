@@ -12,6 +12,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
   const navLinks = [
     { href: "/programs", label: "Programs", labelKo: "프로그램" },
     { href: "/resources", label: "Math Curriculum", labelKo: "수학 교육과정" },
+    { href: "/worksheets", label: "Worksheets", labelKo: "학습지" },
     { href: "/school-calendar", label: "School Calendar", labelKo: "학교 캘린더" },
     { href: "/blog", label: "Blog", labelKo: "블로그" },
   ];
@@ -23,7 +24,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
   ];
 
   return (
-    <footer className="border-t border-navy-100 bg-navy-50">
+    <footer className="border-t border-navy-100 bg-navy-50 print:hidden">
       <Container className="py-12">
         <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:gap-10 lg:grid-cols-[2fr_1fr_1fr_1.2fr]">
 

@@ -3,6 +3,7 @@ import { siteConfig } from "@/lib/site-config";
 import { blogPosts } from "@/lib/blog-posts";
 import { grades } from "@/lib/curriculum-data";
 import { pageAlternates } from "@/lib/seo";
+import { gradeSlug, WORKSHEET_GRADES, WORKSHEETS, worksheetPath } from "@/lib/worksheets/catalog";
 
 const marketingPaths = [
   "",
@@ -21,6 +22,9 @@ const marketingPaths = [
   "/privacy",
   "/terms",
   ...grades.map((g) => `/resources/curriculum/${g.slug}`),
+  "/worksheets",
+  ...WORKSHEET_GRADES.map((g) => `/worksheets/${gradeSlug(g)}`),
+  ...WORKSHEETS.map(worksheetPath),
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

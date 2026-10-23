@@ -6,7 +6,7 @@ import type { Locale } from "@/lib/i18n";
 export function UtilityBar({ locale }: { locale: Locale }) {
   const isKo = locale === "ko";
   return (
-    <div className="hidden border-b border-navy-800 bg-navy-900 text-navy-100 sm:block">
+    <div className="hidden border-b border-navy-800 bg-navy-900 text-navy-100 sm:block print:hidden">
       <Container>
         <div className="flex h-9 items-center justify-between text-xs">
           <a

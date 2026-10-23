@@ -1,7 +1,7 @@
 import QRCode from "qrcode";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { PrintButton } from "@/components/dashboard/print-button";
+import { PrintButton } from "@/components/ui/print-button";
 import { NamePrintToggle } from "@/components/dashboard/name-print-toggle";
 import { MathText } from "@/components/math-text";
 import { requireRole } from "@/lib/dal";

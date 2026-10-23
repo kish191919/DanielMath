@@ -65,7 +65,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
     : pathname.replace(/^\/en/, "") || "/";
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-navy-100 bg-white/85 backdrop-blur supports-[backdrop-filter]:bg-white/70">
+    <header className="sticky top-0 z-40 w-full border-b border-navy-100 bg-white/85 backdrop-blur supports-[backdrop-filter]:bg-white/70 print:hidden">
       <Container>
         <div className="flex h-16 items-center justify-between">
           <Link href={lp("/")} className="flex items-center gap-2">

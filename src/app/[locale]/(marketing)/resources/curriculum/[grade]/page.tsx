@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, ArrowUp, CheckCircle, ExternalLink } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUp, CheckCircle, ExternalLink, FileText } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
 import { grades, gradeBySlug, type GradeData, type TrackData } from "@/lib/curriculum-data";
@@ -9,6 +9,7 @@ import { gradeEquivalentEn, highlightsEn } from "@/lib/curriculum-data-en";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
 import { pageAlternates } from "@/lib/seo";
 import { QuarterTabs } from "@/components/site/curriculum-quarter-tabs";
+import { gradeSlug, WORKSHEET_GRADES, worksheetsForGrade } from "@/lib/worksheets/catalog";
 
 type Props = { params: Promise<{ locale: string; grade: string }> };
 
@@ -50,6 +51,7 @@ export default async function GradePage({ params }: Props) {
     <>
       <GradeHeader g={g} prev={prev} next={next} lp={lp} isKo={isKo} />
       <ComparisonSection g={g} isKo={isKo} enData={enData} enHighlights={enHighlights} />
+      <WorksheetCta g={g} lp={lp} isKo={isKo} />
       <HighlightSection g={g} lp={lp} isKo={isKo} enData={enData} />
       {(g.fcpsUrlStandard || g.fcpsUrlAdvanced) && <FcpsLinks g={g} isKo={isKo} />}
     </>
@@ -193,6 +195,36 @@ function TrackHeader({
         ))}
       </ul>
     </div>
+  );
+}
+
+function WorksheetCta({ g, lp, isKo }: { g: GradeData; lp: (p: string) => string; isKo: boolean }) {
+  const grade = WORKSHEET_GRADES.find((n) => n === g.gradeNum);
+  if (grade === undefined) return null;
+  const count = worksheetsForGrade(grade).length;
+
+  return (
+    <Container>
+      <Link
+        href={lp(`/worksheets/${gradeSlug(grade)}`)}
+        className="group mx-auto mb-12 flex max-w-2xl items-center gap-4 rounded-2xl border border-navy-200 bg-white p-5 shadow-sm transition hover:border-navy-400 hover:shadow-md"
+      >
+        <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-navy-900 text-white">
+          <FileText className="h-5 w-5" />
+        </span>
+        <span className="flex-1">
+          <span className={`block text-base font-bold text-navy-900${isKo ? " font-ko" : ""}`}>
+            {isKo ? `${grade}학년 무료 학습지` : `Free Grade ${grade} Worksheets`}
+          </span>
+          <span className={`block text-sm text-navy-600${isKo ? " font-ko" : ""}`}>
+            {isKo
+              ? `학교 진도에 맞춘 ${count}개 주제 — 매번 새 문제로 만들어 바로 인쇄하세요.`
+              : `${count} topics that follow the school pacing — fresh problems, ready to print.`}
+          </span>
+        </span>
+        <ArrowRight className="h-5 w-5 shrink-0 text-navy-500 transition group-hover:translate-x-0.5 group-hover:text-navy-900" />
+      </Link>
+    </Container>
   );
 }
 

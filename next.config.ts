@@ -41,6 +41,11 @@ const nextConfig: NextConfig = {
         source: "/blog/:slug",
         destination: "/ko/blog/:slug",
       },
+      // Worksheets hub + grade/topic/answer pages (`:path*` also matches /worksheets itself)
+      {
+        source: "/worksheets/:path*",
+        destination: "/ko/worksheets/:path*",
+      },
     ];
   },
 };
