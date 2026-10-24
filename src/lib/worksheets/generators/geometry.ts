@@ -28,21 +28,25 @@ function angleKind(angles: number[]): string {
   return largest === 90 ? "right" : largest > 90 ? "obtuse" : "acute";
 }
 
+/** A random multiple of `step` from min to max. */
+const randStep = (rng: Rng, min: number, max: number, step: number) =>
+  step * randInt(rng, Math.ceil(min / step), Math.floor(max / step));
+
 // An even mix of acute, right and obtuse triangles, every angle at least 10°.
-function triangle(rng: Rng): number[] {
+function triangle(rng: Rng, step: number): number[] {
   const kind = pick(rng, ["acute", "right", "obtuse"] as const);
   for (;;) {
     let angles: number[];
     if (kind === "right") {
-      const a = randInt(rng, 10, 80);
+      const a = randStep(rng, 10, 80, step);
       angles = [90, a, 90 - a];
     } else if (kind === "obtuse") {
-      const big = randInt(rng, 95, 160);
-      const a = randInt(rng, 10, 170 - big);
+      const big = randStep(rng, 95, 160, step);
+      const a = randStep(rng, 10, 170 - big, step);
       angles = [big, a, 180 - big - a];
     } else {
-      const a = randInt(rng, 20, 85);
-      const b = randInt(rng, 20, 85);
+      const a = randStep(rng, 20, 85, step);
+      const b = randStep(rng, 20, 85, step);
       angles = [a, b, 180 - a - b];
     }
     if (angleKind(angles) === kind && angles.every((x) => x >= 10)) return shuffle(rng, angles);
@@ -56,13 +60,13 @@ function anglesFromSides([a, b, c]: number[]): Three<number> {
   return [at(a, b, c), at(b, a, c), at(c, a, b)];
 }
 
-function sidesProblem(rng: Rng): WorksheetProblem {
+function sidesProblem(rng: Rng, [min, max]: readonly [number, number]): WorksheetProblem {
   const kind = rng() < 0.15 ? "equilateral" : pick(rng, ["isosceles", "scalene"] as const);
   let sides: number[];
   for (;;) {
-    const a = randInt(rng, 3, 15);
-    const b = randInt(rng, 3, 15);
-    const c = randInt(rng, 3, 15);
+    const a = randInt(rng, min, max);
+    const b = randInt(rng, min, max);
+    const c = randInt(rng, min, max);
     sides = kind === "equilateral" ? [a, a, a] : kind === "isosceles" ? [a, a, b] : [a, b, c];
     const distinct = new Set(sides).size;
     const [x, y, z] = [...sides].sort((p, q) => p - q);
@@ -92,12 +96,19 @@ function sidesProblem(rng: Rng): WorksheetProblem {
 // Every figure is built from the numbers alone — no extra rng draws — so the
 // problems (and the answers behind a printed QR code) are the same as when
 // this sheet was text-only.
-export const triangleAngles: Generator<{ tasks: readonly TriangleTask[] }> = (rng, { tasks }) => {
+export const triangleAngles: Generator<{
+  tasks: readonly TriangleTask[];
+  /** Every angle a multiple of this (1 by default). */
+  step?: 1 | 5 | 10;
+  /** Range of side lengths for "sides" (3–15 by default). Keep the longest at most five times the
+   * shortest, or the thinnest triangles can't be drawn to scale from angles rounded to 0.1°. */
+  sides?: readonly [number, number];
+}> = (rng, { tasks, step = 1, sides = [3, 15] }) => {
   const task = pick(rng, tasks);
-  if (task === "sides") return sidesProblem(rng);
+  if (task === "sides") return sidesProblem(rng, sides);
 
   if (task === "right-missing") {
-    const a = randInt(rng, 15, 75);
+    const a = randStep(rng, 15, 75, step);
     return {
       body: {
         kind: "figure",
@@ -106,7 +117,7 @@ export const triangleAngles: Generator<{ tasks: readonly TriangleTask[] }> = (rn
           angles: [90, a, 90 - a],
           angleLabels: [null, degLabel(a), "?"],
           right: 0,
-          flip: a % 2 === 1,
+          flip: (a / step) % 2 === 1,
         },
         prompt: "Find the missing angle.",
       },
@@ -116,8 +127,8 @@ export const triangleAngles: Generator<{ tasks: readonly TriangleTask[] }> = (rn
   }
 
   if (task === "isosceles-base") {
-    // An even vertex angle keeps the base angles whole.
-    const vertex = 2 * randInt(rng, 10, 70);
+    // An even vertex angle keeps the base angles whole (and multiples of `step`).
+    const vertex = 2 * randStep(rng, 10, 70, step);
     const base = (180 - vertex) / 2;
     return {
       body: {
@@ -135,7 +146,7 @@ export const triangleAngles: Generator<{ tasks: readonly TriangleTask[] }> = (rn
     };
   }
 
-  const angles = triangle(rng);
+  const angles = triangle(rng, step);
   const unknown = randInt(rng, 0, 2);
   const known = angles.filter((_, i) => i !== unknown);
   const classify = task === "missing-classify";
@@ -146,7 +157,7 @@ export const triangleAngles: Generator<{ tasks: readonly TriangleTask[] }> = (rn
     type: "triangle",
     angles: rotate([known[0], known[1], angles[unknown]], turn),
     angleLabels: rotate([degLabel(known[0]), degLabel(known[1]), "?"], turn),
-    flip: (known[0] + known[1]) % 2 === 1,
+    flip: ((known[0] + known[1]) / step) % 2 === 1,
   };
   // A given right angle is shown the standard way, with a square.
   const right = figure.angles.findIndex((a, i) => a === 90 && figure.angleLabels[i] !== "?");

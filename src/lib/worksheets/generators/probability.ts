@@ -40,10 +40,12 @@ function eventLabel(e: NumberEvent): string {
   }
 }
 
+const CUBE_EVENTS: readonly NumberEvent["kind"][] = ["even", "odd", "prime", "multiple", "greater", "less", "equal"];
+
 // Number-cube events include one impossible (7) and one certain (less than 7)
 // case, so 0 and 1 show up as answers now and then.
-function cubeEvent(rng: Rng): NumberEvent {
-  const kind = pick(rng, ["even", "odd", "prime", "multiple", "greater", "less", "equal"] as const);
+function cubeEvent(rng: Rng, kinds: readonly NumberEvent["kind"][]): NumberEvent {
+  const kind = pick(rng, kinds);
   if (kind === "multiple") return { kind, k: 3 };
   if (kind === "greater") return { kind, k: randInt(rng, 1, 5) };
   if (kind === "less") return { kind, k: randInt(rng, 2, 7) };
@@ -60,9 +62,17 @@ function cardEvent(rng: Rng, max: number): NumberEvent {
 
 const COLORS = ["red", "blue", "green", "yellow"] as const;
 
-export const probability: Generator<{ mode: "cube" | "bag" | "cards" }> = (rng, { mode }) => {
+export const probability: Generator<{
+  mode: "cube" | "bag" | "cards";
+  /** Number-cube events to ask about. */
+  events?: readonly NumberEvent["kind"][];
+  /** How many cards there may be. */
+  cards?: readonly number[];
+  /** Range of how many colors are in the bag. */
+  colors?: readonly [number, number];
+}> = (rng, { mode, events = CUBE_EVENTS, cards = [10, 12, 20], colors: colorRange = [2, 4] }) => {
   if (mode === "bag") {
-    const colors: string[] = shuffle(rng, COLORS).slice(0, randInt(rng, 2, 4));
+    const colors: string[] = shuffle(rng, COLORS).slice(0, randInt(rng, colorRange[0], colorRange[1]));
     const counts = colors.map(() => randInt(rng, 1, 6));
     const outcomes = colors.flatMap((c, i) => Array<string>(counts[i]).fill(c));
     const kind = pick(rng, colors.length > 2 ? (["color", "not-color", "either-color"] as const) : (["color", "not-color"] as const));
@@ -84,8 +94,8 @@ export const probability: Generator<{ mode: "cube" | "bag" | "cards" }> = (rng, 
     };
   }
 
-  const max = mode === "cube" ? 6 : pick(rng, [10, 12, 20]);
-  const event = mode === "cube" ? cubeEvent(rng) : cardEvent(rng, max);
+  const max = mode === "cube" ? 6 : pick(rng, cards);
+  const event = mode === "cube" ? cubeEvent(rng, events) : cardEvent(rng, max);
   const outcomes = Array.from({ length: max }, (_, i) => i + 1);
   const result = simplify([outcomes.filter((x) => holds(event, x)).length, max]);
   const setup = mode === "cube" ? "Roll a number cube numbered 1 to 6." : `Pick one card from cards numbered 1 to ${max}.`;

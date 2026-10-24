@@ -18,9 +18,9 @@ function ratioText(notation: RatioNotation, a: number, b: number): string {
   return notation === "colon" ? `$${a} : ${b}$` : `$\\frac{${a}}{${b}}$`;
 }
 
-function simplifyRatio(rng: Rng): WorksheetProblem {
-  const [x, y] = coprimePair(rng, 12);
-  const g = randInt(rng, 2, 9);
+function simplifyRatio(rng: Rng, max: number, scaleMax: number): WorksheetProblem {
+  const [x, y] = coprimePair(rng, max);
+  const g = randInt(rng, 2, scaleMax);
   const notation = pick(rng, ["colon", "to", "fraction"] as const);
   return {
     body: { kind: "text", text: `Simplest form: ${ratioText(notation, x * g, y * g)}`, blank: "inline" },
@@ -29,9 +29,9 @@ function simplifyRatio(rng: Rng): WorksheetProblem {
   };
 }
 
-function equivalentRatio(rng: Rng): WorksheetProblem {
-  const small: Rational = coprimePair(rng, 12);
-  const k = randInt(rng, 2, 9);
+function equivalentRatio(rng: Rng, max: number, scaleMax: number): WorksheetProblem {
+  const small: Rational = coprimePair(rng, max);
+  const k = randInt(rng, 2, scaleMax);
   const big: Rational = [small[0] * k, small[1] * k];
   // Usually scale up (3 : 4 = □ : 20); sometimes down (15 : 20 = 3 : □).
   const [left, right] = rng() < 0.7 ? [small, big] : [big, small];
@@ -59,8 +59,8 @@ const PRICES = [
   { per: "bottle", pers: "bottles" },
 ] as const;
 
-function unitRate(rng: Rng): WorksheetProblem {
-  const count = randInt(rng, 2, 9);
+function unitRate(rng: Rng, countMax: number): WorksheetProblem {
+  const count = randInt(rng, 2, countMax);
   if (rng() < 0.4) {
     const { per, pers } = pick(rng, PRICES);
     const rate = randInt(rng, 10, 300) * 5;
@@ -83,12 +83,21 @@ function unitRate(rng: Rng): WorksheetProblem {
   };
 }
 
-export const ratiosRates: Generator<{ tasks: readonly ("simplify" | "equivalent" | "unit-rate")[] }> = (
-  rng,
-  { tasks },
-) => {
+export const ratiosRates: Generator<{
+  tasks: readonly ("simplify" | "equivalent" | "unit-rate")[];
+  /** Largest term of a ratio in simplest form (12 by default). */
+  max?: number;
+  /** Largest scale factor between equivalent ratios (9 by default). */
+  scaleMax?: number;
+  /** Largest count a unit rate divides by (9 by default). */
+  countMax?: number;
+}> = (rng, { tasks, max = 12, scaleMax = 9, countMax = 9 }) => {
   const task = pick(rng, tasks);
-  return task === "simplify" ? simplifyRatio(rng) : task === "equivalent" ? equivalentRatio(rng) : unitRate(rng);
+  return task === "simplify"
+    ? simplifyRatio(rng, max, scaleMax)
+    : task === "equivalent"
+      ? equivalentRatio(rng, max, scaleMax)
+      : unitRate(rng, countMax);
 };
 
 type PercentTask =
@@ -101,14 +110,37 @@ type PercentTask =
 // Percents that make friendly "percent of" problems.
 const PERCENT_OF = [5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90];
 
-export const percents: Generator<{ tasks: readonly PercentTask[] }> = (rng, { tasks }) => {
+export const percents: Generator<{
+  tasks: readonly PercentTask[];
+  /** "percent-of": the percents used, and the largest whole. */
+  ofPercents?: readonly number[];
+  ofMax?: number;
+  /** "fraction-to-percent": denominators (each divides 100). */
+  fractionDens?: readonly number[];
+  /** "percent-to-fraction": percents are multiples of this (5 by default). */
+  fractionStep?: number;
+  /** Percents ⇄ decimals: multiples of `percentStep` up to `percentMax` (1 and 150 by default). */
+  percentStep?: number;
+  percentMax?: number;
+}> = (
+  rng,
+  {
+    tasks,
+    ofPercents = PERCENT_OF,
+    ofMax = 200,
+    fractionDens = [2, 4, 5, 10, 20, 25, 50],
+    fractionStep = 5,
+    percentStep = 1,
+    percentMax = 150,
+  },
+) => {
   const task = pick(rng, tasks);
 
   if (task === "percent-of") {
-    const p = pick(rng, PERCENT_OF);
+    const p = pick(rng, ofPercents);
     // Multiples of 100 / gcd(p, 100) make p% of n whole.
     const step = 100 / gcd(p, 100);
-    const n = step * randInt(rng, Math.ceil(10 / step), Math.floor(200 / step));
+    const n = step * randInt(rng, Math.ceil(10 / step), Math.floor(ofMax / step));
     const result = (p * n) / 100;
     return {
       body: { kind: "text", text: `$${p}\\%$ of $${n}$ =`, blank: "inline" },
@@ -118,7 +150,7 @@ export const percents: Generator<{ tasks: readonly PercentTask[] }> = (rng, { ta
   }
 
   if (task === "fraction-to-percent") {
-    const d = pick(rng, [2, 4, 5, 10, 20, 25, 50]);
+    const d = pick(rng, fractionDens);
     let n: number;
     do n = randInt(rng, 1, d - 1);
     while (gcd(n, d) !== 1);
@@ -130,7 +162,7 @@ export const percents: Generator<{ tasks: readonly PercentTask[] }> = (rng, { ta
   }
 
   if (task === "percent-to-fraction") {
-    const p = 5 * randInt(rng, 1, 19);
+    const p = fractionStep * randInt(rng, 1, Math.floor(99 / fractionStep));
     return {
       body: { kind: "text", text: `$${p}\\%$ as a fraction:`, blank: "inline" },
       answer: `$${fractionLatex([p, 100])}$`,
@@ -138,8 +170,8 @@ export const percents: Generator<{ tasks: readonly PercentTask[] }> = (rng, { ta
     };
   }
 
-  // Up to 150% so values over 1 (1.25 = 125%) come up too.
-  const p = randInt(rng, 1, 150);
+  // Past 100% so values over 1 (1.25 = 125%) come up too.
+  const p = percentStep * randInt(rng, 1, Math.floor(percentMax / percentStep));
   const decimal = decimalToString({ units: p, scale: 2 });
   const toDecimal = task === "percent-to-decimal";
   return {

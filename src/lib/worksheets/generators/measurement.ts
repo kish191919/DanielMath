@@ -77,7 +77,9 @@ export const convertUnits: Generator<{
   tasks: readonly ConvertTask[];
   /** Only these kinds of units (all of them if unset). */
   kinds?: readonly UnitKind[];
-}> = (rng, { system, tasks, kinds }) => {
+  /** Metric small-to-big with whole answers (3,000 m = 3 km) instead of decimals. */
+  whole?: boolean;
+}> = (rng, { system, tasks, kinds, whole: wholeOnly }) => {
   const task = pick(rng, tasks);
   const pairs = system === "customary" ? CUSTOMARY : METRIC;
   const { big, small, factor } = pick(rng, kinds ? pairs.filter((p) => kinds.includes(p.kind)) : pairs);
@@ -95,7 +97,7 @@ export const convertUnits: Generator<{
     return task === "mixed-to-small" ? problem(mixed, total) : problem(total, mixed);
   }
 
-  if (system === "customary") {
+  if (system === "customary" || wholeOnly) {
     const n = randInt(rng, 2, 12);
     return problem([whole(n * factor, small)], [whole(n, big)]);
   }

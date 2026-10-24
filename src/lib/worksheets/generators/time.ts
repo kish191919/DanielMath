@@ -29,7 +29,7 @@ export const elapsedTime: Generator<{
   unknowns: readonly ("elapsed" | "start" | "end")[];
   wholeHours: boolean;
   /** Minute step for start times and durations. */
-  step: 5 | 15;
+  step: 1 | 5 | 15;
 }> = (rng, { unknowns, wholeHours, step }) => {
   const unknown = pick(rng, unknowns);
   for (;;) {

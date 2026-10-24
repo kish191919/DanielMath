@@ -30,6 +30,8 @@ function sequence(
   length: number,
   gaps: "end" | "inside",
   skip: readonly number[] | undefined,
+  maxStep: number,
+  factors: readonly number[],
 ): WorksheetProblem {
   for (;;) {
     let op: PatternRule["op"];
@@ -42,7 +44,7 @@ function sequence(
       start = rule.k * randInt(rng, 1, Math.max(1, Math.min(20, Math.floor(999 / rule.k) - length)));
     } else {
       op = pick(rng, ops);
-      rule = { op, k: op === "*" ? randInt(rng, 2, 3) : randInt(rng, 2, 12) };
+      rule = { op, k: op === "*" ? pick(rng, factors) : randInt(rng, 2, maxStep) };
       start =
         op === "*"
           ? randInt(rng, 1, 6)
@@ -105,9 +107,13 @@ export const numberPatterns: Generator<
       gaps: "end" | "inside";
       /** Skip-count by one of these instead of following `ops`. */
       skip?: readonly number[];
+      /** Largest step for + and − rules (12 by default). */
+      maxStep?: number;
+      /** Factors for × rules (2 or 3 by default). */
+      factors?: readonly number[];
     }
   | { kind: "table"; ops: readonly PatternRule["op"][]; maxK: number; cells: number }
 > = (rng, params) =>
   params.kind === "sequence"
-    ? sequence(rng, params.ops, params.length, params.gaps, params.skip)
+    ? sequence(rng, params.ops, params.length, params.gaps, params.skip, params.maxStep ?? 12, params.factors ?? [2, 3])
     : table(rng, params.ops, params.maxK, params.cells);

@@ -48,7 +48,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [6, 8, 10],
     columns: 2,
     generator: primeFactorization,
-    params: { mode: "classify", min: 2, max: 100 },
+    levels: {
+      1: { mode: "classify", min: 2, max: 50 },
+      2: { mode: "classify", min: 2, max: 100 },
+      3: { mode: "classify", min: 50, max: 150 },
+    },
     example: {
       show: math("$13$ → prime", "$15$ → composite $(3 \\times 5)$"),
       think: "A prime number has exactly two factors: 1 and itself. 15 also has 3 and 5, so it is composite.",
@@ -70,7 +74,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [4, 6, 8],
     columns: 2,
     generator: factorsMultiples,
-    params: { task: "list-factors", max: 100 },
+    levels: {
+      1: { task: "list-factors", max: 50 },
+      2: { task: "list-factors", max: 100 },
+      3: { task: "list-factors", max: 150 },
+    },
     example: {
       show: math("Factors of 36: 1, 2, 3, 4, 6, 9, 12, 18, 36"),
       think: "Find the factor pairs ($1 \\times 36$, $2 \\times 18$, $3 \\times 12$, $4 \\times 9$, $6 \\times 6$) and list each number once.",
@@ -92,7 +100,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [4, 5],
     columns: 1,
     generator: primeFactorization,
-    params: { mode: "factorize", min: 4, max: 100 },
+    levels: {
+      1: { mode: "factorize", min: 4, max: 50 },
+      2: { mode: "factorize", min: 4, max: 100 },
+      3: { mode: "factorize", min: 50, max: 200 },
+    },
     example: {
       show: math("$36 = 4 \\times 9 = 2 \\times 2 \\times 3 \\times 3$"),
       think: "Keep splitting into factors until every factor is prime.",
@@ -148,7 +160,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: simplifyFraction,
-    params: { denominators: [2, 3, 4, 5, 6, 7, 8, 9, 10, 12], maxFactor: 6 },
+    levels: {
+      1: { denominators: [2, 3, 4, 5, 6], maxFactor: 4 },
+      2: { denominators: [2, 3, 4, 5, 6, 7, 8, 9, 10, 12], maxFactor: 6 },
+      3: { denominators: [5, 6, 7, 8, 9, 10, 11, 12], maxFactor: 9 },
+    },
     example: {
       show: math("$\\frac{18}{24} = \\frac{3}{4}$"),
       think: "The greatest common factor of 18 and 24 is 6: $18 \\div 6 = 3$ and $24 \\div 6 = 4$.",
@@ -170,7 +186,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: equivalentFractions,
-    params: { denominators: [2, 3, 4, 5, 6, 8], multipliers: [2, 6], direction: "mixed" },
+    levels: {
+      1: { denominators: [2, 3, 4, 5, 6, 8], multipliers: [2, 4], direction: "up" },
+      2: { denominators: [2, 3, 4, 5, 6, 8], multipliers: [2, 6], direction: "mixed" },
+      3: { denominators: [3, 4, 5, 6, 7, 8, 9, 10, 12], multipliers: [3, 9], direction: "mixed" },
+    },
     example: {
       show: math("$\\frac{10}{15} = \\frac{2}{\\boxed{3}}$"),
       think: "$10 \\div 5 = 2$, so divide the denominator by 5 too: $15 \\div 5 = 3$.",
@@ -192,7 +212,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [10, 14],
     columns: 2,
     generator: compareFractions,
-    params: { mode: "unlike", denominators: FRACTION_DENS },
+    levels: {
+      1: { mode: "unlike", denominators: FRACTION_DENS, relatedOnly: true },
+      2: { mode: "unlike", denominators: FRACTION_DENS },
+      3: { mode: "unlike", denominators: [5, 6, 7, 8, 9, 10, 12] },
+    },
     example: {
       show: { kind: "compare", left: "$\\frac{5}{8}$", right: "$\\frac{7}{12}$", symbol: ">" },
       think: "Use the common denominator 24: $\\frac{5}{8} = \\frac{15}{24}$ and $\\frac{7}{12} = \\frac{14}{24}$.",
@@ -214,7 +238,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: fractionsDecimals,
-    params: { to: ["decimal", "fraction"], denominators: [2, 4, 5, 8, 10, 20, 25, 100], wholeMax: 3 },
+    levels: {
+      1: { to: ["decimal", "fraction"], denominators: [2, 4, 5, 10], wholeMax: 0 },
+      2: { to: ["decimal", "fraction"], denominators: [2, 4, 5, 8, 10, 20, 25, 100], wholeMax: 3 },
+      3: { to: ["decimal", "fraction"], denominators: [8, 20, 25, 40, 50, 100, 200, 250], wholeMax: 5 },
+    },
     example: {
       show: math("$1\\frac{3}{8} = 1.375$", "$2.6 = 2\\frac{3}{5}$"),
       think: "$\\frac{3}{8} = 3 \\div 8 = 0.375$, and $0.6 = \\frac{6}{10} = \\frac{3}{5}$.",
@@ -274,7 +302,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [8, 12, 14],
     columns: 2,
     generator: addSubtractFractions,
-    params: { denominators: FRACTION_DENS, like: false, mixed: false, op: "+" },
+    levels: {
+      1: { denominators: FRACTION_DENS, like: false, relatedOnly: true, mixed: false, op: "+" },
+      2: { denominators: FRACTION_DENS, like: false, mixed: false, op: "+" },
+      3: { denominators: FRACTION_DENS, like: false, mixed: true, op: "+" },
+    },
     example: {
       show: math("$\\frac{1}{3} + \\frac{1}{4} = \\frac{4}{12} + \\frac{3}{12} = \\frac{7}{12}$"),
       think: "Use a common denominator: $\\text{LCM}(3, 4) = 12$.",
@@ -296,7 +328,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [8, 12, 14],
     columns: 2,
     generator: addSubtractFractions,
-    params: { denominators: FRACTION_DENS, like: false, mixed: false, op: "-" },
+    levels: {
+      1: { denominators: FRACTION_DENS, like: false, relatedOnly: true, mixed: false, op: "-" },
+      2: { denominators: FRACTION_DENS, like: false, mixed: false, op: "-" },
+      3: { denominators: FRACTION_DENS, like: false, mixed: true, op: "-" },
+    },
     example: {
       show: math("$\\frac{3}{4} - \\frac{2}{5} = \\frac{15}{20} - \\frac{8}{20} = \\frac{7}{20}$"),
       think: "Use a common denominator: $\\text{LCM}(4, 5) = 20$.",
@@ -359,7 +395,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: multiplyFractionWhole,
-    params: { fraction: "unit", denominators: FRACTION_DENS, wholeMax: 12 },
+    levels: {
+      1: { fraction: "unit", denominators: [2, 3, 4, 5, 6], wholeMax: 10 },
+      2: { fraction: "unit", denominators: FRACTION_DENS, wholeMax: 12 },
+      3: { fraction: "unit", denominators: [6, 7, 8, 9, 10, 12], wholeMax: 30 },
+    },
     example: {
       show: math("$6 \\times \\frac{1}{3} = \\frac{6}{3} = 2$"),
       think: "6 groups of one third is 6 thirds, and 6 thirds make 2 wholes.",
@@ -381,7 +421,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: multiplyFractionWhole,
-    params: { fraction: "proper", denominators: [3, 4, 5, 6, 8, 10, 12], wholeMax: 10 },
+    levels: {
+      1: { fraction: "proper", denominators: [2, 3, 4, 5, 6], wholeMax: 6 },
+      2: { fraction: "proper", denominators: [3, 4, 5, 6, 8, 10, 12], wholeMax: 10 },
+      3: { fraction: "proper", denominators: [5, 6, 7, 8, 9, 10, 12], wholeMax: 20 },
+    },
     example: {
       show: math("$4 \\times \\frac{2}{3} = \\frac{8}{3} = 2\\frac{2}{3}$"),
       think: "Multiply the whole number by the numerator ($4 \\times 2 = 8$ thirds), then write it as a mixed number.",
@@ -403,7 +447,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: multiplyFractionWhole,
-    params: { fraction: "mixed", denominators: [2, 3, 4, 5, 6, 8], wholeMax: 6 },
+    levels: {
+      1: { fraction: "mixed", denominators: [2, 3, 4], wholeMax: 4 },
+      2: { fraction: "mixed", denominators: [2, 3, 4, 5, 6, 8], wholeMax: 6 },
+      3: { fraction: "mixed", denominators: [3, 4, 5, 6, 8, 10, 12], wholeMax: 10 },
+    },
     example: {
       show: math("$2\\frac{1}{2} \\times 3 = \\frac{5}{2} \\times 3 = \\frac{15}{2} = 7\\frac{1}{2}$"),
       think: "Change the mixed number to an improper fraction first, then multiply the numerator by the whole number.",
@@ -425,7 +473,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: multiplyDivideFractions,
-    params: { ops: ["*"], denominators: [2, 3, 4, 5, 6, 8, 10], mixed: false },
+    levels: {
+      1: { ops: ["*"], denominators: [2, 3, 4, 5], mixed: false },
+      2: { ops: ["*"], denominators: [2, 3, 4, 5, 6, 8, 10], mixed: false },
+      3: { ops: ["*"], denominators: [4, 6, 8, 9, 10, 12], mixed: false },
+    },
     example: {
       show: math("$\\frac{2}{3} \\times \\frac{3}{4} = \\frac{6}{12} = \\frac{1}{2}$"),
       think: "Multiply the numerators and the denominators, then simplify.",
@@ -485,7 +537,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: decimalDigit,
-    params: { scales: [3], wholeMax: 99, ask: "value" },
+    levels: {
+      1: { scales: [2, 3], wholeMax: 9, ask: "value" },
+      2: { scales: [3], wholeMax: 99, ask: "value" },
+      3: { scales: [3], wholeMax: 9999, ask: "value" },
+    },
     example: {
       show: math("$12.30\\underline{8} \\rightarrow 0.008$"),
       think: "The 8 is in the thousandths place, so it is worth $8 \\times 0.001 = 0.008$.",
@@ -507,7 +563,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [3, 4, 5],
     columns: 1,
     generator: decimalInWords,
-    params: { scales: [2, 3], wholeMax: 99 },
+    levels: {
+      1: { scales: [1, 2], wholeMax: 20 },
+      2: { scales: [2, 3], wholeMax: 99 },
+      3: { scales: [3], wholeMax: 999 },
+    },
     example: {
       show: math("$14.065$ = fourteen and sixty-five thousandths"),
       think: "Read the whole number, say and for the decimal point, then read the digits after it and name the last place.",
@@ -529,7 +589,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [8, 10, 14],
     columns: 2,
     generator: compareDecimalNumbers,
-    params: { scales: [1, 2, 3], wholeMax: 20, tricky: true },
+    levels: {
+      1: { scales: [1, 2], wholeMax: 9, tricky: false },
+      2: { scales: [1, 2, 3], wholeMax: 20, tricky: true },
+      3: { scales: [2, 3], wholeMax: 99, tricky: true },
+    },
     example: {
       show: { kind: "compare", left: "$4.5$", right: "$4.45$", symbol: ">" },
       think: "Give both numbers hundredths: $4.5 = 4.50$, and 50 hundredths is more than 45 hundredths.",
@@ -541,8 +605,8 @@ export const GRADE_5: WorksheetDef[] = [
     slug: "order-decimals",
     title: { en: "Order Decimals", ko: "소수의 순서 정하기" },
     description: {
-      en: "Order four decimals that use the same digits in different places, either direction.",
-      ko: "같은 숫자를 다른 자리에 쓴 소수 네 개를 크기 순서대로 쓰기",
+      en: "Order decimals that use the same digits in different places, either direction.",
+      ko: "같은 숫자를 다른 자리에 쓴 소수들을 크기 순서대로 쓰기",
     },
     instructions: "Write the numbers in the order shown.",
     category: "소수",
@@ -551,7 +615,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [3, 4, 5],
     columns: 1,
     generator: orderValues,
-    params: { values: { kind: "decimal", wholeMax: 3 }, direction: "either" },
+    levels: {
+      1: { values: { kind: "decimal", wholeMax: 3, maxPlaces: 2 }, direction: "asc" },
+      2: { values: { kind: "decimal", wholeMax: 3 }, direction: "either" },
+      3: { values: { kind: "decimal", wholeMax: 3, count: 5 }, direction: "either" },
+    },
     example: {
       show: math("$2.54 > 2.5 > 2.45 > 2.405$"),
       think: "Give every number three decimal places (2.540, 2.500, 2.450, 2.405), then compare them like whole numbers.",
@@ -573,7 +641,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [3, 4, 5],
     columns: 1,
     generator: roundDecimals,
-    params: { places: [0], maxScale: 3, wholeMax: 99, carry: false },
+    levels: {
+      1: { places: [0], maxScale: 2, wholeMax: 20, carry: false },
+      2: { places: [0], maxScale: 3, wholeMax: 99, carry: false },
+      3: { places: [0], maxScale: 3, wholeMax: 999, carry: true },
+    },
     example: {
       show: math("Round $7.63$ to the nearest whole number: $7.63 \\rightarrow 8$"),
       think: "Look at the tenths digit: $6 \\ge 5$, so round up to 8.",
@@ -595,7 +667,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [3, 4, 5],
     columns: 1,
     generator: roundDecimals,
-    params: { places: [1], maxScale: 3, wholeMax: 50, carry: false },
+    levels: {
+      1: { places: [1], maxScale: 2, wholeMax: 9, carry: false },
+      2: { places: [1], maxScale: 3, wholeMax: 50, carry: false },
+      3: { places: [1], maxScale: 3, wholeMax: 99, carry: true },
+    },
     example: {
       show: math("Round $3.248$ to the nearest tenth: $3.248 \\rightarrow 3.2$"),
       think: "Look at the hundredths digit: $4 < 5$, so the tenths digit stays 2.",
@@ -617,7 +693,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [3, 4, 5],
     columns: 1,
     generator: roundDecimals,
-    params: { places: [2], maxScale: 3, wholeMax: 50, carry: true },
+    levels: {
+      1: { places: [2], maxScale: 3, wholeMax: 9, carry: false },
+      2: { places: [2], maxScale: 3, wholeMax: 50, carry: true },
+      3: { places: [2], maxScale: 3, wholeMax: 999, carry: true },
+    },
     example: {
       show: math("Round $6.397$ to the nearest hundredth: $6.397 \\rightarrow 6.40$"),
       think: "The thousandths digit is 7, so round up: 39 hundredths and 1 more make 40 hundredths. Keep the 0 to show hundredths.",
@@ -677,7 +757,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 4,
     generator: addSubtractDecimals,
-    params: { scales: [1, 2, 3], wholeMax: 99, op: "+", sameScale: false },
+    levels: {
+      1: { scales: [1, 2], wholeMax: 20, op: "+", sameScale: true },
+      2: { scales: [1, 2, 3], wholeMax: 99, op: "+", sameScale: false },
+      3: { scales: [1, 2, 3], wholeMax: 999, op: "+", sameScale: false },
+    },
     example: {
       show: { kind: "vertical", operator: "+", top: "7.5", bottom: "2.36", align: "decimal" },
       think: "Give both numbers hundredths ($7.5 = 7.50$), line up the decimal points, then add.",
@@ -699,7 +783,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 4,
     generator: addSubtractDecimals,
-    params: { scales: [1, 2, 3], wholeMax: 99, op: "-", sameScale: false },
+    levels: {
+      1: { scales: [1, 2], wholeMax: 20, op: "-", sameScale: true },
+      2: { scales: [1, 2, 3], wholeMax: 99, op: "-", sameScale: false },
+      3: { scales: [1, 2, 3], wholeMax: 999, op: "-", sameScale: false },
+    },
     example: {
       show: { kind: "vertical", operator: "−", top: "9.2", bottom: "3.47", align: "decimal" },
       think: "Write $9.2$ as $9.20$ so both numbers have hundredths, then subtract, regrouping when needed.",
@@ -723,7 +811,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: decimalPowersOfTen,
-    params: { op: "*", powers: [1, 2, 3] },
+    levels: {
+      1: { op: "*", powers: [1] },
+      2: { op: "*", powers: [1, 2, 3] },
+      3: { op: "*", powers: [2, 3] },
+    },
     example: {
       show: math("$3.45 \\times 100 = 345$"),
       think: "Each factor of 10 moves the decimal point one place to the right. 100 has two zeros: two places.",
@@ -745,7 +837,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [8, 12],
     columns: 4,
     generator: multiplyDecimals,
-    params: { aScale: 2, aWholeMax: 9, bScale: 0, bWholeMax: 9 },
+    levels: {
+      1: { aScale: 1, aWholeMax: 9, bScale: 0, bWholeMax: 9 },
+      2: { aScale: 2, aWholeMax: 9, bScale: 0, bWholeMax: 9 },
+      3: { aScale: 2, aWholeMax: 99, bScale: 0, bWholeMax: 99 },
+    },
     example: {
       show: math("$2.35 \\times 4 = 9.4$"),
       think: "Multiply as whole numbers: $235 \\times 4 = 940$. The factor has 2 decimal places, so $9.40 = 9.4$.",
@@ -767,7 +863,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [8, 12],
     columns: 4,
     generator: multiplyDecimals,
-    params: { aScale: 1, aWholeMax: 20, bScale: 1, bWholeMax: 9 },
+    levels: {
+      1: { aScale: 1, aWholeMax: 9, bScale: 1, bWholeMax: 0 },
+      2: { aScale: 1, aWholeMax: 20, bScale: 1, bWholeMax: 9 },
+      3: { aScale: 2, aWholeMax: 20, bScale: 1, bWholeMax: 9 },
+    },
     example: {
       show: math("$12.4 \\times 0.6 = 7.44$"),
       think: "$124 \\times 6 = 744$. The factors have $1 + 1 = 2$ decimal places, so the product is $7.44$.",
@@ -827,7 +927,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: decimalPowersOfTen,
-    params: { op: "/", powers: [1, 2, 3] },
+    levels: {
+      1: { op: "/", powers: [1] },
+      2: { op: "/", powers: [1, 2, 3] },
+      3: { op: "/", powers: [2, 3] },
+    },
     example: {
       show: math("$45.6 \\div 100 = 0.456$"),
       think: "Each factor of 10 moves the decimal point one place to the left. 100 has two zeros: two places.",
@@ -849,7 +953,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [4, 6],
     columns: 2,
     generator: divideDecimals,
-    params: { quotientScale: 2, quotientWholeMax: 9, divisorScale: 0, divisorMax: 9 },
+    levels: {
+      1: { quotientScale: 1, quotientWholeMax: 9, divisorScale: 0, divisorMax: 9 },
+      2: { quotientScale: 2, quotientWholeMax: 9, divisorScale: 0, divisorMax: 9 },
+      3: { quotientScale: 2, quotientWholeMax: 99, divisorScale: 0, divisorMax: 9 },
+    },
     example: {
       show: math("$7.56 \\div 6 = 1.26$"),
       think: "$756 \\div 6 = 126$. Bring the decimal point straight up: $1.26$.",
@@ -871,7 +979,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [4, 6],
     columns: 2,
     generator: divideDecimals,
-    params: { quotientScale: 0, quotientWholeMax: 12, divisorScale: 1, divisorMax: 9 },
+    levels: {
+      1: { quotientScale: 0, quotientWholeMax: 9, divisorScale: 1, divisorMax: 0 },
+      2: { quotientScale: 0, quotientWholeMax: 12, divisorScale: 1, divisorMax: 9 },
+      3: { quotientScale: 1, quotientWholeMax: 20, divisorScale: 1, divisorMax: 9 },
+    },
     example: {
       show: math("$2.4 \\div 0.6 = 24 \\div 6 = 4$"),
       think: "Multiply both numbers by 10 so the divisor is a whole number, then divide.",
@@ -931,7 +1043,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [10, 16, 20],
     columns: 2,
     generator: convertUnits,
-    params: { system: "metric", tasks: ["big-to-small", "decimal-to-small"] },
+    levels: {
+      1: { system: "metric", tasks: ["big-to-small"] },
+      2: { system: "metric", tasks: ["big-to-small", "decimal-to-small"] },
+      3: { system: "metric", tasks: ["decimal-to-small", "mixed-to-small"] },
+    },
     example: {
       show: math("$2.75\\text{ km} = 2{,}750\\text{ m}$"),
       think: "To change to a smaller unit, multiply: $2.75 \\times 1{,}000 = 2{,}750$.",
@@ -953,7 +1069,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [10, 16, 20],
     columns: 2,
     generator: convertUnits,
-    params: { system: "metric", tasks: ["small-to-big"] },
+    levels: {
+      1: { system: "metric", tasks: ["small-to-big"], whole: true },
+      2: { system: "metric", tasks: ["small-to-big"] },
+      3: { system: "metric", tasks: ["small-to-big", "small-to-mixed"] },
+    },
     example: {
       show: math("$850\\text{ cm} = 8.5\\text{ m}$"),
       think: "To change to a bigger unit, divide: $850 \\div 100 = 8.5$.",
@@ -975,7 +1095,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [12, 18],
     columns: 2,
     generator: convertUnits,
-    params: { system: "customary", tasks: ["mixed-to-small", "small-to-mixed"] },
+    levels: {
+      1: { system: "customary", tasks: ["mixed-to-small"] },
+      2: { system: "customary", tasks: ["mixed-to-small", "small-to-mixed"] },
+      3: { system: "customary", tasks: ["small-to-mixed"] },
+    },
     example: {
       show: math("$50\\text{ in} = 4\\text{ ft}\\ 2\\text{ in}$"),
       think: "How many 12s are in 50? $4 \\times 12 = 48$, and $50 - 48 = 2$ inches are left over.",
@@ -1035,7 +1159,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [4, 6],
     columns: 2,
     generator: shapeMeasures,
-    params: { tasks: ["rect-area", "rect-perimeter", "square-area", "square-perimeter"], max: 25 },
+    levels: {
+      1: { tasks: ["rect-area", "rect-perimeter", "square-area", "square-perimeter"], max: 12 },
+      2: { tasks: ["rect-area", "rect-perimeter", "square-area", "square-perimeter"], max: 25 },
+      3: { tasks: ["rect-area", "rect-perimeter", "square-area", "square-perimeter"], max: 60 },
+    },
     example: {
       show: {
         kind: "figure",
@@ -1062,7 +1190,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [4, 6],
     columns: 2,
     generator: shapeMeasures,
-    params: { tasks: ["missing-side-area", "missing-side-perimeter"], max: 20 },
+    levels: {
+      1: { tasks: ["missing-side-area", "missing-side-perimeter"], max: 12 },
+      2: { tasks: ["missing-side-area", "missing-side-perimeter"], max: 20 },
+      3: { tasks: ["missing-side-area", "missing-side-perimeter"], max: 40 },
+    },
     example: {
       show: {
         kind: "figure",
@@ -1089,7 +1221,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [4, 6],
     columns: 2,
     generator: shapeMeasures,
-    params: { tasks: ["prism-volume"], max: 12 },
+    levels: {
+      1: { tasks: ["prism-volume"], max: 6 },
+      2: { tasks: ["prism-volume"], max: 12 },
+      3: { tasks: ["prism-volume"], max: 20 },
+    },
     example: {
       show: {
         kind: "figure",
@@ -1116,7 +1252,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [4, 6],
     columns: 2,
     generator: shapeMeasures,
-    params: { tasks: ["triangle-area"], max: 20 },
+    levels: {
+      1: { tasks: ["triangle-area"], max: 10 },
+      2: { tasks: ["triangle-area"], max: 20 },
+      3: { tasks: ["triangle-area"], max: 40 },
+    },
     example: {
       show: {
         kind: "figure",
@@ -1145,7 +1285,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [4, 6],
     columns: 2,
     generator: triangleAngles,
-    params: { tasks: ["missing"] },
+    levels: {
+      1: { tasks: ["missing"], step: 10 },
+      2: { tasks: ["missing"], step: 5 },
+      3: { tasks: ["missing"] },
+    },
     example: {
       show: {
         kind: "figure",
@@ -1172,7 +1316,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [4, 6],
     columns: 2,
     generator: triangleAngles,
-    params: { tasks: ["missing-classify"] },
+    levels: {
+      1: { tasks: ["missing-classify"], step: 10 },
+      2: { tasks: ["missing-classify"], step: 5 },
+      3: { tasks: ["missing-classify"] },
+    },
     example: {
       show: {
         kind: "figure",
@@ -1199,7 +1347,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [4, 6],
     columns: 2,
     generator: triangleAngles,
-    params: { tasks: ["sides"] },
+    levels: {
+      1: { tasks: ["sides"], sides: [3, 9] },
+      2: { tasks: ["sides"] },
+      3: { tasks: ["sides"], sides: [10, 20] },
+    },
     example: {
       show: math("Sides 5 cm, 5 cm, 8 cm → isosceles"),
       think: "Equilateral: 3 equal sides. Isosceles: 2 equal sides. Scalene: no equal sides.",
@@ -1221,7 +1373,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [4, 6],
     columns: 2,
     generator: triangleAngles,
-    params: { tasks: ["right-missing"] },
+    levels: {
+      1: { tasks: ["right-missing"], step: 10 },
+      2: { tasks: ["right-missing"], step: 5 },
+      3: { tasks: ["right-missing"] },
+    },
     example: {
       show: {
         kind: "figure",
@@ -1248,7 +1404,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [4, 6],
     columns: 2,
     generator: triangleAngles,
-    params: { tasks: ["isosceles-base"] },
+    levels: {
+      1: { tasks: ["isosceles-base"], step: 10 },
+      2: { tasks: ["isosceles-base"], step: 5 },
+      3: { tasks: ["isosceles-base"] },
+    },
     example: {
       show: {
         kind: "figure",
@@ -1328,7 +1488,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [4, 6, 8],
     columns: 2,
     generator: meanMedianModeRange,
-    params: { size: [4, 7], maxValue: 20, oddOnly: false, ask: ["mean"] },
+    levels: {
+      1: { size: [3, 5], maxValue: 10, oddOnly: false, ask: ["mean"] },
+      2: { size: [4, 7], maxValue: 20, oddOnly: false, ask: ["mean"] },
+      3: { size: [5, 8], maxValue: 50, oddOnly: false, ask: ["mean"] },
+    },
     example: {
       show: math("$4, 7, 2, 7, 10$: mean $= (4 + 7 + 2 + 7 + 10) \\div 5 = 6$"),
       think: "Add all the values, then divide by how many values there are.",
@@ -1350,7 +1514,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [4, 6, 8],
     columns: 2,
     generator: meanMedianModeRange,
-    params: { size: [5, 8], maxValue: 30, oddOnly: false, ask: ["median"] },
+    levels: {
+      1: { size: [5, 7], maxValue: 20, oddOnly: true, ask: ["median"] },
+      2: { size: [5, 8], maxValue: 30, oddOnly: false, ask: ["median"] },
+      3: { size: [7, 10], maxValue: 50, oddOnly: false, ask: ["median"] },
+    },
     example: {
       show: math("$9, 3, 12, 5, 8, 6$ → $3, 5, 6, 8, 9, 12$: median $= (6 + 8) \\div 2 = 7$"),
       think: "Put the data in order first. With an even count, the median is halfway between the two middle values.",
@@ -1372,7 +1540,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [4, 6, 8],
     columns: 2,
     generator: meanMedianModeRange,
-    params: { size: [5, 8], maxValue: 30, oddOnly: false, ask: ["mode", "range"] },
+    levels: {
+      1: { size: [4, 6], maxValue: 20, oddOnly: false, ask: ["mode", "range"] },
+      2: { size: [5, 8], maxValue: 30, oddOnly: false, ask: ["mode", "range"] },
+      3: { size: [7, 10], maxValue: 60, oddOnly: false, ask: ["mode", "range"] },
+    },
     example: {
       show: math("$4, 7, 2, 7, 10$: mode $= 7$, range $= 10 - 2 = 8$"),
       think: "The mode is the value that appears most often. The range is the greatest value minus the least value.",
@@ -1428,7 +1600,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [8, 12, 14],
     columns: 2,
     generator: orderOfOperations,
-    params: { operands: [3, 4], maxOperand: 12, parens: false, maxResult: 100 },
+    levels: {
+      1: { operands: [3, 3], maxOperand: 10, parens: false, maxResult: 50 },
+      2: { operands: [3, 4], maxOperand: 12, parens: false, maxResult: 100 },
+      3: { operands: [4, 5], maxOperand: 15, parens: false, maxResult: 200 },
+    },
     example: {
       show: math("$6 + 4 \\times 3 = 6 + 12 = 18$"),
       think: "Multiply and divide before you add and subtract.",
@@ -1450,7 +1626,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [8, 12, 14],
     columns: 2,
     generator: orderOfOperations,
-    params: { operands: [3, 4], maxOperand: 12, parens: true, maxResult: 150 },
+    levels: {
+      1: { operands: [3, 3], maxOperand: 10, parens: true, maxResult: 100 },
+      2: { operands: [3, 4], maxOperand: 12, parens: true, maxResult: 150 },
+      3: { operands: [4, 5], maxOperand: 15, parens: true, maxResult: 300 },
+    },
     example: {
       show: math("$(8 - 3) \\times 4 + 2 = 5 \\times 4 + 2 = 20 + 2 = 22$"),
       think: "Parentheses first, then multiply and divide, then add and subtract from left to right.",
@@ -1504,7 +1684,11 @@ export const GRADE_5: WorksheetDef[] = [
     counts: [6, 8, 10],
     columns: 2,
     generator: evaluateExpressions,
-    params: { forms: ["linear"] },
+    levels: {
+      1: { forms: ["linear"], xMax: 5, bMax: 10 },
+      2: { forms: ["linear"] },
+      3: { forms: ["linear", "parens"] },
+    },
     example: {
       show: math("$3x + 5$ when $x = 4$: $3 \\times 4 + 5 = 17$"),
       think: "Replace the variable with its value. $3x$ means 3 times $x$.",

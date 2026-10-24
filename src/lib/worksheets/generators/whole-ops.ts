@@ -29,16 +29,20 @@ function noRegroupPair(rng: Rng, topLen: number, bottomLen: number, op: "+" | "-
 }
 
 /**
- * A carry starts where a column's digits sum past 9; a borrow starts where the
- * top digit is smaller. Either way, some column has to regroup.
+ * How many columns regroup: a column carries when its digits (plus any carry
+ * coming in) sum past 9, and borrows when its top digit (less any borrow
+ * already taken) is smaller.
  */
-function regroups(a: number, b: number, op: "+" | "-"): boolean {
+function regroupCount(a: number, b: number, op: "+" | "-"): number {
+  let count = 0;
+  let carry = 0;
   for (let p = 1; p <= Math.max(a, b); p *= 10) {
     const x = Math.floor(a / p) % 10;
     const y = Math.floor(b / p) % 10;
-    if (op === "+" ? x + y >= 10 : x < y) return true;
+    carry = (op === "+" ? x + y + carry >= 10 : x - carry < y) ? 1 : 0;
+    count += carry;
   }
-  return false;
+  return count;
 }
 
 // Every digit between the lead and the ones is 0 (503, 7,006), and the ones
@@ -56,11 +60,11 @@ export const addSubtract: Generator<{
   digits: readonly [number, number];
   op: "+" | "-" | "mixed";
   regroup: boolean;
-  /** With `regroup`: every problem regroups at least once. */
-  mustRegroup?: boolean;
+  /** With `regroup`: every problem regroups in at least this many columns. */
+  minRegroups?: number;
   /** Subtraction from numbers like 400 or 503. */
   acrossZeros?: boolean;
-}> = (rng, { digits, op: opParam, regroup, mustRegroup, acrossZeros }) => {
+}> = (rng, { digits, op: opParam, regroup, minRegroups = 0, acrossZeros }) => {
   const op = opParam === "mixed" ? pick(rng, ["+", "-"] as const) : opParam;
   let a: number;
   let b: number;
@@ -75,7 +79,7 @@ export const addSubtract: Generator<{
     } else {
       [a, b] = noRegroupPair(rng, digits[0], digits[1], op);
     }
-  } while ((op === "-" && a === b) || (mustRegroup && !regroups(a, b, op)));
+  } while ((op === "-" && a === b) || (minRegroups > 0 && regroupCount(a, b, op) < minRegroups));
   const result = op === "+" ? a + b : a - b;
 
   return {
@@ -210,9 +214,11 @@ export const factPowers: Generator<{
   powers: readonly number[];
   /** Both factors end in zeros (30 × 40). */
   bothTens?: boolean;
-}> = (rng, { op, powers, bothTens }) => {
-  const x = randInt(rng, 2, 9);
-  const y = randInt(rng, 2, 9);
+  /** Largest digit in the basic fact. */
+  factMax?: number;
+}> = (rng, { op, powers, bothTens, factMax = 9 }) => {
+  const x = randInt(rng, 2, factMax);
+  const y = randInt(rng, 2, factMax);
   const big = y * 10 ** pick(rng, powers);
   if (op === "/") {
     const dividend = x * big;
@@ -234,8 +240,8 @@ export const factPowers: Generator<{
 type Op = keyof typeof SYMBOL;
 
 // Two numbers for `op`: + and − within `max` (each part at least a tenth of
-// it), × and ÷ within the 10 × 10 facts.
-function opPair(rng: Rng, op: Op, max: number, zero: boolean): { a: number; b: number; result: number } {
+// it), × and ÷ within the `factMax` × `factMax` facts.
+function opPair(rng: Rng, op: Op, max: number, factMax: number, zero: boolean): { a: number; b: number; result: number } {
   if (op === "+") {
     const result = randInt(rng, Math.ceil(max / 5), max);
     const a = randInt(rng, Math.ceil(result / 10), result - Math.ceil(result / 10));
@@ -247,12 +253,12 @@ function opPair(rng: Rng, op: Op, max: number, zero: boolean): { a: number; b: n
     return { a, b, result: a - b };
   }
   if (op === "*") {
-    const a = randInt(rng, zero ? 0 : 1, 10);
-    const b = randInt(rng, zero ? 0 : 1, 10);
+    const a = randInt(rng, zero ? 0 : 1, factMax);
+    const b = randInt(rng, zero ? 0 : 1, factMax);
     return { a, b, result: a * b };
   }
-  const b = randInt(rng, 1, 10);
-  const result = randInt(rng, zero ? 0 : 1, 10);
+  const b = randInt(rng, 1, factMax);
+  const result = randInt(rng, zero ? 0 : 1, factMax);
   return { a: b * result, b, result };
 }
 
@@ -260,9 +266,11 @@ export const missingNumber: Generator<{
   ops: readonly Op[];
   /** Largest sum or starting number for + and −. */
   max: number;
-}> = (rng, { ops, max }) => {
+  /** Largest factor, divisor or quotient for × and ÷. */
+  factMax?: number;
+}> = (rng, { ops, max, factMax = 10 }) => {
   const op = pick(rng, ops);
-  const { a, b, result } = opPair(rng, op, max, false);
+  const { a, b, result } = opPair(rng, op, max, factMax, false);
   const unknown = pick(rng, ["a", "b"] as const);
   const show = (n: number, hide: boolean) => (hide ? "\\square" : latexNumber(n));
 
@@ -279,7 +287,7 @@ export const missingNumber: Generator<{
 
 export const fourOperations: Generator<{ addMax: number }> = (rng, { addMax }) => {
   const op = pick(rng, ["+", "-", "*", "/"] as const);
-  const { a, b, result } = opPair(rng, op, addMax, true);
+  const { a, b, result } = opPair(rng, op, addMax, 10, true);
   return {
     body: { kind: "text", text: `$${latexNumber(a)} ${SYMBOL[op]} ${latexNumber(b)} =$`, blank: "inline" },
     answer: formatNumber(result),
@@ -345,7 +353,9 @@ export const multiply: Generator<{
   zeroInTop?: boolean;
   /** Bottom number is a multiple of ten (e.g. 34 × 20). */
   bottomTens?: boolean;
-}> = (rng, { topDigits, bottomDigits, zeroInTop, bottomTens }) => {
+  /** Range of a one-digit bottom number. */
+  bottom?: readonly [number, number];
+}> = (rng, { topDigits, bottomDigits, zeroInTop, bottomTens, bottom = [2, 9] }) => {
   let a = randDigits(rng, topDigits);
   if (zeroInTop && topDigits >= 3) {
     const s = [...String(a)];
@@ -355,7 +365,7 @@ export const multiply: Generator<{
   const b = bottomTens
     ? randInt(rng, 1, 9) * 10
     : bottomDigits === 1
-      ? randInt(rng, 2, 9)
+      ? randInt(rng, bottom[0], bottom[1])
       : randDigits(rng, bottomDigits);
   const result = a * b;
 
@@ -369,8 +379,10 @@ export const multiply: Generator<{
 export const longDivision: Generator<{
   dividendDigits: readonly [number, number];
   remainder: "none" | "some" | "mixed";
-}> = (rng, { dividendDigits, remainder }) => {
-  const divisor = randInt(rng, 2, 9);
+  /** Range of the one-digit divisor. */
+  divisors?: readonly [number, number];
+}> = (rng, { dividendDigits, remainder, divisors = [2, 9] }) => {
+  const divisor = randInt(rng, divisors[0], divisors[1]);
   const len = randInt(rng, dividendDigits[0], dividendDigits[1]);
   const withRemainder = remainder === "some" || (remainder === "mixed" && rng() < 0.6);
   let dividend: number;

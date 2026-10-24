@@ -88,7 +88,11 @@ const multiplyBy = (k: number) =>
     counts: [8, 12, 16],
     columns: 2,
     generator: tableFacts,
-    params: { op: "*", tables: [k] },
+    levels: {
+      1: { op: "*", tables: [k], max: 5 },
+      2: { op: "*", tables: [k] },
+      3: { op: "*", tables: [k], missing: true },
+    },
     example: TIMES_EXAMPLES[k],
   });
 
@@ -114,7 +118,11 @@ const divideBy = (k: number) =>
     counts: [8, 10, 14],
     columns: 2,
     generator: tableFacts,
-    params: { op: "/", tables: [k] },
+    levels: {
+      1: { op: "/", tables: [k], max: 5 },
+      2: { op: "/", tables: [k] },
+      3: { op: "/", tables: [k], max: 12 },
+    },
     example: DIVIDE_EXAMPLES[k],
   });
 
@@ -136,7 +144,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: placeName,
-    params: { digits: [3, 5] },
+    levels: {
+      1: { digits: [2, 3] },
+      2: { digits: [3, 5] },
+      3: { digits: [4, 5] },
+    },
     example: {
       show: math("$4{,}\\underline{6}52$ → hundreds"),
       think: "Count the places from the right: ones, tens, hundreds. The 6 is in the hundreds place.",
@@ -186,7 +198,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [3, 4, 5],
     columns: 1,
     generator: numberForms,
-    params: { tasks: ["to-unit", "unit-to-standard"], digits: [3, 4] },
+    levels: {
+      1: { tasks: ["to-unit", "unit-to-standard"], digits: [3, 3] },
+      2: { tasks: ["to-unit", "unit-to-standard"], digits: [3, 4] },
+      3: { tasks: ["to-unit", "unit-to-standard"], digits: [4, 5] },
+    },
     example: {
       show: math("$4{,}305$ = 4 thousands, 3 hundreds, 5 ones"),
       think: "Say how many of each place there are. There are 0 tens, so the tens are left out.",
@@ -244,7 +260,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [5, 7, 9],
     columns: 1,
     generator: convertPlaces,
-    params: { tasks: ["to-smaller", "to-larger", "regroup"] },
+    levels: {
+      1: { tasks: ["to-smaller", "to-larger"], places: [2, 2] },
+      2: { tasks: ["to-smaller", "to-larger", "regroup"] },
+      3: { tasks: ["to-smaller", "to-larger", "regroup"], places: [3, 4] },
+    },
     example: {
       show: math("4 hundreds = 40 tens", "2 hundreds 5 tens = 25 tens"),
       think: "1 hundred is 10 tens, so 4 hundreds is $4 \\times 10 = 40$ tens, and 2 hundreds 5 tens is $20 + 5 = 25$ tens.",
@@ -266,7 +286,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: evenOdd,
-    params: { digits: [2, 4] },
+    levels: {
+      1: { digits: [1, 2] },
+      2: { digits: [2, 4] },
+      3: { digits: [4, 6] },
+    },
     example: {
       show: math("$4{,}318$ → even", "$275$ → odd"),
       think: "Only the ones digit matters. Even numbers end in 0, 2, 4, 6, or 8.",
@@ -322,7 +346,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [3, 4, 5],
     columns: 1,
     generator: orderValues,
-    params: { values: { kind: "whole", digits: [3, 4], close: true }, direction: "either" },
+    levels: {
+      1: { values: { kind: "whole", digits: [2, 3], close: false }, direction: "asc" },
+      2: { values: { kind: "whole", digits: [3, 4], close: true }, direction: "either" },
+      3: { values: { kind: "whole", digits: [4, 6], close: true, mixedLengths: true }, direction: "either" },
+    },
     example: {
       show: math("$2{,}354 < 2{,}435 < 2{,}453 < 3{,}245$"),
       think: "Compare the thousands first. When they match, compare the hundreds, then the tens.",
@@ -344,7 +372,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [3, 4, 5],
     columns: 1,
     generator: makeNumber,
-    params: { digits: [3, 4] },
+    levels: {
+      1: { digits: [3, 3] },
+      2: { digits: [3, 4] },
+      3: { digits: [5, 6] },
+    },
     example: {
       show: math("$4,\\ 0,\\ 7,\\ 2$ → greatest $7{,}420$, least $2{,}047$"),
       think: "Greatest: put the digits from biggest to smallest. Least: smallest first — but a number can't start with 0.",
@@ -368,7 +400,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [4, 6, 8],
     columns: 2,
     generator: rounding,
-    params: { digits: [2, 3], places: [10], short: true },
+    levels: {
+      1: { digits: [2, 2], places: [10], short: true },
+      2: { digits: [2, 3], places: [10], short: true },
+      3: { digits: [3, 4], places: [10], short: true },
+    },
     example: {
       show: math("Round $347$ to the nearest ten: $347 \\rightarrow 350$"),
       think: "347 is between 340 and 350. The ones digit is 7, and $7 \\ge 5$, so round up to 350.",
@@ -380,8 +416,8 @@ export const GRADE_3: WorksheetDef[] = [
     slug: "round-to-hundreds",
     title: { en: "Round to the Nearest Hundred", ko: "몇백으로 반올림하기" },
     description: {
-      en: "Round 3-digit numbers to the nearest hundred.",
-      ko: "세 자리 수를 가장 가까운 몇백으로 반올림하기",
+      en: "Round 3- and 4-digit numbers to the nearest hundred.",
+      ko: "세 자리, 네 자리 수를 가장 가까운 몇백으로 반올림하기",
     },
     instructions: "Round each number.",
     category: "수·연산",
@@ -390,7 +426,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [3, 4, 5],
     columns: 1,
     generator: rounding,
-    params: { digits: [3, 3], places: [100], short: true },
+    levels: {
+      1: { digits: [3, 3], places: [100], short: true },
+      2: { digits: [3, 4], places: [100], short: true },
+      3: { digits: [4, 6], places: [100], short: true },
+    },
     example: {
       show: math("Round $682$ to the nearest hundred: $682 \\rightarrow 700$"),
       think: "682 is between 600 and 700. The tens digit is 8, and $8 \\ge 5$, so round up to 700.",
@@ -412,7 +452,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [3, 4, 5],
     columns: 1,
     generator: rounding,
-    params: { digits: [3, 4], places: [10, 100], short: true },
+    levels: {
+      1: { digits: [2, 3], places: [10, 100], short: true },
+      2: { digits: [3, 4], places: [10, 100], short: true },
+      3: { digits: [4, 6], places: [10, 100], short: true },
+    },
     example: {
       show: math("Nearest ten: $2{,}463 \\rightarrow 2{,}460$", "Nearest hundred: $2{,}463 \\rightarrow 2{,}500$"),
       think: "Look at the digit just to the right of the rounding place. If it is 5 or more, round up; if not, round down.",
@@ -434,11 +478,21 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [6, 8, 10],
     columns: 2,
     generator: estimate,
-    params: {
-      cases: [
-        { digits: 2, place: 10, op: "+" },
-        { digits: 3, place: 100, op: "+" },
-      ],
+    levels: {
+      1: { cases: [{ digits: 2, place: 10, op: "+" }] },
+      2: {
+        cases: [
+          { digits: 2, place: 10, op: "+" },
+          { digits: 3, place: 100, op: "+" },
+        ],
+      },
+      3: {
+        cases: [
+          { digits: 3, place: 10, op: "+" },
+          { digits: 4, place: 100, op: "+" },
+          { digits: 4, place: 1000, op: "+" },
+        ],
+      },
     },
     example: {
       show: math("$47 + 32$ → $50 + 30 = 80$", "$387 + 241$ → $400 + 200 = 600$"),
@@ -461,11 +515,21 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [6, 8, 10],
     columns: 2,
     generator: estimate,
-    params: {
-      cases: [
-        { digits: 2, place: 10, op: "-" },
-        { digits: 3, place: 100, op: "-" },
-      ],
+    levels: {
+      1: { cases: [{ digits: 2, place: 10, op: "-" }] },
+      2: {
+        cases: [
+          { digits: 2, place: 10, op: "-" },
+          { digits: 3, place: 100, op: "-" },
+        ],
+      },
+      3: {
+        cases: [
+          { digits: 3, place: 10, op: "-" },
+          { digits: 4, place: 100, op: "-" },
+          { digits: 4, place: 1000, op: "-" },
+        ],
+      },
     },
     example: {
       show: math("$83 - 28$ → $80 - 30 = 50$", "$712 - 386$ → $700 - 400 = 300$"),
@@ -488,13 +552,29 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [6, 8, 10],
     columns: 2,
     generator: estimate,
-    params: {
-      cases: [
-        { digits: 3, place: 10, op: "+" },
-        { digits: 3, place: 10, op: "-" },
-        { digits: 3, place: 100, op: "+" },
-        { digits: 3, place: 100, op: "-" },
-      ],
+    levels: {
+      1: {
+        cases: [
+          { digits: 2, place: 10, op: "+" },
+          { digits: 2, place: 10, op: "-" },
+        ],
+      },
+      2: {
+        cases: [
+          { digits: 3, place: 10, op: "+" },
+          { digits: 3, place: 10, op: "-" },
+          { digits: 3, place: 100, op: "+" },
+          { digits: 3, place: 100, op: "-" },
+        ],
+      },
+      3: {
+        cases: [
+          { digits: 4, place: 100, op: "+" },
+          { digits: 4, place: 100, op: "-" },
+          { digits: 4, place: 1000, op: "+" },
+          { digits: 4, place: 1000, op: "-" },
+        ],
+      },
     },
     example: {
       show: math("Nearest ten: $347 + 128$ → $350 + 130 = 480$", "Nearest hundred: $628 - 174$ → $600 - 200 = 400$"),
@@ -519,7 +599,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 4,
     generator: addSubtract,
-    params: { digits: [3, 3], op: "+", regroup: false },
+    levels: {
+      1: { digits: [2, 2], op: "+", regroup: false },
+      2: { digits: [3, 3], op: "+", regroup: false },
+      3: { digits: [4, 4], op: "+", regroup: false },
+    },
     example: {
       show: { kind: "vertical", operator: "+", top: "352", bottom: "416", align: "right" },
       think: "Add each place, starting with the ones: $2 + 6 = 8$, $5 + 1 = 6$, $3 + 4 = 7$.",
@@ -541,7 +625,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 4,
     generator: addSubtract,
-    params: { digits: [3, 3], op: "+", regroup: true, mustRegroup: true },
+    levels: {
+      1: { digits: [2, 2], op: "+", regroup: true, minRegroups: 1 },
+      2: { digits: [3, 3], op: "+", regroup: true, minRegroups: 1 },
+      3: { digits: [3, 3], op: "+", regroup: true, minRegroups: 2 },
+    },
     example: {
       show: { kind: "vertical", operator: "+", top: "368", bottom: "275", align: "right" },
       think: "$8 + 5 = 13$: write 3, carry 1 ten. $1 + 6 + 7 = 14$: write 4, carry 1 hundred. $1 + 3 + 2 = 6$.",
@@ -563,7 +651,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [10, 16, 20],
     columns: 2,
     generator: missingNumber,
-    params: { ops: ["+"], max: 999 },
+    levels: {
+      1: { ops: ["+"], max: 100 },
+      2: { ops: ["+"], max: 999 },
+      3: { ops: ["+"], max: 9999 },
+    },
     example: {
       show: math("$245 + \\boxed{138} = 383$"),
       think: "Subtract to find the missing part: $383 - 245 = 138$.",
@@ -585,7 +677,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: addThree,
-    params: { digits: [2, 3] },
+    levels: {
+      1: { digits: [1, 2] },
+      2: { digits: [2, 3] },
+      3: { digits: [3, 3] },
+    },
     example: {
       show: math("$125 + 48 + 302 = 475$"),
       think: "Add two of the numbers first ($125 + 48 = 173$), then add the third ($173 + 302 = 475$).",
@@ -607,7 +703,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 4,
     generator: addSubtract,
-    params: { digits: [4, 4], op: "+", regroup: true },
+    levels: {
+      1: { digits: [4, 4], op: "+", regroup: false },
+      2: { digits: [4, 4], op: "+", regroup: true },
+      3: { digits: [4, 4], op: "+", regroup: true, minRegroups: 3 },
+    },
     example: {
       show: { kind: "vertical", operator: "+", top: "4675", bottom: "2548", align: "right" },
       think: "Add place by place from the ones, carrying whenever a column adds up to 10 or more.",
@@ -629,7 +729,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [5, 7, 9],
     columns: 1,
     generator: properties,
-    params: { op: "+", kinds: ["commutative", "identity", "associative"] },
+    levels: {
+      1: { op: "+", kinds: ["commutative", "identity"] },
+      2: { op: "+", kinds: ["commutative", "identity", "associative"] },
+      3: { op: "+", kinds: ["commutative", "associative"] },
+    },
     example: {
       show: math(
         "$23 + 58 = 58 + \\boxed{23}$",
@@ -657,7 +761,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 4,
     generator: addSubtract,
-    params: { digits: [3, 3], op: "-", regroup: false },
+    levels: {
+      1: { digits: [2, 2], op: "-", regroup: false },
+      2: { digits: [3, 3], op: "-", regroup: false },
+      3: { digits: [4, 4], op: "-", regroup: false },
+    },
     example: {
       show: { kind: "vertical", operator: "−", top: "587", bottom: "243", align: "right" },
       think: "Subtract each place, starting with the ones: $7 - 3 = 4$, $8 - 4 = 4$, $5 - 2 = 3$.",
@@ -679,7 +787,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 4,
     generator: addSubtract,
-    params: { digits: [3, 3], op: "-", regroup: true, mustRegroup: true },
+    levels: {
+      1: { digits: [2, 2], op: "-", regroup: true, minRegroups: 1 },
+      2: { digits: [3, 3], op: "-", regroup: true, minRegroups: 1 },
+      3: { digits: [3, 3], op: "-", regroup: true, minRegroups: 2 },
+    },
     example: {
       show: { kind: "vertical", operator: "−", top: "642", bottom: "378", align: "right" },
       think: "$2 < 8$: regroup 1 ten as 10 ones, $12 - 8 = 4$. $3 < 7$: regroup 1 hundred, $13 - 7 = 6$. Then $5 - 3 = 2$.",
@@ -701,7 +813,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 4,
     generator: addSubtract,
-    params: { digits: [3, 3], op: "-", regroup: true, acrossZeros: true },
+    levels: {
+      1: { digits: [3, 2], op: "-", regroup: true, acrossZeros: true },
+      2: { digits: [3, 3], op: "-", regroup: true, acrossZeros: true },
+      3: { digits: [4, 4], op: "-", regroup: true, acrossZeros: true },
+    },
     example: {
       show: { kind: "vertical", operator: "−", top: "503", bottom: "278", align: "right" },
       think: "There are no tens to take, so regroup 1 hundred as 10 tens, then 1 ten as 10 ones: $13 - 8 = 5$, $9 - 7 = 2$, $4 - 2 = 2$.",
@@ -723,7 +839,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [10, 14, 18],
     columns: 2,
     generator: missingNumber,
-    params: { ops: ["-"], max: 999 },
+    levels: {
+      1: { ops: ["-"], max: 100 },
+      2: { ops: ["-"], max: 999 },
+      3: { ops: ["-"], max: 9999 },
+    },
     example: {
       show: math("$\\boxed{512} - 175 = 337$", "$512 - \\boxed{175} = 337$"),
       think: "A missing starting number: add, $337 + 175 = 512$. A missing number taken away: subtract, $512 - 337 = 175$.",
@@ -745,7 +865,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 4,
     generator: addSubtract,
-    params: { digits: [4, 4], op: "-", regroup: true },
+    levels: {
+      1: { digits: [4, 4], op: "-", regroup: false },
+      2: { digits: [4, 4], op: "-", regroup: true },
+      3: { digits: [4, 4], op: "-", regroup: true, minRegroups: 3 },
+    },
     example: {
       show: { kind: "vertical", operator: "−", top: "7251", bottom: "3486", align: "right" },
       think: "Work from the ones to the thousands, regrouping from the next place whenever the top digit is smaller.",
@@ -805,7 +929,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [6, 8, 10],
     columns: 1,
     generator: repeatedAddition,
-    params: { maxAddend: 9, maxTimes: 5 },
+    levels: {
+      1: { maxAddend: 5, maxTimes: 4 },
+      2: { maxAddend: 9, maxTimes: 5 },
+      3: { maxAddend: 12, maxTimes: 6 },
+    },
     example: {
       show: math("$6 + 6 + 6 + 6 = 4 \\times 6 = 24$"),
       think: "There are 4 groups of 6, so adding four 6s is the same as $4 \\times 6$.",
@@ -827,7 +955,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: properties,
-    params: { op: "*", kinds: ["commutative", "identity", "zero", "associative", "distributive"] },
+    levels: {
+      1: { op: "*", kinds: ["commutative", "identity", "zero"] },
+      2: { op: "*", kinds: ["commutative", "identity", "zero", "associative", "distributive"] },
+      3: { op: "*", kinds: ["associative", "distributive"] },
+    },
     example: {
       show: math(
         "$6 \\times 8 = 8 \\times \\boxed{6}$",
@@ -853,7 +985,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: multiplyThree,
-    params: { smallMax: 5 },
+    levels: {
+      1: { smallMax: 3 },
+      2: { smallMax: 5 },
+      3: { smallMax: 9 },
+    },
     example: {
       show: math("$2 \\times 7 \\times 5 = 2 \\times 5 \\times 7 = 10 \\times 7 = 70$"),
       think: "You can multiply in any order. Look for an easy pair first, like $2 \\times 5 = 10$.",
@@ -875,7 +1011,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: multiplyTens,
-    params: { max: 9 },
+    levels: {
+      1: { max: 5 },
+      2: { max: 9 },
+      3: { max: 12 },
+    },
     example: {
       show: math("$4 \\times 30 = 120$"),
       think: "Use the fact $4 \\times 3 = 12$. 30 is 3 tens, so $4 \\times 30$ is 12 tens, or 120.",
@@ -897,7 +1037,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 4,
     generator: multiply,
-    params: { topDigits: 2, bottomDigits: 1 },
+    levels: {
+      1: { topDigits: 2, bottomDigits: 1, bottom: [2, 5] },
+      2: { topDigits: 2, bottomDigits: 1 },
+      3: { topDigits: 2, bottomDigits: 1, bottom: [6, 9] },
+    },
     example: {
       show: { kind: "vertical", operator: "×", top: "46", bottom: "3", align: "right" },
       think: "$6 \\times 3 = 18$: write 8, carry 1. $4 \\times 3 = 12$, plus the 1 carried is 13.",
@@ -922,7 +1066,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: tableFacts,
-    params: { op: "*", tables: [0, 1] },
+    levels: {
+      1: { op: "*", tables: [0, 1], max: 5 },
+      2: { op: "*", tables: [0, 1] },
+      3: { op: "*", tables: [0, 1], max: 99 },
+    },
     example: {
       show: math("$0 \\times 8 = 0$", "$1 \\times 8 = 8$"),
       think: "Zero groups of 8 is 0. One group of 8 is just 8.",
@@ -945,7 +1093,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: tableFacts,
-    params: { op: "*", tables: [2, 3, 4, 5, 10] },
+    levels: {
+      1: { op: "*", tables: [2, 3, 4, 5, 10], max: 5 },
+      2: { op: "*", tables: [2, 3, 4, 5, 10] },
+      3: { op: "*", tables: [2, 3, 4, 5, 10], missing: true },
+    },
     example: {
       show: math("$5 \\times 7 = 35$", "$4 \\times 9 = 36$"),
       think: "Use what you know: count by 5s, or double a 2s fact: $2 \\times 9 = 18$ and $18 + 18 = 36$.",
@@ -967,7 +1119,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: tableFacts,
-    params: { op: "*", tables: [6, 7, 8, 9] },
+    levels: {
+      1: { op: "*", tables: [6, 7, 8, 9], max: 5 },
+      2: { op: "*", tables: [6, 7, 8, 9] },
+      3: { op: "*", tables: [6, 7, 8, 9], missing: true },
+    },
     example: {
       show: math("$7 \\times 6 = 42$", "$9 \\times 8 = 72$"),
       think: "Break a hard fact into easier ones: $5 \\times 6 = 30$ and $2 \\times 6 = 12$, so $7 \\times 6 = 42$.",
@@ -1025,7 +1181,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [10, 16, 20],
     columns: 2,
     generator: tableFacts,
-    params: { op: "*", tables: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], missing: true },
+    levels: {
+      1: { op: "*", tables: [2, 3, 4, 5, 10], missing: true },
+      2: { op: "*", tables: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], missing: true },
+      3: { op: "*", tables: [6, 7, 8, 9], missing: true },
+    },
     example: {
       show: math("$7 \\times \\boxed{8} = 56$"),
       think: "Ask: 7 times what is 56? Count by 7s, or think $56 \\div 7 = 8$.",
@@ -1050,7 +1210,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: tableFacts,
-    params: { op: "/", tables: [2, 3, 4, 5, 10] },
+    levels: {
+      1: { op: "/", tables: [2, 3, 4, 5, 10], max: 5 },
+      2: { op: "/", tables: [2, 3, 4, 5, 10] },
+      3: { op: "/", tables: [2, 3, 4, 5, 10], missing: true },
+    },
     example: {
       show: math("$35 \\div 5 = 7$"),
       think: "Think of the multiplication fact: $5 \\times 7 = 35$.",
@@ -1072,7 +1236,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: tableFacts,
-    params: { op: "/", tables: [6, 7, 8, 9] },
+    levels: {
+      1: { op: "/", tables: [6, 7, 8, 9], max: 5 },
+      2: { op: "/", tables: [6, 7, 8, 9] },
+      3: { op: "/", tables: [6, 7, 8, 9], missing: true },
+    },
     example: {
       show: math("$54 \\div 9 = 6$"),
       think: "Ask: 9 times what is 54? $9 \\times 6 = 54$.",
@@ -1130,7 +1298,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [6, 8, 10],
     columns: 1,
     generator: factFamily,
-    params: { max: 10 },
+    levels: {
+      1: { max: 5 },
+      2: { max: 10 },
+      3: { max: 12 },
+    },
     example: {
       show: math("If $6 \\times 7 = 42$, then $42 \\div 7 = \\boxed{6}$"),
       think: "Multiplication and division undo each other: 42 split into groups of 7 makes 6 groups.",
@@ -1154,7 +1326,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: fourOperations,
-    params: { addMax: 100 },
+    levels: {
+      1: { addMax: 20 },
+      2: { addMax: 100 },
+      3: { addMax: 1000 },
+    },
     example: {
       show: math("$56 + 27 = 83$", "$8 \\times 7 = 56$"),
       think: "Look at the sign first. Add and subtract by place value; multiply and divide with the facts.",
@@ -1176,7 +1352,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [10, 16, 20],
     columns: 2,
     generator: missingNumber,
-    params: { ops: ["*", "/"], max: 100 },
+    levels: {
+      1: { ops: ["*", "/"], max: 100, factMax: 5 },
+      2: { ops: ["*", "/"], max: 100 },
+      3: { ops: ["*", "/"], max: 100, factMax: 12 },
+    },
     example: {
       show: math("$\\boxed{6} \\times 4 = 24$", "$\\boxed{42} \\div 7 = 6$"),
       think: "Use the related fact: $24 \\div 4 = 6$, and $6 \\times 7 = 42$.",
@@ -1198,7 +1378,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [10, 16, 20],
     columns: 2,
     generator: missingNumber,
-    params: { ops: ["+", "-", "*", "/"], max: 100 },
+    levels: {
+      1: { ops: ["+", "-", "*", "/"], max: 20, factMax: 5 },
+      2: { ops: ["+", "-", "*", "/"], max: 100 },
+      3: { ops: ["+", "-", "*", "/"], max: 1000, factMax: 12 },
+    },
     example: {
       show: math("$35 + \\boxed{18} = 53$", "$\\boxed{9} \\times 6 = 54$"),
       think: "Undo the operation: $53 - 35 = 18$, and $54 \\div 6 = 9$.",
@@ -1222,7 +1406,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [6, 8],
     columns: 2,
     generator: fractionModel,
-    params: { denominators: [2, 3, 4, 5, 6, 8], improper: false, unit: true },
+    levels: {
+      1: { denominators: [2, 3, 4], improper: false, unit: true },
+      2: { denominators: [2, 3, 4, 5, 6, 8], improper: false, unit: true },
+      3: { denominators: [6, 8, 10, 12], improper: false, unit: true },
+    },
     example: {
       show: {
         kind: "figure",
@@ -1291,7 +1479,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [6, 8, 10],
     columns: 2,
     generator: fractionInWords,
-    params: { denominators: [2, 3, 4, 5, 6, 8, 10, 12] },
+    levels: {
+      1: { denominators: [2, 3, 4] },
+      2: { denominators: [2, 3, 4, 5, 6, 8, 10, 12] },
+      3: { denominators: [6, 8, 10, 12] },
+    },
     example: {
       show: math("$\\frac{3}{4}$ = three-fourths", "five-eighths = $\\frac{5}{8}$"),
       think: "Say the numerator as a number, then name the parts: halves, thirds, fourths, fifths, sixths, eighths, and so on.",
@@ -1313,7 +1505,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [6, 8, 10],
     columns: 2,
     generator: unitFractionSums,
-    params: { denominators: [2, 3, 4, 5, 6, 8], maxTerms: 6 },
+    levels: {
+      1: { denominators: [2, 3, 4], maxTerms: 3 },
+      2: { denominators: [2, 3, 4, 5, 6, 8], maxTerms: 6 },
+      3: { denominators: [5, 6, 8, 10, 12], maxTerms: 6 },
+    },
     example: {
       show: math("$\\frac{1}{6} + \\frac{1}{6} + \\frac{1}{6} = \\frac{3}{6}$"),
       think: "Count the unit fractions: three sixths make $\\frac{3}{6}$.",
@@ -1335,7 +1531,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: fractionsAsWholes,
-    params: { denominators: [2, 3, 4, 6, 8], wholeMax: 4 },
+    levels: {
+      1: { denominators: [2, 3, 4], wholeMax: 3 },
+      2: { denominators: [2, 3, 4, 6, 8], wholeMax: 4 },
+      3: { denominators: [3, 4, 5, 6, 8, 10, 12], wholeMax: 8 },
+    },
     example: {
       show: math("$\\frac{12}{4} = \\boxed{3}$", "$2 = \\frac{\\boxed{6}}{3}$"),
       think: "4 fourths make 1 whole, so 12 fourths make 3 wholes. 2 wholes cut into thirds make 6 thirds.",
@@ -1359,7 +1559,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: equivalentFractions,
-    params: { denominators: [2, 3, 4, 5, 6], multipliers: [2, 2], direction: "up" },
+    levels: {
+      1: { denominators: [2, 3, 4], multipliers: [2, 2], direction: "up" },
+      2: { denominators: [2, 3, 4, 5, 6], multipliers: [2, 2], direction: "up" },
+      3: { denominators: [2, 3, 4, 5, 6, 8], multipliers: [2, 4], direction: "mixed" },
+    },
     example: {
       show: math("$\\frac{2}{3} = \\frac{\\boxed{4}}{6}$"),
       think: "Cut every third in half: thirds become sixths, so 2 thirds are 4 sixths.",
@@ -1381,7 +1585,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 10, 14],
     columns: 2,
     generator: compareFractions,
-    params: { mode: "like-den", denominators: [3, 4, 5, 6, 8, 10, 12] },
+    levels: {
+      1: { mode: "like-den", denominators: [3, 4, 5, 6] },
+      2: { mode: "like-den", denominators: [3, 4, 5, 6, 8, 10, 12] },
+      3: { mode: "like-den", denominators: [8, 10, 12] },
+    },
     example: {
       show: { kind: "compare", left: "$\\frac{2}{5}$", right: "$\\frac{4}{5}$", symbol: "<" },
       think: "The pieces are the same size, so compare the numerators: $2 < 4$.",
@@ -1403,7 +1611,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 10, 14],
     columns: 2,
     generator: compareFractions,
-    params: { mode: "like-num", denominators: [2, 3, 4, 5, 6, 8, 10, 12] },
+    levels: {
+      1: { mode: "like-num", denominators: [2, 3, 4, 6, 8] },
+      2: { mode: "like-num", denominators: [2, 3, 4, 5, 6, 8, 10, 12] },
+      3: { mode: "like-num", denominators: [5, 6, 8, 10, 12] },
+    },
     example: {
       show: { kind: "compare", left: "$\\frac{3}{4}$", right: "$\\frac{3}{8}$", symbol: ">" },
       think: "Same number of pieces, but fourths are bigger pieces than eighths, so $\\frac{3}{4} > \\frac{3}{8}$.",
@@ -1457,7 +1669,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [4, 6, 8],
     columns: 2,
     generator: orderValues,
-    params: { values: { kind: "like-fraction", denominators: [2, 3, 4, 5, 6, 8, 10, 12] }, direction: "either" },
+    levels: {
+      1: { values: { kind: "like-fraction", denominators: [2, 3, 4, 5, 6, 8] }, direction: "asc" },
+      2: { values: { kind: "like-fraction", denominators: [2, 3, 4, 5, 6, 8, 10, 12] }, direction: "either" },
+      3: { values: { kind: "like-fraction", denominators: [5, 6, 8, 10, 12] }, direction: "either" },
+    },
     example: {
       show: math(
         "$\\frac{1}{8} < \\frac{3}{8} < \\frac{5}{8} < \\frac{7}{8}$",
@@ -1552,7 +1768,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [4, 6, 8],
     columns: 1,
     generator: elapsedTime,
-    params: { unknowns: ["end"], wholeHours: false, step: 5 },
+    levels: {
+      1: { unknowns: ["end"], wholeHours: true, step: 15 },
+      2: { unknowns: ["end"], wholeHours: false, step: 5 },
+      3: { unknowns: ["end"], wholeHours: false, step: 1 },
+    },
     example: {
       show: math("Starts at 1:35 p.m. and lasts 2 hours 40 minutes → ends at 4:15 p.m."),
       think: "Add the hours first: 3:35 p.m. Then add the minutes: 25 minutes gets to 4:00, and 15 more makes 4:15.",
@@ -1574,7 +1794,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [4, 6, 8],
     columns: 1,
     generator: elapsedTime,
-    params: { unknowns: ["start"], wholeHours: false, step: 5 },
+    levels: {
+      1: { unknowns: ["start"], wholeHours: true, step: 15 },
+      2: { unknowns: ["start"], wholeHours: false, step: 5 },
+      3: { unknowns: ["start"], wholeHours: false, step: 1 },
+    },
     example: {
       show: math("Ends at 11:20 a.m. after 1 hour 45 minutes → started at 9:35 a.m."),
       think: "Count back the hour first: 10:20 a.m. Then count back 45 minutes: 20 minutes gets to 10:00, and 25 more makes 9:35.",
@@ -1633,7 +1857,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 4,
     generator: moneyOps,
-    params: { max: 999 },
+    levels: {
+      1: { max: 500 },
+      2: { max: 999 },
+      3: { max: 9999 },
+    },
     example: {
       show: math("$\\text{\\textdollar}3.45 + \\text{\\textdollar}2.78 = \\text{\\textdollar}6.23$"),
       think: "Line up the decimal points and add as if they were cents: $345 + 278 = 623$ cents, which is 6 dollars and 23 cents.",
@@ -1657,7 +1885,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: numberPatterns,
-    params: { kind: "sequence", ops: ["+"], length: 6, gaps: "inside", skip: [2, 3, 4, 5, 10, 25, 50, 100] },
+    levels: {
+      1: { kind: "sequence", ops: ["+"], length: 6, gaps: "inside", skip: [2, 5, 10, 100] },
+      2: { kind: "sequence", ops: ["+"], length: 6, gaps: "inside", skip: [2, 3, 4, 5, 10, 25, 50, 100] },
+      3: { kind: "sequence", ops: ["+"], length: 6, gaps: "inside", skip: [3, 4, 6, 7, 8, 9, 25, 50] },
+    },
     example: {
       show: math("$25,\\ 50,\\ 75,\\ \\boxed{100},\\ 125,\\ \\boxed{150}$"),
       think: "Each number is 25 more than the one before, so count by 25s: $75 + 25 = 100$ and $125 + 25 = 150$.",
@@ -1679,7 +1911,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [8, 12, 16],
     columns: 2,
     generator: numberPatterns,
-    params: { kind: "sequence", ops: ["+", "-"], length: 6, gaps: "inside" },
+    levels: {
+      1: { kind: "sequence", ops: ["+"], length: 6, gaps: "inside" },
+      2: { kind: "sequence", ops: ["+", "-"], length: 6, gaps: "inside" },
+      3: { kind: "sequence", ops: ["+", "-"], length: 6, gaps: "inside", maxStep: 25 },
+    },
     example: {
       show: math("$52,\\ 46,\\ 40,\\ \\boxed{34},\\ 28,\\ \\boxed{22}$"),
       think: "Each number is 6 less than the one before, so the rule is subtract 6: $40 - 6 = 34$ and $28 - 6 = 22$.",
@@ -1701,7 +1937,11 @@ export const GRADE_3: WorksheetDef[] = [
     counts: [4, 6, 8],
     columns: 2,
     generator: numberPatterns,
-    params: { kind: "table", ops: ["+", "-", "*"], maxK: 9, cells: 5 },
+    levels: {
+      1: { kind: "table", ops: ["+", "-"], maxK: 9, cells: 5 },
+      2: { kind: "table", ops: ["+", "-", "*"], maxK: 9, cells: 5 },
+      3: { kind: "table", ops: ["+", "-", "*", "/"], maxK: 12, cells: 5 },
+    },
     example: {
       show: math(
         "$\\begin{array}{|c|c|c|c|c|}\\hline \\text{In} & 2 & 4 & 6 & 8 \\\\ \\hline \\text{Out} & 6 & 12 & \\mathbf{18} & \\mathbf{24} \\\\ \\hline \\end{array}$",

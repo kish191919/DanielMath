@@ -234,8 +234,6 @@ export type WorksheetDef = {
   counts: readonly number[];
   /** 1 for prompts too long for one line in a half-width cell. */
   columns: 1 | 2 | 4;
-  /** Levels offered: all three, or just level 1 for a narrow skill (no level picker). */
-  levels: readonly Level[];
   /** A level without its own example uses the nearest lower level's (see exampleFor). */
   examples: { 1: WorksheetExample; 2?: WorksheetExample; 3?: WorksheetExample };
   generate: (rng: Rng, level: Level) => WorksheetProblem;

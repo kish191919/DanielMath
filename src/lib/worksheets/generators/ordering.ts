@@ -13,7 +13,8 @@ type ValueKind =
       /** Close variations may also drop a digit (1,204,516 vs 120,456). */
       mixedLengths?: boolean;
     }
-  | { kind: "decimal"; wholeMax: number }
+  /** Up to `maxPlaces` decimal places (3 by default); `count` numbers (4 by default). */
+  | { kind: "decimal"; wholeMax: number; maxPlaces?: number; count?: number }
   | { kind: "fraction"; denominators: readonly number[] }
   /** All with one denominator, or all with one numerator — compared without renaming. */
   | { kind: "like-fraction"; denominators: readonly number[] }
@@ -48,14 +49,17 @@ function wholeItems(rng: Rng, v: Extract<ValueKind, { kind: "whole" }>): Item[] 
 
 // Decimals built from the same two digits in different places (0.5, 0.45,
 // 0.405, 0.54) — the classic "longer isn't bigger" trap.
-function decimalItems(rng: Rng, wholeMax: number): Item[] {
+function decimalItems(rng: Rng, wholeMax: number, maxPlaces: number, count: number): Item[] {
   const whole = randInt(rng, 0, wholeMax);
   const a = randInt(rng, 1, 9);
   let b: number;
   do b = randInt(rng, 1, 9);
   while (b === a);
-  const fracs = shuffle(rng, [`${a}`, `${a}${b}`, `${b}${a}`, `0${a}`, `${a}0${b}`, `${b}`, `0${b}${a}`, `${a}${b}${a}`]);
-  return fracs.slice(0, 4).map((f) => ({
+  const fracs = shuffle(
+    rng,
+    [`${a}`, `${a}${b}`, `${b}${a}`, `0${a}`, `${a}0${b}`, `${b}`, `0${b}${a}`, `${a}${b}${a}`].filter((f) => f.length <= maxPlaces),
+  );
+  return fracs.slice(0, count).map((f) => ({
     value: [whole * 10 ** f.length + Number(f), 10 ** f.length],
     latex: `${whole}.${f}`,
   }));
@@ -119,7 +123,7 @@ function mixedFormItems(rng: Rng): Item[] {
 
 function makeItems(rng: Rng, values: ValueKind): Item[] {
   if (values.kind === "whole") return wholeItems(rng, values);
-  if (values.kind === "decimal") return decimalItems(rng, values.wholeMax);
+  if (values.kind === "decimal") return decimalItems(rng, values.wholeMax, values.maxPlaces ?? 3, values.count ?? 4);
   if (values.kind === "fraction") return fractionItems(rng, values.denominators);
   if (values.kind === "like-fraction") return likeFractionItems(rng, values.denominators);
   if (values.kind === "integer") return integerItems(rng, values.range);

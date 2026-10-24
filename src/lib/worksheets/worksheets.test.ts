@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { buildWorksheet, exampleFor, parseWorksheetParams } from "./build";
+import { buildWorksheet, DEFAULT_LEVEL, exampleFor, parseWorksheetParams } from "./build";
 import { getWorksheet, parseGradeSlug, skillPosition, skillsInOrder, WORKSHEET_GRADES, WORKSHEETS, worksheetsInUnit } from "./catalog";
 import { describeData, longDivisionSteps, verticalWork } from "./math";
 import { createRng, randInt } from "./rng";
-import type { ExampleShow, FigureSpec, NumberForm, PatternRule, ProblemMeta, Rational, WorksheetProblem } from "./types";
+import type { ExampleShow, FigureSpec, Level, NumberForm, PatternRule, ProblemMeta, Rational, WorksheetProblem } from "./types";
 import { unitLetter, WORKSHEET_UNITS } from "./units";
 const SEEDS = Array.from({ length: 30 }, (_, i) => `seed${i}`);
+const LEVELS: readonly Level[] = [1, 2, 3];
 
 // ── Independent re-derivation helpers (deliberately not imported from math.ts) ──
 
@@ -504,16 +505,17 @@ function checkMeta(meta: ProblemMeta, p: WorksheetProblem) {
       const text = bodyText(p);
       expect(text.startsWith(meta.direction === "asc" ? "Least to greatest: " : "Greatest to least: ")).toBe(true);
       const shown = spans(text).map(parseValue);
-      expect(shown).toHaveLength(4);
+      expect([4, 5]).toContain(shown.length);
+      expect(shown).toHaveLength(meta.values.length);
       shown.forEach((v, i) => expect(sameValue(v, meta.values[i])).toBe(true));
       // Printed out of order, in both directions.
       const sortedIn = (s: number) => shown.every((v, i) => i === 0 || s * cmp(shown[i - 1], v) < 0);
       expect(sortedIn(1) || sortedIn(-1)).toBe(false);
       const answered = p.answer.split(meta.direction === "asc" ? " < " : " > ").map(parseValue);
       const expected = [...meta.values].sort((x, y) => sign * cmp(x, y));
-      expect(answered).toHaveLength(4);
+      expect(answered).toHaveLength(shown.length);
       answered.forEach((v, i) => expect(sameValue(v, expected[i])).toBe(true));
-      for (let i = 1; i < 4; i++) expect(sign * cmp(answered[i - 1], answered[i])).toBeLessThan(0);
+      for (let i = 1; i < answered.length; i++) expect(sign * cmp(answered[i - 1], answered[i])).toBeLessThan(0);
       break;
     }
     case "pattern": {
@@ -775,12 +777,13 @@ function checkMeta(meta: ProblemMeta, p: WorksheetProblem) {
       expect(Number.isInteger(meta.result) && meta.result > 0).toBe(true);
       expect(num(p.answer)).toBe(meta.result);
       // "3 hundreds 4 tens = □ tens": every amount printed with its place word.
+      const places = ["one", "ten", "hundred", "thousand", "ten thousand", "hundred thousand"];
       const [lhs, rhs] = bodyText(p).split(" = ");
-      const amounts = [...lhs.matchAll(/\$([^$]+)\$ ([a-z]+)/g)].map(
-        ([, count, word]) => [num(count), ["one", "ten", "hundred", "thousand"].indexOf(word.replace(/s$/, ""))] as [number, number],
+      const amounts = [...lhs.matchAll(/\$([^$]+)\$ ([a-z ]+?)(?= \$|$)/g)].map(
+        ([, count, word]) => [num(count), places.indexOf(word.replace(/s$/, ""))] as [number, number],
       );
       expect(amounts).toEqual(meta.from);
-      expect(rhs).toBe(`$\\square$ ${["ones", "tens", "hundreds", "thousands"][meta.to]}`);
+      expect(rhs).toBe(`$\\square$ ${places[meta.to]}s`);
       break;
     }
     case "repeated-addition": {
@@ -958,7 +961,7 @@ describe("worksheet catalog", () => {
     const def = getWorksheet("grade-3", "place-value")!;
     const p = parseWorksheetParams({ n: "999", level: "7", seed: "BAD SEED!", key: "x" }, def);
     expect(p.count).toBe(def.counts[1]);
-    expect(p.level).toBe(1);
+    expect(p.level).toBe(DEFAULT_LEVEL);
     expect(p.seed).toBeNull();
     expect(p.showKey).toBe(true);
     expect(p.showExample).toBe(true);
@@ -1003,13 +1006,18 @@ describe("worksheet catalog", () => {
     }
   });
 
-  it("offers all three levels or just one", () => {
+  it("makes each level its own set of problems", () => {
+    // Same random draws for every level, so any difference comes from the level's numbers.
+    const firstProblems = (def: (typeof WORKSHEETS)[number], level: Level) => {
+      const rng = createRng(`levels/${def.grade}/${def.slug}`);
+      return JSON.stringify(Array.from({ length: 12 }, () => def.generate(rng, level).body));
+    };
     for (const def of WORKSHEETS) {
-      expect([[1], [1, 2, 3]], def.slug).toContainEqual([...def.levels]);
-      if (def.levels.length === 1) expect(def.examples[2] ?? def.examples[3], def.slug).toBeUndefined();
+      const [easy, medium, hard] = LEVELS.map((l) => firstProblems(def, l));
+      expect(new Set([easy, medium, hard]).size, def.slug).toBe(3);
     }
-    // A single-level skill ignores a level from the URL.
-    expect(parseWorksheetParams({ level: "3" }, getWorksheet("grade-3", "multiply-by-7")!).level).toBe(1);
+    expect(parseWorksheetParams({ level: "3" }, getWorksheet("grade-3", "multiply-by-7")!).level).toBe(3);
+    expect(parseWorksheetParams({}, getWorksheet("grade-3", "multiply-by-7")!).level).toBe(DEFAULT_LEVEL);
   });
 
   it("lets answer pages take any count so older QR codes keep working", () => {
@@ -1024,7 +1032,7 @@ describe("worksheet catalog", () => {
 describe.each(WORKSHEETS.map((w) => [`grade ${w.grade} · ${w.slug}`, w] as const))("%s", (_, def) => {
   const count = def.counts[def.counts.length - 1];
 
-  it.each([...def.levels])("level %i: deterministic, clean, and correct", (level) => {
+  it.each(LEVELS)("level %i: deterministic, clean, and correct", (level) => {
     for (const seed of SEEDS) {
       const problems = buildWorksheet(def, { count, level, seed });
       expect(problems).toHaveLength(count);
@@ -1044,7 +1052,7 @@ describe.each(WORKSHEETS.map((w) => [`grade ${w.grade} · ${w.slug}`, w] as cons
   });
 
   it("produces mostly unique problems", () => {
-    const problems = buildWorksheet(def, { count: def.counts[0], level: def.levels.includes(2) ? 2 : 1, seed: "uniq" });
+    const problems = buildWorksheet(def, { count: def.counts[0], level: DEFAULT_LEVEL, seed: "uniq" });
     const unique = new Set(problems.map((p) => JSON.stringify(p.body)));
     expect(unique.size).toBeGreaterThanOrEqual(Math.ceil(problems.length * 0.8));
   });
@@ -1188,7 +1196,7 @@ function checkExampleShow(show: ExampleShow) {
 
 describe("worked examples", () => {
   it.each(WORKSHEETS.map((w) => [`grade ${w.grade} · ${w.slug}`, w] as const))("%s", (_, def) => {
-    for (const level of def.levels) {
+    for (const level of LEVELS) {
       const example = exampleFor(def, level);
       expect(example.think.trim()).not.toBe("");
       checkMathSpans(example.think);

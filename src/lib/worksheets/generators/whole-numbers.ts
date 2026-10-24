@@ -84,10 +84,14 @@ const unitWord = (count: number, power: number) => UNIT_WORDS[power][count === 1
 
 type PlaceTask = "to-smaller" | "to-larger" | "regroup";
 
-export const convertPlaces: Generator<{ tasks: readonly PlaceTask[] }> = (rng, { tasks }) => {
+export const convertPlaces: Generator<{
+  tasks: readonly PlaceTask[];
+  /** Range of the bigger place traded (2 = hundreds … 5 = hundred thousands). */
+  places?: readonly [number, number];
+}> = (rng, { tasks, places = [2, 3] }) => {
   const task = pick(rng, tasks);
-  // Hundreds or thousands, traded with a smaller place.
-  const big = randInt(rng, 2, 3);
+  // Hundreds or thousands (by default), traded with a smaller place.
+  const big = randInt(rng, places[0], places[1]);
   let from: [number, number][];
   let to: number;
   let result: number;
@@ -233,13 +237,18 @@ export const numberForms: Generator<{ tasks: readonly NumberFormTask[]; digits: 
     n = Number(s.join(""));
   } while (expandedParts(n).length < 2);
 
-  const standard = `$${latexNumber(n)}$`;
-  const shown = { standard, expanded: expandedLatex(n), word: numberToWords(n), unit: unitForm(n) };
+  // Built on demand: word and unit forms only go up to six digits.
+  const shown: Record<NumberForm, () => string> = {
+    standard: () => `$${latexNumber(n)}$`,
+    expanded: () => expandedLatex(n),
+    word: () => numberToWords(n),
+    unit: () => unitForm(n),
+  };
   const { from, to } = FORM_TASKS[task];
 
   return {
-    body: { kind: "text", text: `Write in ${to} form: ${shown[from]}`, blank: "line" },
-    answer: shown[to],
+    body: { kind: "text", text: `Write in ${to} form: ${shown[from]()}`, blank: "line" },
+    answer: shown[to](),
     meta: { type: "number-form", n, from, to },
   };
 };

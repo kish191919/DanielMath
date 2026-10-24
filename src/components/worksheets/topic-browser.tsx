@@ -30,7 +30,6 @@ export type SkillItem = {
   /** Shown as a compact tile ("7단") instead of a row. */
   chip?: string;
   quarter?: Quarter;
-  multiLevel: boolean;
   /** Lowercased titles and descriptions in both languages. */
   search: string;
 };
@@ -303,14 +302,6 @@ function UnitCard({
                         <span className={`block text-sm leading-snug font-semibold text-navy-900${ko}`}>{s.title}</span>
                         {s.subtitle && <span className="mt-0.5 block truncate text-xs text-navy-400">{s.subtitle}</span>}
                       </span>
-                      {s.multiLevel && (
-                        <span
-                          className={`mt-px shrink-0 rounded bg-navy-50 px-1.5 py-0.5 text-[10px] font-bold text-navy-500${ko}`}
-                          title={isKo ? "쉬움·보통·어려움 3단계" : "Easy, Medium, and Hard levels"}
-                        >
-                          {isKo ? "3단계" : "3 levels"}
-                        </span>
-                      )}
                       <ChevronRight className="mt-px h-4 w-4 shrink-0 text-navy-300 transition group-hover:translate-x-0.5 group-hover:text-navy-700" />
                     </Link>
                   </li>

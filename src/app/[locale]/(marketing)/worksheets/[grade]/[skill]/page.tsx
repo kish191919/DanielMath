@@ -111,7 +111,6 @@ export default async function WorksheetPage({ params, searchParams }: Props) {
             <WorksheetControls
               path={path}
               counts={def.counts}
-              levels={def.levels}
               count={options.count}
               level={options.level}
               seed={seed}

@@ -73,7 +73,6 @@ export default async function GradeWorksheetsPage({ params }: Props) {
       subtitle: isKo ? s.title.en : undefined,
       chip: s.chip && (isKo ? s.chip.ko : s.chip.en),
       quarter: s.quarter,
-      multiLevel: s.levels.length > 1,
       search: [s.title.ko, s.title.en, s.description.ko, s.description.en].join(" ").toLowerCase(),
     })),
   }));

@@ -223,11 +223,14 @@ export const exponents: Generator<{
 export const oneStepEquations: Generator<{
   ops: readonly Op[];
   negative: boolean;
+  /** Largest solution (or quotient, for ÷). */
   max: number;
-}> = (rng, { ops, negative, max }) => {
+  /** Largest number in the equation besides the variable (12 by default). */
+  aMax?: number;
+}> = (rng, { ops, negative, max, aMax = 12 }) => {
   const v = pick(rng, ["x", "y", "n", "m", "k", "p"] as const);
   const op = pick(rng, ops);
-  const a = negative ? signed(rng, 2, 12) : randInt(rng, 2, 12);
+  const a = negative ? signed(rng, 2, aMax) : randInt(rng, 2, aMax);
   let solution = negative ? signed(rng, 1, max) : randInt(rng, 1, max);
   let latex: string;
   let lhs: string;
@@ -271,17 +274,23 @@ type Shape = { latex: string; js: string; value: number | null };
 
 const VARIABLES = ["x", "y", "n", "m", "a", "b", "k", "p"] as const;
 
-export const evaluateExpressions: Generator<{ forms: readonly EvalForm[] }> = (rng, { forms }) => {
+export const evaluateExpressions: Generator<{
+  forms: readonly EvalForm[];
+  /** Largest value of the (first) variable (12 by default). */
+  xMax?: number;
+  /** Largest number added or subtracted (20 by default). */
+  bMax?: number;
+}> = (rng, { forms, xMax = 12, bMax = 20 }) => {
   const form = pick(rng, forms);
   for (;;) {
     const v = pick(rng, VARIABLES);
     let w: string;
     do w = pick(rng, VARIABLES);
     while (w === v);
-    const x = randInt(rng, 1, 12);
+    const x = randInt(rng, 1, xMax);
     const y = randInt(rng, 1, 10);
     const a = randInt(rng, 2, 9);
-    const b = randInt(rng, 1, 20);
+    const b = randInt(rng, 1, bMax);
 
     const shapes: Record<EvalForm, Shape[]> = {
       linear: [

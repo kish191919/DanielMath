@@ -97,12 +97,14 @@ export const primeFactorization: Generator<{ mode: "classify" | "factorize"; min
   };
 };
 
-export const factorsMultiples: Generator<{ task: "is-factor" | "list-factors" | "list-multiples"; max: number }> = (
-  rng,
-  { task, max },
-) => {
+export const factorsMultiples: Generator<{
+  task: "is-factor" | "list-factors" | "list-multiples";
+  max: number;
+  /** Range of the factor asked about, or whose multiples are listed (2–12 by default). */
+  factors?: readonly [number, number];
+}> = (rng, { task, max, factors = [2, 12] }) => {
   if (task === "list-multiples") {
-    const k = randInt(rng, 2, 12);
+    const k = randInt(rng, factors[0], factors[1]);
     return {
       body: { kind: "text", text: `List the first five multiples of ${k}.`, blank: "line" },
       answer: [1, 2, 3, 4, 5].map((i) => k * i).join(", "),
@@ -124,7 +126,7 @@ export const factorsMultiples: Generator<{ task: "is-factor" | "list-factors" | 
   }
 
   // About half the answers are yes.
-  const k = randInt(rng, 2, 12);
+  const k = randInt(rng, factors[0], factors[1]);
   let n: number;
   if (rng() < 0.5) n = k * randInt(rng, 2, Math.floor(max / k));
   else

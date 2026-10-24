@@ -130,7 +130,9 @@ export const compareFractions: Generator<{
   /** "mixed" alternates like denominators and like numerators. */
   mode: "like-den" | "like-num" | "unlike" | "mixed";
   denominators: readonly number[];
-}> = (rng, { mode, denominators }) => {
+  /** Unlike denominators where one divides the other (1/3 vs 5/12). */
+  relatedOnly?: boolean;
+}> = (rng, { mode, denominators, relatedOnly }) => {
   const m = mode === "mixed" ? pick(rng, ["like-den", "like-num"] as const) : mode;
   let left: Rational;
   let right: Rational;
@@ -155,7 +157,7 @@ export const compareFractions: Generator<{
       d2 = pick(rng, denominators);
       a = randInt(rng, 1, d1 - 1);
       b = randInt(rng, 1, d2 - 1);
-    } while (d1 === d2 || a === b);
+    } while (d1 === d2 || a === b || (relatedOnly && d1 % d2 !== 0 && d2 % d1 !== 0));
     left = [a, d1];
     right = [b, d2];
   } else {

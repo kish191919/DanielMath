@@ -101,7 +101,7 @@ export async function WorksheetSheet({
   example: WorksheetExample | null;
 }) {
   const qrSvg = await QRCode.toString(answersUrl, { type: "svg", margin: 1 });
-  const levelLabel = def.levels.length > 1 ? `${LEVEL_STARS[level]} ${LEVEL_LABELS[level].en}` : null;
+  const levelLabel = `${LEVEL_STARS[level]} ${LEVEL_LABELS[level].en}`;
   const meta = [`Skill ${code} · ${unitTitle}`, levelLabel, def.quarter && `Quarter ${def.quarter.slice(1)}`].filter(Boolean);
   const pages = showKey ? 2 : 1;
 
@@ -177,7 +177,7 @@ export async function WorksheetSheet({
               <h2 className="mt-2 text-xl font-bold text-navy-900">Answer Key</h2>
             </div>
             <p className="text-xs text-navy-500">
-              {[`${code} ${def.title.en}`, levelLabel].filter(Boolean).join(" · ")}
+              {code} {def.title.en} · {levelLabel}
             </p>
           </header>
           <ol className={cn("mt-4 grid border-l border-t border-navy-200 text-sm text-navy-800", KEY_GRID[def.columns])}>

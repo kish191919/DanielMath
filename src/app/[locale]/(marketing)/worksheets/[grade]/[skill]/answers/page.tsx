@@ -53,7 +53,7 @@ export default async function WorksheetAnswersPage({ params, searchParams }: Pro
             {[
               `Grade ${def.grade}`,
               `Skill ${skillPosition(def).code}`,
-              def.levels.length > 1 && LEVEL_LABELS[options.level].en,
+              LEVEL_LABELS[options.level].en,
               `Worksheet #${seed}`,
             ]
               .filter(Boolean)
