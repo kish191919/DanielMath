@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useId, useTransition, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { RefreshCw } from "lucide-react";
 import { PrintButton } from "@/components/ui/print-button";
@@ -9,12 +9,26 @@ import { LEVEL_LABELS, LEVEL_STARS } from "@/lib/worksheets/labels";
 import { newSeed } from "@/lib/worksheets/rng";
 import type { Level } from "@/lib/worksheets/types";
 import { cn } from "@/lib/utils";
-import { StickerButton } from "./stickers";
 
-function pillClass(active: boolean) {
+function segmentClass(active: boolean) {
   return cn(
-    "inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
-    active ? "bg-navy-900 text-white" : "bg-white text-navy-700 ring-1 ring-navy-200 hover:bg-navy-50",
+    "inline-flex items-center justify-center rounded-lg px-2 py-1.5 text-sm font-semibold whitespace-nowrap transition sm:px-3",
+    active ? "bg-white text-navy-900 shadow-sm" : "text-navy-500 hover:text-navy-800",
+  );
+}
+
+// Label above a full-width control on phones, beside it from `sm` up.
+function Segmented({ label, labelClass, children }: { label: string; labelClass?: string; children: ReactNode }) {
+  const id = useId();
+  return (
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2.5">
+      <span id={id} className={cn("text-sm font-semibold text-navy-800", labelClass)}>
+        {label}
+      </span>
+      <div role="group" aria-labelledby={id} className="grid auto-cols-fr grid-flow-col gap-1 rounded-xl bg-navy-100/70 p-1">
+        {children}
+      </div>
+    </div>
   );
 }
 
@@ -26,10 +40,9 @@ export function WorksheetControls({
   path,
   counts,
   levels,
-  stickerId,
   isKo,
   ...state
-}: State & { path: string; counts: readonly number[]; levels: readonly Level[]; stickerId: string; isKo: boolean }) {
+}: State & { path: string; counts: readonly number[]; levels: readonly Level[]; isKo: boolean }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
@@ -47,33 +60,39 @@ export function WorksheetControls({
         pending && "opacity-60",
       )}
     >
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-3">
         {/* Narrow skills have one level; the skill list is their progression. */}
         {levels.length > 1 && (
-          <div className="flex items-center gap-2">
-            <span className={cn("text-sm font-semibold text-navy-800", ko)}>{isKo ? "난이도" : "Level"}</span>
-            <div className="flex gap-1.5">
-              {levels.map((l) => (
-                <button key={l} type="button" onClick={() => go({ level: l })} className={pillClass(state.level === l)}>
-                  <span className={cn("mr-1 text-xs", state.level === l ? "text-gold-300" : "text-amber-500")} aria-hidden>
-                    {LEVEL_STARS[l]}
-                  </span>
-                  <span className={ko}>{isKo ? LEVEL_LABELS[l].ko : LEVEL_LABELS[l].en}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-        <div className="flex items-center gap-2">
-          <span className={cn("text-sm font-semibold text-navy-800", ko)}>{isKo ? "문제 수" : "Problems"}</span>
-          <div className="flex gap-1.5">
-            {counts.map((c) => (
-              <button key={c} type="button" onClick={() => go({ count: c })} className={pillClass(state.count === c)}>
-                {c}
+          <Segmented label={isKo ? "난이도" : "Level"} labelClass={ko}>
+            {levels.map((l) => (
+              <button
+                key={l}
+                type="button"
+                onClick={() => go({ level: l })}
+                aria-pressed={state.level === l}
+                className={cn(segmentClass(state.level === l), "flex-col gap-0.5 sm:flex-row sm:gap-1")}
+              >
+                <span className="text-xs leading-none text-amber-500" aria-hidden>
+                  {LEVEL_STARS[l]}
+                </span>
+                <span className={ko}>{isKo ? LEVEL_LABELS[l].ko : LEVEL_LABELS[l].en}</span>
               </button>
             ))}
-          </div>
-        </div>
+          </Segmented>
+        )}
+        <Segmented label={isKo ? "문제 수" : "Problems"} labelClass={ko}>
+          {counts.map((c) => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => go({ count: c })}
+              aria-pressed={state.count === c}
+              className={cn(segmentClass(state.count === c), "tabular-nums sm:min-w-11")}
+            >
+              {c}
+            </button>
+          ))}
+        </Segmented>
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
           <label className={cn("flex items-center gap-2 text-sm text-navy-700", ko)}>
             <input
@@ -96,25 +115,19 @@ export function WorksheetControls({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex gap-2 border-t border-navy-100 pt-4 sm:flex-wrap sm:items-center">
         <button
           type="button"
           onClick={() => go({ seed: newSeed() })}
           className={cn(
-            "inline-flex items-center gap-1.5 rounded-lg border border-navy-200 bg-white px-4 py-2 text-sm font-medium text-navy-800 hover:bg-navy-50",
+            "inline-flex flex-auto items-center justify-center gap-1.5 rounded-lg border border-navy-200 bg-white px-3 py-2 text-sm font-medium text-navy-800 hover:bg-navy-50 sm:flex-none sm:px-4",
             ko,
           )}
         >
-          <RefreshCw className="h-4 w-4" />
+          <RefreshCw className="h-4 w-4 shrink-0" />
           {isKo ? "새 문제 만들기" : "New problems"}
         </button>
-        <PrintButton label={isKo ? "인쇄하기" : "Print"} />
-        <StickerButton id={stickerId} isKo={isKo} />
-        <p className={cn("ml-auto text-xs text-navy-500", ko)}>
-          {isKo
-            ? `학습지 #${state.seed} — 같은 링크는 항상 같은 문제를 보여줍니다.`
-            : `Worksheet #${state.seed} — this link always shows the same problems.`}
-        </p>
+        <PrintButton label={isKo ? "인쇄하기" : "Print"} className={cn("flex-auto sm:flex-none", ko)} />
       </div>
     </div>
   );

@@ -23,20 +23,6 @@
   /* KaTeX's own face (loaded with katex.min.css): worksheet numbers outside
      $...$ match the fractions, and its digits are equal-width for columns. */
   --font-math: KaTeX_Main, "Times New Roman", serif;
-
-  /* Worksheet sticker: a quick pop when a student marks a skill done. */
-  --animate-sticker-pop: sticker-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-  @keyframes sticker-pop {
-    0% {
-      transform: scale(0.4) rotate(-30deg);
-    }
-    60% {
-      transform: scale(1.6) rotate(12deg);
-    }
-    100% {
-      transform: scale(1) rotate(0);
-    }
-  }
 }
 
 :root {

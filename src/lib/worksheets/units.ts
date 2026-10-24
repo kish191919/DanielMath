@@ -28,7 +28,14 @@ export type UnitIcon =
   | "triangle"
   | "bar-chart"
   | "circle"
-  | "variable";
+  | "variable"
+  | "decimal"
+  | "superscript"
+  | "box"
+  | "diff"
+  | "square"
+  | "equal"
+  | "calculator";
 
 export type UnitColor =
   | "sky"
@@ -82,28 +89,48 @@ export const WORKSHEET_UNITS: WorksheetUnit[] = [
   unit(3, "money", "Money", "돈", "측정", "coins", "lime"),
   unit(3, "patterns", "Skip-counting & patterns", "뛰어 세기와 규칙", "대수·패턴", "trending-up", "teal"),
 
-  unit(4, "whole-numbers", "Large numbers & estimating", "큰 수와 어림하기", "수·연산", "hash", "sky"),
-  unit(4, "multiplication-division", "Multiplication & division", "곱셈과 나눗셈", "수·연산", "x", "orange"),
-  unit(4, "factors", "Factors", "약수", "수·연산", "layout-grid", "emerald"),
-  unit(4, "fractions", "Fractions", "분수", "분수", "pie-chart", "pink"),
-  unit(4, "decimals", "Decimals", "소수", "소수", "scale", "violet"),
-  unit(4, "measurement", "Measurement", "단위 환산", "측정", "ruler", "blue"),
+  unit(4, "place-value", "Place value", "큰 수의 자릿값", "수·연산", "hash", "sky"),
+  unit(4, "compare-round", "Comparing & rounding", "큰 수의 비교와 반올림", "수·연산", "arrow-up-down", "violet"),
+  unit(4, "estimation", "Estimation", "어림셈", "수·연산", "target", "amber"),
+  unit(4, "addition-subtraction", "Addition & subtraction", "덧셈과 뺄셈", "수·연산", "plus", "emerald"),
+  unit(4, "multiplication", "Multiplication", "곱셈", "수·연산", "x", "orange"),
+  unit(4, "division", "Division", "나눗셈", "수·연산", "divide", "cyan"),
+  unit(4, "factors-multiples", "Factors, multiples & primes", "약수·배수와 소수", "수·연산", "layout-grid", "lime"),
+  unit(4, "fraction-compare", "Equivalent & comparing fractions", "분수의 크기", "분수", "scale", "purple"),
+  unit(4, "fraction-operations", "Mixed numbers & fraction operations", "대분수와 분수의 계산", "분수", "pie-chart", "pink"),
+  unit(4, "decimals", "Decimal place value", "소수의 자릿값", "소수", "decimal", "indigo"),
+  unit(4, "decimal-operations", "Adding & subtracting decimals", "소수의 덧셈과 뺄셈", "소수", "calculator", "fuchsia"),
+  unit(4, "measurement", "Measurement & time", "단위 환산과 시간", "측정", "ruler", "blue"),
+  unit(4, "area-perimeter", "Area & perimeter", "넓이와 둘레", "측정", "square", "rose"),
   unit(4, "probability", "Probability", "확률", "확률·자료", "dices", "amber"),
   unit(4, "patterns", "Patterns", "규칙 찾기", "대수·패턴", "trending-up", "teal"),
 
-  unit(5, "number-theory", "Prime & composite numbers", "소수와 합성수", "수·연산", "hash", "sky"),
-  unit(5, "fractions", "Fractions", "분수", "분수", "pie-chart", "pink"),
-  unit(5, "decimals", "Decimals", "소수", "소수", "scale", "violet"),
-  unit(5, "measurement", "Measurement", "단위 환산", "측정", "ruler", "blue"),
-  unit(5, "geometry", "Geometry", "도형", "도형", "triangle", "emerald"),
-  unit(5, "data", "Data", "자료의 정리", "확률·자료", "bar-chart", "amber"),
-  unit(5, "expressions", "Expressions", "혼합 계산", "대수·패턴", "variable", "teal"),
+  unit(5, "number-theory", "Primes, factors & multiples", "약수·배수와 소인수분해", "수·연산", "hash", "sky"),
+  unit(5, "fraction-concepts", "Simplifying & comparing fractions", "약분과 분수의 크기", "분수", "scale", "purple"),
+  unit(5, "fraction-add-sub", "Adding & subtracting fractions", "분수의 덧셈과 뺄셈", "분수", "pie-chart", "pink"),
+  unit(5, "fraction-multiply", "Multiplying fractions", "분수의 곱셈", "분수", "layout-grid", "violet"),
+  unit(5, "decimal-place-value", "Decimal place value & rounding", "소수의 자릿값과 반올림", "소수", "decimal", "indigo"),
+  unit(5, "decimal-add-sub", "Adding & subtracting decimals", "소수의 덧셈과 뺄셈", "소수", "calculator", "fuchsia"),
+  unit(5, "decimal-multiply", "Multiplying decimals", "소수의 곱셈", "소수", "x", "orange"),
+  unit(5, "decimal-divide", "Dividing decimals", "소수의 나눗셈", "소수", "divide", "cyan"),
+  unit(5, "measurement", "Unit conversions", "단위 환산", "측정", "ruler", "blue"),
+  unit(5, "area-volume", "Area, perimeter & volume", "넓이·둘레·부피", "측정", "box", "rose"),
+  unit(5, "triangles", "Triangles", "삼각형", "도형", "triangle", "emerald"),
+  unit(5, "data", "Mean, median, mode & range", "평균·중앙값·최빈값·범위", "확률·자료", "bar-chart", "amber"),
+  unit(5, "expressions", "Order of operations & expressions", "혼합 계산과 식의 값", "대수·패턴", "variable", "teal"),
 
-  unit(6, "number-system", "Number system", "수 체계", "수·연산", "hash", "sky"),
-  unit(6, "ratios-percents", "Ratios & percents", "비와 백분율", "수·연산", "percent", "orange"),
-  unit(6, "fractions", "Fractions", "분수", "분수", "pie-chart", "pink"),
+  unit(6, "number-theory", "GCF & LCM", "최대공약수와 최소공배수", "수·연산", "hash", "sky"),
+  unit(6, "ratios", "Ratios & rates", "비와 비율", "수·연산", "scale", "orange"),
+  unit(6, "percents", "Percents", "백분율", "수·연산", "percent", "amber"),
+  unit(6, "integers", "Integers", "정수", "수·연산", "diff", "violet"),
+  unit(6, "rational-numbers", "Comparing rational numbers", "유리수의 크기 비교", "수·연산", "arrow-up-down", "purple"),
+  unit(6, "exponents", "Exponents & perfect squares", "거듭제곱과 제곱수", "수·연산", "superscript", "indigo"),
+  unit(6, "fractions", "Multiplying & dividing fractions", "분수의 곱셈과 나눗셈", "분수", "pie-chart", "pink"),
+  unit(6, "decimals", "Decimal operations", "소수의 사칙연산", "소수", "decimal", "fuchsia"),
   unit(6, "circles", "Circles", "원", "측정", "circle", "blue"),
-  unit(6, "expressions-equations", "Expressions & equations", "식과 방정식", "대수·패턴", "variable", "teal"),
+  unit(6, "area", "Area of polygons", "도형의 넓이", "측정", "square", "rose"),
+  unit(6, "expressions", "Expressions", "식의 값", "대수·패턴", "variable", "teal"),
+  unit(6, "equations", "One-step equations", "일차방정식", "대수·패턴", "equal", "emerald"),
 ];
 
 const categoryRank = (c: TopicCategory) => CATEGORY_LABELS.findIndex((l) => l.key === c);

@@ -15,7 +15,6 @@ import { buildWorksheet, exampleFor, parseWorksheetParams, worksheetQuery } from
 import {
   getWorksheet,
   gradeSlug,
-  skillKey,
   skillPosition,
   skillsInOrder,
   worksheetPath,
@@ -118,7 +117,6 @@ export default async function WorksheetPage({ params, searchParams }: Props) {
               seed={seed}
               showKey={options.showKey}
               showExample={options.showExample}
-              stickerId={skillKey(def)}
               isKo={isKo}
             />
           </div>

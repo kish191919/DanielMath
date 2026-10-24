@@ -345,6 +345,12 @@ function checkMeta(meta: ProblemMeta, p: WorksheetProblem) {
       expect(Number.isInteger(mean)).toBe(true);
       expect(meta.median).toBe(median);
       expect(meta.range).toBe(d[n - 1] - d[0]);
+      // "Mean 6 · Median 7": one entry per field on the sheet, each right.
+      const asked = p.body.kind === "fields" ? p.body.fields : [];
+      expect(asked.length).toBeGreaterThan(0);
+      expect(p.answer.split(" · ")).toEqual(
+        asked.map((f) => `${f} ${meta[f.toLowerCase() as "mean" | "median" | "mode" | "range"]}`),
+      );
       break;
     }
     case "clock": {
@@ -690,7 +696,9 @@ function checkMeta(meta: ProblemMeta, p: WorksheetProblem) {
       expect(underlined).not.toBeNull();
       expect(underlined![1]).toBe(digits[digits.length - 1 - meta.power]);
       expect(num(bodyText(p).replace(/\\underline\{(\d)\}/, "$1"))).toBe(meta.n);
-      expect(p.answer).toBe(["ones", "tens", "hundreds", "thousands", "ten thousands"][meta.power]);
+      expect(p.answer).toBe(
+        ["ones", "tens", "hundreds", "thousands", "ten thousands", "hundred thousands", "millions"][meta.power],
+      );
       break;
     }
     case "parity": {
@@ -752,6 +760,85 @@ function checkMeta(meta: ProblemMeta, p: WorksheetProblem) {
       expect(fractionSide).toContain(`$\\frac{${n}}{${d}}$`);
       expect(n).toBeGreaterThanOrEqual(2);
       expect(n).toBeLessThanOrEqual(d);
+      break;
+    }
+    case "factor-check": {
+      expect(bodyText(p)).toBe(`Is ${meta.k} a factor of ${meta.n}?`);
+      expect(p.answer).toBe(meta.n % meta.k === 0 ? "yes" : "no");
+      break;
+    }
+    case "factor-list": {
+      const expected = Array.from({ length: meta.n }, (_, i) => i + 1).filter((d) => meta.n % d === 0);
+      expect(expected.length).toBeGreaterThan(2);
+      expect(p.answer.split(", ").map(Number)).toEqual(expected);
+      expect(bodyText(p)).toContain(` ${meta.n}.`);
+      break;
+    }
+    case "multiples": {
+      expect(p.answer.split(", ").map(Number)).toEqual(Array.from({ length: meta.count }, (_, i) => meta.k * (i + 1)));
+      expect(bodyText(p)).toContain(`multiples of ${meta.k}.`);
+      break;
+    }
+    case "decimal-digit": {
+      const frac = meta.n.split(".")[1];
+      const digit = frac[meta.place - 1];
+      // The printed number is n with that one digit underlined.
+      expect(bodyText(p).replace(/\$|\{,\}/g, "").replace(`\\underline{${digit}}`, digit)).toBe(meta.n);
+      expect(bodyText(p)).toMatch(new RegExp(`\\.\\d{${meta.place - 1}}\\\\underline\\{${digit}\\}`));
+      if (meta.ask === "value") {
+        expect(digit).not.toBe("0");
+        const [units, scale] = decimal(p.answer);
+        expect(units * 10 ** meta.place).toBe(Number(digit) * scale);
+      } else {
+        expect(p.answer).toBe(["tenths", "hundredths", "thousandths"][meta.place - 1]);
+      }
+      break;
+    }
+    case "decimal-words": {
+      // "four and thirty-seven hundredths" → 4.37
+      const fromWords = (words: string): string => {
+        const m = words.match(/^(?:(.+) and )?(.+) (tenths?|hundredths?|thousandths?)$/);
+        expect(m, words).not.toBeNull();
+        const scale = { tenth: 1, hundredth: 2, thousandth: 3 }[m![3].replace(/s$/, "") as "tenth"];
+        const frac = wordsToNumber(m![2]);
+        expect(m![3].endsWith("s"), words).toBe(frac !== 1);
+        expect(frac).toBeLessThan(10 ** scale);
+        const whole = m![1] ? wordsToNumber(m![1]) : 0;
+        return `${whole}.${String(frac).padStart(scale, "0")}`;
+      };
+      expect(meta.n).not.toMatch(/0$/);
+      const text = bodyText(p);
+      if (meta.to === "number") {
+        expect(fromWords(text.replace("Write as a decimal: ", ""))).toBe(meta.n);
+        expect(p.answer).toBe(meta.n);
+      } else {
+        expect(text).toBe(`Write in words: $${meta.n}$`);
+        expect(fromWords(p.answer)).toBe(meta.n);
+      }
+      break;
+    }
+    case "measure": {
+      const g = meta.given;
+      const expected = {
+        "rect-area": () => g[0] * g[1],
+        "rect-perimeter": () => 2 * (g[0] + g[1]),
+        "square-area": () => g[0] * g[0],
+        "square-perimeter": () => 4 * g[0],
+        "missing-side-area": () => g[0] / g[1],
+        "missing-side-perimeter": () => g[0] / 2 - g[1],
+        "triangle-area": () => (g[0] * g[1]) / 2,
+        "parallelogram-area": () => g[0] * g[1],
+        "prism-volume": () => g[0] * g[1] * g[2],
+      }[meta.task]();
+      expect(Number.isInteger(expected) && expected > 0).toBe(true);
+      expect(meta.result).toBe(expected);
+      // A rectangle's length is its longer side, so a missing width is the shorter one.
+      if (meta.task.startsWith("missing-side")) expect(expected).toBeLessThan(g[1]);
+      const power = /area/.test(meta.task) && !meta.task.startsWith("missing") ? "²" : meta.task === "prism-volume" ? "³" : "";
+      expect(p.answer).toBe(`${expected.toLocaleString("en-US")} ${meta.unit}${power}`);
+      const text = bodyText(p);
+      expect(text.replace(/,(?=\d)/g, "").match(/\d+/g)!.map(Number)).toEqual(g);
+      for (const u of text.match(/\d ([a-z]+)/g)!) expect(u.split(" ")[1]).toBe(meta.unit);
       break;
     }
     case "money-op": {

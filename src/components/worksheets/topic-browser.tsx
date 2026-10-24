@@ -2,7 +2,7 @@
 
 import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
-import { ChevronDown, ChevronRight, ChevronsDownUp, ChevronsUpDown, Search, Star } from "lucide-react";
+import { ChevronDown, ChevronRight, ChevronsDownUp, ChevronsUpDown, Search } from "lucide-react";
 import type { TopicCategory } from "@/lib/curriculum-data";
 import {
   getCurrentQuarter,
@@ -14,13 +14,12 @@ import {
 import { CATEGORY_LABELS } from "@/lib/worksheets/labels";
 import type { UnitColor, UnitIcon } from "@/lib/worksheets/units";
 import { cn } from "@/lib/utils";
-import { useStickers } from "./stickers";
 import { UNIT_COLORS, UNIT_ICONS } from "./unit-style";
 
 // Plain data only — WorksheetDef carries a generator function, which can't
 // cross the server/client boundary.
 export type SkillItem = {
-  /** Sticker key (see stickers.tsx). */
+  /** Unique across grades (see skillKey). */
   id: string;
   href: string;
   /** "C.2" */
@@ -71,7 +70,6 @@ export function WorksheetUnitBrowser({ units, isKo }: { units: UnitItem[]; isKo:
   const [open, setOpen] = useState<ReadonlySet<string>>(() => new Set());
   // Pages are statically built, so read the date on the client only.
   const currentQuarter = useSyncExternalStore(subscribeNever, getCurrentQuarter, () => null);
-  const { done } = useStickers();
   const ko = isKo ? " font-ko" : "";
   const quarterLabels = isKo ? QUARTER_LABELS_KO : QUARTER_LABELS_EN;
   const shortQuarter = (q: Quarter) => (isKo ? `${q.slice(1)}분기` : q);
@@ -103,7 +101,6 @@ export function WorksheetUnitBrowser({ units, isKo }: { units: UnitItem[]; isKo:
       else next.add(key);
       return next;
     });
-  const stickerCount = units.flatMap((u) => u.skills).filter((s) => done.has(s.id)).length;
 
   return (
     <div>
@@ -164,15 +161,6 @@ export function WorksheetUnitBrowser({ units, isKo }: { units: UnitItem[]; isKo:
               {allOpen ? (isKo ? "모두 접기" : "Collapse all") : isKo ? "모두 펼치기" : "Expand all"}
             </button>
           )}
-
-          {stickerCount > 0 && (
-            <span
-              className={`inline-flex h-10 items-center gap-1.5 rounded-xl bg-amber-50 px-3 text-sm font-bold text-amber-800 ring-1 ring-amber-200${ko}`}
-            >
-              <Star className="h-4 w-4 fill-amber-400 text-amber-500" />
-              {isKo ? `내 스티커 ${stickerCount}개` : `${stickerCount} sticker${stickerCount === 1 ? "" : "s"}`}
-            </span>
-          )}
         </div>
       </div>
 
@@ -208,7 +196,6 @@ export function WorksheetUnitBrowser({ units, isKo }: { units: UnitItem[]; isKo:
                     shown={u.shown}
                     open={isOpen(u.key)}
                     onToggle={() => toggle(u.key)}
-                    done={done}
                     isKo={isKo}
                     shortQuarter={shortQuarter}
                   />
@@ -227,7 +214,6 @@ function UnitCard({
   shown,
   open,
   onToggle,
-  done,
   isKo,
   shortQuarter,
 }: {
@@ -235,14 +221,12 @@ function UnitCard({
   shown: SkillItem[];
   open: boolean;
   onToggle: () => void;
-  done: ReadonlySet<string>;
   isKo: boolean;
   shortQuarter: (q: Quarter) => string;
 }) {
   const sw = UNIT_COLORS[unit.color];
   const Icon = UNIT_ICONS[unit.icon];
   const ko = isKo ? " font-ko" : "";
-  const finished = unit.skills.filter((s) => done.has(s.id)).length;
   const quarters = QUARTERS.filter((q) => unit.skills.some((s) => s.quarter === q));
   const [first, last] = [quarters[0], quarters[quarters.length - 1]];
   const quarterRange =
@@ -278,22 +262,10 @@ function UnitCard({
               {isKo ? `스킬 ${unit.skills.length}개` : `${unit.skills.length} skill${unit.skills.length === 1 ? "" : "s"}`}
             </span>
             {quarterRange && <span className="rounded bg-navy-50 px-1.5 py-0.5 font-medium">{quarterRange}</span>}
-            {finished > 0 && (
-              <span className="inline-flex items-center gap-0.5 font-bold text-amber-700">
-                <Star className="h-3 w-3 fill-amber-400 text-amber-500" />
-                {finished}/{unit.skills.length}
-              </span>
-            )}
           </span>
         </span>
         <ChevronDown className={cn("h-5 w-5 shrink-0 text-navy-300 transition", open && "rotate-180 text-navy-600")} />
       </button>
-
-      {finished > 0 && (
-        <div className="h-1 bg-navy-50" aria-hidden>
-          <div className={cn("h-full", sw.bar)} style={{ width: `${(finished / unit.skills.length) * 100}%` }} />
-        </div>
-      )}
 
       {open && (
         <div id={bodyId} className="space-y-1 border-t border-navy-100 p-2">
@@ -306,7 +278,7 @@ function UnitCard({
                       href={s.href}
                       title={`${s.code} ${s.title}`}
                       className={cn(
-                        "relative flex h-11 items-center justify-center rounded-xl text-sm font-extrabold tabular-nums ring-1 ring-transparent transition hover:-translate-y-0.5 hover:shadow-sm",
+                        "flex h-11 items-center justify-center rounded-xl text-sm font-extrabold tabular-nums ring-1 ring-transparent transition hover:-translate-y-0.5 hover:shadow-sm",
                         sw.soft,
                         sw.text,
                         "hover:ring-current/30",
@@ -314,9 +286,6 @@ function UnitCard({
                       )}
                     >
                       {s.chip}
-                      {done.has(s.id) && (
-                        <Star className="absolute -top-1.5 -right-1.5 h-4 w-4 fill-amber-400 text-amber-500 drop-shadow-sm" />
-                      )}
                     </Link>
                   </li>
                 ))}
@@ -342,11 +311,7 @@ function UnitCard({
                           {isKo ? "3단계" : "3 levels"}
                         </span>
                       )}
-                      {done.has(s.id) ? (
-                        <Star className="mt-px h-4 w-4 shrink-0 fill-amber-400 text-amber-500" aria-label={isKo ? "완료" : "Done"} />
-                      ) : (
-                        <ChevronRight className="mt-px h-4 w-4 shrink-0 text-navy-300 transition group-hover:translate-x-0.5 group-hover:text-navy-700" />
-                      )}
+                      <ChevronRight className="mt-px h-4 w-4 shrink-0 text-navy-300 transition group-hover:translate-x-0.5 group-hover:text-navy-700" />
                     </Link>
                   </li>
                 ))}

@@ -1,8 +1,10 @@
 "use client";
 
+import { cn } from "@/lib/utils";
+
 const PRINT_VIEWPORT_WIDTH = "1024";
 
-export function PrintButton({ label = "인쇄하기" }: { label?: string }) {
+export function PrintButton({ label = "인쇄하기", className }: { label?: string; className?: string }) {
   const handlePrint = () => {
     const meta = document.querySelector('meta[name="viewport"]');
     const original = meta?.getAttribute("content") ?? null;
@@ -31,7 +33,10 @@ export function PrintButton({ label = "인쇄하기" }: { label?: string }) {
     <button
       type="button"
       onClick={handlePrint}
-      className="print:hidden rounded-lg bg-navy-900 px-4 py-2 text-sm font-medium text-white hover:bg-navy-800"
+      className={cn(
+        "print:hidden rounded-lg bg-navy-900 px-4 py-2 text-sm font-medium text-white hover:bg-navy-800",
+        className,
+      )}
     >
       {label}
     </button>
