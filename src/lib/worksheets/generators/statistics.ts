@@ -1,12 +1,17 @@
 import { randInt, shuffle } from "../rng";
-import type { Generator } from "../types";
+import type { Generator, Statistic } from "../types";
+
+const ALL: readonly Statistic[] = ["mean", "median", "mode", "range"];
+const LABEL: Record<Statistic, string> = { mean: "Mean", median: "Median", mode: "Mode", range: "Range" };
 
 export const meanMedianModeRange: Generator<{
   size: readonly [number, number];
   maxValue: number;
   /** Odd-sized sets only, so the median is always a listed value. */
   oddOnly: boolean;
-}> = (rng, { size, maxValue, oddOnly }) => {
+  /** Which statistics to ask for. */
+  ask?: readonly Statistic[];
+}> = (rng, { size, maxValue, oddOnly, ask = ALL }) => {
   for (;;) {
     let n = randInt(rng, size[0], size[1]);
     if (oddOnly && n % 2 === 0) n += n < size[1] ? 1 : -1;
@@ -27,14 +32,15 @@ export const meanMedianModeRange: Generator<{
     const mean = sum / n;
     const range = sorted[n - 1] - sorted[0];
     const shown = shuffle(rng, data);
+    const values: Record<Statistic, number> = { mean, median, mode, range };
 
     return {
       body: {
         kind: "fields",
         text: shown.join(", "),
-        fields: ["Mean", "Median", "Mode", "Range"],
+        fields: ask.map((s) => LABEL[s]),
       },
-      answer: `Mean ${mean} · Median ${median} · Mode ${mode} · Range ${range}`,
+      answer: ask.map((s) => `${LABEL[s]} ${values[s]}`).join(" · "),
       meta: { type: "stats", data: shown, mean, median, mode, range },
     };
   }

@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { MathText } from "@/components/math-text";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
 import { buildWorksheet, parseWorksheetParams, worksheetQuery } from "@/lib/worksheets/build";
-import { getWorksheet, worksheetPath } from "@/lib/worksheets/catalog";
+import { getWorksheet, skillPosition, worksheetPath } from "@/lib/worksheets/catalog";
 import { LEVEL_LABELS } from "@/lib/worksheets/labels";
 
 type Props = {
@@ -50,7 +50,14 @@ export default async function WorksheetAnswersPage({ params, searchParams }: Pro
       ) : (
         <>
           <p className="mt-1 text-sm text-navy-500">
-            Grade {def.grade} · {LEVEL_LABELS[options.level].en} · Worksheet #{seed}
+            {[
+              `Grade ${def.grade}`,
+              `Skill ${skillPosition(def).code}`,
+              def.levels.length > 1 && LEVEL_LABELS[options.level].en,
+              `Worksheet #${seed}`,
+            ]
+              .filter(Boolean)
+              .join(" · ")}
           </p>
           <ol className="mt-6 space-y-2.5 text-base text-navy-800">
             {buildWorksheet(def, { count: options.count, level: options.level, seed }).map((p, i) => (

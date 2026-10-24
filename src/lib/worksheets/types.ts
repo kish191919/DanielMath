@@ -95,9 +95,41 @@ export type ProblemMeta =
   | { type: "unit-rate"; total: number; count: number; rate: number; money: boolean }
   // `expr` is a JS expression in the variables of `vars`.
   | { type: "evaluate"; expr: string; vars: Record<string, number>; result: number }
-  | { type: "circle"; given: "r" | "d"; value: number; find: "r" | "d" | "C" | "A"; result: string };
+  | { type: "circle"; given: "r" | "d"; value: number; find: "r" | "d" | "C" | "A"; result: string }
+  // `power` 0 = ones, 1 = tens, …: the place of the underlined digit.
+  | { type: "place-name"; n: number; power: number }
+  | { type: "parity"; n: number }
+  | { type: "make-number"; digits: number[]; goal: "greatest" | "least"; result: number }
+  // Each [count, power] is count × 10^power; together they equal result × 10^to.
+  | { type: "place-units"; from: [number, number][]; to: number; result: number }
+  | { type: "repeated-addition"; addend: number; times: number }
+  | { type: "fraction-words"; value: Rational; to: "number" | "words" }
+  | { type: "unit-fraction-sum"; value: Rational; to: "fraction" | "sum" }
+  // Amounts in cents.
+  | { type: "money-op"; op: "+" | "-"; a: number; b: number; result: number }
+  | { type: "factor-check"; n: number; k: number }
+  | { type: "factor-list"; n: number }
+  | { type: "multiples"; k: number; count: number }
+  // `place` 1 = tenths, 2 = hundredths, 3 = thousandths.
+  | { type: "decimal-digit"; n: string; place: number; ask: "value" | "name" }
+  | { type: "decimal-words"; n: string; to: "number" | "words" }
+  // `given` is every number printed, in order; the unit is the same throughout.
+  | { type: "measure"; task: ShapeTask; given: number[]; result: number; unit: string };
 
-export type NumberForm = "standard" | "expanded" | "word";
+export type Statistic = "mean" | "median" | "mode" | "range";
+
+export type ShapeTask =
+  | "rect-area"
+  | "rect-perimeter"
+  | "square-area"
+  | "square-perimeter"
+  | "missing-side-area"
+  | "missing-side-perimeter"
+  | "triangle-area"
+  | "parallelogram-area"
+  | "prism-volume";
+
+export type NumberForm = "standard" | "expanded" | "word" | "unit";
 
 export type PatternRule = { op: "+" | "-" | "*" | "/"; k: number };
 
@@ -143,6 +175,10 @@ export type WorksheetExample = {
 export type WorksheetDef = {
   grade: GradeNum;
   slug: string;
+  /** Key of the unit (units.ts) the skill is listed under; skills keep catalog order within a unit. */
+  unit: string;
+  /** Short label for a compact tile in the skill list (one times table: "×7" / "7단") instead of a full row. */
+  chip?: { en: string; ko: string };
   title: { en: string; ko: string };
   description: { en: string; ko: string };
   /** Printed on the sheet — English only (students learn in English). */
@@ -159,6 +195,8 @@ export type WorksheetDef = {
    */
   counts: readonly number[];
   columns: 2 | 3 | 4;
+  /** Levels offered: all three, or just level 1 for a narrow skill (no level picker). */
+  levels: readonly Level[];
   /** A level without its own example uses the nearest lower level's (see exampleFor). */
   examples: { 1: WorksheetExample; 2?: WorksheetExample; 3?: WorksheetExample };
   generate: (rng: Rng, level: Level) => WorksheetProblem;

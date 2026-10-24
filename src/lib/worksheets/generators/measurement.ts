@@ -1,28 +1,31 @@
 import { pick, randInt, type Rng } from "../rng";
 import { decimalToString, formatNumber, latexNumber } from "../math";
-import type { Generator, WorksheetProblem } from "../types";
+import type { Generator, ShapeTask, WorksheetProblem } from "../types";
 
-type UnitPair = { big: string; small: string; factor: number };
+type UnitKind = "length" | "volume" | "weight";
+
+type UnitPair = { big: string; small: string; factor: number; kind: UnitKind };
 
 const CUSTOMARY: UnitPair[] = [
-  { big: "ft", small: "in", factor: 12 },
-  { big: "yd", small: "ft", factor: 3 },
-  { big: "yd", small: "in", factor: 36 },
-  { big: "gal", small: "qt", factor: 4 },
-  { big: "qt", small: "pt", factor: 2 },
-  { big: "pt", small: "c", factor: 2 },
-  { big: "gal", small: "pt", factor: 8 },
-  { big: "qt", small: "c", factor: 4 },
-  { big: "lb", small: "oz", factor: 16 },
+  { big: "ft", small: "in", factor: 12, kind: "length" },
+  { big: "yd", small: "ft", factor: 3, kind: "length" },
+  { big: "yd", small: "in", factor: 36, kind: "length" },
+  { big: "gal", small: "qt", factor: 4, kind: "volume" },
+  { big: "qt", small: "pt", factor: 2, kind: "volume" },
+  { big: "pt", small: "c", factor: 2, kind: "volume" },
+  { big: "gal", small: "pt", factor: 8, kind: "volume" },
+  { big: "qt", small: "c", factor: 4, kind: "volume" },
+  { big: "lb", small: "oz", factor: 16, kind: "weight" },
 ];
 
+// Mass counts as "weight" here, so one filter covers both systems.
 const METRIC: UnitPair[] = [
-  { big: "km", small: "m", factor: 1000 },
-  { big: "m", small: "cm", factor: 100 },
-  { big: "cm", small: "mm", factor: 10 },
-  { big: "m", small: "mm", factor: 1000 },
-  { big: "kg", small: "g", factor: 1000 },
-  { big: "L", small: "mL", factor: 1000 },
+  { big: "km", small: "m", factor: 1000, kind: "length" },
+  { big: "m", small: "cm", factor: 100, kind: "length" },
+  { big: "cm", small: "mm", factor: 10, kind: "length" },
+  { big: "m", small: "mm", factor: 1000, kind: "length" },
+  { big: "kg", small: "g", factor: 1000, kind: "weight" },
+  { big: "L", small: "mL", factor: 1000, kind: "volume" },
 ];
 
 type ConvertTask =
@@ -69,12 +72,15 @@ function metricDecimal(rng: Rng, factor: number): { units: number; scale: number
   return { units, scale };
 }
 
-export const convertUnits: Generator<{ system: "customary" | "metric"; tasks: readonly ConvertTask[] }> = (
-  rng,
-  { system, tasks },
-) => {
+export const convertUnits: Generator<{
+  system: "customary" | "metric";
+  tasks: readonly ConvertTask[];
+  /** Only these kinds of units (all of them if unset). */
+  kinds?: readonly UnitKind[];
+}> = (rng, { system, tasks, kinds }) => {
   const task = pick(rng, tasks);
-  const { big, small, factor } = pick(rng, system === "customary" ? CUSTOMARY : METRIC);
+  const pairs = system === "customary" ? CUSTOMARY : METRIC;
+  const { big, small, factor } = pick(rng, kinds ? pairs.filter((p) => kinds.includes(p.kind)) : pairs);
   const whole = (n: number, unit: string): Amount => ({ value: String(n), unit });
 
   if (task === "big-to-small") {
@@ -128,5 +134,72 @@ export const circles: Generator<{ finds: readonly ("r" | "d" | "C" | "A")[]; max
     },
     answer: `${result} ${unit}${find === "A" ? "²" : ""}`,
     meta: { type: "circle", given, value, find, result },
+  };
+};
+
+/** Area, perimeter and volume from the measurements, written out in words (no figure). */
+export const shapeMeasures: Generator<{ tasks: readonly ShapeTask[]; max: number }> = (rng, { tasks, max }) => {
+  const task = pick(rng, tasks);
+  const unit = pick(rng, ["cm", "m", "in", "ft"] as const);
+  const u = (n: number) => `${formatNumber(n)} ${unit}`;
+  // Length is the longer side.
+  const l = randInt(rng, 3, max);
+  const w = randInt(rng, 2, l - 1);
+  let text: string;
+  let given: number[];
+  let result: number;
+  let power: 1 | 2 | 3 = 2;
+
+  switch (task) {
+    case "rect-area":
+    case "rect-perimeter":
+      text = `A rectangle is ${u(l)} long and ${u(w)} wide. Find its ${task === "rect-area" ? "area" : "perimeter"}.`;
+      given = [l, w];
+      result = task === "rect-area" ? l * w : 2 * (l + w);
+      if (task === "rect-perimeter") power = 1;
+      break;
+    case "square-area":
+    case "square-perimeter":
+      text = `A square has sides of ${u(l)}. Find its ${task === "square-area" ? "area" : "perimeter"}.`;
+      given = [l];
+      result = task === "square-area" ? l * l : 4 * l;
+      if (task === "square-perimeter") power = 1;
+      break;
+    case "missing-side-area":
+      text = `A rectangle has an area of ${u(l * w)}² and a length of ${u(l)}. Find its width.`;
+      given = [l * w, l];
+      result = w;
+      power = 1;
+      break;
+    case "missing-side-perimeter":
+      text = `A rectangle has a perimeter of ${u(2 * (l + w))} and a length of ${u(l)}. Find its width.`;
+      given = [2 * (l + w), l];
+      result = w;
+      power = 1;
+      break;
+    case "triangle-area":
+    case "parallelogram-area": {
+      // An even base keeps half of base × height whole.
+      const b = task === "triangle-area" && l % 2 ? l + 1 : l;
+      const h = randInt(rng, 2, max);
+      text = `A ${task === "triangle-area" ? "triangle" : "parallelogram"} has a base of ${u(b)} and a height of ${u(h)}. Find its area.`;
+      given = [b, h];
+      result = task === "triangle-area" ? (b * h) / 2 : b * h;
+      break;
+    }
+    case "prism-volume": {
+      const h = randInt(rng, 2, max);
+      text = `A rectangular prism is ${u(l)} long, ${u(w)} wide, and ${u(h)} tall. Find its volume.`;
+      given = [l, w, h];
+      result = l * w * h;
+      power = 3;
+      break;
+    }
+  }
+
+  return {
+    body: { kind: "text", text, blank: "line" },
+    answer: `${u(result)}${power === 2 ? "²" : power === 3 ? "³" : ""}`,
+    meta: { type: "measure", task, given, result, unit },
   };
 };

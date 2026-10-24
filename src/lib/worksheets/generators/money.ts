@@ -19,6 +19,26 @@ function coinSet(rng: Rng, kinds: number): [Piece, number][] {
   return COINS.filter((c) => chosen.includes(c)).map((c) => [c, randInt(rng, 1, 4)]);
 }
 
+/** "$3.45" as printed in a vertical problem (plain text, not MathText). */
+const dollars = (cents: number) => `$${Math.floor(cents / 100)}.${String(cents % 100).padStart(2, "0")}`;
+
+export const moneyOps: Generator<{ max: number }> = (rng, { max }) => {
+  const op = pick(rng, ["+", "-"] as const);
+  let a: number;
+  let b: number;
+  do {
+    a = randInt(rng, 100, max);
+    b = randInt(rng, 100, max);
+  } while (a === b);
+  if (op === "-" && a < b) [a, b] = [b, a];
+  const result = op === "+" ? a + b : a - b;
+  return {
+    body: { kind: "vertical", operator: op === "+" ? "+" : "−", top: dollars(a), bottom: dollars(b), align: "decimal" },
+    answer: `$${moneyLatex(result)}$`,
+    meta: { type: "money-op", op, a, b, result },
+  };
+};
+
 export const countMoney: Generator<{ mode: "coins" | "bills" | "change" }> = (rng, { mode }) => {
   if (mode === "change") {
     const paid = pick(rng, [100, 500, 1000]);

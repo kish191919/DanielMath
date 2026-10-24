@@ -1,14 +1,16 @@
 import { pick, randInt, type Rng } from "../rng";
-import { addR, compareR, divR, fractionLatex, gcd, mixedLatex, mulR, subR } from "../math";
+import { addR, compareR, divR, fractionLatex, gcd, mixedLatex, mulR, numberToWords, subR } from "../math";
 import type { Generator, Rational } from "../types";
 
-export const fractionModel: Generator<{ denominators: readonly number[]; improper: boolean }> = (
-  rng,
-  { denominators, improper },
-) => {
+export const fractionModel: Generator<{
+  denominators: readonly number[];
+  improper: boolean;
+  /** Shade exactly one part. */
+  unit?: boolean;
+}> = (rng, { denominators, improper, unit }) => {
   const parts = pick(rng, denominators);
   const shape = pick(rng, ["circle", "bar"] as const);
-  const shaded = improper ? [parts, randInt(rng, 1, parts - 1)] : [randInt(rng, 1, parts - 1)];
+  const shaded = improper ? [parts, randInt(rng, 1, parts - 1)] : [unit ? 1 : randInt(rng, 1, parts - 1)];
   const total = shaded.reduce((s, x) => s + x, 0);
   // The model shows total/parts literally, so that's the answer (not reduced);
   // improper amounts also get the mixed-number form.
@@ -27,8 +29,106 @@ export const fractionModel: Generator<{ denominators: readonly number[]; imprope
   };
 };
 
+const DENOMINATOR_WORDS: Record<number, [string, string]> = {
+  2: ["half", "halves"],
+  3: ["third", "thirds"],
+  4: ["fourth", "fourths"],
+  5: ["fifth", "fifths"],
+  6: ["sixth", "sixths"],
+  7: ["seventh", "sevenths"],
+  8: ["eighth", "eighths"],
+  9: ["ninth", "ninths"],
+  10: ["tenth", "tenths"],
+  12: ["twelfth", "twelfths"],
+};
+
+/** 3/4 → "three-fourths", 1/2 → "one-half". */
+function fractionWords(n: number, d: number): string {
+  return `${numberToWords(n)}-${DENOMINATOR_WORDS[d][n === 1 ? 0 : 1]}`;
+}
+
+// Grade 3 names fractions as they are shown, so nothing here is simplified.
+export const fractionInWords: Generator<{ denominators: readonly number[] }> = (rng, { denominators }) => {
+  const d = pick(rng, denominators);
+  const n = randInt(rng, 1, d - 1);
+  const to = pick(rng, ["number", "words"] as const);
+  const latex = `$\\frac{${n}}{${d}}$`;
+  const words = fractionWords(n, d);
+  return {
+    body: {
+      kind: "text",
+      text: to === "number" ? `Write as a fraction: ${words}` : `Write in words: ${latex}`,
+      blank: "line",
+    },
+    answer: to === "number" ? latex : words,
+    meta: { type: "fraction-words", value: [n, d], to },
+  };
+};
+
+export const unitFractionSums: Generator<{ denominators: readonly number[]; maxTerms: number }> = (
+  rng,
+  { denominators, maxTerms },
+) => {
+  const d = pick(rng, denominators);
+  const n = randInt(rng, 2, Math.min(d, maxTerms));
+  const sum = Array.from({ length: n }, () => `\\frac{1}{${d}}`).join(" + ");
+  const fraction = `\\frac{${n}}{${d}}`;
+  return rng() < 0.5
+    ? {
+        body: { kind: "text", text: `$${sum} =$`, blank: "inline" },
+        answer: `$${fraction}$`,
+        meta: { type: "unit-fraction-sum", value: [n, d], to: "fraction" },
+      }
+    : {
+        body: { kind: "text", text: `Write $${fraction}$ as a sum of unit fractions.`, blank: "line" },
+        answer: `$${sum}$`,
+        meta: { type: "unit-fraction-sum", value: [n, d], to: "sum" },
+      };
+};
+
+/** 6/8 = 3/4: reduce to simplest form. */
+export const simplifyFraction: Generator<{ denominators: readonly number[]; maxFactor: number }> = (
+  rng,
+  { denominators, maxFactor },
+) => {
+  const d = pick(rng, denominators);
+  const n = properNumerator(rng, d, true);
+  const k = randInt(rng, 2, maxFactor);
+  return {
+    body: { kind: "text", text: `$\\frac{${n * k}}{${d * k}} =$`, blank: "inline" },
+    answer: `$\\frac{${n}}{${d}}$`,
+    meta: { type: "convert", value: [n, d], to: "fraction" },
+  };
+};
+
+/** 12/4 = □, 3 = □/4, 2 = 6/□. */
+export const fractionsAsWholes: Generator<{ denominators: readonly number[]; wholeMax: number }> = (
+  rng,
+  { denominators, wholeMax },
+) => {
+  const d = pick(rng, denominators);
+  const w = randInt(rng, 1, wholeMax);
+  const form = pick(rng, ["to-whole", "missing-num", "missing-den"] as const);
+  if (form === "to-whole") {
+    return {
+      body: { kind: "text", text: `$\\frac{${w * d}}{${d}} = \\square$`, blank: "none" },
+      answer: String(w),
+      meta: { type: "equivalent", left: [w * d, d], right: [w, 1], missingPart: "num" },
+    };
+  }
+  const missingPart = form === "missing-num" ? "num" : "den";
+  const num = missingPart === "num" ? "\\square" : String(w * d);
+  const den = missingPart === "den" ? "\\square" : String(d);
+  return {
+    body: { kind: "text", text: `$${w} = \\frac{${num}}{${den}}$`, blank: "none" },
+    answer: String(missingPart === "num" ? w * d : d),
+    meta: { type: "equivalent", left: [w, 1], right: [w * d, d], missingPart },
+  };
+};
+
 export const compareFractions: Generator<{
-  mode: "like-den" | "like-num" | "mixed";
+  /** "mixed" alternates like denominators and like numerators. */
+  mode: "like-den" | "like-num" | "unlike" | "mixed";
   denominators: readonly number[];
 }> = (rng, { mode, denominators }) => {
   const m = mode === "mixed" ? pick(rng, ["like-den", "like-num"] as const) : mode;
@@ -44,6 +144,20 @@ export const compareFractions: Generator<{
     while (b === a);
     left = [a, d];
     right = [b, d];
+  } else if (m === "unlike") {
+    // Different numerators and denominators: rename, or compare each to 1/2.
+    let d1: number;
+    let d2: number;
+    let a: number;
+    let b: number;
+    do {
+      d1 = pick(rng, denominators);
+      d2 = pick(rng, denominators);
+      a = randInt(rng, 1, d1 - 1);
+      b = randInt(rng, 1, d2 - 1);
+    } while (d1 === d2 || a === b);
+    left = [a, d1];
+    right = [b, d2];
   } else {
     const d1 = pick(rng, denominators);
     let d2: number;

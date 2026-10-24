@@ -237,12 +237,12 @@ export function ProblemView({ body }: { body: ProblemBody }) {
       // handwriting.
       return body.blank === "inline" ? (
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-3 pt-4 text-lg text-navy-900">
-          <MathText text={body.text} />
+          <MathText text={body.text} answerBoxes />
           <Blank className="min-w-12 flex-1" />
         </div>
       ) : (
         <div className="text-lg text-navy-900">
-          <MathText text={body.text} />
+          <MathText text={body.text} answerBoxes />
           {body.blank === "line" && <div className="mt-12 border-b border-navy-500" />}
         </div>
       );

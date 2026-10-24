@@ -5,10 +5,11 @@ import { useRouter } from "next/navigation";
 import { RefreshCw } from "lucide-react";
 import { PrintButton } from "@/components/ui/print-button";
 import { worksheetQuery } from "@/lib/worksheets/build";
-import { LEVEL_LABELS } from "@/lib/worksheets/labels";
+import { LEVEL_LABELS, LEVEL_STARS } from "@/lib/worksheets/labels";
 import { newSeed } from "@/lib/worksheets/rng";
 import type { Level } from "@/lib/worksheets/types";
 import { cn } from "@/lib/utils";
+import { StickerButton } from "./stickers";
 
 function pillClass(active: boolean) {
   return cn(
@@ -24,9 +25,11 @@ type State = { count: number; level: Level; seed: string; showKey: boolean; show
 export function WorksheetControls({
   path,
   counts,
+  levels,
+  stickerId,
   isKo,
   ...state
-}: State & { path: string; counts: readonly number[]; isKo: boolean }) {
+}: State & { path: string; counts: readonly number[]; levels: readonly Level[]; stickerId: string; isKo: boolean }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
@@ -45,16 +48,22 @@ export function WorksheetControls({
       )}
     >
       <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-        <div className="flex items-center gap-2">
-          <span className={cn("text-sm font-semibold text-navy-800", ko)}>{isKo ? "난이도" : "Level"}</span>
-          <div className="flex gap-1.5">
-            {([1, 2, 3] as const).map((l) => (
-              <button key={l} type="button" onClick={() => go({ level: l })} className={pillClass(state.level === l)}>
-                <span className={ko}>{isKo ? LEVEL_LABELS[l].ko : LEVEL_LABELS[l].en}</span>
-              </button>
-            ))}
+        {/* Narrow skills have one level; the skill list is their progression. */}
+        {levels.length > 1 && (
+          <div className="flex items-center gap-2">
+            <span className={cn("text-sm font-semibold text-navy-800", ko)}>{isKo ? "난이도" : "Level"}</span>
+            <div className="flex gap-1.5">
+              {levels.map((l) => (
+                <button key={l} type="button" onClick={() => go({ level: l })} className={pillClass(state.level === l)}>
+                  <span className={cn("mr-1 text-xs", state.level === l ? "text-gold-300" : "text-amber-500")} aria-hidden>
+                    {LEVEL_STARS[l]}
+                  </span>
+                  <span className={ko}>{isKo ? LEVEL_LABELS[l].ko : LEVEL_LABELS[l].en}</span>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
         <div className="flex items-center gap-2">
           <span className={cn("text-sm font-semibold text-navy-800", ko)}>{isKo ? "문제 수" : "Problems"}</span>
           <div className="flex gap-1.5">
@@ -100,6 +109,7 @@ export function WorksheetControls({
           {isKo ? "새 문제 만들기" : "New problems"}
         </button>
         <PrintButton label={isKo ? "인쇄하기" : "Print"} />
+        <StickerButton id={stickerId} isKo={isKo} />
         <p className={cn("ml-auto text-xs text-navy-500", ko)}>
           {isKo
             ? `학습지 #${state.seed} — 같은 링크는 항상 같은 문제를 보여줍니다.`

@@ -1,11 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { buildWorksheet, exampleFor, parseWorksheetParams } from "./build";
-import { getWorksheet, parseGradeSlug, WORKSHEETS } from "./catalog";
+import { getWorksheet, parseGradeSlug, skillPosition, skillsInOrder, WORKSHEET_GRADES, WORKSHEETS, worksheetsInUnit } from "./catalog";
 import { describeData, longDivisionSteps, verticalWork } from "./math";
 import { createRng, randInt } from "./rng";
-import type { ExampleShow, FigureSpec, Level, NumberForm, PatternRule, ProblemMeta, Rational, WorksheetProblem } from "./types";
-
-const LEVELS: Level[] = [1, 2, 3];
+import type { ExampleShow, FigureSpec, NumberForm, PatternRule, ProblemMeta, Rational, WorksheetProblem } from "./types";
+import { unitLetter, WORKSHEET_UNITS } from "./units";
 const SEEDS = Array.from({ length: 30 }, (_, i) => `seed${i}`);
 
 // ── Independent re-derivation helpers (deliberately not imported from math.ts) ──
@@ -112,6 +111,54 @@ function cents(s: string): number {
   if (!d) throw new Error(`unparseable money: ${s}`);
   return Number(d[1]) * 100 + Number(d[2]);
 }
+
+const PLACE_VALUES: Record<string, number> = {
+  one: 1,
+  ten: 10,
+  hundred: 100,
+  thousand: 1000,
+  "ten thousand": 10_000,
+  "hundred thousand": 100_000,
+};
+
+const DENOMINATOR_NAMES: Record<string, number> = {
+  half: 2,
+  halves: 2,
+  third: 3,
+  thirds: 3,
+  fourth: 4,
+  fourths: 4,
+  fifth: 5,
+  fifths: 5,
+  sixth: 6,
+  sixths: 6,
+  seventh: 7,
+  sevenths: 7,
+  eighth: 8,
+  eighths: 8,
+  ninth: 9,
+  ninths: 9,
+  tenth: 10,
+  tenths: 10,
+  twelfth: 12,
+  twelfths: 12,
+};
+
+/** "three-fourths" → [3, 4]; singular only for a numerator of 1. */
+function fractionFromWords(words: string): Rational {
+  const m = words.match(/^([a-z]+)-([a-z]+)$/);
+  expect(m, words).not.toBeNull();
+  const n = WORD_VALUES[m![1]];
+  const d = DENOMINATOR_NAMES[m![2]];
+  expect(n, words).toBeGreaterThan(0);
+  expect(d, words).toBeDefined();
+  expect(m![2].endsWith("s"), words).toBe(n !== 1);
+  return [n, d];
+}
+
+/** Every permutation of `xs`. */
+const permutations = (xs: number[]): number[][] =>
+  xs.length <= 1 ? [xs] : xs.flatMap((x, i) => permutations([...xs.slice(0, i), ...xs.slice(i + 1)]).map((p) => [x, ...p]));
 
 // Every unit in terms of the smallest one of its kind.
 const UNIT_BASE: Record<string, [string, number]> = {
@@ -311,6 +358,17 @@ function checkMeta(meta: ProblemMeta, p: WorksheetProblem) {
     case "number-form": {
       const read = (text: string, form: NumberForm): number => {
         if (form === "word") return wordsToNumber(text.trim());
+        if (form === "unit") {
+          // "4 thousands, 3 hundreds, 5 ones": largest place first, no zero places.
+          const parts = text.split(", ").map((part) => {
+            const m = part.match(/^([1-9]) (one|ten|hundred|thousand|ten thousand|hundred thousand)(s?)$/);
+            expect(m, part).not.toBeNull();
+            expect(m![3] === "", part).toBe(m![1] === "1");
+            return Number(m![1]) * PLACE_VALUES[m![2]];
+          });
+          expect(parts).toEqual([...parts].sort((a, b) => b - a));
+          return parts.reduce((s, v) => s + v, 0);
+        }
         if (form === "standard") {
           expect(spans(text)).toHaveLength(1);
           return num(spans(text)[0]);
@@ -624,6 +682,95 @@ function checkMeta(meta: ProblemMeta, p: WorksheetProblem) {
       expect(bodyText(p)).toContain(`$${meta.given} = ${meta.value}\\text{`);
       break;
     }
+    case "place-name": {
+      const digits = String(meta.n);
+      expect(meta.power).toBeLessThan(digits.length);
+      // The underlined digit is the one at that place.
+      const underlined = bodyText(p).match(/\\underline\{(\d)\}/);
+      expect(underlined).not.toBeNull();
+      expect(underlined![1]).toBe(digits[digits.length - 1 - meta.power]);
+      expect(num(bodyText(p).replace(/\\underline\{(\d)\}/, "$1"))).toBe(meta.n);
+      expect(p.answer).toBe(["ones", "tens", "hundreds", "thousands", "ten thousands"][meta.power]);
+      break;
+    }
+    case "parity": {
+      expect(num(bodyText(p))).toBe(meta.n);
+      expect(p.answer).toBe(meta.n % 2 === 0 ? "even" : "odd");
+      break;
+    }
+    case "make-number": {
+      const { digits, goal, result } = meta;
+      expect(new Set(digits).size).toBe(digits.length);
+      const candidates = permutations(digits)
+        .filter((perm) => perm[0] !== 0)
+        .map((perm) => Number(perm.join("")));
+      expect(result).toBe(goal === "greatest" ? Math.max(...candidates) : Math.min(...candidates));
+      expect(num(p.answer)).toBe(result);
+      expect(spans(bodyText(p))[0].split(",").map((d) => Number(d.replace(/\\ /g, "")))).toEqual(digits);
+      expect(bodyText(p)).toContain(`the ${goal} number`);
+      break;
+    }
+    case "place-units": {
+      const total = meta.from.reduce((s, [count, power]) => s + count * 10 ** power, 0);
+      expect(total).toBe(meta.result * 10 ** meta.to);
+      expect(Number.isInteger(meta.result) && meta.result > 0).toBe(true);
+      expect(num(p.answer)).toBe(meta.result);
+      // "3 hundreds 4 tens = □ tens": every amount printed with its place word.
+      const [lhs, rhs] = bodyText(p).split(" = ");
+      const amounts = [...lhs.matchAll(/\$([^$]+)\$ ([a-z]+)/g)].map(
+        ([, count, word]) => [num(count), ["one", "ten", "hundred", "thousand"].indexOf(word.replace(/s$/, ""))] as [number, number],
+      );
+      expect(amounts).toEqual(meta.from);
+      expect(rhs).toBe(`$\\square$ ${["ones", "tens", "hundreds", "thousands"][meta.to]}`);
+      break;
+    }
+    case "repeated-addition": {
+      const [sum] = spans(bodyText(p))[0].split("=");
+      const addends = sum.split("+").map(num);
+      expect(addends).toEqual(Array.from({ length: meta.times }, () => meta.addend));
+      expect(p.answer.match(/\d+/g)!.map(Number)).toEqual([meta.times, meta.addend, meta.times * meta.addend]);
+      break;
+    }
+    case "fraction-words": {
+      const [n, d] = meta.value;
+      expect(n).toBeGreaterThan(0);
+      expect(n).toBeLessThan(d);
+      const text = bodyText(p);
+      if (meta.to === "number") {
+        expect(fractionFromWords(text.replace("Write as a fraction: ", ""))).toEqual(meta.value);
+        expect(p.answer).toBe(`$\\frac{${n}}{${d}}$`);
+      } else {
+        expect(text).toBe(`Write in words: $\\frac{${n}}{${d}}$`);
+        expect(fractionFromWords(p.answer)).toEqual(meta.value);
+      }
+      break;
+    }
+    case "unit-fraction-sum": {
+      const [n, d] = meta.value;
+      const [sumSide, fractionSide] = meta.to === "fraction" ? [bodyText(p), p.answer] : [p.answer, bodyText(p)];
+      expect(sumSide.match(/\\frac\{(\d+)\}\{(\d+)\}/g)).toEqual(Array.from({ length: n }, () => `\\frac{1}{${d}}`));
+      expect(fractionSide).toContain(`$\\frac{${n}}{${d}}$`);
+      expect(n).toBeGreaterThanOrEqual(2);
+      expect(n).toBeLessThanOrEqual(d);
+      break;
+    }
+    case "money-op": {
+      const { op, a, b, result } = meta;
+      expect(result).toBe(op === "+" ? a + b : a - b);
+      expect(result).toBeGreaterThan(0);
+      expect(cents(p.answer)).toBe(result);
+      expect(p.body.kind).toBe("vertical");
+      if (p.body.kind === "vertical") {
+        const amount = (s: string) => {
+          const m = s.match(/^\$(\d+)\.(\d{2})$/);
+          expect(m, s).not.toBeNull();
+          return Number(m![1]) * 100 + Number(m![2]);
+        };
+        expect([amount(p.body.top), amount(p.body.bottom)]).toEqual([a, b]);
+        expect(p.body.operator).toBe(op === "+" ? "+" : "−");
+      }
+      break;
+    }
   }
 }
 
@@ -650,7 +797,7 @@ describe("worksheet catalog", () => {
   });
 
   it("falls back to defaults on bad params", () => {
-    const def = WORKSHEETS[0];
+    const def = getWorksheet("grade-3", "place-value")!;
     const p = parseWorksheetParams({ n: "999", level: "7", seed: "BAD SEED!", key: "x" }, def);
     expect(p.count).toBe(def.counts[1]);
     expect(p.level).toBe(1);
@@ -668,8 +815,47 @@ describe("worksheet catalog", () => {
     });
   });
 
+  it("files every skill under a unit of its own grade and category", () => {
+    for (const def of WORKSHEETS) {
+      const unit = WORKSHEET_UNITS.find((u) => u.grade === def.grade && u.key === def.unit);
+      expect(unit, `${def.grade}/${def.slug}`).toBeDefined();
+      expect(def.category, def.slug).toBe(unit!.category);
+    }
+    for (const u of WORKSHEET_UNITS) {
+      expect(worksheetsInUnit(u.grade, u.key).length, `${u.grade}/${u.key}`).toBeGreaterThan(0);
+    }
+    const keys = WORKSHEET_UNITS.map((u) => `${u.grade}/${u.key}`);
+    expect(new Set(keys).size).toBe(keys.length);
+  });
+
+  it("gives every skill a unique code in display order", () => {
+    for (const grade of WORKSHEET_GRADES) {
+      const codes = skillsInOrder(grade).map((d) => skillPosition(d).code);
+      expect(codes).toHaveLength(WORKSHEETS.filter((w) => w.grade === grade).length);
+      expect(new Set(codes).size).toBe(codes.length);
+    }
+    expect(skillPosition(getWorksheet("grade-3", "place-value")!).code).toBe("A.2");
+    expect([0, 25, 26, 27].map(unitLetter)).toEqual(["A", "Z", "AA", "BB"]);
+  });
+
+  it("keeps a unit's tile (chip) skills next to each other", () => {
+    for (const u of WORKSHEET_UNITS) {
+      const chips = worksheetsInUnit(u.grade, u.key).map((d) => d.chip !== undefined);
+      expect(chips.filter((c, i) => c && !chips[i - 1]).length, u.key).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it("offers all three levels or just one", () => {
+    for (const def of WORKSHEETS) {
+      expect([[1], [1, 2, 3]], def.slug).toContainEqual([...def.levels]);
+      if (def.levels.length === 1) expect(def.examples[2] ?? def.examples[3], def.slug).toBeUndefined();
+    }
+    // A single-level skill ignores a level from the URL.
+    expect(parseWorksheetParams({ level: "3" }, getWorksheet("grade-3", "multiply-by-7")!).level).toBe(1);
+  });
+
   it("lets answer pages take any count so older QR codes keep working", () => {
-    const def = WORKSHEETS[0];
+    const def = getWorksheet("grade-3", "place-value")!;
     expect(parseWorksheetParams({ n: "30" }, def).count).toBe(def.counts[1]);
     expect(parseWorksheetParams({ n: "30" }, def, { anyCount: true }).count).toBe(30);
     expect(parseWorksheetParams({ n: "41" }, def, { anyCount: true }).count).toBe(def.counts[1]);
@@ -680,7 +866,7 @@ describe("worksheet catalog", () => {
 describe.each(WORKSHEETS.map((w) => [`grade ${w.grade} · ${w.slug}`, w] as const))("%s", (_, def) => {
   const count = def.counts[def.counts.length - 1];
 
-  it.each(LEVELS)("level %i: deterministic, clean, and correct", (level) => {
+  it.each([...def.levels])("level %i: deterministic, clean, and correct", (level) => {
     for (const seed of SEEDS) {
       const problems = buildWorksheet(def, { count, level, seed });
       expect(problems).toHaveLength(count);
@@ -700,7 +886,7 @@ describe.each(WORKSHEETS.map((w) => [`grade ${w.grade} · ${w.slug}`, w] as cons
   });
 
   it("produces mostly unique problems", () => {
-    const problems = buildWorksheet(def, { count: def.counts[0], level: 2, seed: "uniq" });
+    const problems = buildWorksheet(def, { count: def.counts[0], level: def.levels.includes(2) ? 2 : 1, seed: "uniq" });
     const unique = new Set(problems.map((p) => JSON.stringify(p.body)));
     expect(unique.size).toBeGreaterThanOrEqual(Math.ceil(problems.length * 0.8));
   });
@@ -828,7 +1014,7 @@ function checkExampleShow(show: ExampleShow) {
 
 describe("worked examples", () => {
   it.each(WORKSHEETS.map((w) => [`grade ${w.grade} · ${w.slug}`, w] as const))("%s", (_, def) => {
-    for (const level of LEVELS) {
+    for (const level of def.levels) {
       const example = exampleFor(def, level);
       expect(example.think.trim()).not.toBe("");
       checkMathSpans(example.think);

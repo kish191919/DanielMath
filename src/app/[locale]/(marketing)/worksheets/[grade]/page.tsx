@@ -4,19 +4,22 @@ import Link from "next/link";
 import { BookOpen, ChevronRight } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section } from "@/components/site/section";
-import { WorksheetTopicBrowser, type WorksheetTopic } from "@/components/worksheets/topic-browser";
-import { QUARTERS, type Quarter } from "@/lib/curriculum-quarter";
+import { WorksheetUnitBrowser, type UnitItem } from "@/components/worksheets/topic-browser";
+import { GRADE_COLORS, UNIT_COLORS } from "@/components/worksheets/unit-style";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
 import { pageAlternates } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 import {
   gradeSlug,
   parseGradeSlug,
+  skillKey,
+  skillPosition,
   WORKSHEET_GRADES,
   worksheetPath,
   worksheetsForGrade,
+  worksheetsInUnit,
 } from "@/lib/worksheets/catalog";
-import { CATEGORY_LABELS } from "@/lib/worksheets/labels";
+import { unitLetter, unitsForGrade } from "@/lib/worksheets/units";
 
 type Props = { params: Promise<{ locale: string; grade: string }> };
 
@@ -35,12 +38,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return locale === "ko"
     ? {
         title: `${grade}학년 수학 학습지`,
-        description: `FCPS·버지니아 SOL ${grade}학년 진도에 맞춘 주제별 수학 학습지. 난이도와 문제 수를 골라 답안지와 함께 인쇄하세요.`,
+        description: `FCPS·버지니아 SOL ${grade}학년 진도에 맞춘 단원·스킬별 수학 학습지. 세부 스킬을 골라 답안지와 함께 인쇄하세요.`,
         alternates,
       }
     : {
         title: `Grade ${grade} Math Worksheets`,
-        description: `Printable grade ${grade} math worksheets by topic, aligned with FCPS and the Virginia SOL, with answer keys.`,
+        description: `Printable grade ${grade} math worksheets by unit and skill, aligned with FCPS and the Virginia SOL, with answer keys.`,
         alternates,
       };
 }
@@ -52,24 +55,29 @@ export default async function GradeWorksheetsPage({ params }: Props) {
   const isKo = locale === "ko";
   const lp = (path: string) => localePath(locale as Locale, path);
   const ko = isKo ? " font-ko" : "";
-  const sheets = worksheetsForGrade(grade);
-  const quarterRank = (q: Quarter | undefined) => (q ? QUARTERS.indexOf(q) : QUARTERS.length);
-  const topics: WorksheetTopic[] = [...sheets]
-    .sort((a, b) => quarterRank(a.quarter) - quarterRank(b.quarter))
-    .map((s) => {
-      const category = CATEGORY_LABELS.find((c) => c.key === s.category);
-      return {
-        slug: s.slug,
-        href: lp(worksheetPath(s)),
-        title: isKo ? s.title.ko : s.title.en,
-        subtitle: isKo ? s.title.en : undefined,
-        category: s.category,
-        quarter: s.quarter,
-        search: [s.title.ko, s.title.en, s.description.ko, s.description.en, s.category, category?.en]
-          .join(" ")
-          .toLowerCase(),
-      };
-    });
+  const skillCount = worksheetsForGrade(grade).length;
+  const units: UnitItem[] = unitsForGrade(grade).map((u, i) => ({
+    key: u.key,
+    letter: unitLetter(i),
+    title: isKo ? u.title.ko : u.title.en,
+    subtitle: isKo ? u.title.en : undefined,
+    category: u.category,
+    icon: u.icon,
+    color: u.color,
+    search: [u.title.ko, u.title.en].join(" ").toLowerCase(),
+    skills: worksheetsInUnit(grade, u.key).map((s) => ({
+      id: skillKey(s),
+      href: lp(worksheetPath(s)),
+      code: skillPosition(s).code,
+      title: isKo ? s.title.ko : s.title.en,
+      subtitle: isKo ? s.title.en : undefined,
+      chip: s.chip && (isKo ? s.chip.ko : s.chip.en),
+      quarter: s.quarter,
+      multiLevel: s.levels.length > 1,
+      search: [s.title.ko, s.title.en, s.description.ko, s.description.en].join(" ").toLowerCase(),
+    })),
+  }));
+  const gradeTile = UNIT_COLORS[GRADE_COLORS[grade]].tile;
 
   return (
     <>
@@ -83,16 +91,27 @@ export default async function GradeWorksheetsPage({ params }: Props) {
             <span aria-current="page">{isKo ? `${grade}학년` : `Grade ${grade}`}</span>
           </nav>
 
-          <div className="mt-3 flex flex-wrap items-end justify-between gap-5">
-            <div>
-              <h1 className={`text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl${ko}`}>
-                {isKo ? `${grade}학년 수학 학습지` : `Grade ${grade} Math Worksheets`}
-              </h1>
-              <p className={`mt-1.5 text-sm text-navy-500${ko}`}>
-                {isKo
-                  ? `주제 ${sheets.length}개 · 분기는 FCPS 일반반 진도 기준`
-                  : `${sheets.length} topics · Quarters follow FCPS Standard pacing`}
-              </p>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-5">
+            <div className="flex items-center gap-4">
+              <span
+                className={cn(
+                  "flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-3xl font-black shadow-sm sm:h-16 sm:w-16",
+                  gradeTile,
+                )}
+                aria-hidden
+              >
+                {grade}
+              </span>
+              <div>
+                <h1 className={`text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl${ko}`}>
+                  {isKo ? `${grade}학년 수학 학습지` : `Grade ${grade} Math Worksheets`}
+                </h1>
+                <p className={`mt-1 text-sm text-navy-500${ko}`}>
+                  {isKo
+                    ? `단원 ${units.length}개 · 스킬 ${skillCount}개 · 단원을 눌러 연습할 스킬을 골라요`
+                    : `${units.length} units · ${skillCount} skills · Open a unit to pick a skill`}
+                </p>
+              </div>
             </div>
             <nav className="flex gap-1.5" aria-label={isKo ? "학년 선택" : "Choose grade"}>
               {WORKSHEET_GRADES.map((g) => (
@@ -115,7 +134,7 @@ export default async function GradeWorksheetsPage({ params }: Props) {
 
       <Section className="bg-navy-50/50 py-8 sm:py-12">
         <Container>
-          <WorksheetTopicBrowser topics={topics} isKo={isKo} />
+          <WorksheetUnitBrowser units={units} isKo={isKo} />
 
           <p className={`mt-12 flex items-center justify-center gap-2 text-sm text-navy-600${ko}`}>
             <BookOpen className="h-4 w-4 shrink-0 text-navy-400" />

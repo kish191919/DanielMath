@@ -3,7 +3,7 @@ import QRCode from "qrcode";
 import { MathText } from "@/components/math-text";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/lib/site-config";
-import { CATEGORY_LABELS, LEVEL_LABELS, LEVEL_STARS } from "@/lib/worksheets/labels";
+import { LEVEL_LABELS, LEVEL_STARS } from "@/lib/worksheets/labels";
 import type { Level, WorksheetDef, WorksheetExample, WorksheetProblem } from "@/lib/worksheets/types";
 import { ProblemView } from "./problem-view";
 import { WorksheetExampleBox } from "./worksheet-example";
@@ -83,6 +83,8 @@ export async function WorksheetSheet({
   seed,
   answersUrl,
   showKey,
+  code,
+  unitTitle,
   example,
 }: {
   def: WorksheetDef;
@@ -91,16 +93,16 @@ export async function WorksheetSheet({
   seed: string;
   answersUrl: string;
   showKey: boolean;
+  /** Skill code, "C.2". */
+  code: string;
+  /** English unit title. */
+  unitTitle: string;
   /** null when the example is switched off. */
   example: WorksheetExample | null;
 }) {
   const qrSvg = await QRCode.toString(answersUrl, { type: "svg", margin: 1 });
-  const category = CATEGORY_LABELS.find((c) => c.key === def.category)?.en;
-  const meta = [
-    `${LEVEL_STARS[level]} ${LEVEL_LABELS[level].en}`,
-    category,
-    def.quarter && `Quarter ${def.quarter.slice(1)}`,
-  ].filter(Boolean);
+  const levelLabel = def.levels.length > 1 ? `${LEVEL_STARS[level]} ${LEVEL_LABELS[level].en}` : null;
+  const meta = [`Skill ${code} · ${unitTitle}`, levelLabel, def.quarter && `Quarter ${def.quarter.slice(1)}`].filter(Boolean);
   const pages = showKey ? 2 : 1;
   const keyColumns = def.columns === 2 ? 2 : problems.length % 4 === 0 ? 4 : 3;
 
@@ -176,7 +178,7 @@ export async function WorksheetSheet({
               <h2 className="mt-2 text-xl font-bold text-navy-900">Answer Key</h2>
             </div>
             <p className="text-xs text-navy-500">
-              {def.title.en} · {LEVEL_STARS[level]} {LEVEL_LABELS[level].en}
+              {[`${code} ${def.title.en}`, levelLabel].filter(Boolean).join(" · ")}
             </p>
           </header>
           <ol className={cn("mt-4 grid border-l border-t border-navy-200 text-sm text-navy-800", KEY_GRID[keyColumns])}>

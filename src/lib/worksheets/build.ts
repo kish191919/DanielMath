@@ -72,9 +72,11 @@ export function parseWorksheetParams(
   const p = ParamsSchema.parse(raw);
   const n = p.n;
   const countOk = n !== undefined && (anyCount ? n >= 1 && n <= MAX_ANSWER_COUNT : def.counts.includes(n));
+  const level = Number(p.level) as Level;
   return {
     count: countOk ? n : defaultCount(def),
-    level: p.level ? (Number(p.level) as Level) : 1,
+    // Single-level skills ignore any other level in the URL.
+    level: def.levels.includes(level) ? level : def.levels[0],
     seed: p.seed ?? null,
     showKey: p.key !== "0",
     showExample: p.ex !== "0",

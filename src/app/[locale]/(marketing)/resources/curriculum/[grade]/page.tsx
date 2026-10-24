@@ -218,8 +218,8 @@ function WorksheetCta({ g, lp, isKo }: { g: GradeData; lp: (p: string) => string
           </span>
           <span className={`block text-sm text-navy-600${isKo ? " font-ko" : ""}`}>
             {isKo
-              ? `학교 진도에 맞춘 ${count}개 주제 — 매번 새 문제로 만들어 바로 인쇄하세요.`
-              : `${count} topics that follow the school pacing — fresh problems, ready to print.`}
+              ? `학교 진도에 맞춘 ${count}개 스킬 — 매번 새 문제로 만들어 바로 인쇄하세요.`
+              : `${count} skills that follow the school pacing — fresh problems, ready to print.`}
           </span>
         </span>
         <ArrowRight className="h-5 w-5 shrink-0 text-navy-500 transition group-hover:translate-x-0.5 group-hover:text-navy-900" />

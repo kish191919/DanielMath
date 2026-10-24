@@ -96,3 +96,43 @@ export const primeFactorization: Generator<{ mode: "classify" | "factorize"; min
     meta: { type: "prime-factorization", n, factors },
   };
 };
+
+export const factorsMultiples: Generator<{ task: "is-factor" | "list-factors" | "list-multiples"; max: number }> = (
+  rng,
+  { task, max },
+) => {
+  if (task === "list-multiples") {
+    const k = randInt(rng, 2, 12);
+    return {
+      body: { kind: "text", text: `List the first five multiples of ${k}.`, blank: "line" },
+      answer: [1, 2, 3, 4, 5].map((i) => k * i).join(", "),
+      meta: { type: "multiples", k, count: 5 },
+    };
+  }
+
+  if (task === "list-factors") {
+    // Composite, so the list is more than "1 and itself".
+    let n: number;
+    do n = randInt(rng, 6, max);
+    while (isPrime(n));
+    const factors = Array.from({ length: n }, (_, i) => i + 1).filter((d) => n % d === 0);
+    return {
+      body: { kind: "text", text: `List all the factors of ${n}.`, blank: "line" },
+      answer: factors.join(", "),
+      meta: { type: "factor-list", n },
+    };
+  }
+
+  // About half the answers are yes.
+  const k = randInt(rng, 2, 12);
+  let n: number;
+  if (rng() < 0.5) n = k * randInt(rng, 2, Math.floor(max / k));
+  else
+    do n = randInt(rng, k + 1, max);
+    while (n % k === 0);
+  return {
+    body: { kind: "text", text: `Is ${k} a factor of ${n}?`, blank: "inline" },
+    answer: n % k === 0 ? "yes" : "no",
+    meta: { type: "factor-check", n, k },
+  };
+};

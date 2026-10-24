@@ -1,5 +1,16 @@
 import { pick, randInt, type Rng } from "../rng";
-import { compareDecimals, compareR, decimalToString, fractionLatex, gcd, rescale, simplify, type Decimal } from "../math";
+import {
+  compareDecimals,
+  compareR,
+  decimalToString,
+  fractionLatex,
+  gcd,
+  latexNumber,
+  numberToWords,
+  rescale,
+  simplify,
+  type Decimal,
+} from "../math";
 import type { Generator, Rational } from "../types";
 
 function randomDecimal(rng: Rng, scale: number, wholeMin: number, wholeMax: number): Decimal {
@@ -221,4 +232,65 @@ export const compareRationals: Generator<{
       meta: { type: "compare", left: left.value, right: right.value, symbol },
     };
   }
+};
+
+const PLACE_NAMES: [string, string][] = [
+  ["tenth", "tenths"],
+  ["hundredth", "hundredths"],
+  ["thousandth", "thousandths"],
+];
+
+/** The value (0.07) or the place name (hundredths) of an underlined digit after the decimal point. */
+export const decimalDigit: Generator<{ scales: readonly number[]; wholeMax: number; ask: "value" | "name" }> = (
+  rng,
+  { scales, wholeMax, ask },
+) => {
+  const n = decimalToString(randomDecimal(rng, pick(rng, scales), 0, wholeMax));
+  const [whole, frac] = n.split(".");
+  // A 0 has no value worth asking for, but it still has a place.
+  const candidates = [...frac].map((_, i) => i).filter((i) => ask === "name" || frac[i] !== "0");
+  const i = pick(rng, candidates);
+  const shown = [...frac].map((d, k) => (k === i ? `\\underline{${d}}` : d)).join("");
+  return {
+    body: { kind: "text", text: `$${latexNumber(Number(whole))}.${shown}$`, blank: "inline" },
+    answer: ask === "value" ? decimalToString({ units: Number(frac[i]), scale: i + 1 }) : PLACE_NAMES[i][1],
+    meta: { type: "decimal-digit", n, place: i + 1, ask },
+  };
+};
+
+/** 4.37 ↔ "four and thirty-seven hundredths". */
+export const decimalInWords: Generator<{ scales: readonly number[]; wholeMax: number }> = (rng, { scales, wholeMax }) => {
+  const d = randomDecimal(rng, pick(rng, scales), 0, wholeMax);
+  const n = decimalToString(d);
+  const whole = Math.floor(d.units / 10 ** d.scale);
+  const frac = d.units % 10 ** d.scale;
+  const words = `${whole ? `${numberToWords(whole)} and ` : ""}${numberToWords(frac)} ${PLACE_NAMES[d.scale - 1][frac === 1 ? 0 : 1]}`;
+  const to = pick(rng, ["number", "words"] as const);
+  return {
+    body: {
+      kind: "text",
+      text: to === "number" ? `Write as a decimal: ${words}` : `Write in words: $${n}$`,
+      blank: "line",
+    },
+    answer: to === "number" ? n : words,
+    meta: { type: "decimal-words", n, to },
+  };
+};
+
+/** 3.45 × 100 or 3.45 ÷ 100: the decimal point moves one place per zero. */
+export const decimalPowersOfTen: Generator<{ op: "*" | "/"; powers: readonly number[] }> = (rng, { op, powers }) => {
+  const p = pick(rng, powers);
+  // Products stay under 1,000, so the plain answer never needs a comma.
+  const d = randomDecimal(rng, randInt(rng, 1, 2), 0, op === "*" && p === 3 ? 0 : 9);
+  const scale = op === "*" ? d.scale - p : d.scale + p;
+  const result: Decimal = scale >= 0 ? { units: d.units, scale } : { units: d.units * 10 ** -scale, scale: 0 };
+  return {
+    body: {
+      kind: "text",
+      text: `$${decimalToString(d)} ${op === "*" ? "\\times" : "\\div"} ${latexNumber(10 ** p)} =$`,
+      blank: "inline",
+    },
+    answer: decimalToString(result),
+    meta: { type: "decimal-op", op, a: decimalToString(d), b: String(10 ** p), result: decimalToString(result) },
+  };
 };

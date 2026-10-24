@@ -1,6 +1,6 @@
-import { pick, randDigits, randInt, type Rng } from "../rng";
-import { formatNumber } from "../math";
-import type { Generator } from "../types";
+import { pick, randDigits, randInt, shuffle, type Rng } from "../rng";
+import { formatNumber, latexNumber } from "../math";
+import type { Generator, WorksheetProblem } from "../types";
 
 // Digits (least significant first) for an a ± b pair that never carries or
 // borrows — the "no regrouping" warm-up level.
@@ -28,24 +28,54 @@ function noRegroupPair(rng: Rng, topLen: number, bottomLen: number, op: "+" | "-
   return [a, b];
 }
 
+/**
+ * A carry starts where a column's digits sum past 9; a borrow starts where the
+ * top digit is smaller. Either way, some column has to regroup.
+ */
+function regroups(a: number, b: number, op: "+" | "-"): boolean {
+  for (let p = 1; p <= Math.max(a, b); p *= 10) {
+    const x = Math.floor(a / p) % 10;
+    const y = Math.floor(b / p) % 10;
+    if (op === "+" ? x + y >= 10 : x < y) return true;
+  }
+  return false;
+}
+
+// Every digit between the lead and the ones is 0 (503, 7,006), and the ones
+// digit below is bigger, so the borrow has to cross the zeros.
+function acrossZerosPair(rng: Rng, topLen: number, bottomLen: number): [number, number] {
+  for (;;) {
+    const ones = randInt(rng, 0, 8);
+    const a = randInt(rng, 1, 9) * 10 ** (topLen - 1) + ones;
+    const b = randDigits(rng, bottomLen);
+    if (b % 10 > ones && b < a) return [a, b];
+  }
+}
+
 export const addSubtract: Generator<{
   digits: readonly [number, number];
   op: "+" | "-" | "mixed";
   regroup: boolean;
-}> = (rng, { digits, op: opParam, regroup }) => {
+  /** With `regroup`: every problem regroups at least once. */
+  mustRegroup?: boolean;
+  /** Subtraction from numbers like 400 or 503. */
+  acrossZeros?: boolean;
+}> = (rng, { digits, op: opParam, regroup, mustRegroup, acrossZeros }) => {
   const op = opParam === "mixed" ? pick(rng, ["+", "-"] as const) : opParam;
   let a: number;
   let b: number;
   // A difference of 0 (44 − 44) isn't practice.
   do {
-    if (regroup) {
+    if (acrossZeros) {
+      [a, b] = acrossZerosPair(rng, digits[0], digits[1]);
+    } else if (regroup) {
       a = randDigits(rng, digits[0]);
       b = randDigits(rng, digits[1]);
       if (op === "-" && a < b) [a, b] = [b, a];
     } else {
       [a, b] = noRegroupPair(rng, digits[0], digits[1], op);
     }
-  } while (op === "-" && a === b);
+  } while ((op === "-" && a === b) || (mustRegroup && !regroups(a, b, op)));
   const result = op === "+" ? a + b : a - b;
 
   return {
@@ -96,6 +126,217 @@ export const facts: Generator<{
         meta: { type: "int-op", op, a: dividend, b: y, result: x, unknown: "result" },
       };
 };
+
+const SYMBOL = { "+": "+", "-": "-", "*": "\\times", "/": "\\div" } as const;
+
+export const tableFacts: Generator<{
+  op: "*" | "/";
+  /** One factor (×) or the divisor (÷) comes from these tables; the other number runs to 10. */
+  tables: readonly number[];
+  /** Ask for the missing factor or divisor. Tables must not include 0 (0 × □ = 0 has no single answer). */
+  missing?: boolean;
+  /** Largest other factor or quotient. */
+  max?: number;
+}> = (rng, { op, tables, missing, max = 10 }) => {
+  const k = pick(rng, tables);
+  if (op === "/") {
+    const q = randInt(rng, 1, max);
+    const dividend = k * q;
+    return missing
+      ? {
+          body: { kind: "text", text: `$${dividend} \\div \\square = ${q}$`, blank: "none" },
+          answer: String(k),
+          meta: { type: "int-op", op, a: dividend, b: k, result: q, unknown: "b" },
+        }
+      : {
+          body: { kind: "text", text: `$${dividend} \\div ${k} =$`, blank: "inline" },
+          answer: String(q),
+          meta: { type: "int-op", op, a: dividend, b: k, result: q, unknown: "result" },
+        };
+  }
+
+  const n = randInt(rng, missing ? 1 : 0, max);
+  // Both orders, so 7 × 3 and 3 × 7 are practiced as the same fact.
+  const tableFirst = rng() < 0.5;
+  const [a, b] = tableFirst ? [k, n] : [n, k];
+  const product = a * b;
+  if (!missing) {
+    return {
+      body: { kind: "text", text: `$${a} \\times ${b} =$`, blank: "inline" },
+      answer: String(product),
+      meta: { type: "int-op", op, a, b, result: product, unknown: "result" },
+    };
+  }
+  return {
+    body: {
+      kind: "text",
+      text: tableFirst ? `$${k} \\times \\square = ${product}$` : `$\\square \\times ${k} = ${product}$`,
+      blank: "none",
+    },
+    answer: String(n),
+    meta: { type: "int-op", op, a, b, result: product, unknown: tableFirst ? "b" : "a" },
+  };
+};
+
+export const multiplyTens: Generator<{ max: number }> = (rng, { max }) => {
+  const x = randInt(rng, 2, max);
+  const tens = randInt(rng, 1, 9) * 10;
+  const [a, b] = rng() < 0.5 ? [x, tens] : [tens, x];
+  return {
+    body: { kind: "text", text: `$${a} \\times ${b} =$`, blank: "inline" },
+    answer: formatNumber(a * b),
+    meta: { type: "int-op", op: "*", a, b, result: a * b, unknown: "result" },
+  };
+};
+
+/** 34 × 100 or 5,600 ÷ 100: whole numbers times or divided by 10, 100, or 1,000. */
+export const powersOfTen: Generator<{ op: "*" | "/"; powers: readonly number[]; digits: readonly [number, number] }> = (
+  rng,
+  { op, powers, digits },
+) => {
+  const power = 10 ** pick(rng, powers);
+  const n = randDigits(rng, randInt(rng, digits[0], digits[1]));
+  const [a, b, result] = op === "*" ? [n, power, n * power] : [n * power, power, n];
+  return {
+    body: { kind: "text", text: `$${latexNumber(a)} ${SYMBOL[op]} ${latexNumber(b)} =$`, blank: "inline" },
+    answer: formatNumber(result),
+    meta: { type: "int-op", op, a, b, result, unknown: "result" },
+  };
+};
+
+/** 6 × 400, 30 × 40, or 2,400 ÷ 6: a basic fact carried over to tens, hundreds, or thousands. */
+export const factPowers: Generator<{
+  op: "*" | "/";
+  powers: readonly number[];
+  /** Both factors end in zeros (30 × 40). */
+  bothTens?: boolean;
+}> = (rng, { op, powers, bothTens }) => {
+  const x = randInt(rng, 2, 9);
+  const y = randInt(rng, 2, 9);
+  const big = y * 10 ** pick(rng, powers);
+  if (op === "/") {
+    const dividend = x * big;
+    return {
+      body: { kind: "text", text: `$${latexNumber(dividend)} \\div ${x} =$`, blank: "inline" },
+      answer: formatNumber(big),
+      meta: { type: "int-op", op, a: dividend, b: x, result: big, unknown: "result" },
+    };
+  }
+  const small = bothTens ? x * 10 : x;
+  const [a, b] = rng() < 0.5 ? [small, big] : [big, small];
+  return {
+    body: { kind: "text", text: `$${latexNumber(a)} \\times ${latexNumber(b)} =$`, blank: "inline" },
+    answer: formatNumber(a * b),
+    meta: { type: "int-op", op, a, b, result: a * b, unknown: "result" },
+  };
+};
+
+type Op = keyof typeof SYMBOL;
+
+// Two numbers for `op`: + and − within `max` (each part at least a tenth of
+// it), × and ÷ within the 10 × 10 facts.
+function opPair(rng: Rng, op: Op, max: number, zero: boolean): { a: number; b: number; result: number } {
+  if (op === "+") {
+    const result = randInt(rng, Math.ceil(max / 5), max);
+    const a = randInt(rng, Math.ceil(result / 10), result - Math.ceil(result / 10));
+    return { a, b: result - a, result };
+  }
+  if (op === "-") {
+    const a = randInt(rng, Math.ceil(max / 5), max);
+    const b = randInt(rng, Math.ceil(a / 10), a - Math.ceil(a / 10));
+    return { a, b, result: a - b };
+  }
+  if (op === "*") {
+    const a = randInt(rng, zero ? 0 : 1, 10);
+    const b = randInt(rng, zero ? 0 : 1, 10);
+    return { a, b, result: a * b };
+  }
+  const b = randInt(rng, 1, 10);
+  const result = randInt(rng, zero ? 0 : 1, 10);
+  return { a: b * result, b, result };
+}
+
+export const missingNumber: Generator<{
+  ops: readonly Op[];
+  /** Largest sum or starting number for + and −. */
+  max: number;
+}> = (rng, { ops, max }) => {
+  const op = pick(rng, ops);
+  const { a, b, result } = opPair(rng, op, max, false);
+  const unknown = pick(rng, ["a", "b"] as const);
+  const show = (n: number, hide: boolean) => (hide ? "\\square" : latexNumber(n));
+
+  return {
+    body: {
+      kind: "text",
+      text: `$${show(a, unknown === "a")} ${SYMBOL[op]} ${show(b, unknown === "b")} = ${latexNumber(result)}$`,
+      blank: "none",
+    },
+    answer: formatNumber(unknown === "a" ? a : b),
+    meta: { type: "int-op", op, a, b, result, unknown },
+  };
+};
+
+export const fourOperations: Generator<{ addMax: number }> = (rng, { addMax }) => {
+  const op = pick(rng, ["+", "-", "*", "/"] as const);
+  const { a, b, result } = opPair(rng, op, addMax, true);
+  return {
+    body: { kind: "text", text: `$${latexNumber(a)} ${SYMBOL[op]} ${latexNumber(b)} =$`, blank: "inline" },
+    answer: formatNumber(result),
+    meta: { type: "int-op", op, a, b, result, unknown: "result" },
+  };
+};
+
+export const factFamily: Generator<{ max: number }> = (rng, { max }) => {
+  const a = randInt(rng, 2, max);
+  const b = randInt(rng, 2, max);
+  const product = a * b;
+  return rng() < 0.5
+    ? {
+        body: {
+          kind: "text",
+          text: `If $${a} \\times ${b} = ${product}$, then $${product} \\div ${b} = \\square$`,
+          blank: "none",
+        },
+        answer: String(a),
+        meta: { type: "int-op", op: "/", a: product, b, result: a, unknown: "result" },
+      }
+    : {
+        body: {
+          kind: "text",
+          text: `If $${product} \\div ${a} = ${b}$, then $${a} \\times \\square = ${product}$`,
+          blank: "none",
+        },
+        answer: String(b),
+        meta: { type: "int-op", op: "*", a, b, result: product, unknown: "b" },
+      };
+};
+
+function sumOrProduct(op: "+" | "*", values: number[]): WorksheetProblem {
+  const result = values.reduce((s, v) => (op === "+" ? s + v : s * v));
+  return {
+    body: {
+      kind: "text",
+      text: `$${values.map(latexNumber).join(op === "+" ? " + " : " \\times ")} =$`,
+      blank: "inline",
+    },
+    answer: formatNumber(result),
+    meta: { type: "expression", expr: values.join(op), result },
+  };
+}
+
+export const addThree: Generator<{ digits: readonly [number, number] }> = (rng, { digits }) =>
+  sumOrProduct(
+    "+",
+    [0, 1, 2].map(() => randDigits(rng, randInt(rng, digits[0], digits[1]))),
+  );
+
+// Two small factors and one up to 10, in any order: 2 × 7 × 3.
+export const multiplyThree: Generator<{ smallMax: number }> = (rng, { smallMax }) =>
+  sumOrProduct(
+    "*",
+    shuffle(rng, [randInt(rng, 2, smallMax), randInt(rng, 2, smallMax), randInt(rng, 1, 10)]),
+  );
 
 export const multiply: Generator<{
   topDigits: number;

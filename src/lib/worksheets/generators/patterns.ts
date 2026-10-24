@@ -24,16 +24,32 @@ function twoIndices(rng: Rng, from: number, to: number): number[] {
   return [a, b].sort((x, y) => x - y);
 }
 
-function sequence(rng: Rng, ops: readonly ("+" | "-" | "*")[], length: number, gaps: "end" | "inside"): WorksheetProblem {
+function sequence(
+  rng: Rng,
+  ops: readonly ("+" | "-" | "*")[],
+  length: number,
+  gaps: "end" | "inside",
+  skip: readonly number[] | undefined,
+): WorksheetProblem {
   for (;;) {
-    const op = pick(rng, ops);
-    const rule: PatternRule = { op, k: op === "*" ? randInt(rng, 2, 3) : randInt(rng, 2, 12) };
-    const start =
-      op === "*"
-        ? randInt(rng, 1, 6)
-        : op === "-"
-          ? randInt(rng, rule.k * (length - 1) + 1, rule.k * (length - 1) + 60)
-          : randInt(rng, 1, 50);
+    let op: PatternRule["op"];
+    let rule: PatternRule;
+    let start: number;
+    if (skip) {
+      // Skip-counting: add k, starting from a multiple of k.
+      op = "+";
+      rule = { op, k: pick(rng, skip) };
+      start = rule.k * randInt(rng, 1, Math.max(1, Math.min(20, Math.floor(999 / rule.k) - length)));
+    } else {
+      op = pick(rng, ops);
+      rule = { op, k: op === "*" ? randInt(rng, 2, 3) : randInt(rng, 2, 12) };
+      start =
+        op === "*"
+          ? randInt(rng, 1, 6)
+          : op === "-"
+            ? randInt(rng, rule.k * (length - 1) + 1, rule.k * (length - 1) + 60)
+            : randInt(rng, 1, 50);
+    }
     const terms = [start];
     for (let i = 1; i < length; i++) terms.push(apply(rule, terms[i - 1]));
     // Sub-1,000 terms keep thousands commas out of a comma-separated list.
@@ -82,9 +98,16 @@ function table(rng: Rng, ops: readonly PatternRule["op"][], maxK: number, cells:
 }
 
 export const numberPatterns: Generator<
-  | { kind: "sequence"; ops: readonly ("+" | "-" | "*")[]; length: number; gaps: "end" | "inside" }
+  | {
+      kind: "sequence";
+      ops: readonly ("+" | "-" | "*")[];
+      length: number;
+      gaps: "end" | "inside";
+      /** Skip-count by one of these instead of following `ops`. */
+      skip?: readonly number[];
+    }
   | { kind: "table"; ops: readonly PatternRule["op"][]; maxK: number; cells: number }
 > = (rng, params) =>
   params.kind === "sequence"
-    ? sequence(rng, params.ops, params.length, params.gaps)
+    ? sequence(rng, params.ops, params.length, params.gaps, params.skip)
     : table(rng, params.ops, params.maxK, params.cells);

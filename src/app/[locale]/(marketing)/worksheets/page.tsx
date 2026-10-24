@@ -4,9 +4,12 @@ import Link from "next/link";
 import { ArrowRight, FileText, KeyRound, Printer, RefreshCw } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { Section, SectionHeader } from "@/components/site/section";
+import { GRADE_COLORS, UNIT_COLORS, UNIT_ICONS } from "@/components/worksheets/unit-style";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
 import { pageAlternates } from "@/lib/seo";
+import { cn } from "@/lib/utils";
 import { gradeSlug, WORKSHEET_GRADES, worksheetsForGrade } from "@/lib/worksheets/catalog";
+import { unitsForGrade } from "@/lib/worksheets/units";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -32,8 +35,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 const STEPS = [
   {
     icon: FileText,
-    ko: { title: "학년·주제 선택", body: "학교 진도(FCPS 분기)에 맞춰 주제를 고르세요." },
-    en: { title: "Pick a grade & topic", body: "Topics follow the FCPS quarter-by-quarter pacing." },
+    ko: { title: "학년·스킬 선택", body: "단원을 펼쳐 학교 진도(FCPS 분기)에 맞는 세부 스킬을 고르세요." },
+    en: { title: "Pick a grade & skill", body: "Open a unit and pick a skill; quarters follow the FCPS pacing." },
   },
   {
     icon: RefreshCw,
@@ -85,14 +88,24 @@ export default async function WorksheetsHubPage({ params }: Props) {
           <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
             {WORKSHEET_GRADES.map((grade) => {
               const count = worksheetsForGrade(grade).length;
+              const units = unitsForGrade(grade);
+              const sw = UNIT_COLORS[GRADE_COLORS[grade]];
               return (
                 <Link
                   key={grade}
                   href={lp(`/worksheets/${gradeSlug(grade)}`)}
-                  className="group flex flex-col rounded-2xl border border-navy-100 bg-white p-4 shadow-sm transition hover:border-navy-300 hover:shadow-md sm:p-6"
+                  className={cn(
+                    "group flex flex-col rounded-2xl bg-white p-4 shadow-sm ring-1 transition hover:-translate-y-0.5 hover:shadow-md sm:p-6",
+                    sw.ring,
+                  )}
                 >
                   <div className="flex items-start justify-between">
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-navy-900 text-xl font-bold text-white sm:h-12 sm:w-12 sm:text-2xl">
+                    <span
+                      className={cn(
+                        "inline-flex h-10 w-10 items-center justify-center rounded-xl text-xl font-black shadow-sm sm:h-12 sm:w-12 sm:text-2xl",
+                        sw.tile,
+                      )}
+                    >
                       {grade}
                     </span>
                     <ArrowRight className="h-5 w-5 text-navy-300 transition group-hover:translate-x-0.5 group-hover:text-navy-900" />
@@ -101,8 +114,22 @@ export default async function WorksheetsHubPage({ params }: Props) {
                     {isKo ? `${grade}학년` : `Grade ${grade}`}
                   </h2>
                   <p className={`mt-0.5 text-sm text-navy-500${ko}`}>
-                    {isKo ? `${count}개 주제` : `${count} topics`}
+                    {isKo ? `단원 ${units.length}개 · 스킬 ${count}개` : `${units.length} units · ${count} skills`}
                   </p>
+                  {/* A peek at what's inside: one tile per unit. */}
+                  <div className="mt-4 flex flex-wrap gap-1" aria-hidden>
+                    {units.map((u) => {
+                      const Icon = UNIT_ICONS[u.icon];
+                      return (
+                        <span
+                          key={u.key}
+                          className={cn("flex h-6 w-6 items-center justify-center rounded-md", UNIT_COLORS[u.color].soft)}
+                        >
+                          <Icon className={cn("h-3.5 w-3.5", UNIT_COLORS[u.color].text)} strokeWidth={2.5} />
+                        </span>
+                      );
+                    })}
+                  </div>
                 </Link>
               );
             })}

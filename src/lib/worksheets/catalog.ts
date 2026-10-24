@@ -17,415 +17,35 @@ import {
 import { factorsGcf, gcfLcm, primeFactorization } from "./generators/factors";
 import {
   addSubtractFractions,
-  compareFractions,
   convertMixed,
   equivalentFractions,
-  fractionModel,
   multiplyDivideFractions,
   multiplyFractionWhole,
 } from "./generators/fractions";
 import { triangleAngles } from "./generators/geometry";
 import { circles, convertUnits } from "./generators/measurement";
-import { countMoney } from "./generators/money";
 import { orderValues } from "./generators/ordering";
 import { numberPatterns } from "./generators/patterns";
 import { probability } from "./generators/probability";
 import { percents, ratiosRates } from "./generators/ratios";
 import { meanMedianModeRange } from "./generators/statistics";
-import { elapsedTime, tellingTime } from "./generators/time";
-import { compareWhole, estimate, numberForms, placeValue, rounding } from "./generators/whole-numbers";
-import { addSubtract, facts, longDivision, multiply } from "./generators/whole-ops";
-import type { Generator, GradeNum, Level, WorksheetDef } from "./types";
-
-// Closes over the generator's param type so the catalog can hold worksheets
-// with different param shapes in one array.
-function defineWorksheet<P>(
-  def: Omit<WorksheetDef, "generate"> & { generator: Generator<P>; levels: Record<Level, P> },
-): WorksheetDef {
-  const { generator, levels, ...rest } = def;
-  return { ...rest, generate: (rng, level) => generator(rng, levels[level]) };
-}
+import { estimate, rounding } from "./generators/whole-numbers";
+import { facts, longDivision, multiply } from "./generators/whole-ops";
+import { GRADE_3 } from "./catalog-grade3";
+import { defineWorksheet } from "./define";
+import { unitLetter, unitsForGrade } from "./units";
+import type { GradeNum, WorksheetDef } from "./types";
 
 const FRACTION_DENS = [2, 3, 4, 5, 6, 8, 10, 12];
 
 export const WORKSHEETS: WorksheetDef[] = [
-  // ── Grade 3 ────────────────────────────────────────────────────────────────
-  defineWorksheet({
-    grade: 3,
-    slug: "place-value",
-    title: { en: "Place Value", ko: "자릿값" },
-    description: {
-      en: "Find the value of the underlined digit in numbers up to six digits.",
-      ko: "밑줄 친 숫자가 나타내는 값 구하기 (최대 6자리 수)",
-    },
-    instructions: "Write the value of the underlined digit.",
-    category: "수·연산",
-    conceptCode: "ns-place-value",
-    quarter: "Q1",
-    counts: [12, 18, 24],
-    columns: 3,
-    generator: placeValue,
-    levels: { 1: { digits: [3, 4] }, 2: { digits: [4, 5] }, 3: { digits: [5, 6] } },
-    examples: {
-      1: {
-        show: { kind: "math", lines: ["$4{,}\\underline{6}52 \\rightarrow 600$"] },
-        think: "The 6 is in the hundreds place, so it is worth $6 \\times 100 = 600$.",
-      },
-      2: {
-        show: { kind: "math", lines: ["$3\\underline{5}{,}218 \\rightarrow 50{,}000$"] },
-        think: "The 5 is in the ten thousands place, so it is worth $5 \\times 10{,}000 = 50{,}000$.",
-      },
-    },
-  }),
-  defineWorksheet({
-    grade: 3,
-    slug: "number-forms",
-    title: { en: "Standard, Expanded & Word Form", ko: "수의 세 가지 표현 (표준형·전개형·단어형)" },
-    description: {
-      en: "Write numbers up to six digits in standard, expanded, and word form.",
-      ko: "여섯 자리까지의 수를 표준형·전개형(자릿값의 합)·영어 단어로 나타내기",
-    },
-    instructions: "Write each number in the form asked for.",
-    category: "수·연산",
-    conceptCode: "ns-place-value",
-    quarter: "Q1",
-    counts: [4, 6, 8],
-    columns: 2,
-    generator: numberForms,
-    levels: {
-      1: { tasks: ["to-expanded"], digits: [3, 4] },
-      2: { tasks: ["to-expanded", "to-standard"], digits: [5, 6] },
-      3: { tasks: ["word-to-standard", "to-word"], digits: [4, 6] },
-    },
-    examples: {
-      1: {
-        show: { kind: "math", lines: ["$4{,}305 = 4{,}000 + 300 + 5$"] },
-        think: "Write the value of each digit. The 0 in the tens place is worth 0, so leave it out.",
-      },
-      2: {
-        show: { kind: "math", lines: ["$60{,}000 + 2{,}000 + 40 + 7 = 62{,}047$"] },
-        think: "There are no hundreds, so write a 0 in the hundreds place.",
-      },
-      3: {
-        show: { kind: "math", lines: ["$35{,}612$ = thirty-five thousand, six hundred twelve"] },
-        think: "Read the digits before the comma and say thousand, then read the last three digits.",
-      },
-    },
-  }),
-  defineWorksheet({
-    grade: 3,
-    slug: "compare-numbers",
-    title: { en: "Comparing Numbers", ko: "수의 크기 비교" },
-    description: {
-      en: "Compare whole numbers up to 9,999 using >, <, or =.",
-      ko: "9,999 이하의 수를 >, <, = 로 비교하기",
-    },
-    instructions: "Write >, <, or = in each circle.",
-    category: "수·연산",
-    conceptCode: "ns-compare-order-whole",
-    quarter: "Q1",
-    counts: [12, 18, 21],
-    columns: 3,
-    generator: compareWhole,
-    levels: {
-      1: { digits: 3, close: false },
-      2: { digits: 4, close: false },
-      3: { digits: 4, close: true },
-    },
-    examples: {
-      1: {
-        show: { kind: "compare", left: "$582$", right: "$528$", symbol: ">" },
-        think: "The hundreds are the same (5). Compare the tens: $8 > 2$, so $582 > 528$.",
-      },
-      2: {
-        show: { kind: "compare", left: "$4{,}315$", right: "$4{,}351$", symbol: "<" },
-        think: "The thousands and hundreds match. Compare the tens: $1 < 5$, so $4{,}315 < 4{,}351$.",
-      },
-    },
-  }),
-  defineWorksheet({
-    grade: 3,
-    slug: "add-subtract",
-    title: { en: "Addition & Subtraction", ko: "덧셈과 뺄셈" },
-    description: {
-      en: "Multi-digit addition and subtraction, with and without regrouping.",
-      ko: "받아올림·받아내림이 있는/없는 여러 자리 수의 덧셈과 뺄셈",
-    },
-    instructions: "Add or subtract.",
-    category: "수·연산",
-    conceptCode: "ops-add-sub-multi-digit",
-    quarter: "Q1",
-    counts: [8, 12, 16],
-    columns: 4,
-    generator: addSubtract,
-    levels: {
-      1: { digits: [2, 2], op: "mixed", regroup: false },
-      2: { digits: [3, 3], op: "mixed", regroup: true },
-      3: { digits: [4, 3], op: "mixed", regroup: true },
-    },
-    examples: {
-      1: {
-        show: { kind: "vertical", operator: "+", top: "43", bottom: "25", align: "right" },
-        think: "Add the ones first ($3 + 5 = 8$), then the tens ($4 + 2 = 6$).",
-      },
-      2: {
-        show: { kind: "vertical", operator: "+", top: "368", bottom: "275", align: "right" },
-        think: "$8 + 5 = 13$: write 3, carry 1 ten. $1 + 6 + 7 = 14$: write 4, carry 1 hundred. $1 + 3 + 2 = 6$.",
-      },
-      3: {
-        show: { kind: "vertical", operator: "−", top: "4312", bottom: "1205", align: "right" },
-        think: "$2 < 5$, so regroup 1 ten as 10 ones: $12 - 5 = 7$. Then $0 - 0 = 0$, $3 - 2 = 1$, $4 - 1 = 3$.",
-      },
-    },
-  }),
-  defineWorksheet({
-    grade: 3,
-    slug: "multiplication-facts",
-    title: { en: "Multiplication Facts (0–10)", ko: "곱셈구구 (0–10)" },
-    description: {
-      en: "Quick recall of multiplication facts through 10 × 10.",
-      ko: "10 × 10까지의 곱셈구구 빠르게 익히기",
-    },
-    instructions: "Multiply. Fill in any missing numbers.",
-    category: "수·연산",
-    conceptCode: "ops-mult-facts",
-    quarter: "Q2",
-    counts: [12, 18, 24],
-    columns: 3,
-    generator: facts,
-    levels: {
-      1: { op: "*", min: 0, max: 5, missing: false },
-      2: { op: "*", min: 0, max: 10, missing: false },
-      3: { op: "*", min: 1, max: 10, missing: true },
-    },
-    examples: {
-      1: {
-        show: { kind: "math", lines: ["$4 \\times 5 = 20$"] },
-        think: "4 groups of 5: skip count 5, 10, 15, 20.",
-      },
-      2: {
-        show: { kind: "math", lines: ["$7 \\times 8 = 56$"] },
-        think: "Use a fact you know: $7 \\times 4 = 28$, and $28 + 28 = 56$.",
-      },
-      3: {
-        show: { kind: "math", lines: ["$6 \\times \\boxed{7} = 42$"] },
-        think: "Ask: 6 times what is 42? $6 \\times 7 = 42$, so the missing number is 7.",
-      },
-    },
-  }),
-  defineWorksheet({
-    grade: 3,
-    slug: "division-facts",
-    title: { en: "Division Facts (0–10)", ko: "나눗셈 기본 (0–10)" },
-    description: {
-      en: "Division facts related to multiplication through 10 × 10.",
-      ko: "10 × 10 곱셈구구와 연결된 기본 나눗셈",
-    },
-    instructions: "Divide. Fill in any missing numbers.",
-    category: "수·연산",
-    conceptCode: "ops-division-basic",
-    quarter: "Q2",
-    counts: [12, 18, 24],
-    columns: 3,
-    generator: facts,
-    levels: {
-      1: { op: "/", min: 1, max: 5, missing: false },
-      2: { op: "/", min: 1, max: 10, missing: false },
-      3: { op: "/", min: 1, max: 10, missing: true },
-    },
-    examples: {
-      1: {
-        show: { kind: "math", lines: ["$20 \\div 4 = 5$"] },
-        think: "Think multiplication: $4 \\times 5 = 20$, so $20 \\div 4 = 5$.",
-      },
-      2: {
-        show: { kind: "math", lines: ["$63 \\div 9 = 7$"] },
-        think: "Think multiplication: $9 \\times 7 = 63$, so $63 \\div 9 = 7$.",
-      },
-      3: {
-        show: { kind: "math", lines: ["$48 \\div \\boxed{6} = 8$"] },
-        think: "Ask: 48 divided by what is 8? $8 \\times 6 = 48$, so the missing number is 6.",
-      },
-    },
-  }),
-  defineWorksheet({
-    grade: 3,
-    slug: "fraction-models",
-    title: { en: "Fraction Models", ko: "분수 모형 읽기" },
-    description: {
-      en: "Name the fraction shown by shaded circles and bars.",
-      ko: "색칠된 원·막대 모형을 보고 분수로 나타내기",
-    },
-    instructions: "Write the fraction of each model that is shaded.",
-    category: "분수",
-    conceptCode: "frac-basic-concept",
-    quarter: "Q3",
-    counts: [6, 9],
-    columns: 3,
-    generator: fractionModel,
-    levels: {
-      1: { denominators: [2, 3, 4], improper: false },
-      2: { denominators: [2, 3, 4, 5, 6, 8, 10], improper: false },
-      3: { denominators: [2, 3, 4, 5, 6, 8], improper: true },
-    },
-    examples: {
-      1: {
-        show: {
-          kind: "figure",
-          figure: { type: "fraction-model", shape: "circle", parts: 4, shaded: [3] },
-          prompt: "Fraction shaded:",
-          answer: "$\\frac{3}{4}$",
-        },
-        think: "The circle has 4 equal parts and 3 are shaded, so $\\frac{3}{4}$ is shaded.",
-      },
-      3: {
-        show: {
-          kind: "figure",
-          figure: { type: "fraction-model", shape: "bar", parts: 3, shaded: [3, 2] },
-          prompt: "Improper fraction and mixed number:",
-          answer: "$\\frac{5}{3}$ = $1\\frac{2}{3}$",
-        },
-        think: "One whole bar is $\\frac{3}{3}$. Add 2 more thirds: $\\frac{5}{3} = 1\\frac{2}{3}$.",
-      },
-    },
-  }),
-  defineWorksheet({
-    grade: 3,
-    slug: "compare-fractions",
-    title: { en: "Comparing Fractions", ko: "분수의 크기 비교" },
-    description: {
-      en: "Compare fractions with like numerators or like denominators.",
-      ko: "분자 또는 분모가 같은 분수의 크기 비교하기",
-    },
-    instructions: "Write >, <, or = in each circle.",
-    category: "분수",
-    conceptCode: "frac-compare-order",
-    quarter: "Q4",
-    counts: [12, 18, 21],
-    columns: 3,
-    generator: compareFractions,
-    levels: {
-      1: { mode: "like-den", denominators: [3, 4, 5, 6, 8, 10] },
-      2: { mode: "like-num", denominators: [2, 3, 4, 5, 6, 8, 10] },
-      3: { mode: "mixed", denominators: [2, 3, 4, 5, 6, 8, 10] },
-    },
-    examples: {
-      1: {
-        show: { kind: "compare", left: "$\\frac{2}{5}$", right: "$\\frac{4}{5}$", symbol: "<" },
-        think: "Same denominator: compare the numerators. $2 < 4$, so $\\frac{2}{5} < \\frac{4}{5}$.",
-      },
-      2: {
-        show: { kind: "compare", left: "$\\frac{3}{4}$", right: "$\\frac{3}{8}$", symbol: ">" },
-        think: "Same numerator: fourths are bigger pieces than eighths, so $\\frac{3}{4} > \\frac{3}{8}$.",
-      },
-    },
-  }),
-  defineWorksheet({
-    grade: 3,
-    slug: "telling-time",
-    title: { en: "Telling Time", ko: "시계 보기" },
-    description: {
-      en: "Read analog clocks to the half hour, five minutes, and nearest minute.",
-      ko: "아날로그 시계 읽기 (30분 → 5분 → 1분 단위)",
-    },
-    instructions: "Write the time shown on each clock.",
-    category: "측정",
-    conceptCode: "meas-time-elapsed",
-    quarter: "Q4",
-    counts: [6, 9],
-    columns: 3,
-    generator: tellingTime,
-    levels: { 1: { minuteStep: 30 }, 2: { minuteStep: 5 }, 3: { minuteStep: 1 } },
-    examples: {
-      1: {
-        show: { kind: "figure", figure: { type: "clock", hour: 4, minute: 30 }, prompt: "Time:", answer: "4:30" },
-        think: "The long hand points to 6, which means 30 minutes. The short hand is between 4 and 5.",
-      },
-      2: {
-        show: { kind: "figure", figure: { type: "clock", hour: 7, minute: 25 }, prompt: "Time:", answer: "7:25" },
-        think: "The long hand points to 5. Count by fives: $5 \\times 5 = 25$ minutes past 7.",
-      },
-      3: {
-        show: { kind: "figure", figure: { type: "clock", hour: 2, minute: 38 }, prompt: "Time:", answer: "2:38" },
-        think: "The long hand is 3 marks past the 7: $35 + 3 = 38$ minutes past 2.",
-      },
-    },
-  }),
-  defineWorksheet({
-    grade: 3,
-    slug: "elapsed-time",
-    title: { en: "Elapsed Time", ko: "걸린 시간 구하기" },
-    description: {
-      en: "Find the elapsed time, start time, or end time within a.m. or within p.m.",
-      ko: "오전 또는 오후 안에서 걸린 시간, 시작 시각, 끝난 시각 구하기",
-    },
-    instructions: "Find the elapsed time, or the missing start or end time.",
-    category: "측정",
-    conceptCode: "meas-time-elapsed",
-    quarter: "Q4",
-    counts: [4, 6, 8],
-    columns: 2,
-    generator: elapsedTime,
-    levels: {
-      1: { unknowns: ["elapsed"], wholeHours: true, step: 15 },
-      2: { unknowns: ["elapsed"], wholeHours: false, step: 5 },
-      3: { unknowns: ["start", "end"], wholeHours: false, step: 5 },
-    },
-    examples: {
-      1: {
-        show: { kind: "math", lines: ["From 2:15 p.m. to 5:15 p.m. → 3 hours"] },
-        think: "Count the hours: 3:15, 4:15, 5:15. That is 3 hours.",
-      },
-      2: {
-        show: { kind: "math", lines: ["From 9:20 a.m. to 11:45 a.m. → 2 hours 25 minutes"] },
-        think: "Count whole hours up to 11:20 (2 hours), then the minutes from 11:20 to 11:45 (25 minutes).",
-      },
-      3: {
-        show: { kind: "math", lines: ["Starts at 1:35 p.m. and lasts 2 hours 40 minutes → ends at 4:15 p.m."] },
-        think: "Add the hours first: 3:35 p.m. Then add the minutes: 25 minutes gets to 4:00, and 15 more makes 4:15.",
-      },
-    },
-  }),
-  defineWorksheet({
-    grade: 3,
-    slug: "counting-money",
-    title: { en: "Counting Money & Making Change", ko: "돈 세기와 거스름돈" },
-    description: {
-      en: "Count coins and bills up to five dollars, and make change from one, five, or ten dollars.",
-      ko: "5달러까지 동전·지폐 세기, 1·5·10달러를 냈을 때 거스름돈 구하기",
-    },
-    instructions: "Find the total value, or the change.",
-    category: "측정",
-    conceptCode: "meas-money",
-    quarter: "Q4",
-    counts: [4, 6, 8],
-    columns: 2,
-    generator: countMoney,
-    levels: { 1: { mode: "coins" }, 2: { mode: "bills" }, 3: { mode: "change" } },
-    examples: {
-      1: {
-        show: { kind: "math", lines: ["2 quarters, 1 dime, 3 pennies → 63¢"] },
-        think: "Start with the coins worth the most and count on: 25, 50, then 60, then 61, 62, 63.",
-      },
-      2: {
-        show: { kind: "math", lines: ["2 one-dollar bills, 3 quarters, 1 nickel → $\\text{\\textdollar}2.80$"] },
-        think: "The bills make 2 dollars. The coins make 80¢ (25, 50, 75, 80). Together: $\\text{\\textdollar}2.80$.",
-      },
-      3: {
-        show: {
-          kind: "math",
-          lines: ["Pay $\\text{\\textdollar}5.00$ for something that costs $\\text{\\textdollar}3.47$. Change: $\\text{\\textdollar}1.53$"],
-        },
-        think:
-          "Count up from the price: 3¢ makes $\\text{\\textdollar}3.50$, 50¢ makes $\\text{\\textdollar}4.00$, and 1 dollar makes $\\text{\\textdollar}5.00$.",
-      },
-    },
-  }),
+  ...GRADE_3,
 
   // ── Grade 4 ────────────────────────────────────────────────────────────────
   defineWorksheet({
     grade: 4,
     slug: "rounding",
+    unit: "whole-numbers",
     title: { en: "Rounding Whole Numbers", ko: "반올림하기" },
     description: {
       en: "Round whole numbers to the nearest ten, hundred, thousand, and beyond.",
@@ -461,6 +81,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 4,
     slug: "order-numbers",
+    unit: "whole-numbers",
     title: { en: "Ordering Whole Numbers", ko: "큰 수의 순서 정하기" },
     description: {
       en: "Put four whole numbers up to seven digits in order, least to greatest or greatest to least.",
@@ -496,6 +117,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 4,
     slug: "estimation",
+    unit: "whole-numbers",
     title: { en: "Estimating Sums, Differences & Products", ko: "어림셈 (반올림하여 계산하기)" },
     description: {
       en: "Round each number to the place shown, then add, subtract, or multiply to estimate.",
@@ -551,6 +173,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 4,
     slug: "number-patterns",
+    unit: "patterns",
     title: { en: "Number Patterns & Input/Output Tables", ko: "수의 규칙과 입출력표" },
     description: {
       en: "Find the rule to extend number patterns and complete input/output tables.",
@@ -591,6 +214,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 4,
     slug: "multiplication-division-facts",
+    unit: "multiplication-division",
     title: { en: "Multiplication & Division Facts (0–12)", ko: "곱셈·나눗셈 기본 (0–12)" },
     description: {
       en: "Facts through 12 × 12 and the related division facts.",
@@ -626,6 +250,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 4,
     slug: "multiply-by-1-digit",
+    unit: "multiplication-division",
     title: { en: "Multiplying by 1-Digit Numbers", ko: "(두·세 자리 수) × (한 자리 수)" },
     description: {
       en: "2- and 3-digit numbers times a 1-digit number.",
@@ -660,7 +285,44 @@ export const WORKSHEETS: WorksheetDef[] = [
   }),
   defineWorksheet({
     grade: 4,
+    slug: "multiply-2-digit",
+    unit: "multiplication-division",
+    title: { en: "Multiplying 2-Digit Numbers", ko: "(두 자리 수) × (두 자리 수)" },
+    description: {
+      en: "2-digit by 2-digit multiplication with the standard algorithm.",
+      ko: "두 자리 수끼리의 곱셈 (세로셈)",
+    },
+    instructions: "Multiply.",
+    category: "수·연산",
+    conceptCode: "ops-mult-multi-digit",
+    quarter: "Q3",
+    counts: [4, 8],
+    columns: 4,
+    generator: multiply,
+    levels: {
+      1: { topDigits: 2, bottomDigits: 2, bottomTens: true },
+      2: { topDigits: 2, bottomDigits: 2 },
+      3: { topDigits: 3, bottomDigits: 2 },
+    },
+    examples: {
+      1: {
+        show: { kind: "vertical", operator: "×", top: "34", bottom: "20", align: "right" },
+        think: "$34 \\times 2 = 68$. Multiplying by 2 tens gives 68 tens: $34 \\times 20 = 680$.",
+      },
+      2: {
+        show: { kind: "vertical", operator: "×", top: "47", bottom: "23", align: "right" },
+        think: "$47 \\times 3 = 141$ and $47 \\times 20 = 940$. Add the partial products: $141 + 940 = 1{,}081$.",
+      },
+      3: {
+        show: { kind: "vertical", operator: "×", top: "216", bottom: "34", align: "right" },
+        think: "$216 \\times 4 = 864$ and $216 \\times 30 = 6{,}480$. Add: $864 + 6{,}480 = 7{,}344$.",
+      },
+    },
+  }),
+  defineWorksheet({
+    grade: 4,
     slug: "long-division",
+    unit: "multiplication-division",
     title: { en: "Long Division", ko: "나눗셈 (한 자리 수로 나누기)" },
     description: {
       en: "Divide 2- and 3-digit numbers by a 1-digit divisor, with and without remainders.",
@@ -696,6 +358,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 4,
     slug: "factors-gcf",
+    unit: "factors",
     title: { en: "Factor Pairs & GCF", ko: "약수와 최대공약수" },
     description: {
       en: "List factor pairs for numbers up to 100 and find the greatest common factor.",
@@ -727,6 +390,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 4,
     slug: "equivalent-fractions",
+    unit: "fractions",
     title: { en: "Equivalent Fractions", ko: "크기가 같은 분수" },
     description: {
       en: "Fill in the missing numerator or denominator.",
@@ -762,6 +426,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 4,
     slug: "mixed-numbers",
+    unit: "fractions",
     title: { en: "Improper Fractions & Mixed Numbers", ko: "가분수와 대분수" },
     description: {
       en: "Rename improper fractions as mixed numbers, and mixed numbers as improper fractions.",
@@ -796,42 +461,8 @@ export const WORKSHEETS: WorksheetDef[] = [
   }),
   defineWorksheet({
     grade: 4,
-    slug: "multiply-2-digit",
-    title: { en: "Multiplying 2-Digit Numbers", ko: "(두 자리 수) × (두 자리 수)" },
-    description: {
-      en: "2-digit by 2-digit multiplication with the standard algorithm.",
-      ko: "두 자리 수끼리의 곱셈 (세로셈)",
-    },
-    instructions: "Multiply.",
-    category: "수·연산",
-    conceptCode: "ops-mult-multi-digit",
-    quarter: "Q3",
-    counts: [4, 8],
-    columns: 4,
-    generator: multiply,
-    levels: {
-      1: { topDigits: 2, bottomDigits: 2, bottomTens: true },
-      2: { topDigits: 2, bottomDigits: 2 },
-      3: { topDigits: 3, bottomDigits: 2 },
-    },
-    examples: {
-      1: {
-        show: { kind: "vertical", operator: "×", top: "34", bottom: "20", align: "right" },
-        think: "$34 \\times 2 = 68$. Multiplying by 2 tens gives 68 tens: $34 \\times 20 = 680$.",
-      },
-      2: {
-        show: { kind: "vertical", operator: "×", top: "47", bottom: "23", align: "right" },
-        think: "$47 \\times 3 = 141$ and $47 \\times 20 = 940$. Add the partial products: $141 + 940 = 1{,}081$.",
-      },
-      3: {
-        show: { kind: "vertical", operator: "×", top: "216", bottom: "34", align: "right" },
-        think: "$216 \\times 4 = 864$ and $216 \\times 30 = 6{,}480$. Add: $864 + 6{,}480 = 7{,}344$.",
-      },
-    },
-  }),
-  defineWorksheet({
-    grade: 4,
     slug: "compare-decimals",
+    unit: "decimals",
     title: { en: "Comparing Decimals", ko: "소수의 크기 비교" },
     description: {
       en: "Compare decimals through thousandths.",
@@ -867,6 +498,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 4,
     slug: "fractions-decimals",
+    unit: "decimals",
     title: { en: "Fractions & Decimals", ko: "분수와 소수의 관계" },
     description: {
       en: "Write fractions as decimals, and decimals as fractions in simplest form.",
@@ -902,6 +534,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 4,
     slug: "add-subtract-decimals",
+    unit: "decimals",
     title: { en: "Adding & Subtracting Decimals", ko: "소수의 덧셈과 뺄셈" },
     description: {
       en: "Line up the decimal points to add and subtract decimals through thousandths.",
@@ -937,6 +570,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 4,
     slug: "add-subtract-fractions",
+    unit: "fractions",
     title: { en: "Adding & Subtracting Fractions (Like Denominators)", ko: "분모가 같은 분수의 덧셈과 뺄셈" },
     description: {
       en: "Add and subtract fractions and mixed numbers with like denominators.",
@@ -972,6 +606,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 4,
     slug: "customary-units",
+    unit: "measurement",
     title: { en: "Customary Unit Conversions", ko: "미국 단위 환산 (길이·들이·무게)" },
     description: {
       en: "Convert among inches, feet, yards, cups, pints, quarts, gallons, ounces, and pounds.",
@@ -1007,6 +642,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 4,
     slug: "probability",
+    unit: "probability",
     title: { en: "Probability", ko: "확률" },
     description: {
       en: "Write the probability of simple events with number cubes, marbles, and number cards.",
@@ -1040,6 +676,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 5,
     slug: "order-of-operations",
+    unit: "expressions",
     title: { en: "Order of Operations", ko: "혼합 계산 (계산 순서)" },
     description: {
       en: "Simplify expressions with +, −, ×, ÷, and parentheses.",
@@ -1071,6 +708,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 5,
     slug: "prime-factorization",
+    unit: "number-theory",
     title: { en: "Prime & Composite Numbers", ko: "소수·합성수와 소인수분해" },
     description: {
       en: "Classify numbers as prime or composite and write prime factorizations up to 100.",
@@ -1102,6 +740,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 5,
     slug: "mean-median-mode-range",
+    unit: "data",
     title: { en: "Mean, Median, Mode & Range", ko: "평균·중앙값·최빈값·범위" },
     description: {
       en: "Find the mean, median, mode, and range of small data sets.",
@@ -1133,6 +772,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 5,
     slug: "rounding-decimals",
+    unit: "decimals",
     title: { en: "Rounding Decimals", ko: "소수의 반올림" },
     description: {
       en: "Round decimals to the nearest whole number, tenth, or hundredth.",
@@ -1168,6 +808,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 5,
     slug: "order-fractions-decimals",
+    unit: "fractions",
     title: { en: "Ordering Fractions & Decimals", ko: "분수와 소수의 크기 순서" },
     description: {
       en: "Order decimals, fractions with unlike denominators, and lists that mix both.",
@@ -1203,6 +844,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 5,
     slug: "multiply-decimals",
+    unit: "decimals",
     title: { en: "Multiplying Decimals", ko: "소수의 곱셈" },
     description: {
       en: "Multiply decimals by whole numbers and by other decimals.",
@@ -1238,6 +880,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 5,
     slug: "divide-decimals",
+    unit: "decimals",
     title: { en: "Dividing Decimals", ko: "소수의 나눗셈" },
     description: {
       en: "Divide decimals by whole numbers and by tenths.",
@@ -1273,6 +916,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 5,
     slug: "add-subtract-unlike-fractions",
+    unit: "fractions",
     title: { en: "Adding & Subtracting Fractions (Unlike Denominators)", ko: "분모가 다른 분수의 덧셈과 뺄셈" },
     description: {
       en: "Find common denominators to add and subtract fractions and mixed numbers.",
@@ -1311,6 +955,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 5,
     slug: "multiply-fraction-whole",
+    unit: "fractions",
     title: { en: "Multiplying Fractions by Whole Numbers", ko: "(분수) × (자연수)" },
     description: {
       en: "Multiply whole numbers by unit fractions, fractions, and mixed numbers; simplify.",
@@ -1346,6 +991,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 5,
     slug: "metric-units",
+    unit: "measurement",
     title: { en: "Metric Unit Conversions", ko: "미터법 단위 환산" },
     description: {
       en: "Convert among kilometers, meters, centimeters, millimeters, kilograms, grams, liters, and milliliters.",
@@ -1381,6 +1027,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 5,
     slug: "triangle-angles",
+    unit: "geometry",
     title: { en: "Triangle Angles & Classification", ko: "삼각형의 각과 분류" },
     description: {
       en: "Use the 180° angle sum to find missing angles, and classify triangles by angles and sides.",
@@ -1433,6 +1080,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 6,
     slug: "gcf-lcm",
+    unit: "number-system",
     title: { en: "GCF & LCM", ko: "최대공약수와 최소공배수" },
     description: {
       en: "Greatest common factor and least common multiple of two numbers.",
@@ -1468,6 +1116,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 6,
     slug: "ratios-rates",
+    unit: "ratios-percents",
     title: { en: "Ratios & Unit Rates", ko: "비와 단위비율" },
     description: {
       en: "Simplify ratios, find equivalent ratios, and work out unit rates.",
@@ -1499,6 +1148,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 6,
     slug: "percents",
+    unit: "ratios-percents",
     title: { en: "Fractions, Decimals & Percents", ko: "분수·소수·백분율" },
     description: {
       en: "Convert among percents, decimals, and fractions, and find a percent of a number.",
@@ -1534,6 +1184,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 6,
     slug: "compare-rational-numbers",
+    unit: "number-system",
     title: { en: "Comparing Rational Numbers", ko: "유리수의 크기 비교" },
     description: {
       en: "Compare fractions, mixed numbers, and decimals, including negative numbers.",
@@ -1569,6 +1220,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 6,
     slug: "integer-operations",
+    unit: "number-system",
     title: { en: "Integer Operations", ko: "정수의 사칙연산" },
     description: {
       en: "Add, subtract, multiply, and divide positive and negative integers, including absolute value.",
@@ -1604,6 +1256,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 6,
     slug: "exponents-perfect-squares",
+    unit: "number-system",
     title: { en: "Exponents & Perfect Squares", ko: "거듭제곱과 완전제곱수" },
     description: {
       en: "Evaluate powers, powers of ten, and perfect squares up to 20².",
@@ -1639,6 +1292,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 6,
     slug: "multiply-divide-fractions",
+    unit: "fractions",
     title: { en: "Multiplying & Dividing Fractions", ko: "분수의 곱셈과 나눗셈" },
     description: {
       en: "Multiply and divide fractions and mixed numbers; simplify.",
@@ -1680,6 +1334,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 6,
     slug: "evaluate-expressions",
+    unit: "expressions-equations",
     title: { en: "Evaluating Expressions", ko: "식의 값 구하기" },
     description: {
       en: "Substitute values for one or two variables and simplify.",
@@ -1711,6 +1366,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 6,
     slug: "one-step-equations",
+    unit: "expressions-equations",
     title: { en: "One-Step Equations", ko: "한 단계 일차방정식" },
     description: {
       en: "Solve one-step equations using inverse operations.",
@@ -1746,6 +1402,7 @@ export const WORKSHEETS: WorksheetDef[] = [
   defineWorksheet({
     grade: 6,
     slug: "circles",
+    unit: "circles",
     title: { en: "Circumference & Area of Circles", ko: "원의 둘레와 넓이" },
     description: {
       en: "Find the radius, diameter, circumference, and area of circles using π ≈ 3.14.",
@@ -1802,4 +1459,27 @@ export function getWorksheet(gradeSlugParam: string, slug: string): WorksheetDef
 
 export function worksheetPath(def: WorksheetDef): string {
   return `/worksheets/${gradeSlug(def.grade)}/${def.slug}`;
+}
+
+/** Stable key for a skill outside the catalog (the browser's sticker list). */
+export function skillKey(def: WorksheetDef): string {
+  return `${def.grade}/${def.slug}`;
+}
+
+export function worksheetsInUnit(grade: GradeNum, unitKey: string): WorksheetDef[] {
+  return WORKSHEETS.filter((w) => w.grade === grade && w.unit === unitKey);
+}
+
+/** A grade's skills in display order, unit by unit — the order of their codes. */
+export function skillsInOrder(grade: GradeNum): WorksheetDef[] {
+  return unitsForGrade(grade).flatMap((u) => worksheetsInUnit(grade, u.key));
+}
+
+/** IXL-style position of a skill: its unit, that unit's letter, and the skill's code ("C.2"). */
+export function skillPosition(def: WorksheetDef) {
+  const units = unitsForGrade(def.grade);
+  const index = units.findIndex((u) => u.key === def.unit);
+  const letter = unitLetter(index);
+  const number = worksheetsInUnit(def.grade, def.unit).indexOf(def) + 1;
+  return { unit: units[index], letter, code: `${letter}.${number}` };
 }

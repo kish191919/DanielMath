@@ -186,7 +186,8 @@ export const exponents: Generator<{
     if (style === "missing") {
       const value = 10 ** exp;
       return {
-        body: { kind: "text", text: `$${latexNumber(value)} = 10^{\\square}$`, blank: "none" },
+        // Scriptsize keeps the answer box exponent-sized instead of a full-size box up in the air.
+        body: { kind: "text", text: `$${latexNumber(value)} = 10^{\\scriptsize\\square}$`, blank: "none" },
         answer: String(exp),
         meta: { type: "equation", variable: "x", lhs: "10**x", rhs: value, solution: exp },
       };

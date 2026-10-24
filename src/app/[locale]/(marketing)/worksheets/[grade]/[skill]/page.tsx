@@ -1,16 +1,26 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronRight } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { WorksheetControls } from "@/components/worksheets/worksheet-controls";
 import { WorksheetSheet } from "@/components/worksheets/worksheet-sheet";
+import { UNIT_COLORS, UNIT_ICONS } from "@/components/worksheets/unit-style";
 import { QUARTER_LABELS_EN, QUARTER_LABELS_KO } from "@/lib/curriculum-quarter";
 import { hasLocale, localePath, type Locale } from "@/lib/i18n";
 import { pageAlternates } from "@/lib/seo";
 import { siteConfig } from "@/lib/site-config";
+import { cn } from "@/lib/utils";
 import { buildWorksheet, exampleFor, parseWorksheetParams, worksheetQuery } from "@/lib/worksheets/build";
-import { getWorksheet, gradeSlug, worksheetPath, worksheetsForGrade } from "@/lib/worksheets/catalog";
+import {
+  getWorksheet,
+  gradeSlug,
+  skillKey,
+  skillPosition,
+  skillsInOrder,
+  worksheetPath,
+  worksheetsInUnit,
+} from "@/lib/worksheets/catalog";
 import { newSeed } from "@/lib/worksheets/rng";
 
 type Props = {
@@ -53,7 +63,17 @@ export default async function WorksheetPage({ params, searchParams }: Props) {
   const path = lp(worksheetPath(def));
   const query = worksheetQuery({ ...options, seed });
   const answersUrl = `${siteConfig.url}${path}/answers?${query}`;
-  const siblings = worksheetsForGrade(def.grade).filter((w) => w.slug !== def.slug);
+
+  const { unit, letter, code } = skillPosition(def);
+  const sw = UNIT_COLORS[unit.color];
+  const UnitIcon = UNIT_ICONS[unit.icon];
+  const unitTitle = isKo ? unit.title.ko : unit.title.en;
+  const gradePath = lp(`/worksheets/${gradeSlug(def.grade)}`);
+  const order = skillsInOrder(def.grade);
+  const index = order.indexOf(def);
+  const [prev, next] = [order[index - 1], order[index + 1]];
+  const siblings = worksheetsInUnit(def.grade, def.unit);
+  const skillTitle = (s: typeof def) => (isKo ? s.title.ko : s.title.en);
 
   return (
     <div className="bg-navy-50/50 print:bg-white">
@@ -64,14 +84,22 @@ export default async function WorksheetPage({ params, searchParams }: Props) {
               {isKo ? "학습지" : "Worksheets"}
             </Link>
             <ChevronRight className="h-3.5 w-3.5" />
-            <Link href={lp(`/worksheets/${gradeSlug(def.grade)}`)} className="hover:text-navy-900">
+            <Link href={gradePath} className="hover:text-navy-900">
               {isKo ? `${def.grade}학년` : `Grade ${def.grade}`}
             </Link>
+            <ChevronRight className="h-3.5 w-3.5" />
+            <span>
+              {letter}. {unitTitle}
+            </span>
           </nav>
           <div className="mt-3 flex flex-wrap items-center gap-3">
-            <h1 className={`text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl${ko}`}>
-              {isKo ? def.title.ko : def.title.en}
-            </h1>
+            <span
+              className={cn("inline-flex h-9 items-center gap-1.5 rounded-xl px-2.5 text-sm font-extrabold tabular-nums shadow-sm", sw.tile)}
+            >
+              <UnitIcon className="h-4 w-4" strokeWidth={2.5} />
+              {code}
+            </span>
+            <h1 className={`text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl${ko}`}>{skillTitle(def)}</h1>
             {def.quarter && (
               <span className={`rounded-full bg-white px-2.5 py-0.5 text-xs font-semibold text-navy-600 ring-1 ring-navy-200${ko}`}>
                 {(isKo ? QUARTER_LABELS_KO : QUARTER_LABELS_EN)[def.quarter]}
@@ -84,11 +112,13 @@ export default async function WorksheetPage({ params, searchParams }: Props) {
             <WorksheetControls
               path={path}
               counts={def.counts}
+              levels={def.levels}
               count={options.count}
               level={options.level}
               seed={seed}
               showKey={options.showKey}
               showExample={options.showExample}
+              stickerId={skillKey(def)}
               isKo={isKo}
             />
           </div>
@@ -102,28 +132,79 @@ export default async function WorksheetPage({ params, searchParams }: Props) {
             seed={seed}
             answersUrl={answersUrl}
             showKey={options.showKey}
+            code={code}
+            unitTitle={unit.title.en}
             example={options.showExample ? exampleFor(def, options.level) : null}
           />
         </div>
 
-        {siblings.length > 0 && (
-          <div className="mt-12 print:hidden">
-            <h2 className={`text-base font-bold text-navy-900${ko}`}>
-              {isKo ? `${def.grade}학년 다른 학습지` : `More grade ${def.grade} worksheets`}
+        <div className="mt-12 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-start print:hidden">
+          <section aria-labelledby="unit-skills" className={cn("rounded-2xl bg-white p-4 ring-1 sm:p-5", sw.ring)}>
+            <h2 id="unit-skills" className={`flex items-center gap-2 text-base font-bold text-navy-900${ko}`}>
+              <span className={cn("flex h-7 w-7 items-center justify-center rounded-lg", sw.tile)}>
+                <UnitIcon className="h-4 w-4" strokeWidth={2.5} />
+              </span>
+              {letter}. {unitTitle}
+              <span className="text-sm font-medium text-navy-400">
+                {isKo ? `스킬 ${siblings.length}개` : `${siblings.length} skill${siblings.length === 1 ? "" : "s"}`}
+              </span>
             </h2>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {siblings.map((s) => (
-                <Link
-                  key={s.slug}
-                  href={lp(worksheetPath(s))}
-                  className={`rounded-full bg-white px-3 py-1.5 text-sm text-navy-700 ring-1 ring-navy-200 transition hover:bg-navy-50 hover:text-navy-900${ko}`}
-                >
-                  {isKo ? s.title.ko : s.title.en}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
+            <ol className="mt-3 flex flex-wrap gap-2">
+              {siblings.map((s) => {
+                const current = s === def;
+                return (
+                  <li key={s.slug}>
+                    <Link
+                      href={lp(worksheetPath(s))}
+                      aria-current={current ? "page" : undefined}
+                      className={cn(
+                        "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition",
+                        current ? cn(sw.tile, "font-semibold") : "bg-white text-navy-700 ring-1 ring-navy-200 hover:bg-navy-50",
+                        isKo && "font-ko",
+                      )}
+                    >
+                      <span className={cn("text-xs font-extrabold tabular-nums", !current && sw.text)}>
+                        {skillPosition(s).code}
+                      </span>
+                      {s.chip ? (isKo ? s.chip.ko : s.chip.en) : skillTitle(s)}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
+
+          <nav className="flex gap-2 lg:flex-col" aria-label={isKo ? "이전·다음 스킬" : "Previous and next skill"}>
+            {prev && (
+              <Link
+                href={lp(worksheetPath(prev))}
+                className={`group flex flex-1 items-center gap-2 rounded-2xl bg-white px-4 py-3 text-sm ring-1 ring-navy-200 transition hover:ring-navy-400 lg:w-72${ko}`}
+              >
+                <ArrowLeft className="h-4 w-4 shrink-0 text-navy-400 transition group-hover:-translate-x-0.5" />
+                <span className="min-w-0">
+                  <span className="block text-xs text-navy-400">{isKo ? "이전 스킬" : "Previous"}</span>
+                  <span className="block truncate font-semibold text-navy-800">
+                    {skillPosition(prev).code} {skillTitle(prev)}
+                  </span>
+                </span>
+              </Link>
+            )}
+            {next && (
+              <Link
+                href={lp(worksheetPath(next))}
+                className={`group flex flex-1 items-center justify-end gap-2 rounded-2xl bg-navy-900 px-4 py-3 text-right text-sm text-white transition hover:bg-navy-800 lg:w-72${ko}`}
+              >
+                <span className="min-w-0">
+                  <span className="block text-xs text-navy-300">{isKo ? "다음 스킬" : "Next"}</span>
+                  <span className="block truncate font-semibold">
+                    {skillPosition(next).code} {skillTitle(next)}
+                  </span>
+                </span>
+                <ArrowRight className="h-4 w-4 shrink-0 text-navy-300 transition group-hover:translate-x-0.5" />
+              </Link>
+            )}
+          </nav>
+        </div>
       </Container>
     </div>
   );

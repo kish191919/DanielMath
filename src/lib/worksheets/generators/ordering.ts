@@ -15,7 +15,11 @@ type ValueKind =
     }
   | { kind: "decimal"; wholeMax: number }
   | { kind: "fraction"; denominators: readonly number[] }
-  | { kind: "mixed-forms" };
+  /** All with one denominator, or all with one numerator — compared without renaming. */
+  | { kind: "like-fraction"; denominators: readonly number[] }
+  | { kind: "mixed-forms" }
+  /** Integers from −range to range, at least two of them negative. */
+  | { kind: "integer"; range: number };
 
 function closeVariant(rng: Rng, base: number, mixedLengths: boolean): number {
   // Positions from 1 on, so the leading digit stays nonzero.
@@ -79,6 +83,27 @@ function fractionItems(rng: Rng, denominators: readonly number[]): Item[] {
   }
 }
 
+function likeFractionItems(rng: Rng, denominators: readonly number[]): Item[] {
+  const item = (n: number, d: number): Item => ({ value: [n, d], latex: `\\frac{${n}}{${d}}` });
+  if (rng() < 0.5) {
+    // Four numerators need a denominator of at least 5.
+    const d = pick(rng, denominators.filter((x) => x >= 5));
+    const nums = shuffle(rng, Array.from({ length: d - 1 }, (_, i) => i + 1)).slice(0, 4);
+    return nums.map((n) => item(n, d));
+  }
+  const dens = shuffle(rng, denominators).slice(0, 4);
+  const n = randInt(rng, 1, Math.min(...dens) - 1);
+  return dens.map((d) => item(n, d));
+}
+
+function integerItems(rng: Rng, range: number): Item[] {
+  for (;;) {
+    const nums = Array.from({ length: 4 }, () => randInt(rng, -range, range));
+    if (new Set(nums).size < 4 || nums.filter((n) => n < 0).length < 2) continue;
+    return nums.map((n) => ({ value: [n, 1], latex: String(n) }));
+  }
+}
+
 // Two decimals and two fractions (or mixed numbers) sharing a whole part.
 // Denominators divide 1,000, so every value has an exact decimal.
 function mixedFormItems(rng: Rng): Item[] {
@@ -96,6 +121,8 @@ function makeItems(rng: Rng, values: ValueKind): Item[] {
   if (values.kind === "whole") return wholeItems(rng, values);
   if (values.kind === "decimal") return decimalItems(rng, values.wholeMax);
   if (values.kind === "fraction") return fractionItems(rng, values.denominators);
+  if (values.kind === "like-fraction") return likeFractionItems(rng, values.denominators);
+  if (values.kind === "integer") return integerItems(rng, values.range);
   return mixedFormItems(rng);
 }
 
