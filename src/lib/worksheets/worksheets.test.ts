@@ -200,6 +200,52 @@ function checkTriangleFigure(fig: Extract<FigureSpec, { type: "triangle" }>) {
   );
 }
 
+type ShapeFigure = Extract<FigureSpec, { type: "rectangle" | "base-height" | "prism" | "circle" }>;
+
+/** A length label such as "12 ft" or "1,200 cm": [number, unit]. */
+function lengthLabel(label: string): [number, string] {
+  const m = label.match(/^(\d[\d,]*) ([a-z]+)$/);
+  expect(m, label).not.toBeNull();
+  return [Number(m![1].replace(/,/g, "")), m![2]];
+}
+
+/** A shape's labels agree with the measurements it is drawn from, all in one unit; returns the unit. */
+function checkShapeFigure(fig: ShapeFigure): string {
+  switch (fig.type) {
+    case "rectangle": {
+      const [length, unit] = lengthLabel(fig.labels[0]);
+      expect(length).toBe(fig.length);
+      if (fig.labels[1] !== "?") expect(lengthLabel(fig.labels[1])).toEqual([fig.width, unit]);
+      if (fig.square) expect(fig.width).toBe(fig.length);
+      if (fig.inside) {
+        const area = `Area = ${(fig.length * fig.width).toLocaleString("en-US")} ${unit}²`;
+        const perimeter = `Perimeter = ${(2 * (fig.length + fig.width)).toLocaleString("en-US")} ${unit}`;
+        expect([area, perimeter]).toContain(fig.inside);
+      }
+      return unit;
+    }
+    case "base-height": {
+      const [base, unit] = lengthLabel(fig.labels[0]);
+      expect([base, unit]).toEqual([fig.base, unit]);
+      expect(lengthLabel(fig.labels[1])).toEqual([fig.height, unit]);
+      expect(fig.apex).toBeGreaterThanOrEqual(0);
+      expect(fig.apex).toBeLessThanOrEqual(1);
+      return unit;
+    }
+    case "prism": {
+      const unit = lengthLabel(fig.labels[0])[1];
+      expect(fig.labels.map(lengthLabel)).toEqual([fig.length, fig.width, fig.height].map((n) => [n, unit]));
+      return unit;
+    }
+    case "circle": {
+      const m = fig.label.match(/^([rd]) = (\d+) ([a-z]+)$/);
+      expect(m, fig.label).not.toBeNull();
+      expect(m![1]).toBe(fig.segment);
+      return m![3];
+    }
+  }
+}
+
 function checkMeta(meta: ProblemMeta, p: WorksheetProblem) {
   switch (meta.type) {
     case "int-op": {
@@ -685,7 +731,12 @@ function checkMeta(meta: ProblemMeta, p: WorksheetProblem) {
       expect(units * 100).toBe(hundredths * scale);
       expect(meta.result).not.toMatch(/\.\d*0$/);
       expect(p.answer).toMatch(new RegExp(`^${meta.result.replace(".", "\\.")} (cm|m|mm|in|ft)${meta.find === "A" ? "²" : ""}$`));
-      expect(bodyText(p)).toContain(`$${meta.given} = ${meta.value}\\text{`);
+      expect(p.body.kind).toBe("figure");
+      if (p.body.kind !== "figure" || p.body.figure.type !== "circle") break;
+      const unit = checkShapeFigure(p.body.figure);
+      expect(p.body.figure.label).toBe(`${meta.given} = ${meta.value} ${unit}`);
+      expect(p.answer.split(" ")[1].replace("²", "")).toBe(unit);
+      expect(p.body.prompt).toBe(`Find the ${{ r: "radius", d: "diameter", C: "circumference", A: "area" }[meta.find]}.`);
       break;
     }
     case "place-name": {
@@ -836,9 +887,29 @@ function checkMeta(meta: ProblemMeta, p: WorksheetProblem) {
       if (meta.task.startsWith("missing-side")) expect(expected).toBeLessThan(g[1]);
       const power = /area/.test(meta.task) && !meta.task.startsWith("missing") ? "²" : meta.task === "prism-volume" ? "³" : "";
       expect(p.answer).toBe(`${expected.toLocaleString("en-US")} ${meta.unit}${power}`);
-      const text = bodyText(p);
-      expect(text.replace(/,(?=\d)/g, "").match(/\d+/g)!.map(Number)).toEqual(g);
-      for (const u of text.match(/\d ([a-z]+)/g)!) expect(u.split(" ")[1]).toBe(meta.unit);
+      // The figure shows exactly the given numbers, each in its role.
+      expect(p.body.kind).toBe("figure");
+      if (p.body.kind !== "figure") break;
+      const fig = p.body.figure as ShapeFigure;
+      expect(checkShapeFigure(fig)).toBe(meta.unit);
+      const shown = {
+        "rect-area": { type: "rectangle", length: g[0], width: g[1] },
+        "rect-perimeter": { type: "rectangle", length: g[0], width: g[1] },
+        "square-area": { type: "rectangle", length: g[0], width: g[0], square: true },
+        "square-perimeter": { type: "rectangle", length: g[0], width: g[0], square: true },
+        "missing-side-area": { type: "rectangle", length: g[1], width: expected, labels: [`${g[1]} ${meta.unit}`, "?"], inside: `Area = ${g[0].toLocaleString("en-US")} ${meta.unit}²` },
+        "missing-side-perimeter": { type: "rectangle", length: g[1], width: expected, labels: [`${g[1]} ${meta.unit}`, "?"], inside: `Perimeter = ${g[0].toLocaleString("en-US")} ${meta.unit}` },
+        "triangle-area": { type: "base-height", shape: "triangle", base: g[0], height: g[1] },
+        "parallelogram-area": { type: "base-height", shape: "parallelogram", base: g[0], height: g[1] },
+        "prism-volume": { type: "prism", length: g[0], width: g[1], height: g[2] },
+      }[meta.task];
+      expect(fig).toMatchObject(shown);
+      if (fig.type === "rectangle") {
+        expect(fig.square ?? false).toBe(meta.task.startsWith("square"));
+        expect(fig.inside !== undefined).toBe(meta.task.startsWith("missing"));
+      }
+      const asked = meta.task.startsWith("missing") ? "missing side" : meta.task === "prism-volume" ? "volume" : meta.task.split("-")[1];
+      expect(p.body.prompt).toBe(`Find the ${asked}.`);
       break;
     }
     case "money-op": {
@@ -1039,6 +1110,19 @@ function checkMathSpans(text: string) {
   }
 }
 
+/** What a worked example's prompt asks for, worked out from its figure (π as 3.14). */
+function shapeAnswer(f: ShapeFigure, prompt: string): number {
+  if (f.type === "circle") {
+    const n = Number(f.label.split(" ")[2]);
+    const r = f.segment === "r" ? n : n / 2;
+    return { "r =": r, "d =": 2 * r, "C =": (314 * 2 * r) / 100, "A =": (314 * r * r) / 100 }[prompt]!;
+  }
+  if (f.type === "rectangle") return { "Area =": f.length * f.width, "Perimeter =": 2 * (f.length + f.width), "? =": f.width }[prompt]!;
+  if (f.type === "prism") return f.length * f.width * f.height;
+  expect(prompt).toBe("Area =");
+  return f.shape === "triangle" ? (f.base * f.height) / 2 : f.base * f.height;
+}
+
 function checkExampleShow(show: ExampleShow) {
   switch (show.kind) {
     case "math":
@@ -1081,6 +1165,9 @@ function checkExampleShow(show: ExampleShow) {
         const asked = f.angles.filter((_, i) => f.angleLabels[i] === "?");
         expect(asked.length).toBeGreaterThan(0);
         asked.forEach((a) => expect(show.answer.startsWith(`$${a}^\\circ$`)).toBe(true));
+      } else if (f.type !== "fraction-model") {
+        const unit = checkShapeFigure(f);
+        expect(show.answer).toBe(`${shapeAnswer(f, show.prompt)} ${unit}${{ "Area =": "²", "A =": "²", "Volume =": "³" }[show.prompt] ?? ""}`);
       } else {
         const total = f.shaded.reduce((s, x) => s + x, 0);
         expect(show.answer.startsWith(`$\\frac{${total}}{${f.parts}}$`)).toBe(true);

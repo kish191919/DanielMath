@@ -3,7 +3,15 @@ import { MathText } from "@/components/math-text";
 import { cn } from "@/lib/utils";
 import { longDivisionSteps, type VerticalWork } from "@/lib/worksheets/math";
 import type { FigureSpec, ProblemBody } from "@/lib/worksheets/types";
-import { AnalogClock, FractionModel, TriangleFigure } from "./figures";
+import {
+  AnalogClock,
+  BaseHeightFigure,
+  CircleFigure,
+  FractionModel,
+  PrismFigure,
+  RectangleFigure,
+  TriangleFigure,
+} from "./figures";
 
 // Filled-in answers in worked examples use this accent so they read as
 // "the teacher's answer" next to the printed problem.
@@ -196,6 +204,25 @@ export function CompareView({ left, right, symbol }: { left: string; right: stri
   );
 }
 
+function Figure({ figure, compact }: { figure: FigureSpec; compact?: boolean }) {
+  switch (figure.type) {
+    case "clock":
+      return <AnalogClock hour={figure.hour} minute={figure.minute} className={compact ? "h-20 w-20" : undefined} />;
+    case "fraction-model":
+      return <FractionModel shape={figure.shape} parts={figure.parts} shaded={figure.shaded} />;
+    case "triangle":
+      return <TriangleFigure {...figure} compact={compact} />;
+    case "rectangle":
+      return <RectangleFigure {...figure} compact={compact} />;
+    case "base-height":
+      return <BaseHeightFigure {...figure} compact={compact} />;
+    case "prism":
+      return <PrismFigure {...figure} compact={compact} />;
+    case "circle":
+      return <CircleFigure {...figure} compact={compact} />;
+  }
+}
+
 export function FigureView({
   figure,
   prompt,
@@ -208,17 +235,11 @@ export function FigureView({
   /** Smaller figure with the answer beside it — for the example box. */
   compact?: boolean;
 }) {
-  // Longer prompts (triangles) get an answer line that runs to the cell edge.
-  const wide = !compact && figure.type === "triangle";
+  // Longer prompts (shapes) get an answer line that runs to the cell edge.
+  const wide = !compact && figure.type !== "clock" && figure.type !== "fraction-model";
   return (
     <div className={compact ? "flex items-center gap-4" : "flex flex-col items-start gap-3"}>
-      {figure.type === "clock" ? (
-        <AnalogClock hour={figure.hour} minute={figure.minute} className={compact ? "h-20 w-20" : undefined} />
-      ) : figure.type === "fraction-model" ? (
-        <FractionModel shape={figure.shape} parts={figure.parts} shaded={figure.shaded} />
-      ) : (
-        <TriangleFigure {...figure} compact={compact} />
-      )}
+      <Figure figure={figure} compact={compact} />
       <div className={cn("flex items-end gap-2 text-sm text-navy-700", wide && "self-stretch")}>
         <span>{prompt}</span>
         <Blank className={cn("px-1", answer ? cn("min-w-20 text-base", SOLVED) : cn("h-9 min-w-24", wide && "flex-1"))}>

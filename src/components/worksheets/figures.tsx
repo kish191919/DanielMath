@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import type { FigureSpec } from "@/lib/worksheets/types";
 
 const SHADE = "#93afcf"; // navy-300
+const FACE = "#e2eaf4"; // navy-100, for the sides of a solid
 
 const r2 = (n: number) => Math.round(n * 100) / 100;
 
@@ -150,6 +151,74 @@ const reach = ([hw, hh]: Pt, n: Pt) => Math.abs(n[0]) * hw + Math.abs(n[1]) * hh
 const overlap = (p: Pt, a: Pt, q: Pt, b: Pt) =>
   Math.abs(p[0] - q[0]) < a[0] + b[0] + 1 && Math.abs(p[1] - q[1]) < a[1] + b[1] + 1;
 
+type Label = {
+  at: Pt;
+  text: string;
+  box: Pt;
+  bold?: boolean;
+  /** Set in italic just before `text`, like a math variable. */
+  variable?: string;
+};
+
+/** A label `gap` px clear of `from`, in direction `out`. */
+function labelOut(
+  from: Pt,
+  out: Pt,
+  text: string,
+  { variable, gap = 3 }: { variable?: string; gap?: number } = {},
+): Label {
+  const box = labelBox((variable ?? "") + text);
+  return { at: add(from, mul(out, reach(box, out) + gap)), text, box, variable };
+}
+
+const points = (pts: Pt[]) => pts.map((p) => `${r2(p[0])},${r2(p[1])}`).join(" ");
+
+/** An SVG cropped to the drawing's extent and every label around it. */
+function FittedSvg({
+  extent,
+  labels,
+  title,
+  children,
+}: {
+  extent: Pt[];
+  labels: Label[];
+  title: string;
+  children: ReactNode;
+}) {
+  const xs = [...extent.map((p) => p[0]), ...labels.flatMap(({ at, box }) => [at[0] - box[0], at[0] + box[0]])];
+  const ys = [...extent.map((p) => p[1]), ...labels.flatMap(({ at, box }) => [at[1] - box[1], at[1] + box[1]])];
+  const [x0, y0] = [Math.min(...xs) - 2, Math.min(...ys) - 2];
+  const [w, h] = [Math.max(...xs) + 2 - x0, Math.max(...ys) + 2 - y0];
+
+  return (
+    <svg
+      viewBox={`${r2(x0)} ${r2(y0)} ${r2(w)} ${r2(h)}`}
+      width={r2(w)}
+      height={r2(h)}
+      className="max-w-full shrink-0 text-navy-900"
+      role="img"
+      aria-label={title}
+    >
+      {children}
+      {labels.map(({ at, text, bold, variable }, i) => (
+        <text
+          key={i}
+          x={r2(at[0])}
+          y={r2(at[1])}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fontSize={LABEL_FONT}
+          fontWeight={bold ? 700 : 500}
+          fill="currentColor"
+        >
+          {variable && <tspan fontStyle="italic">{variable}</tspan>}
+          {text}
+        </text>
+      ))}
+    </svg>
+  );
+}
+
 // Which vertices sit at the base's left and right ends and which on top. A
 // marked right angle goes in the bottom corner with the longer leg as the
 // base; otherwise vertex A is on top unless that would leave an obtuse or
@@ -217,7 +286,7 @@ export function TriangleFigure({
   };
 
   const marks: ReactNode[] = [];
-  const labels: { at: Pt; text: string; box: Pt; bold?: boolean }[] = [];
+  const labels: Label[] = [];
 
   const angleMarks = angleLabels.flatMap((text, i) => {
     if (text === null) return [];
@@ -255,7 +324,7 @@ export function TriangleFigure({
     marks.push(
       <polyline
         key="right"
-        points={corner.map((p) => `${r2(p[0])},${r2(p[1])}`).join(" ")}
+        points={points(corner)}
         fill="none"
         stroke="currentColor"
         strokeWidth="1.2"
@@ -293,47 +362,199 @@ export function TriangleFigure({
 
   sideLabels?.forEach((text, i) => {
     const { mid, out } = sides[i];
-    const box = labelBox(text);
-    labels.push({ at: add(mid, mul(out, reach(box, out) + 3)), text, box });
+    labels.push(labelOut(mid, out, text));
   });
 
-  // Fit the view to the triangle and every label box.
-  const xs = [...pts.map((p) => p[0]), ...labels.flatMap(({ at, box }) => [at[0] - box[0], at[0] + box[0]])];
-  const ys = [...pts.map((p) => p[1]), ...labels.flatMap(({ at, box }) => [at[1] - box[1], at[1] + box[1]])];
-  const [x0, y0] = [Math.min(...xs) - 2, Math.min(...ys) - 2];
-  const [w, h] = [Math.max(...xs) + 2 - x0, Math.max(...ys) + 2 - y0];
-
   return (
-    <svg
-      viewBox={`${r2(x0)} ${r2(y0)} ${r2(w)} ${r2(h)}`}
-      width={r2(w)}
-      height={r2(h)}
-      className="max-w-full shrink-0 text-navy-900"
-      role="img"
-      aria-label="Triangle"
-    >
+    <FittedSvg extent={pts} labels={labels} title="Triangle">
       <polygon
-        points={pts.map((p) => `${r2(p[0])},${r2(p[1])}`).join(" ")}
+        points={points(pts)}
         fill="white"
         stroke="currentColor"
         strokeWidth="1.8"
         strokeLinejoin="round"
       />
       {marks}
-      {labels.map(({ at, text, bold }, i) => (
-        <text
+    </FittedSvg>
+  );
+}
+
+const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+
+function Outline({ pts }: { pts: Pt[] }) {
+  return <polygon points={points(pts)} fill="white" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />;
+}
+
+function Dashed({ from, to }: { from: Pt; to: Pt }) {
+  return (
+    <line
+      x1={r2(from[0])}
+      y1={r2(from[1])}
+      x2={r2(to[0])}
+      y2={r2(to[1])}
+      stroke="currentColor"
+      strokeWidth="1.2"
+      strokeDasharray="4 3"
+    />
+  );
+}
+
+/** The little square at `at`, between unit directions `u` and `w`. */
+function RightAngleMark({ at, u, w }: { at: Pt; u: Pt; w: Pt }) {
+  const [a, b] = [mul(u, 8), mul(w, 8)];
+  return (
+    <polyline
+      points={points([add(at, a), add(add(at, a), b), add(at, b)])}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.2"
+    />
+  );
+}
+
+/** A short tick across the middle of the side from `a` to `b`. */
+function Tick({ a, b }: { a: Pt; b: Pt }) {
+  const mid = mul(add(a, b), 0.5);
+  const n = mul(normal(unit(sub(b, a))), 5);
+  const [p1, p2] = [add(mid, n), sub(mid, n)];
+  return (
+    <line x1={r2(p1[0])} y1={r2(p1[1])} x2={r2(p2[0])} y2={r2(p2[1])} stroke="currentColor" strokeWidth="1.4" />
+  );
+}
+
+type Figure<T extends FigureSpec["type"]> = Omit<Extract<FigureSpec, { type: T }>, "type"> & { compact?: boolean };
+
+export function RectangleFigure({ length, width, labels, square, inside, compact }: Figure<"rectangle">) {
+  const [maxW, maxH] = compact ? [110, 66] : [150, 92];
+  // A square stays square, and a rectangle never passes for one.
+  const ratio = square ? 1 : clamp(width / length, 0.35, 0.65);
+  const w = Math.min(maxW, maxH / ratio);
+  const h = w * ratio;
+  const pts: Pt[] = [
+    [0, 0],
+    [w, 0],
+    [w, h],
+    [0, h],
+  ];
+  // Clear of the ticks on a square.
+  const gap = square ? 9 : 3;
+  const text: Label[] = [
+    labelOut([w / 2, h], [0, 1], labels[0], { gap }),
+    labelOut([w, h / 2], [1, 0], labels[1], { gap }),
+  ];
+  if (inside) text.push({ at: [w / 2, h / 2], text: inside, box: labelBox(inside) });
+
+  return (
+    <FittedSvg extent={pts} labels={text} title={square ? "Square" : "Rectangle"}>
+      <Outline pts={pts} />
+      {square && pts.map((p, i) => <Tick key={i} a={p} b={pts[(i + 1) % 4]} />)}
+    </FittedSvg>
+  );
+}
+
+export function BaseHeightFigure({ shape, base, height, apex, labels, flip, compact }: Figure<"base-height">) {
+  const parallelogram = shape === "parallelogram";
+  const [maxW, maxH] = compact ? [110, 62] : [150, 90];
+  const ratio = clamp(height / base, 0.35, 0.8);
+  // A parallelogram's top side overhangs the base by `apex` bases.
+  const span = parallelogram ? 1 + apex : 1;
+  const b = Math.min(maxW / span, maxH / ratio);
+  const h = b * ratio;
+  const top = apex * b;
+  const place = ([x, y]: Pt): Pt => [flip ? b * span - x : x, y];
+  const pts = (parallelogram ? [[0, h], [b, h], [top + b, 0], [top, 0]] : [[0, h], [b, h], [top, 0]]).map((p) =>
+    place(p as Pt),
+  );
+  // The height goes on the roomier side of the line dropped from the top
+  // vertex, or outside when that line is the triangle's own side.
+  const side = (parallelogram || top < b - top ? 1 : -1) * (flip ? -1 : 1);
+  const onSide = !parallelogram && (apex === 0 || apex === 1);
+  const [peak, foot] = [place([top, 0]), place([top, h])];
+  // A triangle narrows toward its apex, so the height label goes low enough
+  // for its top edge to clear the slanted side, but stays above the
+  // right-angle mark.
+  const box = labelBox(labels[1]);
+  const clearAt = ((2 * box[0] + 7) * h) / Math.max(top, b - top) + box[1];
+  const heightAt: Pt = [peak[0], parallelogram ? h / 2 : Math.min(h - 10 - box[1], Math.max(h / 2, clearAt))];
+  const heightLabel = onSide
+    ? labelOut(heightAt, [-side, 0], labels[1])
+    : labelOut(add(heightAt, [side * 2, 0]), [side, 0], labels[1]);
+
+  return (
+    <FittedSvg
+      extent={pts}
+      labels={[labelOut(place([b / 2, h]), [0, 1], labels[0]), heightLabel]}
+      title={parallelogram ? "Parallelogram" : "Triangle"}
+    >
+      <Outline pts={pts} />
+      {!onSide && <Dashed from={peak} to={foot} />}
+      <RightAngleMark at={foot} u={[side, 0]} w={[0, -1]} />
+    </FittedSvg>
+  );
+}
+
+export function PrismFigure({ length, width, height, labels, compact }: Figure<"prism">) {
+  // Eased proportions (a power below 1), so a 12 × 2 × 2 box is no sliver;
+  // the depth recedes up and to the right.
+  const [l, w, h] = [length, width, height].map((v) => v ** 0.6);
+  const [dx, dy] = [0.49, -0.34];
+  const [maxW, maxH] = compact ? [110, 70] : [150, 95];
+  const k = Math.min(maxW / (l + w * dx), maxH / (h - w * dy));
+  const depth: Pt = [w * dx * k, w * dy * k];
+  const [L, H] = [l * k, h * k];
+  const front: Pt[] = [
+    [0, 0],
+    [L, 0],
+    [L, -H],
+    [0, -H],
+  ];
+  const back = front.map((p) => add(p, depth));
+  const visible: Pt[][] = [front, [front[3], front[2], back[2], back[3]], [front[1], back[1], back[2], front[2]]];
+  const along = unit(depth);
+
+  return (
+    <FittedSvg
+      extent={[...front, ...back]}
+      labels={[
+        labelOut([L / 2, 0], [0, 1], labels[0]),
+        labelOut(add(front[1], mul(depth, 0.5)), [-along[1], along[0]], labels[1]),
+        labelOut([0, -H / 2], [-1, 0], labels[2]),
+      ]}
+      title="Rectangular prism"
+    >
+      {visible.map((face, i) => (
+        <polygon
           key={i}
-          x={r2(at[0])}
-          y={r2(at[1])}
-          textAnchor="middle"
-          dominantBaseline="central"
-          fontSize={LABEL_FONT}
-          fontWeight={bold ? 700 : 500}
-          fill="currentColor"
-        >
-          {text}
-        </text>
+          points={points(face)}
+          fill={i === 0 ? "white" : FACE}
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinejoin="round"
+        />
       ))}
-    </svg>
+      {/* The three hidden edges, seen through the faces. */}
+      {[back[1], back[3], front[0]].map((p, i) => (
+        <Dashed key={i} from={back[0]} to={p} />
+      ))}
+    </FittedSvg>
+  );
+}
+
+export function CircleFigure({ segment, label, compact }: Figure<"circle">) {
+  const r = compact ? 30 : 42;
+  const start: Pt = segment === "d" ? [-r, 0] : [0, 0];
+  return (
+    <FittedSvg
+      extent={[
+        [-r, -r],
+        [r, r],
+      ]}
+      labels={[labelOut([r, 0], [1, 0], label.slice(1), { variable: label[0] })]}
+      title="Circle"
+    >
+      <circle cx="0" cy="0" r={r} fill="white" stroke="currentColor" strokeWidth="1.8" />
+      <line x1={start[0]} y1="0" x2={r} y2="0" stroke="currentColor" strokeWidth="1.6" />
+      <circle cx="0" cy="0" r="2.4" fill="currentColor" />
+    </FittedSvg>
   );
 }

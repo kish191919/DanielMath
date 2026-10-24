@@ -25,7 +25,45 @@ export type FigureSpec =
       ticks?: [number, number, number];
       /** Mirror left to right. */
       flip?: boolean;
-    };
+    }
+  // Shapes for area, perimeter and volume, in their true proportions eased
+  // toward a square, so a long thin one still has room for its labels.
+  | {
+      type: "rectangle";
+      /** The horizontal side. */
+      length: number;
+      width: number;
+      /** Bottom side, then right side. */
+      labels: [string, string];
+      /** Tick marks on all four sides. */
+      square?: boolean;
+      /** Written in the middle, e.g. "Area = 24 cm²". */
+      inside?: string;
+    }
+  // A triangle's apex or a parallelogram's top-left corner sits `apex` × base
+  // along from the left end, with the height dashed straight down from it
+  // (drawn as the side itself when it lands on an end).
+  | {
+      type: "base-height";
+      shape: "triangle" | "parallelogram";
+      base: number;
+      height: number;
+      apex: number;
+      /** Base, then height. */
+      labels: [string, string];
+      /** Mirror left to right. */
+      flip?: boolean;
+    }
+  | {
+      type: "prism";
+      length: number;
+      width: number;
+      height: number;
+      /** Length, width, height. */
+      labels: [string, string, string];
+    }
+  // A radius or a diameter drawn in, labeled at its end ("r = 6 cm").
+  | { type: "circle"; segment: "r" | "d"; label: string };
 
 // Everything a printed problem shows. Text fields may contain `$...$` LaTeX
 // spans (rendered by MathText — same convention as src/lib/ai/math-notation.ts).
@@ -194,7 +232,8 @@ export type WorksheetDef = {
    * print on a single Letter page with the example box shown.
    */
   counts: readonly number[];
-  columns: 2 | 3 | 4;
+  /** 1 for prompts too long for one line in a half-width cell. */
+  columns: 1 | 2 | 4;
   /** Levels offered: all three, or just level 1 for a narrow skill (no level picker). */
   levels: readonly Level[];
   /** A level without its own example uses the nearest lower level's (see exampleFor). */

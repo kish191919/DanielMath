@@ -1,6 +1,6 @@
 import { pick, randInt, type Rng } from "../rng";
 import { decimalToString, formatNumber, latexNumber } from "../math";
-import type { Generator, ShapeTask, WorksheetProblem } from "../types";
+import type { FigureSpec, Generator, ShapeTask, WorksheetProblem } from "../types";
 
 type UnitKind = "length" | "volume" | "weight";
 
@@ -108,6 +108,9 @@ export const convertUnits: Generator<{
 
 const CIRCLE_PARTS = { r: "radius", d: "diameter", C: "circumference", A: "area" } as const;
 
+// Every figure here is built from the numbers alone — no extra rng draws — so
+// the problems (and the answers behind a printed QR code) are the same as when
+// these sheets were written out in words.
 export const circles: Generator<{ finds: readonly ("r" | "d" | "C" | "A")[]; maxRadius: number }> = (
   rng,
   { finds, maxRadius },
@@ -128,16 +131,16 @@ export const circles: Generator<{ finds: readonly ("r" | "d" | "C" | "A")[]; max
 
   return {
     body: {
-      kind: "text",
-      text: `$${given} = ${value}\\text{ ${unit}}$. Find the ${CIRCLE_PARTS[find]}.`,
-      blank: "line",
+      kind: "figure",
+      figure: { type: "circle", segment: given, label: `${given} = ${value} ${unit}` },
+      prompt: `Find the ${CIRCLE_PARTS[find]}.`,
     },
     answer: `${result} ${unit}${find === "A" ? "²" : ""}`,
     meta: { type: "circle", given, value, find, result },
   };
 };
 
-/** Area, perimeter and volume from the measurements, written out in words (no figure). */
+/** Area, perimeter and volume of a shape drawn with its measurements. */
 export const shapeMeasures: Generator<{ tasks: readonly ShapeTask[]; max: number }> = (rng, { tasks, max }) => {
   const task = pick(rng, tasks);
   const unit = pick(rng, ["cm", "m", "in", "ft"] as const);
@@ -145,7 +148,8 @@ export const shapeMeasures: Generator<{ tasks: readonly ShapeTask[]; max: number
   // Length is the longer side.
   const l = randInt(rng, 3, max);
   const w = randInt(rng, 2, l - 1);
-  let text: string;
+  let figure: FigureSpec;
+  let prompt: string;
   let given: number[];
   let result: number;
   let power: 1 | 2 | 3 = 2;
@@ -153,43 +157,63 @@ export const shapeMeasures: Generator<{ tasks: readonly ShapeTask[]; max: number
   switch (task) {
     case "rect-area":
     case "rect-perimeter":
-      text = `A rectangle is ${u(l)} long and ${u(w)} wide. Find its ${task === "rect-area" ? "area" : "perimeter"}.`;
+      figure = { type: "rectangle", length: l, width: w, labels: [u(l), u(w)] };
+      prompt = task === "rect-area" ? "Find the area." : "Find the perimeter.";
       given = [l, w];
       result = task === "rect-area" ? l * w : 2 * (l + w);
       if (task === "rect-perimeter") power = 1;
       break;
     case "square-area":
     case "square-perimeter":
-      text = `A square has sides of ${u(l)}. Find its ${task === "square-area" ? "area" : "perimeter"}.`;
+      figure = { type: "rectangle", length: l, width: l, labels: [u(l), u(l)], square: true };
+      prompt = task === "square-area" ? "Find the area." : "Find the perimeter.";
       given = [l];
       result = task === "square-area" ? l * l : 4 * l;
       if (task === "square-perimeter") power = 1;
       break;
     case "missing-side-area":
-      text = `A rectangle has an area of ${u(l * w)}² and a length of ${u(l)}. Find its width.`;
-      given = [l * w, l];
+    case "missing-side-perimeter": {
+      const area = task === "missing-side-area";
+      figure = {
+        type: "rectangle",
+        length: l,
+        width: w,
+        labels: [u(l), "?"],
+        inside: area ? `Area = ${u(l * w)}²` : `Perimeter = ${u(2 * (l + w))}`,
+      };
+      prompt = "Find the missing side.";
+      given = [area ? l * w : 2 * (l + w), l];
       result = w;
       power = 1;
       break;
-    case "missing-side-perimeter":
-      text = `A rectangle has a perimeter of ${u(2 * (l + w))} and a length of ${u(l)}. Find its width.`;
-      given = [2 * (l + w), l];
-      result = w;
-      power = 1;
-      break;
+    }
     case "triangle-area":
     case "parallelogram-area": {
       // An even base keeps half of base × height whole.
       const b = task === "triangle-area" && l % 2 ? l + 1 : l;
       const h = randInt(rng, 2, max);
-      text = `A ${task === "triangle-area" ? "triangle" : "parallelogram"} has a base of ${u(b)} and a height of ${u(h)}. Find its area.`;
+      // The sum picks the look: a third of the triangles are right triangles
+      // (apex over one end), and either way the shape may lean left or right.
+      const look = b + h;
+      const triangle = task === "triangle-area";
+      figure = {
+        type: "base-height",
+        shape: triangle ? "triangle" : "parallelogram",
+        base: b,
+        height: h,
+        apex: triangle && look % 3 === 0 ? 0 : 0.3,
+        labels: [u(b), u(h)],
+        flip: look % 2 === 1,
+      };
+      prompt = "Find the area.";
       given = [b, h];
-      result = task === "triangle-area" ? (b * h) / 2 : b * h;
+      result = triangle ? (b * h) / 2 : b * h;
       break;
     }
     case "prism-volume": {
       const h = randInt(rng, 2, max);
-      text = `A rectangular prism is ${u(l)} long, ${u(w)} wide, and ${u(h)} tall. Find its volume.`;
+      figure = { type: "prism", length: l, width: w, height: h, labels: [u(l), u(w), u(h)] };
+      prompt = "Find the volume.";
       given = [l, w, h];
       result = l * w * h;
       power = 3;
@@ -198,7 +222,7 @@ export const shapeMeasures: Generator<{ tasks: readonly ShapeTask[]; max: number
   }
 
   return {
-    body: { kind: "text", text, blank: "line" },
+    body: { kind: "figure", figure, prompt },
     answer: `${u(result)}${power === 2 ? "²" : power === 3 ? "³" : ""}`,
     meta: { type: "measure", task, given, result, unit },
   };

@@ -11,16 +11,16 @@ import { WorksheetExampleBox } from "./worksheet-example";
 // Static class strings (Tailwind can't see dynamically built ones). Phones get
 // fewer columns on screen; print always uses the worksheet's own layout.
 const PROBLEM_GRID: Record<WorksheetDef["columns"], string> = {
+  1: "grid-cols-1",
   2: "grid-cols-1 sm:grid-cols-2 print:grid-cols-2",
-  3: "grid-cols-2 sm:grid-cols-3 print:grid-cols-3",
   4: "grid-cols-2 sm:grid-cols-4 print:grid-cols-4",
 };
 
-// Answer-key columns are picked so every row is full (counts are multiples of
-// the sheet's columns, and 4 when that divides evenly).
-const KEY_GRID: Record<2 | 3 | 4, string> = {
+// The answer key follows the sheet's columns, so every row is full (counts
+// are multiples of the sheet's columns).
+const KEY_GRID: Record<WorksheetDef["columns"], string> = {
+  1: "grid-cols-1",
   2: "grid-cols-2",
-  3: "grid-cols-3",
   4: "grid-cols-2 sm:grid-cols-4 print:grid-cols-4",
 };
 
@@ -104,7 +104,6 @@ export async function WorksheetSheet({
   const levelLabel = def.levels.length > 1 ? `${LEVEL_STARS[level]} ${LEVEL_LABELS[level].en}` : null;
   const meta = [`Skill ${code} · ${unitTitle}`, levelLabel, def.quarter && `Quarter ${def.quarter.slice(1)}`].filter(Boolean);
   const pages = showKey ? 2 : 1;
-  const keyColumns = def.columns === 2 ? 2 : problems.length % 4 === 0 ? 4 : 3;
 
   return (
     // A math expression never breaks mid-way (KaTeX allows a break after any
@@ -181,7 +180,7 @@ export async function WorksheetSheet({
               {[`${code} ${def.title.en}`, levelLabel].filter(Boolean).join(" · ")}
             </p>
           </header>
-          <ol className={cn("mt-4 grid border-l border-t border-navy-200 text-sm text-navy-800", KEY_GRID[keyColumns])}>
+          <ol className={cn("mt-4 grid border-l border-t border-navy-200 text-sm text-navy-800", KEY_GRID[def.columns])}>
             {problems.map((p, i) => (
               <li key={i} className="flex min-w-0 items-start gap-2 border-b border-r border-navy-200 px-3 py-2">
                 <NumberBadge n={i + 1} className="mt-0.5" />
